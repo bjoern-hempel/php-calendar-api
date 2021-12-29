@@ -15,6 +15,11 @@
         "symfony/yaml": "6.0.*"
     },
     "require-dev": {
+        "phpstan/phpstan": "^1.2",
+        "phpunit/phpunit": "^9.5",
+        "symfony/browser-kit": "6.0.*",
+        "symfony/css-selector": "6.0.*",
+        "symfony/phpunit-bridge": "^6.0"
     },
     "config": {
         "allow-plugins": {
@@ -56,6 +61,14 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "phpunit-api": "phpunit tests/Api --testdox",
+        "phpunit-unit": "phpunit tests/Unit --testdox",
+        "sca": "phpstan analyse --level max --memory-limit 256M src tests",
+        "test": [
+            "@phpunit-unit",
+            "@phpunit-api",
+            "@sca"
         ]
     },
     "conflict": {
