@@ -83,12 +83,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Event::class, orphanRemoval: true)]
     private Collection $events;
 
+    /** @var Collection<int, Image> $images */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Image::class, orphanRemoval: true)]
+    private Collection $images;
+
+    /** @var Collection<int, Calendar> $calendars */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Calendar::class, orphanRemoval: true)]
+    private Collection $calendars;
+
+    /** @var Collection<int, CalendarImage> $calendarImages */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: CalendarImage::class, orphanRemoval: true)]
+    private Collection $calendarImages;
+
     /**
      * User constructor
      */
     #[Pure] public function __construct()
     {
         $this->events = new ArrayCollection();
+        $this->images = new ArrayCollection();
+        $this->calendars = new ArrayCollection();
+        $this->calendarImages = new ArrayCollection();
     }
 
     /**
@@ -294,7 +309,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Remove a related event.
+     * Removes a related event.
      * 
      * @param Event $event
      * @return $this
@@ -305,6 +320,138 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($event->getUser() === $this) {
                 $event->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Gets all related images.
+     *
+     * @return Collection<int, Image>
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    /**
+     * Adds a related image.
+     *
+     * @param Image $image
+     * @return $this
+     */
+    public function addImage(Image $image): self
+    {
+        if (!$this->images->contains($image)) {
+            $this->images[] = $image;
+            $image->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Removes a related image.
+     *
+     * @param Image $image
+     * @return $this
+     */
+    public function removeImage(Image $image): self
+    {
+        if ($this->images->removeElement($image)) {
+            // set the owning side to null (unless already changed)
+            if ($image->getUser() === $this) {
+                $image->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Gets all related calendars.
+     *
+     * @return Collection<int, Calendar>
+     */
+    public function getCalendars(): Collection
+    {
+        return $this->calendars;
+    }
+
+    /**
+     * Adds a related calendar.
+     *
+     * @param Calendar $calendar
+     * @return $this
+     */
+    public function addCalendar(Calendar $calendar): self
+    {
+        if (!$this->calendars->contains($calendar)) {
+            $this->calendars[] = $calendar;
+            $calendar->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Removes a related calendar.
+     *
+     * @param Calendar $calendar
+     * @return $this
+     */
+    public function removeCalendar(Calendar $calendar): self
+    {
+        if ($this->calendars->removeElement($calendar)) {
+            // set the owning side to null (unless already changed)
+            if ($calendar->getUser() === $this) {
+                $calendar->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Gets all related calendar images.
+     *
+     * @return Collection<int, CalendarImage>
+     */
+    public function getCalendarImages(): Collection
+    {
+        return $this->calendarImages;
+    }
+
+    /**
+     * Adds a related calendar image.
+     *
+     * @param CalendarImage $calendarImage
+     * @return $this
+     */
+    public function addCalendarImage(CalendarImage $calendarImage): self
+    {
+        if (!$this->calendarImages->contains($calendarImage)) {
+            $this->calendarImages[] = $calendarImage;
+            $calendarImage->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Removes a related calendar image.
+     *
+     * @param CalendarImage $calendarImage
+     * @return $this
+     */
+    public function removeCalendarImage(CalendarImage $calendarImage): self
+    {
+        if ($this->calendarImages->removeElement($calendarImage)) {
+            // set the owning side to null (unless already changed)
+            if ($calendarImage->getUser() === $this) {
+                $calendarImage->setUser(null);
             }
         }
 
