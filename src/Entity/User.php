@@ -31,13 +31,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
-use ReflectionException;
-use ReflectionProperty;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Entity class user
+ * Entity class User
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2021-12-30)

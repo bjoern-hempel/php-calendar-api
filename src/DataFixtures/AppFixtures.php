@@ -27,6 +27,8 @@
 namespace App\DataFixtures;
 
 use App\Entity\Event;
+use App\Entity\Holiday;
+use App\Entity\HolidayGroup;
 use App\Entity\User;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -56,6 +58,7 @@ class AppFixtures extends Fixture
      */
     public function load(ObjectManager $manager): void
     {
+        /* Add user and events */
         for ($i = 1; $i <= 10; $i++) {
             $user = new User();
             $user->setEmail(sprintf('user%d@domain.tld', $i));
@@ -73,6 +76,34 @@ class AppFixtures extends Fixture
                 $event->setColor('255,255,255,100');
                 $manager->persist($event);
             }
+        }
+
+        /* Add public holiday group */
+        $holidayGroup = new HolidayGroup();
+        $holidayGroup->setName('Saxony');
+        $manager->persist($holidayGroup);
+
+        $holidayDatas = [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostern', '2022-04-18T12:00:00Z'],
+            ['1. Mai', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingsten ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['Buß- und Bettag', '2022-11-16T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ];
+
+        foreach ($holidayDatas as $holidayData) {
+            $holiday = new Holiday();
+            $holiday->setHolidayGroup($holidayGroup);
+            $holiday->setName($holidayData[0]);
+            $holiday->setDate(new DateTime($holidayData[1]));
+            $holiday->setColor('255,255,255,100');
+            $manager->persist($holiday);
         }
 
         $manager->flush();
