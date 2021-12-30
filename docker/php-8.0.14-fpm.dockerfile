@@ -42,7 +42,7 @@ COPY php/conf.d/messenger-worker.conf  /etc/supervisor/conf.d/messenger-worker.c
 
 # Install php extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-RUN docker-php-ext-install mysqli pdo pdo_mysql zip intl opcache soap
+RUN docker-php-ext-install mysqli pdo pdo_mysql zip intl opcache soap gd
 
 # Install npm
 RUN npm install -g npm
