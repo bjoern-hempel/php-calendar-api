@@ -31,6 +31,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use ReflectionException;
+use ReflectionProperty;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Entity class user
@@ -40,23 +44,31 @@ use JetBrains\PhpStorm\Pure;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+#[ORM\HasLifecycleCallbacks]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    use TimestampsTrait;
+
+    const ROLE_USER = 'ROLE_USER';
+
+    const ROLE_ADMIN = 'ROLE_ADMIN';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private int $id;
 
-    #[ORM\Column(type: 'string', length: 40)]
-    private string $id_hash;
+    #[ORM\Column(name: 'id_hash', type: 'string', length: 40, unique: true, nullable: false)]
+    /** @phpstan-ignore-next-line → idHash must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
+    private ?string $idHash = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
     private string $email;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
     private string $username;
 
-    #[ORM\Column(type: 'string', length: 40)]
+    #[ORM\Column(type: 'string', length: 255)]
     private string $password;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -64,6 +76,10 @@ class User
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $lastname;
+
+    /** @var string[] $roles */
+    #[ORM\Column(type: 'json', nullable: false)]
+    private array $roles = [];
 
     /** @var Collection<int, Event> $events */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Event::class, orphanRemoval: true)]
@@ -94,18 +110,18 @@ class User
      */
     public function getIdHash(): ?string
     {
-        return $this->id_hash;
+        return $this->idHash;
     }
 
     /**
      * Sets the hash id of this user.
      *
-     * @param string $id_hash
+     * @param string $idHash
      * @return $this
      */
-    public function setIdHash(string $id_hash): self
+    public function setIdHash(string $idHash): self
     {
-        $this->id_hash = $id_hash;
+        $this->idHash = $idHash;
 
         return $this;
     }
@@ -226,6 +242,34 @@ class User
     }
 
     /**
+     * Gets the roles of this user.
+     *
+     * @return string[]
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+
+        // guarantee every user at least has ROLE_USER
+        $roles[] = self::ROLE_USER;
+
+        return array_unique($roles);
+    }
+
+    /**
+     * Gets the roles of this user.
+     *
+     * @param string[] $roles
+     * @return $this
+     */
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
      * Gets all related events.
      *
      * @return Collection<int, Event>
@@ -267,5 +311,42 @@ class User
         }
 
         return $this;
+    }
+
+    /**
+     * Sets automatically the hash id of this user.
+     *
+     * @return $this
+     */
+    #[ORM\PrePersist]
+    public function setIdHashAutomatically(): self
+    {
+        if ($this->idHash === null) {
+            $this->setIdHash(sha1(sprintf('salt_%d_%d', rand(0, 999999999), rand(0, 999999999))));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Erase credentials.
+     *
+     * @see UserInterface
+     * @return void
+     */
+    public function eraseCredentials(): void
+    {
+        /* Erase sensitive data on the user */
+        $this->setPassword('');
+    }
+
+    /**
+     * Gets the user identifier.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier():string
+    {
+        return $this->email;
     }
 }

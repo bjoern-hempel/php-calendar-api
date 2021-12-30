@@ -38,8 +38,11 @@ use Doctrine\ORM\Mapping as ORM;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: EventRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Event
 {
+    use TimestampsTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

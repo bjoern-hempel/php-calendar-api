@@ -16,11 +16,14 @@
         "symfony/dotenv": "6.0.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.0.*",
+        "symfony/password-hasher": "6.0.*",
         "symfony/proxy-manager-bridge": "6.0.*",
         "symfony/runtime": "6.0.*",
+        "symfony/security-bundle": "6.0.*",
         "symfony/yaml": "6.0.*"
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.4",
         "jetbrains/phpstorm-attributes": "^1.0",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan": "^1.2",
