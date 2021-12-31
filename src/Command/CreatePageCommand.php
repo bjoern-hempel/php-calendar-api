@@ -26,20 +26,11 @@
 
 namespace App\Command;
 
-use App\Entity\Calendar;
-use App\Entity\CalendarImage;
-use App\Entity\Image;
-use App\Entity\User;
-use App\Repository\CalendarImageRepository;
-use App\Repository\CalendarRepository;
-use App\Repository\UserRepository;
 use App\Service\CalendarBuilderService;
+use App\Service\CalendarLoaderService;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\NonUniqueResultException;
 use Exception;
-use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -59,114 +50,26 @@ class CreatePageCommand extends Command
 
     protected CalendarBuilderService $calendarBuilderService;
 
+    protected CalendarLoaderService $calendarLoaderService;
+
     protected EntityManagerInterface $manager;
 
     /**
      * CreatePageCommand constructor
      *
      * @param CalendarBuilderService $calendarBuilderService
+     * @param CalendarLoaderService $calendarLoaderService
      * @param EntityManagerInterface $manager
      */
-    public function __construct(CalendarBuilderService $calendarBuilderService, EntityManagerInterface $manager)
+    public function __construct(CalendarBuilderService $calendarBuilderService, CalendarLoaderService $calendarLoaderService, EntityManagerInterface $manager)
     {
         $this->calendarBuilderService = $calendarBuilderService;
+
+        $this->calendarLoaderService = $calendarLoaderService;
 
         $this->manager = $manager;
 
         parent::__construct();
-    }
-
-    /**
-     * Returns the DocumentRepository.
-     *
-     * @return UserRepository
-     * @throws Exception
-     */
-    protected function getUserRepository(): UserRepository
-    {
-        $repository = $this->manager->getRepository(User::class);
-
-        if (!$repository instanceof UserRepository) {
-            throw new Exception('Error while getting UserRepository.');
-        }
-
-        return $repository;
-    }
-
-    /**
-     * Returns the CalendarRepository.
-     *
-     * @return CalendarRepository
-     * @throws Exception
-     */
-    protected function getCalendarRepository(): CalendarRepository
-    {
-        $repository = $this->manager->getRepository(Calendar::class);
-
-        if (!$repository instanceof CalendarRepository) {
-            throw new Exception('Error while getting CalendarRepository.');
-        }
-
-        return $repository;
-    }
-
-    /**
-     * Returns the CalendarImageRepository.
-     *
-     * @return CalendarImageRepository
-     * @throws Exception
-     */
-    protected function getCalendarImageRepository(): CalendarImageRepository
-    {
-        $repository = $this->manager->getRepository(CalendarImage::class);
-
-        if (!$repository instanceof CalendarImageRepository) {
-            throw new Exception('Error while getting CalendarImageRepository.');
-        }
-
-        return $repository;
-    }
-
-    /**
-     * Returns user and calendar image.
-     *
-     * @param string $email
-     * @param string $name
-     * @param int $year
-     * @param int $month
-     * @return array{user: User, calendar: Calendar, calendar-image: CalendarImage, image: Image}
-     * @throws NonUniqueResultException
-     * @throws Exception
-     */
-    #[ArrayShape(['user' => 'User', 'calendar' => 'Calendar', 'calendar-image' => 'CalendarImage', 'image' => 'Image'])]
-    protected function getUserAndCalendarImage(string $email, string $name, int $year, int $month): array
-    {
-        $user = $this->getUserRepository()->findOneByEmail($email);
-        if ($user === null) {
-            throw new Exception(sprintf('Unable to find user with email "%s".', $email));
-        }
-
-        $calendar = $this->getCalendarRepository()->findOneByName($user, $name);
-        if ($calendar === null) {
-            throw new Exception(sprintf('Unable to find calendar with name "%s".', $name));
-        }
-
-        $calendarImage = $this->getCalendarImageRepository()->findOneByYearAndMonth($user, $calendar, $year, $month);
-        if ($calendarImage === null) {
-            throw new Exception(sprintf('Unable to find calendar image with year "%d" and month "%d".', $year, $month));
-        }
-
-        $image = $calendarImage->getImage();
-        if ($image === null) {
-            throw new Exception('Unable to find image.');
-        }
-
-        return [
-            'user' => $user,
-            'calendar' => $calendar,
-            'calendar-image' => $calendarImage,
-            'image' => $image,
-        ];
     }
 
     /**
@@ -211,17 +114,14 @@ EOT
         ]);
 
         $email = 'user1@domain.tld';
-        $name = 'Name 1';
+        $name = 'Calendar 1';
         $year = intval($input->getOption('year'));
         $month = intval($input->getOption('month'));
 
-        $data = $this->getUserAndCalendarImage($email, $name, $year, $month);
+        $this->calendarLoaderService->loadCalendarImage($email, $name, $year, $month);
 
-        /** @var CalendarImage $calendarImage */
-        $calendarImage = $data['calendar-image'];
-
-        /** @var Image $image */
-        $image = $data['image'];
+        $image = $this->calendarLoaderService->getImage();
+        $calendarImage = $this->calendarLoaderService->getCalendarImage();
 
         // retrieve the argument value using getArgument()
         $output->writeln(sprintf('Year:  %d',$year));
