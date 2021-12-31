@@ -27,6 +27,7 @@
 namespace App\Entity;
 
 use App\Repository\CalendarImageRepository;
+use App\Utils\ArrayToObject;
 use Doctrine\ORM\Mapping as ORM;
 use phpDocumentor\Reflection\Types\Integer;
 
@@ -80,6 +81,12 @@ class CalendarImage
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $valign;
+
+    /** @var array<string|int|bool> $config */
+    #[ORM\Column(type: 'json')]
+    private array $config = [];
+
+    private ArrayToObject $configObject;
 
     /**
      * Gets the id of this calendar image.
@@ -294,6 +301,45 @@ class CalendarImage
     public function setValign(?int $valign): self
     {
         $this->valign = $valign;
+
+        return $this;
+    }
+
+    /**
+     * Gets the config as array.
+     *
+     * @return array<string|int|bool>
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
+    /**
+     * Gets the config as object.
+     *
+     * @return ArrayToObject
+     */
+    public function getConfigObject(): ArrayToObject
+    {
+        if (!isset($this->configObject)) {
+            $this->configObject = new ArrayToObject($this->config);
+        }
+
+        return $this->configObject;
+    }
+
+    /**
+     * Sets the config.
+     *
+     * @param array<string|int|bool> $config
+     * @return $this
+     */
+    public function setConfig(array $config): self
+    {
+        $this->config = $config;
+
+        $this->configObject = new ArrayToObject($config);
 
         return $this;
     }

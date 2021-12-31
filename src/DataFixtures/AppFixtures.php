@@ -262,6 +262,9 @@ class AppFixtures extends Fixture
         /* Create calendar style */
         $calendarStyle = new CalendarStyle();
         $calendarStyle->setName('default');
+        $calendarStyle->setConfig([
+            'name' => 'default',
+        ]);
         $manager->persist($calendarStyle);
 
         /* Add user and events */
@@ -297,6 +300,13 @@ class AppFixtures extends Fixture
             $calendar->setPrintWeekNumber(true);
             $calendar->setPrintQrCodeMonth(true);
             $calendar->setPrintQrCodeTitle(true);
+            $calendar->setConfig([
+                'background-color' => '255,255,255,100',
+                'print-calendar-week' => true,
+                'print-week-number' => true,
+                'print-qr-code-month' => true,
+                'print-qr-code-title' => true,
+            ]);
             $manager->persist($calendar);
 
             foreach ($this->calendars as $calendarData) {
@@ -319,6 +329,9 @@ class AppFixtures extends Fixture
                 $calendarImage->setTitle(strval($calendarData['title']));
                 $calendarImage->setPosition(strval($calendarData['position']));
                 $calendarImage->setValign(intval($calendarData['valign']));
+                $calendarImage->setConfig([
+                    'valign' => intval($calendarData['valign']),
+                ]);
                 $manager->persist($calendarImage);
             }
         }

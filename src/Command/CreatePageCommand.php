@@ -136,7 +136,7 @@ EOT
             $calendarImage->getPosition() ?? '',
             $year,
             $month,
-            $calendarImage->getValign() ?? CalendarBuilderService::VALIGN_TOP
+            $calendarImage->getConfigObject()->getValign() ?? CalendarBuilderService::VALIGN_TOP
         );
 
         return Command::SUCCESS;

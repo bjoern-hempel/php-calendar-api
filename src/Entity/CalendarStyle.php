@@ -50,6 +50,10 @@ class CalendarStyle
     #[ORM\Column(type: 'string', length: 255)]
     private string $name;
 
+    /** @var array<string|int|bool> $config */
+    #[ORM\Column(type: 'json')]
+    private array $config = [];
+
     /**
      * Gets the id of this calendar style.
      *
@@ -79,6 +83,29 @@ class CalendarStyle
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Gets the config.
+     *
+     * @return array<string|int|bool>
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
+    /**
+     * Sets the config.
+     *
+     * @param array<string|int|bool> $config
+     * @return $this
+     */
+    public function setConfig(array $config): self
+    {
+        $this->config = $config;
 
         return $this;
     }

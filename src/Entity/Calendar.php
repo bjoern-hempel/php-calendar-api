@@ -91,6 +91,10 @@ class Calendar
     #[ORM\OneToMany(mappedBy: 'calendar', targetEntity: CalendarImage::class, orphanRemoval: true)]
     private Collection $calendarImages;
 
+    /** @var array<string|int|bool> $config */
+    #[ORM\Column(type: 'json')]
+    private $config = [];
+
     /**
      * Calendar constructor.
      */
@@ -403,6 +407,29 @@ class Calendar
                 $calendarImage->setCalendar(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Gets the config.
+     *
+     * @return array<string|int|bool>
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
+    /**
+     * Sets the config.
+     *
+     * @param array<string|int|bool> $config
+     * @return $this
+     */
+    public function setConfig(array $config): self
+    {
+        $this->config = $config;
 
         return $this;
     }
