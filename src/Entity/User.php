@@ -98,7 +98,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * User constructor
      */
-    #[Pure] public function __construct()
+    #[Pure]
+    public function __construct()
     {
         $this->events = new ArrayCollection();
         $this->images = new ArrayCollection();

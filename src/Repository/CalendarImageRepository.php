@@ -26,9 +26,13 @@
 
 namespace App\Repository;
 
+use App\Entity\Calendar;
 use App\Entity\CalendarImage;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 
 /**
  * Class CalendarImageRepository
@@ -53,5 +57,41 @@ class CalendarImageRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, CalendarImage::class);
+    }
+
+    /**
+     * Find one by name field.
+     *
+     * @param User $user
+     * @param Calendar $calendar
+     * @param int $year
+     * @param int $month
+     * @return CalendarImage|null
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function findOneByYearAndMonth(User $user, Calendar $calendar, int $year, int $month): ?CalendarImage
+    {
+        $result = $this->createQueryBuilder('ci')
+            ->where('ci.user = :user')
+            ->andWhere('ci.calendar = :calendar')
+            ->andWhere('ci.year = :year')
+            ->andWhere('ci.month = :month')
+            ->setParameter('user', $user)
+            ->setParameter('calendar', $calendar)
+            ->setParameter('year', $year)
+            ->setParameter('month', $month)
+            ->getQuery()
+            ->getOneOrNullResult();
+        
+        if ($result instanceof CalendarImage) {
+            return $result;
+        }
+        
+        if ($result !== null) {
+            throw new Exception(sprintf('Unsupported type (%s:%d).', __FILE__, __LINE__));
+        }
+        
+        return null;
     }
 }

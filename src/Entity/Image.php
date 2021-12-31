@@ -74,7 +74,8 @@ class Image
     /**
      * Image constructor.
      */
-    #[Pure] public function __construct()
+    #[Pure]
+    public function __construct()
     {
         $this->calendarImages = new ArrayCollection();
     }
@@ -120,6 +121,36 @@ class Image
     public function getPath(): string
     {
         return $this->path;
+    }
+
+    /**
+     * Gets the relative source path of this image.
+     *
+     * @param string|null $source
+     * @return string
+     */
+    public function getSourcePath(?string $source = null): string
+    {
+        if ($source === null) {
+            return $this->getPath();
+        }
+
+        return str_replace('/', sprintf('/%s/', $source), $this->getPath());
+    }
+
+    /**
+     * Gets the relative target path of this image.
+     *
+     * @param string|null $target
+     * @return string
+     */
+    public function getTargetPath(?string $target = 'calendar'): string
+    {
+        if ($target === null) {
+            return $this->getPath();
+        }
+
+        return str_replace('/', sprintf('/%s/', $target), $this->getPath());
     }
 
     /**

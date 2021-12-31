@@ -94,7 +94,8 @@ class Calendar
     /**
      * Calendar constructor.
      */
-    #[Pure] public function __construct()
+    #[Pure]
+    public function __construct()
     {
         $this->calendarImages = new ArrayCollection();
     }

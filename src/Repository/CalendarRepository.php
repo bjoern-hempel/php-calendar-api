@@ -27,8 +27,11 @@
 namespace App\Repository;
 
 use App\Entity\Calendar;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 
 /**
  * Class CalendarRepository
@@ -53,5 +56,35 @@ class CalendarRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Calendar::class);
+    }
+
+    /**
+     * Find one by name field.
+     *
+     * @param User $user
+     * @param string $name
+     * @return Calendar|null
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function findOneByName(User $user, string $name): ?Calendar
+    {
+        $result = $this->createQueryBuilder('c')
+            ->where('c.user = :user')
+            ->andWhere('c.name = :name')
+            ->setParameter('user', $user)
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($result instanceof Calendar) {
+            return $result;
+        }
+
+        if ($result !== null) {
+            throw new Exception(sprintf('Unsupported type (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return null;
     }
 }

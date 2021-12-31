@@ -30,7 +30,6 @@ use DateTime;
 use Exception;
 use GdImage;
 use JetBrains\PhpStorm\ArrayShape;
-use JetBrains\PhpStorm\Pure;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -216,7 +215,8 @@ class CalendarBuilderService
      * @return array{width: int, height: int}
      * @throws Exception
      */
-    #[ArrayShape(['width' => "int", 'height' => "int"])] protected function getDimension(string $text, int $fontSize, int $angle = 0): array
+    #[ArrayShape(['width' => "int", 'height' => "int"])]
+    protected function getDimension(string $text, int $fontSize, int $angle = 0): array
     {
         $boundingBox = imageftbbox($fontSize, $angle, $this->pathFont, $text);
 

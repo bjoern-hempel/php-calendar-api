@@ -28,7 +28,9 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 
 /**
  * Class UserRepository
@@ -53,5 +55,32 @@ class UserRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
+    }
+
+    /**
+     * Find one by email field.
+     *
+     * @param string $email
+     * @return User|null
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function findOneByEmail(string $email): ?User
+    {
+        $result = $this->createQueryBuilder('u')
+            ->andWhere('u.email = :val')
+            ->setParameter('val', $email)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($result instanceof User) {
+            return $result;
+        }
+
+        if ($result !== null) {
+            throw new Exception(sprintf('Unsupported type (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return null;
     }
 }
