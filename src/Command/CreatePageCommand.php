@@ -120,24 +120,15 @@ EOT
 
         $this->calendarLoaderService->loadCalendarImage($email, $name, $year, $month);
 
-        $image = $this->calendarLoaderService->getImage();
         $calendarImage = $this->calendarLoaderService->getCalendarImage();
 
-        // retrieve the argument value using getArgument()
-        $output->writeln(sprintf('Year:  %d',$year));
-        $output->writeln(sprintf('Month: %d', $month));
+        /* retrieve the argument value using getArgument() */
+        $output->writeln(sprintf('Year:  %d', $calendarImage->getYear()));
+        $output->writeln(sprintf('Month: %d', $calendarImage->getMonth()));
 
         /* Create calendar image */
-        $this->calendarBuilderService->init($image->getHeight() ?? 4000, $this->factor);
-        $this->calendarBuilderService->build(
-            $image->getSourcePath(),
-            $image->getTargetPath(),
-            $calendarImage->getTitle() ?? '',
-            $calendarImage->getPosition() ?? '',
-            $year,
-            $month,
-            $calendarImage->getConfigObject()->getValign() ?? CalendarBuilderService::VALIGN_TOP
-        );
+        $this->calendarBuilderService->init($calendarImage);
+        $this->calendarBuilderService->build();
 
         return Command::SUCCESS;
     }

@@ -306,6 +306,7 @@ class AppFixtures extends Fixture
                 'print-week-number' => true,
                 'print-qr-code-month' => true,
                 'print-qr-code-title' => true,
+                'aspect-ratio' => round(sqrt(2), 3), /* 1:1.414 */
             ]);
             $manager->persist($calendar);
 

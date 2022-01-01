@@ -27,9 +27,11 @@
 namespace App\Entity;
 
 use App\Repository\CalendarRepository;
+use App\Utils\ArrayToObject;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -91,9 +93,11 @@ class Calendar
     #[ORM\OneToMany(mappedBy: 'calendar', targetEntity: CalendarImage::class, orphanRemoval: true)]
     private Collection $calendarImages;
 
-    /** @var array<string|int|bool> $config */
+    /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
-    private $config = [];
+    private array $config = [];
+
+    private ArrayToObject $configObject;
 
     /**
      * Calendar constructor.
@@ -398,6 +402,7 @@ class Calendar
      *
      * @param CalendarImage $calendarImage
      * @return $this
+     * @throws Exception
      */
     public function removeCalendarImage(CalendarImage $calendarImage): self
     {
@@ -414,7 +419,7 @@ class Calendar
     /**
      * Gets the config.
      *
-     * @return array<string|int|bool>
+     * @return array<string|int|float|bool>
      */
     public function getConfig(): array
     {
@@ -422,14 +427,32 @@ class Calendar
     }
 
     /**
+     * Gets the config as object.
+     *
+     * @return ArrayToObject
+     * @throws Exception
+     */
+    public function getConfigObject(): ArrayToObject
+    {
+        if (!isset($this->configObject)) {
+            $this->configObject = new ArrayToObject($this->config);
+        }
+
+        return $this->configObject;
+    }
+
+    /**
      * Sets the config.
      *
-     * @param array<string|int|bool> $config
+     * @param array<string|int|float|bool> $config
      * @return $this
+     * @throws Exception
      */
     public function setConfig(array $config): self
     {
         $this->config = $config;
+
+        $this->configObject = new ArrayToObject($config);
 
         return $this;
     }

@@ -29,6 +29,7 @@ namespace App\Entity;
 use App\Repository\CalendarImageRepository;
 use App\Utils\ArrayToObject;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use phpDocumentor\Reflection\Types\Integer;
 
 /**
@@ -124,10 +125,15 @@ class CalendarImage
     /**
      * Gets the calendar of this calendar image.
      *
-     * @return Calendar|null
+     * @return Calendar
+     * @throws Exception
      */
-    public function getCalendar(): ?Calendar
+    public function getCalendar(): Calendar
     {
+        if (!isset($this->calendar)) {
+            throw new Exception(sprintf('No calendar was configured (%s:%d)', __FILE__, __LINE__));
+        }
+
         return $this->calendar;
     }
 
@@ -148,9 +154,14 @@ class CalendarImage
      * Gets the image of this calendar image.
      *
      * @return Image
+     * @throws Exception
      */
-    public function getImage(): ?Image
+    public function getImage(): Image
     {
+        if (!isset($this->image)) {
+            throw new Exception(sprintf('No image was configured (%s:%d)', __FILE__, __LINE__));
+        }
+
         return $this->image;
     }
 
@@ -319,6 +330,7 @@ class CalendarImage
      * Gets the config as object.
      *
      * @return ArrayToObject
+     * @throws Exception
      */
     public function getConfigObject(): ArrayToObject
     {
@@ -334,6 +346,7 @@ class CalendarImage
      *
      * @param array<string|int|bool> $config
      * @return $this
+     * @throws Exception
      */
     public function setConfig(array $config): self
     {

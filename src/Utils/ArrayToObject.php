@@ -35,17 +35,18 @@ use Exception;
  * @version 1.0 (2021-12-31)
  * @package App\Command
  *
+ * @method float|null getAspectRatio()
  * @method int|null getValign()
  */
 class ArrayToObject
 {
-    /** @var array<string|int|bool> $data */
+    /** @var array<string|int|float|bool> $data */
     protected array $data;
 
     /**
      * ArrayToObject constructor.
      *
-     * @param array<string|int|bool> $data
+     * @param array<string|int|float|bool> $data
      * @throws Exception
      */
     public function __construct(array $data)
@@ -68,10 +69,10 @@ class ArrayToObject
      * Returns the value from given key.
      *
      * @param string $key
-     * @return string|int|bool
+     * @return string|int|float|bool
      * @throws Exception
      */
-    public function get(string $key): string|int|bool
+    public function get(string $key): string|int|float|bool
     {
         if (!$this->has($key)) {
             throw new Exception(sprintf('Given key "%s" does not exist.', $key));
@@ -85,10 +86,10 @@ class ArrayToObject
      *
      * @param string $name
      * @param mixed[] $arguments
-     * @return string|int|bool|null
+     * @return string|int|float|bool|null
      * @throws Exception
      */
-    public function __call(string $name, array $arguments): string|int|bool|null
+    public function __call(string $name, array $arguments): string|int|float|bool|null
     {
         if (!preg_match('~^get[A-Z][a-z0-9]*~', $name)) {
             throw new Exception(sprintf('Unsupported method name "%s".', $name));

@@ -172,11 +172,7 @@ class CalendarLoaderService
         $this->calendarImage = $calendarImage;
 
         /* Load image */
-        $image = $calendarImage->getImage();
-        if ($image === null) {
-            throw new Exception('Unable to find image.');
-        }
-        $this->image = $image;
+        $this->image = $calendarImage->getImage();
 
         /* Returns the calendar image */
         return $this->getCalendarImage();

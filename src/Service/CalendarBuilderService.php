@@ -26,6 +26,9 @@
 
 namespace App\Service;
 
+use App\Entity\Calendar;
+use App\Entity\CalendarImage;
+use App\Entity\Image;
 use DateTime;
 use Exception;
 use GdImage;
@@ -43,7 +46,7 @@ class CalendarBuilderService
 {
     protected KernelInterface $appKernel;
 
-    protected float $factor;
+    protected float $aspectRatio;
 
     protected int $width;
 
@@ -127,6 +130,12 @@ class CalendarBuilderService
 
     protected GdImage $imageQrCode;
 
+    protected CalendarImage $calendarImage;
+
+    protected Calendar $calendar;
+
+    protected Image $image;
+
     const ALIGN_LEFT = 1;
 
     const ALIGN_CENTER = 2;
@@ -160,15 +169,20 @@ class CalendarBuilderService
     /**
      * Init function.
      *
-     * @param int $height
-     * @param float $factor
+     * @param CalendarImage $calendarImage
+     * @throws Exception
      */
-    public function init(int $height, float $factor = 3 / 2): void
+    public function init(CalendarImage $calendarImage): void
     {
+        /* calendar instances */
+        $this->calendarImage = $calendarImage;
+        $this->calendar = $this->calendarImage->getCalendar();
+        $this->image = $this->calendarImage->getImage();
+
         /* sizes */
-        $this->height = $height;
-        $this->width = intval(floor($height * $factor));
-        $this->factor = $factor;
+        $this->aspectRatio = $this->calendarImage->getCalendar()->getConfigObject()->getAspectRatio() ?? 3 / 2;
+        $this->height = $this->calendarImage->getImage()->getHeight() ?? 4000;
+        $this->width = intval(floor($this->height * $this->aspectRatio));
 
         /* Root path */
         $this->pathRoot = $this->appKernel->getProjectDir();
@@ -178,7 +192,7 @@ class CalendarBuilderService
         $this->pathFont = sprintf('%s/font/%s', $this->pathUpload, $this->font);
 
         /* Calculate zoom */
-        $this->zoom = $height / self::ZOOM_HEIGHT_100;
+        $this->zoom = $this->height / self::ZOOM_HEIGHT_100;
 
         /* Calculate sizes */
         $this->fontSizeTitle = $this->getSize($this->fontSizeTitle);
@@ -567,11 +581,11 @@ class CalendarBuilderService
         $this->initXY($xCenterCalendar, $this->yRect + $this->padding);
 
         $paddingTopYear = $this->getSize(0);
-        $dimensionYear = $this->addText(sprintf('%s', $this->year), $this->fontSizeTitlePage, $this->colors['white'], $paddingTopYear, self::ALIGN_CENTER, self::VALIGN_TOP);
+        $dimensionYear = $this->addText(sprintf('%s', $this->calendar->getTitle()), $this->fontSizeTitlePage, $this->colors['white'], $paddingTopYear, self::ALIGN_CENTER, self::VALIGN_TOP);
         $this->addY($dimensionYear['height'] + $paddingTopYear);
 
         $paddingTopSubtext = $this->getSize(40);
-        $dimensionYear = $this->addText('With love'.' - '.'Isa & Björn', $this->fontSizeTitlePageSubtext, $this->colors['white'], $paddingTopSubtext, self::ALIGN_CENTER, self::VALIGN_TOP);
+        $dimensionYear = $this->addText(sprintf('%s', $this->calendar->getSubtitle()), $this->fontSizeTitlePageSubtext, $this->colors['white'], $paddingTopSubtext, self::ALIGN_CENTER, self::VALIGN_TOP);
         $this->addY($dimensionYear['height'] + $paddingTopSubtext);
     }
 
@@ -769,26 +783,19 @@ class CalendarBuilderService
     /**
      * Builds the given source image to a calendar page.
      *
-     * @param string $pathSource
-     * @param string $pathTarget
-     * @param string $title
-     * @param string $position
-     * @param int $year
-     * @param int $month
-     * @param int $valign
      * @throws Exception
      */
-    public function build(string $pathSource, string $pathTarget, string $title, string $position, int $year, int $month, int $valign = self::VALIGN_TOP): void
+    public function build(): void
     {
         /* Save given values */
-        $this->pathSource = sprintf('%s/%s', $this->pathUpload, $pathSource);
-        $this->pathTarget = sprintf('%s/%s', $this->pathUpload, $pathTarget);
+        $this->pathSource = sprintf('%s/%s', $this->pathUpload, $this->image->getSourcePath());
+        $this->pathTarget = sprintf('%s/%s', $this->pathUpload, $this->image->getTargetPath());
         $this->pathQrCode = str_replace('.jpg', '.png', $this->pathSource);
-        $this->textTitle = $title;
-        $this->textPosition = $position;
-        $this->year = $year;
-        $this->month = $month;
-        $this->valignImage = $valign;
+        $this->textTitle = $this->calendarImage->getTitle() ?? '';
+        $this->textPosition = $this->calendarImage->getPosition() ?? '';
+        $this->year = $this->calendarImage->getYear();
+        $this->month = $this->calendarImage->getMonth();
+        $this->valignImage = $this->calendarImage->getConfigObject()->getValign() ?? self::VALIGN_TOP;
 
         /* Init */
         $this->prepare();
