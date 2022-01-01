@@ -599,13 +599,14 @@ class CalendarBuilderService
     /**
      * Adds the title page.
      *
+     * @param int $y
      * @throws Exception
      */
-    protected function addTitleOnTitlePage(): void
+    protected function addTitleOnTitlePage(int $y = 0): void
     {
         /* Set x and y */
         $xCenterCalendar = intval(round($this->width / 2));
-        $this->initXY($xCenterCalendar, $this->yRect + $this->padding);
+        $this->initXY($xCenterCalendar, $this->yRect + $this->padding + $y);
 
         $paddingTopYear = $this->getSize(0);
         $dimensionYear = $this->addText(sprintf('%s', $this->calendar->getTitle()), $this->fontSizeTitlePage, $this->colors['white'], $paddingTopYear, self::ALIGN_CENTER, self::VALIGN_TOP);
@@ -828,14 +829,14 @@ class CalendarBuilderService
      */
     protected function addCalendar(): void
     {
-        /* This is the title page */
-        if ($this->month === 0) {
-            $this->addTitleOnTitlePage();
-            return;
-        }
-
         /* Change calendar box size from 5:6 (20:24) to 19.5:24 -> 4:24 to 4.5:24 */
         $y = intval(round($this->height * 4.5 / 24 - $this->height * 4 / 24));
+
+        /* This is the title page */
+        if ($this->month === 0) {
+            $this->addTitleOnTitlePage($y);
+            return;
+        }
 
         /* Set x and y */
         $xCenterCalendar = intval(round($this->width / 2) + round($this->width / 8));
