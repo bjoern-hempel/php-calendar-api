@@ -28,6 +28,7 @@ namespace App\Service;
 
 use App\Entity\Calendar;
 use App\Entity\CalendarImage;
+use App\Entity\HolidayGroup;
 use App\Entity\Image;
 use DateTime;
 use Exception;
@@ -140,6 +141,11 @@ class CalendarBuilderService
 
     protected Image $image;
 
+    protected ?HolidayGroup $holidayGroup = null;
+
+    /** @var array<string> $holidays */
+    protected array $holidays = [];
+
     const ALIGN_LEFT = 1;
 
     const ALIGN_CENTER = 2;
@@ -211,6 +217,18 @@ class CalendarBuilderService
         $this->heightQrCode = $this->getSize($this->heightQrCode);
         $this->widthQrCode = $this->getSize($this->widthQrCode);
         $this->dayDistance = $this->getSize($this->dayDistance);
+    }
+
+    /**
+     * Sets the holiday group.
+     *
+     * @param HolidayGroup $holidayGroup
+     */
+    public function setHolidayGroup(HolidayGroup $holidayGroup): void
+    {
+        $this->holidayGroup = $holidayGroup;
+
+        $this->holidays = $this->holidayGroup->getHolidayArray();
     }
 
     /**
@@ -460,7 +478,7 @@ class CalendarBuilderService
         $this->widthSourceQrCode = $propertiesQrCode[0];
         $this->heightSourceQrCode = $propertiesQrCode[1];
 
-        $this->yRect = intval(floor($this->height * 5 / 6));
+        $this->yRect = intval(floor($this->height * 19.5 / 24));
     }
 
     /**
@@ -736,15 +754,23 @@ class CalendarBuilderService
     }
 
     /**
-     * Add event to
+     * Add event to day.
      *
-     * @param string $event
+     * @param int $day
      * @param array{width: int, height: int} $dimensionDay
      * @param int $align
      * @throws Exception
      */
-    protected function addEvent(string $event, array $dimensionDay, int $align): void
+    protected function addEvent(int $day, array $dimensionDay, int $align): void
     {
+        $date = sprintf('%04d-%02d-%02d', $this->year, $this->month, $day);
+
+        if (!array_key_exists($date, $this->holidays)) {
+            return;
+        }
+
+        $event = $this->holidays[$date];
+
         /* Remember current x and y position. */
         $this->rememberPosition();
 
@@ -789,7 +815,7 @@ class CalendarBuilderService
         $this->addWeekNumber($weekNumber, $dimensionDay, $align);
 
         /* Add Event */
-        $this->addEvent('Björn Hempel', $dimensionDay, $align);
+        $this->addEvent($day, $dimensionDay, $align);
 
         /* Add x for next day */
         $this->addX($align === self::ALIGN_LEFT ? $dimensionDay['width'] : -$dimensionDay['width']);
@@ -808,9 +834,12 @@ class CalendarBuilderService
             return;
         }
 
+        /* Change calendar box size from 5:6 (20:24) to 19.5:24 -> 4:24 to 4.5:24 */
+        $y = intval(round($this->height * 4.5 / 24 - $this->height * 4 / 24));
+
         /* Set x and y */
         $xCenterCalendar = intval(round($this->width / 2) + round($this->width / 8));
-        $this->initXY($xCenterCalendar, $this->yRect + $this->padding);
+        $this->initXY($xCenterCalendar, $this->yRect + $this->padding + $y);
 
         /* Add month */
         $paddingTop = $this->getSize(0);

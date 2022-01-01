@@ -110,6 +110,22 @@ class HolidayGroup
     }
 
     /**
+     * Gets all related holidays as array.
+     *
+     * @return array<string>
+     */
+    public function getHolidayArray(): array
+    {
+        $holidays = [];
+
+        foreach ($this->holidays as $holiday) {
+            $holidays[$holiday->getDate()->format('Y-m-d')] = $holiday->getName();
+        }
+
+        return $holidays;
+    }
+
+    /**
      * Adds a related holiday.
      *
      * @param Holiday $holiday

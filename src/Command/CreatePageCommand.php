@@ -26,6 +26,11 @@
 
 namespace App\Command;
 
+use App\Entity\Holiday;
+use App\Entity\HolidayGroup;
+use App\Entity\User;
+use App\Repository\HolidayGroupRepository;
+use App\Repository\UserRepository;
 use App\Service\CalendarBuilderService;
 use App\Service\CalendarLoaderService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -98,6 +103,23 @@ EOT
     }
 
     /**
+     * Returns the HolidayGroupRepository.
+     *
+     * @return HolidayGroupRepository
+     * @throws Exception
+     */
+    protected function getHolidayGroupRepository(): HolidayGroupRepository
+    {
+        $repository = $this->manager->getRepository(HolidayGroup::class);
+
+        if (!$repository instanceof HolidayGroupRepository) {
+            throw new Exception('Error while getting HolidayGroup.');
+        }
+
+        return $repository;
+    }
+
+    /**
      * Execute the commands.
      *
      * @param InputInterface $input
@@ -120,6 +142,14 @@ EOT
 
         $this->calendarLoaderService->loadCalendarImage($email, $name, $year, $month);
 
+        $holidayGroupRepository = $this->getHolidayGroupRepository();
+
+        $holidayGroup = $holidayGroupRepository->findOneByName('Saxony');
+
+        if ($holidayGroup === null) {
+            throw new Exception(sprintf('No holiday group was found (%s:%d).', __FILE__, __LINE__));
+        }
+
         $calendarImage = $this->calendarLoaderService->getCalendarImage();
 
         /* retrieve the argument value using getArgument() */
@@ -128,6 +158,7 @@ EOT
 
         /* Create calendar image */
         $this->calendarBuilderService->init($calendarImage);
+        $this->calendarBuilderService->setHolidayGroup($holidayGroup);
         $this->calendarBuilderService->build();
 
         return Command::SUCCESS;

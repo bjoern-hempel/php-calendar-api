@@ -29,6 +29,7 @@ namespace App\Repository;
 use App\Entity\HolidayGroup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 
 /**
  * Class HolidayGroupRepository
@@ -53,5 +54,31 @@ class HolidayGroupRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, HolidayGroup::class);
+    }
+
+    /**
+     * Find one by name field.
+     *
+     * @param string $name
+     * @return HolidayGroup|null
+     * @throws Exception
+     */
+    public function findOneByName(string $name): ?HolidayGroup
+    {
+        $result = $this->createQueryBuilder('hg')
+            ->andWhere('hg.name = :val')
+            ->setParameter('val', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($result instanceof HolidayGroup) {
+            return $result;
+        }
+
+        if ($result !== null) {
+            throw new Exception(sprintf('Unsupported type (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return null;
     }
 }
