@@ -3,7 +3,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 Björn Hempel <bjoern@hempel.li>
+ * Copyright (c) 2022 Björn Hempel <bjoern@hempel.li>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,27 +26,29 @@
 
 namespace App\Command;
 
+use App\Entity\CalendarImage;
 use App\Service\CalendarBuilderService;
 use App\Service\CalendarLoaderService;
 use App\Service\HolidayGroupLoaderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class CreatePageCommand
+ * Class CreateCalendarCommand
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2021-12-29)
+ * @version 1.0 (2022-01-02)
  * @package App\Command
- * @example bin/console calendar:create-page --email "user1@domain.tld" --name "Calendar 1" --year 2022 --month 0
+ * @example bin/console calendar:create-calendar --email "user1@domain.tld" --name "Calendar 1"
  */
-class CreatePageCommand extends Command
+class CreateCalendarCommand extends Command
 {
-    protected static $defaultName = 'calendar:create-page';
+    protected static $defaultName = 'calendar:create-calendar';
 
     protected CalendarBuilderService $calendarBuilderService;
 
@@ -83,23 +85,21 @@ class CreatePageCommand extends Command
     protected function configure(): void
     {
         /* Set command name */
-        if (CreatePageCommand::$defaultName !== null) {
-            $this->setName(CreatePageCommand::$defaultName);
+        if (CreateCalendarCommand::$defaultName !== null) {
+            $this->setName(CreateCalendarCommand::$defaultName);
         }
 
         $this
-            ->setDescription('Creates a calendar page')
+            ->setDescription('Creates the whole calendar')
             ->setDefinition([
                 new InputOption('email', null, InputOption::VALUE_REQUIRED, 'The email of the user.'),
-                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'The calendar name which will be used.'),
-                new InputOption('year', 'y', InputOption::VALUE_REQUIRED, 'The year with which the page will be created.'),
-                new InputOption('month', 'm', InputOption::VALUE_REQUIRED, 'The month with which the page will be created.'),
+                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'The calendar name which will be created.'),
             ])
             ->setHelp(
                 <<<'EOT'
-The <info>calendar:create-page</info> creates a calendar page:
+The <info>calendar:create-calendar</info> creates a calendar page:
   <info>php %command.full_name%</info>
-Creates a calendar page.
+Creates the whole calendar.
 EOT
             );
     }
@@ -117,7 +117,7 @@ EOT
         $output->writeln([
             '',
             '============',
-            'Page Creator',
+            'Calendar Creator',
             '============',
             '',
         ]);
@@ -125,48 +125,38 @@ EOT
         /* Read parameter */
         $email = strval($input->getOption('email'));
         $calendarName = strval($input->getOption('name'));
-        $year = intval($input->getOption('year'));
-        $month = intval($input->getOption('month'));
-        $holidayGroupName = 'Saxony';
 
         /* Read db */
-        $calendarImage = $this->calendarLoaderService->loadCalendarImage($email, $calendarName, $year, $month);
-        $holidayGroup = $this->holidayGroupLoaderService->loadHolidayGroup($holidayGroupName);
+        $calendar = $this->calendarLoaderService->loadCalendar($email, $calendarName);
 
-        /* Print details */
-        $output->writeln(sprintf('Email:          %s', $calendarImage->getUser()->getEmail()));
-        $output->writeln(sprintf('Calendar name:  %s', $calendarImage->getCalendar()->getName()));
-        $output->writeln(sprintf('Year:           %d', $calendarImage->getYear()));
-        $output->writeln(sprintf('Month:          %d', $calendarImage->getMonth()));
-        $output->writeln(sprintf('Holiday group:  %s', $holidayGroup->getName()));
+        /* Get application */
+        $application = $this->getApplication();
 
-        $output->writeln('');
-        $output->write(sprintf('Create calendar at %s. Please wait.. ', date('Y-m-d H:i:s')));
+        /* Check application */
+        if ($application === null) {
+            throw new Exception(sprintf('Can not find any application (%s:%d).', __FILE__, __LINE__));
+        }
 
-        /* Create calendar image */
-        $timeStart = microtime(true);
-        $this->calendarBuilderService->init($calendarImage);
-        $this->calendarBuilderService->setHolidayGroup($holidayGroup);
-        $file = $this->calendarBuilderService->build();
-        $timeTaken = microtime(true) - $timeStart;
+        /* Get command */
+        $command = $application->find('calendar:create-page');
 
-        $output->writeln(sprintf('→ Time taken: %.2fs', $timeTaken));
+        /** @var CalendarImage $calendarImage */
+        foreach ($calendar->getCalendarImages() as $calendarImage) {
+            $calendarCreatePageInput = new ArrayInput([
+                '--email' => $calendar->getUser()->getEmail(),
+                '--name' => $calendar->getName(),
+                '--year'  => $calendarImage->getYear(),
+                '--month' => $calendarImage->getMonth(),
+            ]);
 
-        $output->writeln('');
-        $output->writeln('Calendar built from:');
-        $output->writeln(sprintf('→ Path:      %s', $file['pathSource']));
-        $output->writeln(sprintf('→ Mime:      %s', $file['mimeSource']));
-        $output->writeln(sprintf('→ Size:      %s (%d Bytes)', $file['sizeHumanSource'], $file['sizeSource']));
-        $output->writeln(sprintf('→ Dimension: %dx%d', $file['widthSource'], $file['heightSource']));
+            $returnCode = $command->run($calendarCreatePageInput, $output);
 
-        $output->writeln('');
-        $output->writeln('Calendar written to:');
-        $output->writeln(sprintf('→ Path:      %s', $file['pathTarget']));
-        $output->writeln(sprintf('→ Mime:      %s', $file['mimeTarget']));
-        $output->writeln(sprintf('→ Size:      %s (%d Bytes)', $file['sizeHumanTarget'], $file['sizeTarget']));
-        $output->writeln(sprintf('→ Dimension: %dx%d', $file['widthTarget'], $file['heightTarget']));
+            if ($returnCode !== Command::SUCCESS) {
+                $output->writeln('An error occurred while trying to create a single calendar page.');
 
-        $output->writeln('');
+                return $returnCode;
+            }
+        }
 
         return Command::SUCCESS;
     }

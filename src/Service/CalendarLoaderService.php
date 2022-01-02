@@ -135,21 +135,21 @@ class CalendarLoaderService
     }
 
     /**
-     * Loads and returns calendar from user.
+     * Loads and returns user
      *
      * @param string $email
-     * @param string $calendarName
-     * @param int $year
-     * @param int $month
-     * @return CalendarImage
+     * @param bool $clearObjects
+     * @return User
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function loadCalendarImage(string $email, string $calendarName, int $year, int $month): CalendarImage
+    public function loadUser(string $email, bool $clearObjects = true): User
     {
         /* Clears all objects */
-        $this->clear();
-        
+        if ($clearObjects) {
+            $this->clear();
+        }
+
         /* Load user */
         $user = $this->getUserRepository()->findOneByEmail($email);
         if ($user === null) {
@@ -157,15 +157,63 @@ class CalendarLoaderService
         }
         $this->user = $user;
 
+        return $this->getUser();
+    }
+
+    /**
+     * Loads and returns the calendar
+     *
+     * @param string $email
+     * @param string $calendarName
+     * @param bool $clearObjects
+     * @return Calendar
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function loadCalendar(string $email, string $calendarName, bool $clearObjects = true): Calendar
+    {
+        /* Clears all objects */
+        if ($clearObjects) {
+            $this->clear();
+        }
+
+        /* Load User */
+        $this->loadUser($email, false);
+
         /* Load calendar */
-        $calendar = $this->getCalendarRepository()->findOneByName($user, $calendarName);
+        $calendar = $this->getCalendarRepository()->findOneByName($this->getUser(), $calendarName);
         if ($calendar === null) {
             throw new Exception(sprintf('Unable to find calendar with name "%s".', $calendarName));
         }
         $this->calendar = $calendar;
 
+        return $this->getCalendar();
+    }
+
+    /**
+     * Loads and returns calendar from user.
+     *
+     * @param string $email
+     * @param string $calendarName
+     * @param int $year
+     * @param int $month
+     * @param bool $clearObjects
+     * @return CalendarImage
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function loadCalendarImage(string $email, string $calendarName, int $year, int $month, bool $clearObjects = true): CalendarImage
+    {
+        /* Clears all objects */
+        if ($clearObjects) {
+            $this->clear();
+        }
+        
+        /* Load user */
+        $calendar = $this->loadCalendar($email, $calendarName, false);
+
         /* Load calendar image */
-        $calendarImage = $this->getCalendarImageRepository()->findOneByYearAndMonth($user, $calendar, $year, $month);
+        $calendarImage = $this->getCalendarImageRepository()->findOneByYearAndMonth($this->getUser(), $calendar, $year, $month);
         if ($calendarImage === null) {
             throw new Exception(sprintf('Unable to find calendar image with year "%d" and month "%d".', $year, $month));
         }
@@ -182,9 +230,14 @@ class CalendarLoaderService
      * Returns the user object.
      *
      * @return User
+     * @throws Exception
      */
     public function getUser(): User
     {
+        if (!isset($this->user)) {
+            throw new Exception(sprintf('No user was configured (%s:%d)', __FILE__, __LINE__));
+        }
+
         return $this->user;
     }
 
@@ -192,9 +245,14 @@ class CalendarLoaderService
      * Returns the calendar object.
      *
      * @return Calendar
+     * @throws Exception
      */
     public function getCalendar(): Calendar
     {
+        if (!isset($this->calendar)) {
+            throw new Exception(sprintf('No calendar was configured (%s:%d)', __FILE__, __LINE__));
+        }
+
         return $this->calendar;
     }
 
@@ -202,9 +260,14 @@ class CalendarLoaderService
      * Returns the calendar image object.
      *
      * @return CalendarImage
+     * @throws Exception
      */
     public function getCalendarImage(): CalendarImage
     {
+        if (!isset($this->calendarImage)) {
+            throw new Exception(sprintf('No calendar image was configured (%s:%d)', __FILE__, __LINE__));
+        }
+
         return $this->calendarImage;
     }
 
@@ -212,9 +275,14 @@ class CalendarLoaderService
      * Returns the image object.
      *
      * @return Image
+     * @throws Exception
      */
     public function getImage(): Image
     {
+        if (!isset($this->image)) {
+            throw new Exception(sprintf('No image was configured (%s:%d)', __FILE__, __LINE__));
+        }
+
         return $this->image;
     }
 }

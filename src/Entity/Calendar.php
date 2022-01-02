@@ -121,10 +121,15 @@ class Calendar
     /**
      * Gets the user of this calendar.
      *
-     * @return User|null
+     * @return User
+     * @throws Exception
      */
-    public function getUser(): ?User
+    public function getUser(): User
     {
+        if (!isset($this->user)) {
+            throw new Exception(sprintf('No user was configured (%s:%d)', __FILE__, __LINE__));
+        }
+
         return $this->user;
     }
 
