@@ -105,6 +105,10 @@ class CalendarBuilderService
 
     protected int $padding = 160;
 
+    protected int $maxLength = 28;
+
+    protected string $maxLengthAdd = '...';
+
     protected string $textTitle;
 
     protected string $textPosition;
@@ -911,8 +915,13 @@ class CalendarBuilderService
         $angleEvent = 90;
         $fontSizeEvent = intval(ceil($this->fontSizeDay * 0.6));
 
+        /* Get name */
+        $name = strlen($eventOrHoliday['name']) > $this->maxLength ?
+            substr($eventOrHoliday['name'], 0, $this->maxLength - strlen($this->maxLengthAdd)).$this->maxLengthAdd :
+            $eventOrHoliday['name'];
+
         /* Dimension Event */
-        $dimensionEvent = $this->getDimension($eventOrHoliday['name'], $fontSizeEvent, $angleEvent);
+        $dimensionEvent = $this->getDimension($name, $fontSizeEvent, $angleEvent);
         $xEvent = $dimensionEvent['width'] + $fontSizeEvent;
 
         /* Set event position */
@@ -921,7 +930,7 @@ class CalendarBuilderService
         $this->y -= intval(round(1.5 * $this->fontSizeDay));
 
         /* Add Event */
-        $this->addText(text: $eventOrHoliday['name'], fontSize: $fontSizeEvent, color: $this->colors['white'], align: self::ALIGN_LEFT, angle: $angleEvent);
+        $this->addText(text: $name, fontSize: $fontSizeEvent, color: $this->colors['white'], align: self::ALIGN_LEFT, angle: $angleEvent);
     }
 
     /**
