@@ -196,6 +196,9 @@ class CalendarBuilderService
      */
     public function init(CalendarImage $calendarImage): void
     {
+        /* Clear positions */
+        $this->positionDays = [];
+
         /* calendar instances */
         $this->calendarImage = $calendarImage;
         $this->calendar = $this->calendarImage->getCalendar();
