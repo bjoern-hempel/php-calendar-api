@@ -250,18 +250,22 @@ class AppFixtures extends Fixture
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
         ];
 
-        $events = [
+        $eventDatas = [
             ['Angela Merkel', '1954-07-17T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Arnold Schwarzenegger', '1947-07-30T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Bernhard', '2100-12-25T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Björn', '1980-02-02T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Carolin Kebekus', '1980-05-09T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Daniel Radcliffe', '1989-07-23T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Isabel', '1994-08-18T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Manuel Neuer', '1986-03-27T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Olaf Scholz', '1958-06-14T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Otto Waalkes', '1948-07-22T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Rico', '2100-08-18T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Sido', '1980-11-30T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Elisabeth II.', '1926-04-21T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['New York City Marathon', '2022-11-06T12:00:00Z', CalendarBuilderService::EVENT_TYPE_EVENT],
-            ['Zrce Spring Break, Croatia', ]
+            ['Zrce Spring Break, Croatia', '2022-06-03T12:00:00Z', CalendarBuilderService::EVENT_TYPE_EVENT_GROUP],
         ];
 
         foreach ($holidayDatas as $holidayData) {
@@ -292,11 +296,12 @@ class AppFixtures extends Fixture
             $manager->persist($user);
 
             /* Add events to user */
-            for ($j = 1; $j <= 5; $j++) {
+            foreach ($eventDatas as $eventData) {
                 $event = new Event();
                 $event->setUser($user);
-                $event->setName(sprintf('Event %d', $j));
-                $event->setDate(new DateTime(sprintf('2022-%02d-02T12:00:00Z', $j)));
+                $event->setName($eventData[0]);
+                $event->setType($eventData[2]);
+                $event->setDate(new DateTime($eventData[1]));
                 $event->setColor('255,255,255,100');
                 $manager->persist($event);
             }

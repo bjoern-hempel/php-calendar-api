@@ -56,6 +56,9 @@ class Event
     #[ORM\Column(type: 'string', length: 255)]
     private string $name;
 
+    #[ORM\Column(type: 'integer')]
+    private int $type;
+
     #[ORM\Column(type: 'date')]
     private DateTimeInterface $date;
 
@@ -98,9 +101,9 @@ class Event
     /**
      * Gets the name of this event.
      *
-     * @return string|null
+     * @return string
      */
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -119,11 +122,34 @@ class Event
     }
 
     /**
+     * Gets the type of this event.
+     *
+     * @return int
+     */
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    /**
+     * Sets the type of this event.
+     *
+     * @param int $type
+     * @return $this
+     */
+    public function setType(int $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
      * Gets the date of this event.
      * 
-     * @return DateTimeInterface|null
+     * @return DateTimeInterface
      */
-    public function getDate(): ?DateTimeInterface
+    public function getDate(): DateTimeInterface
     {
         return $this->date;
     }

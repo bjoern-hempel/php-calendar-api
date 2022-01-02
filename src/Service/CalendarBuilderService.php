@@ -28,6 +28,8 @@ namespace App\Service;
 
 use App\Entity\Calendar;
 use App\Entity\CalendarImage;
+use App\Entity\Event;
+use App\Entity\Holiday;
 use App\Entity\HolidayGroup;
 use App\Entity\Image;
 use App\Utils\SizeConverter;
@@ -151,8 +153,13 @@ class CalendarBuilderService
 
     protected ?HolidayGroup $holidayGroup = null;
 
-    /** @var array<string> $holidays */
-    protected array $holidays = [];
+    /** @var array<array{name: string[]}> $eventsAndHolidaysRaw */
+    protected array $eventsAndHolidaysRaw = [];
+
+    /** @var array<array{name: string}> $eventsAndHolidays */
+    protected array $eventsAndHolidays = [];
+
+    const BIRTHDAY_YEAR_NOT_GIVEN = 2100;
 
     const ALIGN_LEFT = 1;
 
@@ -174,9 +181,11 @@ class CalendarBuilderService
 
     const IMAGE_JPG = 'jpg';
 
-    const EVENT_TYPE_BIRTHDAY = 'birthday';
+    const EVENT_TYPE_BIRTHDAY = 0;
 
-    const EVENT_TYPE_EVENT = 'event';
+    const EVENT_TYPE_EVENT = 1;
+
+    const EVENT_TYPE_EVENT_GROUP = 2;
 
     /**
      * Calendar constructor
@@ -192,15 +201,17 @@ class CalendarBuilderService
      * Init function.
      *
      * @param CalendarImage $calendarImage
+     * @param HolidayGroup|null $holidayGroup
      * @throws Exception
      */
-    public function init(CalendarImage $calendarImage): void
+    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null): void
     {
         /* Clear positions */
         $this->positionDays = [];
 
         /* calendar instances */
         $this->calendarImage = $calendarImage;
+        $this->holidayGroup = $holidayGroup;
         $this->calendar = $this->calendarImage->getCalendar();
         $this->image = $this->calendarImage->getImage();
 
@@ -232,18 +243,6 @@ class CalendarBuilderService
         $this->heightQrCode = $this->getSize($this->heightQrCode);
         $this->widthQrCode = $this->getSize($this->widthQrCode);
         $this->dayDistance = $this->getSize($this->dayDistance);
-    }
-
-    /**
-     * Sets the holiday group.
-     *
-     * @param HolidayGroup $holidayGroup
-     */
-    public function setHolidayGroup(HolidayGroup $holidayGroup): void
-    {
-        $this->holidayGroup = $holidayGroup;
-
-        $this->holidays = $this->holidayGroup->getHolidayArray();
     }
 
     /**
@@ -293,6 +292,7 @@ class CalendarBuilderService
         $this->createImages();
         $this->createColors();
         $this->calculateVariables();
+        $this->createEventsAndHolidays();
     }
 
     /**
@@ -883,12 +883,12 @@ class CalendarBuilderService
     }
 
     /**
-     * Add event to day.
+     * Add holiday or event to day.
      *
      * @param string $dayKey
      * @throws Exception
      */
-    protected function addEvent(string $dayKey): void
+    protected function addHolidayOrEvent(string $dayKey): void
     {
         $positionDay = $this->positionDays[$dayKey];
         $day = $positionDay['day'];
@@ -897,11 +897,11 @@ class CalendarBuilderService
 
         $dayKey = $this->getDayKey($day);
 
-        if (!array_key_exists($dayKey, $this->holidays)) {
+        if (!array_key_exists($dayKey, $this->eventsAndHolidays)) {
             return;
         }
 
-        $event = $this->holidays[$dayKey];
+        $eventOrHoliday = $this->eventsAndHolidays[$dayKey];
 
         /* Set x and y */
         $this->setX($positionDay['x']);
@@ -912,7 +912,7 @@ class CalendarBuilderService
         $fontSizeEvent = intval(ceil($this->fontSizeDay * 0.6));
 
         /* Dimension Event */
-        $dimensionEvent = $this->getDimension($event, $fontSizeEvent, $angleEvent);
+        $dimensionEvent = $this->getDimension($eventOrHoliday['name'], $fontSizeEvent, $angleEvent);
         $xEvent = $dimensionEvent['width'] + $fontSizeEvent;
 
         /* Set event position */
@@ -921,18 +921,18 @@ class CalendarBuilderService
         $this->y -= intval(round(1.5 * $this->fontSizeDay));
 
         /* Add Event */
-        $this->addText(text: $event, fontSize: $fontSizeEvent, color: $this->colors['white'], align: self::ALIGN_LEFT, angle: $angleEvent);
+        $this->addText(text: $eventOrHoliday['name'], fontSize: $fontSizeEvent, color: $this->colors['white'], align: self::ALIGN_LEFT, angle: $angleEvent);
     }
 
     /**
-     * Adds events to days.
+     * Adds holidays and events to days.
      *
      * @throws Exception
      */
-    protected function addEvents(): void
+    protected function addHolidaysAndEvents(): void
     {
         foreach ($this->positionDays as $dayKey => $positionDay) {
-            $this->addEvent($dayKey);
+            $this->addHolidayOrEvent($dayKey);
         }
     }
 
@@ -1002,6 +1002,157 @@ class CalendarBuilderService
         ];
     }
 
+
+    /**
+     * Returns the year month key.
+     *
+     * @param int $month
+     * @return string
+     */
+    protected function getYearMonthKey(int $month): string
+    {
+        return sprintf('%04d-%02d', $this->year, $month);
+    }
+
+    /**
+     * Adds given event.
+     *
+     * @param string $key
+     * @param string $name
+     */
+    protected function addEventOrHoliday(string $key, string $name): void
+    {
+        /* Add new key */
+        if (!array_key_exists($key, $this->eventsAndHolidaysRaw)) {
+            $this->eventsAndHolidaysRaw[$key] = [
+                'name' => [],
+            ];
+        }
+
+        /* Add name */
+        $this->eventsAndHolidaysRaw[$key]['name'][] = $name;
+    }
+
+    /**
+     * Adds all events according to this month.
+     *
+     * @throws Exception
+     */
+    protected function addEvents(): void
+    {
+        /* Build current year and month */
+        $yearMonthPage = $this->getYearMonthKey($this->month);
+
+        /** @var Event $event */
+        foreach ($this->calendarImage->getUser()->getEvents() as $event) {
+
+            /* Get event key */
+            $eventKey = $this->getDayKey(intval($event->getDate()->format('j')));
+
+            /* Get year from event */
+            $year = intval($event->getDate()->format('Y'));
+
+            /* Calculate age from event */
+            $age = $this->calendarImage->getYear() - $year;
+
+            /* This event does not fit the month → Skip */
+            if ($yearMonthPage !== $this->getYearMonthKey(intval($event->getDate()->format('n')))) {
+                continue;
+            }
+
+            /* No birthday event → Only show name */
+            if ($event->getType() !== CalendarBuilderService::EVENT_TYPE_BIRTHDAY) {
+                $this->addEventOrHoliday($eventKey, $event->getName());
+                continue;
+            }
+
+            /* Birthday event → But no year given */
+            if ($year === self::BIRTHDAY_YEAR_NOT_GIVEN) {
+                $this->addEventOrHoliday($eventKey, $event->getName());
+                continue;
+            }
+
+            /* Birthday event → Age must be greater than 0 */
+            if ($age <= 0) {
+                $this->addEventOrHoliday($eventKey, $event->getName());
+                continue;
+            }
+
+            /* Birthday event → Add age to name */
+            $this->addEventOrHoliday($eventKey, sprintf('%s (%d)', $event->getName(), $age));
+        }
+    }
+
+    /**
+     * Add holidays to this month.
+     *
+     * @throws Exception
+     */
+    public function addHolidays(): void
+    {
+        /* No holiday group class given → no holidays */
+        if ($this->holidayGroup === null) {
+            return;
+        }
+
+        /* Build current year and month */
+        $yearMonthPage = $this->getYearMonthKey($this->month);
+
+        /** @var Holiday $holiday */
+        foreach ($this->holidayGroup->getHolidays() as $holiday) {
+
+            /* Get event key */
+            $holidayKey = $this->getDayKey(intval($holiday->getDate()->format('j')));
+
+            /* This event does not fit the month → Skip */
+            if ($yearMonthPage !== $this->getYearMonthKey(intval($holiday->getDate()->format('n')))) {
+                continue;
+            }
+
+            $this->addEventOrHoliday($holidayKey, $holiday->getName());
+        }
+    }
+
+    /**
+     * Combine entries from $this->eventsAndHolidaysRaw to $this->eventsAndHolidays
+     *
+     * @return array<array{name: string}>
+     */
+    protected function combineEventsAndHolidays(): array
+    {
+        $eventsAndHolidays = [];
+
+        foreach ($this->eventsAndHolidaysRaw as $key => $eventOrHoliday) {
+            $eventsAndHolidays[$key] = [
+                'name' => implode(', ', $eventOrHoliday['name']),
+            ];
+        }
+
+        /* Return events and holidays. */
+        return $eventsAndHolidays;
+    }
+
+    /**
+     * Build all events and holidays according to this month.
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function createEventsAndHolidays(): void
+    {
+        /* Reset events and holidays. */
+        $this->eventsAndHolidaysRaw = [];
+
+        /* Add events. */
+        $this->addEvents();
+
+        /* Add holidays */
+        $this->addHolidays();
+
+        /* Combine events and holidays */
+        $this->eventsAndHolidays = $this->combineEventsAndHolidays();
+    }
+
     /**
      * Builds the given source image to a calendar page.
      *
@@ -1038,7 +1189,7 @@ class CalendarBuilderService
         } else {
             $this->addYearMonthAndDays();
             $this->addCalendarWeeks();
-            $this->addEvents();
+            $this->addHolidaysAndEvents();
         }
 
         /* Add qr code */

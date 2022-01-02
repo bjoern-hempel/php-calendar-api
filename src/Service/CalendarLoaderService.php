@@ -51,6 +51,8 @@ class CalendarLoaderService
 
     protected EntityManagerInterface $manager;
 
+    protected CalendarLoaderService $calendarLoaderService;
+
     protected User $user;
 
     protected Calendar $calendar;
