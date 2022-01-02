@@ -138,14 +138,14 @@ class CalendarLoaderService
      * Loads and returns calendar from user.
      *
      * @param string $email
-     * @param string $name
+     * @param string $calendarName
      * @param int $year
      * @param int $month
      * @return CalendarImage
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function loadCalendarImage(string $email, string $name, int $year, int $month): CalendarImage
+    public function loadCalendarImage(string $email, string $calendarName, int $year, int $month): CalendarImage
     {
         /* Clears all objects */
         $this->clear();
@@ -158,9 +158,9 @@ class CalendarLoaderService
         $this->user = $user;
 
         /* Load calendar */
-        $calendar = $this->getCalendarRepository()->findOneByName($user, $name);
+        $calendar = $this->getCalendarRepository()->findOneByName($user, $calendarName);
         if ($calendar === null) {
-            throw new Exception(sprintf('Unable to find calendar with name "%s".', $name));
+            throw new Exception(sprintf('Unable to find calendar with name "%s".', $calendarName));
         }
         $this->calendar = $calendar;
 

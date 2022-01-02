@@ -33,6 +33,7 @@ use App\Repository\HolidayGroupRepository;
 use App\Repository\UserRepository;
 use App\Service\CalendarBuilderService;
 use App\Service\CalendarLoaderService;
+use App\Service\HolidayGroupLoaderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Command\Command;
@@ -56,6 +57,8 @@ class CreatePageCommand extends Command
 
     protected CalendarLoaderService $calendarLoaderService;
 
+    protected HolidayGroupLoaderService $holidayGroupLoaderService;
+
     protected EntityManagerInterface $manager;
 
     /**
@@ -63,13 +66,16 @@ class CreatePageCommand extends Command
      *
      * @param CalendarBuilderService $calendarBuilderService
      * @param CalendarLoaderService $calendarLoaderService
+     * @param HolidayGroupLoaderService $holidayGroupLoaderService
      * @param EntityManagerInterface $manager
      */
-    public function __construct(CalendarBuilderService $calendarBuilderService, CalendarLoaderService $calendarLoaderService, EntityManagerInterface $manager)
+    public function __construct(CalendarBuilderService $calendarBuilderService, CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, EntityManagerInterface $manager)
     {
         $this->calendarBuilderService = $calendarBuilderService;
 
         $this->calendarLoaderService = $calendarLoaderService;
+
+        $this->holidayGroupLoaderService = $holidayGroupLoaderService;
 
         $this->manager = $manager;
 
@@ -104,23 +110,6 @@ EOT
     }
 
     /**
-     * Returns the HolidayGroupRepository.
-     *
-     * @return HolidayGroupRepository
-     * @throws Exception
-     */
-    protected function getHolidayGroupRepository(): HolidayGroupRepository
-    {
-        $repository = $this->manager->getRepository(HolidayGroup::class);
-
-        if (!$repository instanceof HolidayGroupRepository) {
-            throw new Exception('Error while getting HolidayGroup.');
-        }
-
-        return $repository;
-    }
-
-    /**
      * Execute the commands.
      *
      * @param InputInterface $input
@@ -138,28 +127,23 @@ EOT
             '',
         ]);
 
+        /* Read parameter */
         $email = strval($input->getOption('email'));
         $calendarName = strval($input->getOption('name'));
         $year = intval($input->getOption('year'));
         $month = intval($input->getOption('month'));
+        $holidayGroupName = 'Saxony';
 
-        $this->calendarLoaderService->loadCalendarImage($email, $calendarName, $year, $month);
+        /* Read db */
+        $calendarImage = $this->calendarLoaderService->loadCalendarImage($email, $calendarName, $year, $month);
+        $holidayGroup = $this->holidayGroupLoaderService->loadHolidayGroup($holidayGroupName);
 
-        $holidayGroupRepository = $this->getHolidayGroupRepository();
-
-        $holidayGroup = $holidayGroupRepository->findOneByName('Saxony');
-
-        if ($holidayGroup === null) {
-            throw new Exception(sprintf('No holiday group was found (%s:%d).', __FILE__, __LINE__));
-        }
-
-        $calendarImage = $this->calendarLoaderService->getCalendarImage();
-
-        /* retrieve the argument value using getArgument() */
-        $output->writeln(sprintf('Email:          %s', $email));
-        $output->writeln(sprintf('Calendar name:  %s', $calendarName));
+        /* Print details */
+        $output->writeln(sprintf('Email:          %s', $calendarImage->getUser()->getEmail()));
+        $output->writeln(sprintf('Calendar name:  %s', $calendarImage->getCalendar()->getName()));
         $output->writeln(sprintf('Year:           %d', $calendarImage->getYear()));
         $output->writeln(sprintf('Month:          %d', $calendarImage->getMonth()));
+        $output->writeln(sprintf('Holiday group:  %s', $holidayGroup->getName()));
 
         $output->writeln('');
         $output->write(sprintf('Create calendar at %s. Please wait.. ', date('Y-m-d H:i:s')));
