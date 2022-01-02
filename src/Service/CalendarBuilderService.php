@@ -163,6 +163,9 @@ class CalendarBuilderService
     /** @var array<array{name: string}> $eventsAndHolidays */
     protected array $eventsAndHolidays = [];
 
+    /** @var array<bool> $holidays */
+    protected array $holidays = [];
+
     const BIRTHDAY_YEAR_NOT_GIVEN = 2100;
 
     const ALIGN_LEFT = 1;
@@ -572,9 +575,18 @@ class CalendarBuilderService
      */
     protected function getDayColor(int $year, int $month, int $day): int
     {
-        return $this->getDayOfWeek($year, $month, $day) === self::DAY_SUNDAY ?
-            $this->colors['red'] :
-            $this->colors['white'];
+        /* Print day in red if sunday */
+        if ($this->getDayOfWeek($year, $month, $day) === self::DAY_SUNDAY) {
+            return $this->colors['red'];
+        }
+
+        /* Print day in red if holiday */
+        if (array_key_exists($this->getDayKey($day), $this->holidays)) {
+            return $this->colors['red'];
+        }
+
+        /* Print day in white otherwise */
+        return $this->colors['white'];
     }
 
     /**
@@ -912,7 +924,7 @@ class CalendarBuilderService
         $this->setY($positionDay['y']);
 
         /* Angle and font size */
-        $angleEvent = 90;
+        $angleEvent = 80;
         $fontSizeEvent = intval(ceil($this->fontSizeDay * 0.6));
 
         /* Get name */
@@ -922,7 +934,7 @@ class CalendarBuilderService
 
         /* Dimension Event */
         $dimensionEvent = $this->getDimension($name, $fontSizeEvent, $angleEvent);
-        $xEvent = $dimensionEvent['width'] + $fontSizeEvent;
+        $xEvent = $fontSizeEvent + intval(round(($dimensionDay['width'] - $fontSizeEvent) / 2));
 
         /* Set event position */
         $this->x -= $align === self::ALIGN_LEFT ? 0 : $dimensionDay['width'];
@@ -1118,7 +1130,11 @@ class CalendarBuilderService
                 continue;
             }
 
+            /* Add event or holiday label */
             $this->addEventOrHoliday($holidayKey, $holiday->getName());
+
+            /* Add holiday */
+            $this->holidays[$holidayKey] = true;
         }
     }
 
