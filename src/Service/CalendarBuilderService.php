@@ -224,7 +224,7 @@ class CalendarBuilderService
 
         /* sizes */
         $this->aspectRatio = $this->calendarImage->getCalendar()->getConfigObject()->getAspectRatio() ?? 3 / 2;
-        $this->height = $this->calendarImage->getImage()->getHeight() ?? 4000;
+        $this->height = $this->calendarImage->getCalendar()->getConfigObject()->getHeight() ?? 4000;
         $this->width = intval(floor($this->height * $this->aspectRatio));
 
         /* Root path */
@@ -725,7 +725,7 @@ class CalendarBuilderService
             default => 0,
         };
 
-        $x = 0; // round(($this->width - $this->widthSource) / 2);
+        $x = 0;
 
         imagecopyresampled($this->imageTarget, $this->imageSource, $x, $y, 0, 0, $this->width, $this->height, $this->widthSource, $this->heightSource);
     }
@@ -793,8 +793,11 @@ class CalendarBuilderService
      */
     protected function addDay(int $day, int $align = self::ALIGN_LEFT): void
     {
+        /* Add distance for next day and between calendar weeks */
+        $calendarWeekDistance = $this->getDayOfWeek($this->year, $this->month, $day) === self::DAY_MONDAY ? $this->dayDistance : 0;
+
         /* Add x for next day */
-        $this->addX($align === self::ALIGN_LEFT ? $this->dayDistance : -$this->dayDistance);
+        $this->addX($align === self::ALIGN_LEFT ? ($this->dayDistance + $calendarWeekDistance) : -1 * $this->dayDistance);
 
         /* Add day */
         $color = $this->getDayColor($this->year, $this->month, $day);
@@ -810,7 +813,7 @@ class CalendarBuilderService
         ];
 
         /* Add x for next day */
-        $this->addX($align === self::ALIGN_LEFT ? $dimension['width'] : -$dimension['width']);
+        $this->addX($align === self::ALIGN_LEFT ? $dimension['width'] : -1 * ($dimension['width'] + $calendarWeekDistance));
     }
 
     /**
@@ -868,22 +871,27 @@ class CalendarBuilderService
         $weekNumber = $this->getCalendarWeekIfMonday($this->year, $this->month, $day);
 
         /* Add calendar week, if day is monday */
-        if ($weekNumber !== null) {
-
-            /* Set x and y */
-            $this->setX($positionDay['x']);
-            $this->setY($positionDay['y']);
-
-            /* Set calendar week position (ALIGN_LEFT -> right side) */
-            $this->x -= $align === self::ALIGN_LEFT ? 0 : $dimensionDay['width'];
-            $this->y += intval(round(1.0 * $this->fontSizeDay));
-
-            /* Build calendar week text */
-            $weekNumberText = sprintf('KW %02d >', $weekNumber);
-
-            /* Add calendar week */
-            $this->addText($weekNumberText, intval(ceil($this->fontSizeDay * 0.5)), $this->colors['white']);
+        if ($weekNumber === null) {
+            return;
         }
+
+        /* Set x and y */
+        $this->setX($positionDay['x']);
+        $this->setY($positionDay['y']);
+
+        /* Set calendar week position (ALIGN_LEFT -> right side) */
+        $this->x -= $align === self::ALIGN_LEFT ? 0 : $dimensionDay['width'];
+        $this->y += intval(round(1.0 * $this->fontSizeDay));
+
+        /* Build calendar week text */
+        $weekNumberText = sprintf('KW %02d >', $weekNumber);
+
+        /* Add calendar week */
+        $this->addText($weekNumberText, intval(ceil($this->fontSizeDay * 0.5)), $this->colors['white']);
+
+        /* Add line */
+        $x = $this->x - intval(round($this->dayDistance / 1));
+        imageline($this->imageTarget, $x, $this->y, $x, $positionDay['y'] - $this->fontSizeDay, $this->colors['white']);
     }
 
     /**
@@ -978,6 +986,8 @@ class CalendarBuilderService
      */
     protected function addQrCode(): void
     {
+        print $this->padding;
+        print "\n";
         imagecopyresized($this->imageTarget, $this->imageQrCode, $this->padding, $this->height - $this->padding - $this->heightQrCode, 0, 0, $this->widthQrCode, $this->heightQrCode, $this->widthSourceQrCode, $this->heightSourceQrCode);
     }
 

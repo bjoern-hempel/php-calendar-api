@@ -36,6 +36,7 @@ use Exception;
  * @package App\Command
  *
  * @method float|null getAspectRatio()
+ * @method int|null getHeight()
  * @method int|null getValign()
  */
 class ArrayToObject

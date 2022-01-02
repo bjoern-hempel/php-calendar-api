@@ -37,6 +37,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Class CreatePageCommand
@@ -50,7 +51,7 @@ class CreatePageCommand extends Command
 {
     protected static $defaultName = 'calendar:create-page';
 
-    protected CalendarBuilderService $calendarBuilderService;
+    protected KernelInterface $appKernel;
 
     protected CalendarLoaderService $calendarLoaderService;
 
@@ -61,14 +62,14 @@ class CreatePageCommand extends Command
     /**
      * CreatePageCommand constructor
      *
-     * @param CalendarBuilderService $calendarBuilderService
+     * @param KernelInterface $appKernel
      * @param CalendarLoaderService $calendarLoaderService
      * @param HolidayGroupLoaderService $holidayGroupLoaderService
      * @param EntityManagerInterface $manager
      */
-    public function __construct(CalendarBuilderService $calendarBuilderService, CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, EntityManagerInterface $manager)
+    public function __construct(KernelInterface $appKernel, CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, EntityManagerInterface $manager)
     {
-        $this->calendarBuilderService = $calendarBuilderService;
+        $this->appKernel = $appKernel;
 
         $this->calendarLoaderService = $calendarLoaderService;
 
@@ -147,8 +148,9 @@ EOT
 
         /* Create calendar image */
         $timeStart = microtime(true);
-        $this->calendarBuilderService->init($calendarImage, $holidayGroup);
-        $file = $this->calendarBuilderService->build();
+        $calendarBuilderService = new CalendarBuilderService($this->appKernel);
+        $calendarBuilderService->init($calendarImage, $holidayGroup);
+        $file = $calendarBuilderService->build();
         $timeTaken = microtime(true) - $timeStart;
 
         $output->writeln(sprintf('→ Time taken: %.2fs', $timeTaken));

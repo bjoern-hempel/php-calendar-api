@@ -259,10 +259,12 @@ class AppFixtures extends Fixture
             ['Daniel Radcliffe', '1989-07-23T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Erik', '1970-09-11T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Isabel', '1994-08-18T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Heike', '1970-05-06T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Manuel Neuer', '1986-03-27T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Olaf Scholz', '1958-06-14T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Otto Waalkes', '1948-07-22T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Rico', '2100-08-18T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Sebastian', '1997-05-22T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Sido', '1980-11-30T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['Elisabeth II.', '1926-04-21T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
             ['New York City Marathon', '2022-11-06T12:00:00Z', CalendarBuilderService::EVENT_TYPE_EVENT],
@@ -314,7 +316,7 @@ class AppFixtures extends Fixture
             $calendar->setHolidayGroup($holidayGroup);
             $calendar->setName(sprintf('Calendar %d', 1));
             $calendar->setTitle('2022');
-            $calendar->setSubtitle('With love'.' - '.'Isa & Björn');
+            $calendar->setSubtitle('With love - Isa & Björn');
             $calendar->setBackgroundColor('255,255,255,100');
             $calendar->setPrintCalendarWeek(true);
             $calendar->setPrintWeekNumber(true);
@@ -327,6 +329,7 @@ class AppFixtures extends Fixture
                 'print-qr-code-month' => true,
                 'print-qr-code-title' => true,
                 'aspect-ratio' => round(sqrt(2), 3), /* 1:1.414 */
+                'height' => 4000,
             ]);
             $manager->persist($calendar);
 
