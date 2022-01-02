@@ -46,12 +46,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2021-12-29)
  * @package App\Command
+ * @example bin/console calendar:create-page --email "user1@domain.tld" --name "Calendar 1" --year 2022 --month 0
  */
 class CreatePageCommand extends Command
 {
     protected static $defaultName = 'calendar:create-page';
-
-    protected float $factor = 1.414;
 
     protected CalendarBuilderService $calendarBuilderService;
 
@@ -90,6 +89,8 @@ class CreatePageCommand extends Command
         $this
             ->setDescription('Creates a calendar page')
             ->setDefinition([
+                new InputOption('email', null, InputOption::VALUE_REQUIRED, 'The email of the user.'),
+                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'The calendar name which will be used.'),
                 new InputOption('year', 'y', InputOption::VALUE_REQUIRED, 'The year with which the page will be created.'),
                 new InputOption('month', 'm', InputOption::VALUE_REQUIRED, 'The month with which the page will be created.'),
             ])
@@ -137,12 +138,12 @@ EOT
             '',
         ]);
 
-        $email = 'user1@domain.tld';
-        $name = 'Calendar 1';
+        $email = strval($input->getOption('email'));
+        $calendarName = strval($input->getOption('name'));
         $year = intval($input->getOption('year'));
         $month = intval($input->getOption('month'));
 
-        $this->calendarLoaderService->loadCalendarImage($email, $name, $year, $month);
+        $this->calendarLoaderService->loadCalendarImage($email, $calendarName, $year, $month);
 
         $holidayGroupRepository = $this->getHolidayGroupRepository();
 
@@ -155,8 +156,10 @@ EOT
         $calendarImage = $this->calendarLoaderService->getCalendarImage();
 
         /* retrieve the argument value using getArgument() */
-        $output->writeln(sprintf('Year:  %d', $calendarImage->getYear()));
-        $output->writeln(sprintf('Month: %d', $calendarImage->getMonth()));
+        $output->writeln(sprintf('Email:          %s', $email));
+        $output->writeln(sprintf('Calendar name:  %s', $calendarName));
+        $output->writeln(sprintf('Year:           %d', $calendarImage->getYear()));
+        $output->writeln(sprintf('Month:          %d', $calendarImage->getMonth()));
 
         $output->writeln('');
         $output->write(sprintf('Create calendar at %s. Please wait.. ', date('Y-m-d H:i:s')));
