@@ -250,6 +250,20 @@ class AppFixtures extends Fixture
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
         ];
 
+        $events = [
+            ['Angela Merkel', '1954-07-17T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Arnold Schwarzenegger', '1947-07-30T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Carolin Kebekus', '1980-05-09T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Daniel Radcliffe', '1989-07-23T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Manuel Neuer', '1986-03-27T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Olaf Scholz', '1958-06-14T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Otto Waalkes', '1948-07-22T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Sido', '1980-11-30T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['Elisabeth II.', '1926-04-21T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+            ['New York City Marathon', '2022-11-06T12:00:00Z', CalendarBuilderService::EVENT_TYPE_EVENT],
+            ['Zrce Spring Break, Croatia', ]
+        ];
+
         foreach ($holidayDatas as $holidayData) {
             $holiday = new Holiday();
             $holiday->setHolidayGroup($holidayGroup);

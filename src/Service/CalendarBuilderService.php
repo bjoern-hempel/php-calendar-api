@@ -30,6 +30,7 @@ use App\Entity\Calendar;
 use App\Entity\CalendarImage;
 use App\Entity\HolidayGroup;
 use App\Entity\Image;
+use App\Utils\SizeConverter;
 use DateTime;
 use Exception;
 use GdImage;
@@ -165,6 +166,10 @@ class CalendarBuilderService
     const IMAGE_PNG = 'png';
 
     const IMAGE_JPG = 'jpg';
+
+    const EVENT_TYPE_BIRTHDAY = 'birthday';
+
+    const EVENT_TYPE_EVENT = 'event';
 
     /**
      * Calendar constructor
@@ -746,8 +751,12 @@ class CalendarBuilderService
             $this->x -= $align === self::ALIGN_LEFT ? 0 : $dimensionDay['width'];
             $this->y += intval(round(1.0 * $this->fontSizeDay));
 
+            $weekNumberText = sprintf('KW %02d >', $weekNumber);
+            //$weekNumberText = mb_convert_encoding($weekNumberText, "HTML-ENTITIES", "UTF-8");
+            //$weekNumberText = preg_replace('~^(&([a-zA-Z0-9]);)~',htmlentities('${1}'),$weekNumberText);
+
             /* Add calendar week */
-            $this->addText(sprintf('%02d', $weekNumber), intval(ceil($this->fontSizeDay * 0.5)), $this->colors['white']);
+            $this->addText($weekNumberText, intval(ceil($this->fontSizeDay * 0.5)), $this->colors['white']);
 
             /* Set remembered position */
             $this->resetPosition();
@@ -895,15 +904,58 @@ class CalendarBuilderService
     }
 
     /**
-     * Builds the given source image to a calendar page.
+     * Returns image properties from given image.
      *
+     * @param string $path
+     * @param string $keyPostfix
+     * @return array<string|int>
      * @throws Exception
      */
-    public function build(): void
+    protected function getImageProperties(string $path, string $keyPostfix = 'Target'): array
+    {
+        /* Check created image */
+        if (!file_exists($path)) {
+            throw new Exception(sprintf('Missing file "%s" (%s:%d).', $path, __FILE__, __LINE__));
+        }
+
+        /* Get image properties */
+        $image = getimagesize($path);
+
+        /* Check image properties */
+        if ($image === false) {
+            throw new Exception(sprintf('Unable to get file information from "%s" (%s:%d).', $path, __FILE__, __LINE__));
+        }
+
+        /* Get file size */
+        $sizeByte = filesize($path);
+
+        /* Check image properties */
+        if ($sizeByte === false) {
+            throw new Exception(sprintf('Unable to get file size from "%s" (%s:%d).', $path, __FILE__, __LINE__));
+        }
+
+        /* Return the image properties */
+        return [
+            sprintf('path%s', $keyPostfix) => $path,
+            sprintf('width%s', $keyPostfix) => intval($image[0]),
+            sprintf('height%s', $keyPostfix) => intval($image[1]),
+            sprintf('mime%s', $keyPostfix) => $image['mime'],
+            sprintf('size%s', $keyPostfix) => $sizeByte,
+            sprintf('sizeHuman%s', $keyPostfix) => SizeConverter::getHumanReadableSize($sizeByte),
+        ];
+    }
+
+    /**
+     * Builds the given source image to a calendar page.
+     *
+     * @return array<string|int>
+     * @throws Exception
+     */
+    public function build(): array
     {
         /* Save given values */
-        $this->pathSource = sprintf('%s/%s', $this->pathUpload, $this->image->getSourcePath());
-        $this->pathTarget = sprintf('%s/%s', $this->pathUpload, $this->image->getTargetPath());
+        $this->pathSource = sprintf('%s%s', $this->pathUpload, $this->image->getSourcePath());
+        $this->pathTarget = sprintf('%s%s', $this->pathUpload, $this->image->getTargetPath());
         $this->pathQrCode = str_replace('.jpg', '.png', $this->pathSource);
         $this->textTitle = $this->calendarImage->getTitle() ?? '';
         $this->textPosition = $this->calendarImage->getPosition() ?? '';
@@ -914,11 +966,19 @@ class CalendarBuilderService
         /* Init */
         $this->prepare();
 
-        /* Build calender image */
+        /* Add main image */
         $this->addImage();
+
+        /* Add calendar area */
         $this->addRectangle();
+
+        /* Add title, position, etc. */
         $this->addTitleAndPositionOnCalendarPage();
+
+        /* Add calendar */
         $this->addCalendar();
+
+        /* Add qr code */
         $this->addQrCode();
 
         /* Write image */
@@ -926,5 +986,10 @@ class CalendarBuilderService
 
         /* Destroy image */
         $this->destroy();
+
+        return array_merge(
+            $this->getImageProperties($this->pathSource, 'Source'),
+            $this->getImageProperties($this->pathTarget),
+        );
     }
 }

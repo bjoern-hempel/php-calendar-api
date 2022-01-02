@@ -156,10 +156,33 @@ EOT
         $output->writeln(sprintf('Year:  %d', $calendarImage->getYear()));
         $output->writeln(sprintf('Month: %d', $calendarImage->getMonth()));
 
+        $output->writeln('');
+        $output->write('Create calendar. Please wait.. ');
+
         /* Create calendar image */
+        $timeStart = microtime(true);
         $this->calendarBuilderService->init($calendarImage);
         $this->calendarBuilderService->setHolidayGroup($holidayGroup);
-        $this->calendarBuilderService->build();
+        $file = $this->calendarBuilderService->build();
+        $timeTaken = microtime(true) - $timeStart;
+
+        $output->writeln(sprintf('→ Time taken: %.2fs', $timeTaken));
+
+        $output->writeln('');
+        $output->writeln('Calendar built from:');
+        $output->writeln(sprintf('→ Path:      %s', $file['pathSource']));
+        $output->writeln(sprintf('→ Mime:      %s', $file['mimeSource']));
+        $output->writeln(sprintf('→ Size:      %s (%d Bytes)', $file['sizeHumanSource'], $file['sizeSource']));
+        $output->writeln(sprintf('→ Dimension: %dx%d', $file['widthSource'], $file['heightSource']));
+
+        $output->writeln('');
+        $output->writeln('Calendar written to:');
+        $output->writeln(sprintf('→ Path:      %s', $file['pathTarget']));
+        $output->writeln(sprintf('→ Mime:      %s', $file['mimeTarget']));
+        $output->writeln(sprintf('→ Size:      %s (%d Bytes)', $file['sizeHumanTarget'], $file['sizeTarget']));
+        $output->writeln(sprintf('→ Dimension: %dx%d', $file['widthTarget'], $file['heightTarget']));
+
+        $output->writeln('');
 
         return Command::SUCCESS;
     }
