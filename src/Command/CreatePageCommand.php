@@ -130,6 +130,8 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln([
+            '',
+            '============',
             'Page Creator',
             '============',
             '',
@@ -157,7 +159,7 @@ EOT
         $output->writeln(sprintf('Month: %d', $calendarImage->getMonth()));
 
         $output->writeln('');
-        $output->write('Create calendar. Please wait.. ');
+        $output->write(sprintf('Create calendar at %s. Please wait.. ', date('Y-m-d H:i:s')));
 
         /* Create calendar image */
         $timeStart = microtime(true);

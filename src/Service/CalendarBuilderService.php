@@ -54,9 +54,13 @@ class CalendarBuilderService
 
     protected int $height;
 
-    protected int $widthQrCode = 200;
+    protected float $calendarBoxBottomSizeReference = 1/6;
 
-    protected int $heightQrCode = 200;
+    protected float $calendarBoxBottomSize = 9/48;
+
+    protected int $widthQrCode = 250;
+
+    protected int $heightQrCode = 250;
 
     protected string $font = 'OpenSansCondensed-Light.ttf';
 
@@ -113,7 +117,7 @@ class CalendarBuilderService
 
     protected int $heightSourceQrCode;
 
-    protected int $yRect;
+    protected int $yCalendarBoxBottom;
 
     protected int $x;
 
@@ -129,6 +133,9 @@ class CalendarBuilderService
     protected float $zoom = 1.0;
 
     protected int $valignImage;
+
+    /** @var array<string, array{x: int, y: int, align: int, dimension: int[], day: int}> $positionDays */
+    protected array $positionDays = [];
 
     protected GdImage $imageTarget;
 
@@ -483,7 +490,7 @@ class CalendarBuilderService
         $this->widthSourceQrCode = $propertiesQrCode[0];
         $this->heightSourceQrCode = $propertiesQrCode[1];
 
-        $this->yRect = intval(floor($this->height * 19.5 / 24));
+        $this->yCalendarBoxBottom = intval(floor($this->height * (1 - $this->calendarBoxBottomSize)));
     }
 
     /**
@@ -509,117 +516,6 @@ class CalendarBuilderService
                 'to' => $days,
             ]
         ];
-    }
-
-    /**
-     * Add text.
-     *
-     * @param string $text
-     * @param int $fontSize
-     * @param ?int $color
-     * @param int $paddingTop
-     * @param int $align
-     * @param int $valign
-     * @param int $angle
-     * @return array{width: int, height: int}
-     * @throws Exception
-     */
-    #[ArrayShape(['width' => "int", 'height' => "int"])]
-    protected function addText(string $text, int $fontSize, int $color = null, int $paddingTop = 0, int $align = self::ALIGN_LEFT, int $valign = self::VALIGN_BOTTOM, int $angle = 0): array
-    {
-        if ($color === null) {
-            $color = $this->colors['white'];
-        }
-
-        $dimension = $this->getDimension($text, $fontSize, $angle);
-
-        $x = match ($align) {
-            self::ALIGN_CENTER => $this->x - intval(round($dimension['width'] / 2)),
-            self::ALIGN_RIGHT => $this->x - $dimension['width'],
-            default => $this->x,
-        };
-
-        $y = match ($valign) {
-            self::VALIGN_TOP => $this->y + $fontSize,
-            default => $this->y,
-        };
-
-        imagettftext($this->imageTarget, $fontSize, $angle, $x, $y + $paddingTop, $color, $this->pathFont, $text);
-
-        return [
-            'width' => $dimension['width'],
-            'height' => $fontSize,
-        ];
-    }
-
-    /**
-     * Add image
-     */
-    protected function addImage(): void
-    {
-        $y = match ($this->valignImage) {
-            self::VALIGN_BOTTOM => $this->yRect - $this->height,
-            default => 0,
-        };
-
-        $x = 0; // round(($this->width - $this->widthSource) / 2);
-
-        imagecopyresampled($this->imageTarget, $this->imageSource, $x, $y, 0, 0, $this->width, $this->height, $this->widthSource, $this->heightSource);
-    }
-
-    /**
-     * Add bottom text and calendar rectangle.
-     */
-    protected function addRectangle(): void
-    {
-        /* Add calendar area (rectangle) */
-        imagefilledrectangle($this->imageTarget, 0, $this->yRect, $this->width, $this->height, $this->colors['blackTransparency']);
-    }
-
-    /**
-     * Add the title and position.
-     *
-     * @throws Exception
-     */
-    protected function addTitleAndPositionOnCalendarPage(): void
-    {
-        /* Start y */
-        $x = $this->padding;
-        $y = $this->yRect + $this->padding;
-
-        /* Add title */
-        $fontSizeTitle = $this->fontSizeTitle;
-        $angleAll = 0;
-        $dimensionTitle = $this->getDimension($this->textTitle, $this->fontSizeTitle, $angleAll);
-        imagettftext($this->imageTarget, $this->fontSizeTitle, $angleAll, $x, $y + $fontSizeTitle, $this->colors['white'], $this->pathFont, $this->textTitle);
-
-        /* Add position */
-        $anglePosition = 90;
-        $dimensionPosition = $this->getDimension($this->textPosition, $this->fontSizePosition, $anglePosition);
-        $xPosition = $this->padding + $dimensionPosition['width'] + $this->fontSizePosition;
-        $yPosition = $this->yRect - $this->padding;
-        imagettftext($this->imageTarget, $this->fontSizePosition, $anglePosition, $xPosition, $yPosition, $this->colors['white'], $this->pathFont, $this->textPosition);
-    }
-
-    /**
-     * Adds the title page.
-     *
-     * @param int $y
-     * @throws Exception
-     */
-    protected function addTitleOnTitlePage(int $y = 0): void
-    {
-        /* Set x and y */
-        $xCenterCalendar = intval(round($this->width / 2));
-        $this->initXY($xCenterCalendar, $this->yRect + $this->padding + $y);
-
-        $paddingTopYear = $this->getSize(0);
-        $dimensionYear = $this->addText(sprintf('%s', $this->calendar->getTitle()), $this->fontSizeTitlePage, $this->colors['white'], $paddingTopYear, self::ALIGN_CENTER, self::VALIGN_TOP);
-        $this->addY($dimensionYear['height'] + $paddingTopYear);
-
-        $paddingTopSubtext = $this->getSize(40);
-        $dimensionYear = $this->addText(sprintf('%s', $this->calendar->getSubtitle()), $this->fontSizeTitlePageSubtext, $this->colors['white'], $paddingTopSubtext, self::ALIGN_CENTER, self::VALIGN_TOP);
-        $this->addY($dimensionYear['height'] + $paddingTopSubtext);
     }
 
     /**
@@ -689,7 +585,7 @@ class CalendarBuilderService
     }
 
     /**
-     * Returns the number of week if monday. Otherwise null.
+     * Returns the number of week if monday. Otherwise, null.
      *
      * @param int $year
      * @param int $month
@@ -697,7 +593,7 @@ class CalendarBuilderService
      * @return int|null
      * @throws Exception
      */
-    protected function getWeekNumberIfMonday(int $year, int $month, int $day): ?int
+    protected function getCalendarWeekIfMonday(int $year, int $month, int $day): ?int
     {
         $dayOfWeek = $this->getDayOfWeek($year, $month, $day);
 
@@ -733,75 +629,140 @@ class CalendarBuilderService
     }
 
     /**
-     * Adds week number to day (addDay).
+     * Returns the y correction for all calendar box.
      *
-     * @param int|null $weekNumber
-     * @param array{width: int, height: int} $dimensionDay
-     * @param int $align
-     * @throws Exception
+     * $this->calendarBoxBottomSizeReference is the reference for all positions. Move some elements to keep valign: bottom.
+     *
+     * @return int
      */
-    protected function addWeekNumber(?int $weekNumber, array $dimensionDay, int $align): void
+    protected function getCalendarBoxYCorrection(): int
     {
-        /* Add calendar week, if day is monday */
-        if ($weekNumber !== null) {
-            /* Remember current x and y position. */
-            $this->rememberPosition();
-
-            /* Set calendar week position (ALIGN_LEFT -> right side) */
-            $this->x -= $align === self::ALIGN_LEFT ? 0 : $dimensionDay['width'];
-            $this->y += intval(round(1.0 * $this->fontSizeDay));
-
-            $weekNumberText = sprintf('KW %02d >', $weekNumber);
-            //$weekNumberText = mb_convert_encoding($weekNumberText, "HTML-ENTITIES", "UTF-8");
-            //$weekNumberText = preg_replace('~^(&([a-zA-Z0-9]);)~',htmlentities('${1}'),$weekNumberText);
-
-            /* Add calendar week */
-            $this->addText($weekNumberText, intval(ceil($this->fontSizeDay * 0.5)), $this->colors['white']);
-
-            /* Set remembered position */
-            $this->resetPosition();
+        if ($this->calendarBoxBottomSize === $this->calendarBoxBottomSizeReference) {
+            return 0;
         }
+
+        return intval(round($this->height * ($this->calendarBoxBottomSize - $this->calendarBoxBottomSizeReference)));
     }
 
     /**
-     * Add event to day.
+     * Returns the day key.
      *
      * @param int $day
-     * @param array{width: int, height: int} $dimensionDay
+     * @return string
+     */
+    protected function getDayKey(int $day): string
+    {
+        return sprintf('%04d-%02d-%02d', $this->year, $this->month, $day);
+    }
+
+    /**
+     * Add text.
+     *
+     * @param string $text
+     * @param int $fontSize
+     * @param ?int $color
+     * @param int $paddingTop
      * @param int $align
+     * @param int $valign
+     * @param int $angle
+     * @return array{width: int, height: int}
      * @throws Exception
      */
-    protected function addEvent(int $day, array $dimensionDay, int $align): void
+    #[ArrayShape(['width' => "int", 'height' => "int"])]
+    protected function addText(string $text, int $fontSize, int $color = null, int $paddingTop = 0, int $align = self::ALIGN_LEFT, int $valign = self::VALIGN_BOTTOM, int $angle = 0): array
     {
-        $date = sprintf('%04d-%02d-%02d', $this->year, $this->month, $day);
-
-        if (!array_key_exists($date, $this->holidays)) {
-            return;
+        if ($color === null) {
+            $color = $this->colors['white'];
         }
 
-        $event = $this->holidays[$date];
+        $dimension = $this->getDimension($text, $fontSize, $angle);
 
-        /* Remember current x and y position. */
-        $this->rememberPosition();
+        $x = match ($align) {
+            self::ALIGN_CENTER => $this->x - intval(round($dimension['width'] / 2)),
+            self::ALIGN_RIGHT => $this->x - $dimension['width'],
+            default => $this->x,
+        };
 
-        /* Angle and font size */
-        $angleEvent = 90;
-        $fontSizeEvent = intval(ceil($this->fontSizeDay * 0.6));
+        $y = match ($valign) {
+            self::VALIGN_TOP => $this->y + $fontSize,
+            default => $this->y,
+        };
 
-        /* Dimension Event */
-        $dimensionEvent = $this->getDimension($event, $fontSizeEvent, $angleEvent);
-        $xEvent = $dimensionEvent['width'] + $fontSizeEvent;
+        imagettftext($this->imageTarget, $fontSize, $angle, $x, $y + $paddingTop, $color, $this->pathFont, $text);
 
-        /* Set event position */
-        $this->x -= $align === self::ALIGN_LEFT ? 0 : $dimensionDay['width'];
-        $this->x += $xEvent;
-        $this->y -= intval(round(1.5 * $this->fontSizeDay));
+        return [
+            'width' => $dimension['width'],
+            'height' => $fontSize,
+        ];
+    }
 
-        /* Add Event */
-        $this->addText(text: $event, fontSize: $fontSizeEvent, color: $this->colors['white'], align: self::ALIGN_LEFT, angle: $angleEvent);
+    /**
+     * Add image
+     */
+    protected function addImage(): void
+    {
+        $y = match ($this->valignImage) {
+            self::VALIGN_BOTTOM => $this->yCalendarBoxBottom - $this->height,
+            default => 0,
+        };
 
-        /* Set remembered position */
-        $this->resetPosition();
+        $x = 0; // round(($this->width - $this->widthSource) / 2);
+
+        imagecopyresampled($this->imageTarget, $this->imageSource, $x, $y, 0, 0, $this->width, $this->height, $this->widthSource, $this->heightSource);
+    }
+
+    /**
+     * Add bottom calendar box.
+     */
+    protected function addRectangle(): void
+    {
+        /* Add calendar area (rectangle) */
+        imagefilledrectangle($this->imageTarget, 0, $this->yCalendarBoxBottom, $this->width, $this->height, $this->colors['blackTransparency']);
+    }
+
+    /**
+     * Add the title and position.
+     *
+     * @throws Exception
+     */
+    protected function addImageDescriptionAndPositionOnCalendarPage(): void
+    {
+        /* Start y */
+        $x = $this->padding;
+        $y = $this->yCalendarBoxBottom + $this->padding;
+
+        /* Add title */
+        $fontSizeTitle = $this->fontSizeTitle;
+        $angleAll = 0;
+        $dimensionTitle = $this->getDimension($this->textTitle, $this->fontSizeTitle, $angleAll);
+        imagettftext($this->imageTarget, $this->fontSizeTitle, $angleAll, $x, $y + $fontSizeTitle, $this->colors['white'], $this->pathFont, $this->textTitle);
+
+        /* Add position */
+        $anglePosition = 90;
+        $dimensionPosition = $this->getDimension($this->textPosition, $this->fontSizePosition, $anglePosition);
+        $xPosition = $this->padding + $dimensionPosition['width'] + $this->fontSizePosition;
+        $yPosition = $this->yCalendarBoxBottom - $this->padding;
+        imagettftext($this->imageTarget, $this->fontSizePosition, $anglePosition, $xPosition, $yPosition, $this->colors['white'], $this->pathFont, $this->textPosition);
+    }
+
+    /**
+     * Adds the title page elements (instead of the calendar).
+     *
+     * @throws Exception
+     */
+    protected function addTitleOnTitlePage(): void
+    {
+        /* Set x and y */
+        $xCenterCalendar = intval(round($this->width / 2));
+        $this->initXY($xCenterCalendar, $this->yCalendarBoxBottom + $this->padding + $this->getCalendarBoxYCorrection());
+
+        $paddingTopYear = $this->getSize(0);
+        $dimensionYear = $this->addText(sprintf('%s', $this->calendar->getTitle()), $this->fontSizeTitlePage, $this->colors['white'], $paddingTopYear, self::ALIGN_CENTER, self::VALIGN_TOP);
+        $this->addY($dimensionYear['height'] + $paddingTopYear);
+
+        $paddingTopSubtext = $this->getSize(40);
+        $dimensionYear = $this->addText(sprintf('%s', $this->calendar->getSubtitle()), $this->fontSizeTitlePageSubtext, $this->colors['white'], $paddingTopSubtext, self::ALIGN_CENTER, self::VALIGN_TOP);
+        $this->addY($dimensionYear['height'] + $paddingTopSubtext);
     }
 
     /**
@@ -818,38 +779,31 @@ class CalendarBuilderService
 
         /* Add day */
         $color = $this->getDayColor($this->year, $this->month, $day);
-        $dimensionDay = $this->addText(sprintf('%02d', $day), $this->fontSizeDay, $color, align: $align);
-        $weekNumber = $this->getWeekNumberIfMonday($this->year, $this->month, $day);
+        $dimension = $this->addText(sprintf('%02d', $day), $this->fontSizeDay, $color, align: $align);
 
-        /* Add week number */
-        $this->addWeekNumber($weekNumber, $dimensionDay, $align);
-
-        /* Add Event */
-        $this->addEvent($day, $dimensionDay, $align);
+        /* Save position */
+        $this->positionDays[$this->getDayKey($day)] = [
+            'x' => $this->x,
+            'y' => $this->y,
+            'align' => $align,
+            'dimension' => $dimension,
+            'day' => $day,
+        ];
 
         /* Add x for next day */
-        $this->addX($align === self::ALIGN_LEFT ? $dimensionDay['width'] : -$dimensionDay['width']);
+        $this->addX($align === self::ALIGN_LEFT ? $dimension['width'] : -$dimension['width']);
     }
 
     /**
-     * Adds the calendar.
+     * Adds the calendar (year, month and days).
      *
      * @throws Exception
      */
-    protected function addCalendar(): void
+    protected function addYearMonthAndDays(): void
     {
-        /* Change calendar box size from 5:6 (20:24) to 19.5:24 -> 4:24 to 4.5:24 */
-        $y = intval(round($this->height * 4.5 / 24 - $this->height * 4 / 24));
-
-        /* This is the title page */
-        if ($this->month === 0) {
-            $this->addTitleOnTitlePage($y);
-            return;
-        }
-
         /* Set x and y */
         $xCenterCalendar = intval(round($this->width / 2) + round($this->width / 8));
-        $this->initXY($xCenterCalendar, $this->yRect + $this->padding + $y);
+        $this->initXY($xCenterCalendar, $this->yCalendarBoxBottom + $this->padding + $this->getCalendarBoxYCorrection());
 
         /* Add month */
         $paddingTop = $this->getSize(0);
@@ -876,6 +830,106 @@ class CalendarBuilderService
         $this->addX($this->dayDistance);
         for ($day = $days['right']['from']; $day <= $days['right']['to']; $day++) {
             $this->addDay($day);
+        }
+    }
+
+    /**
+     * Adds calendar week to day.
+     *
+     * @param string $dayKey
+     * @throws Exception
+     */
+    protected function addCalendarWeek(string $dayKey): void
+    {
+        $positionDay = $this->positionDays[$dayKey];
+        $day = $positionDay['day'];
+        $dimensionDay = $positionDay['dimension'];
+        $align = $positionDay['align'];
+
+        $weekNumber = $this->getCalendarWeekIfMonday($this->year, $this->month, $day);
+
+        /* Add calendar week, if day is monday */
+        if ($weekNumber !== null) {
+
+            /* Set x and y */
+            $this->setX($positionDay['x']);
+            $this->setY($positionDay['y']);
+
+            /* Set calendar week position (ALIGN_LEFT -> right side) */
+            $this->x -= $align === self::ALIGN_LEFT ? 0 : $dimensionDay['width'];
+            $this->y += intval(round(1.0 * $this->fontSizeDay));
+
+            /* Build calendar week text */
+            $weekNumberText = sprintf('KW %02d >', $weekNumber);
+
+            /* Add calendar week */
+            $this->addText($weekNumberText, intval(ceil($this->fontSizeDay * 0.5)), $this->colors['white']);
+        }
+    }
+
+    /**
+     * Adds calendar week to days.
+     *
+     * @throws Exception
+     */
+    protected function addCalendarWeeks(): void
+    {
+        foreach ($this->positionDays as $dayKey => $positionDay) {
+            $this->addCalendarWeek($dayKey);
+        }
+    }
+
+    /**
+     * Add event to day.
+     *
+     * @param string $dayKey
+     * @throws Exception
+     */
+    protected function addEvent(string $dayKey): void
+    {
+        $positionDay = $this->positionDays[$dayKey];
+        $day = $positionDay['day'];
+        $dimensionDay = $positionDay['dimension'];
+        $align = $positionDay['align'];
+
+        $dayKey = $this->getDayKey($day);
+
+        if (!array_key_exists($dayKey, $this->holidays)) {
+            return;
+        }
+
+        $event = $this->holidays[$dayKey];
+
+        /* Set x and y */
+        $this->setX($positionDay['x']);
+        $this->setY($positionDay['y']);
+
+        /* Angle and font size */
+        $angleEvent = 90;
+        $fontSizeEvent = intval(ceil($this->fontSizeDay * 0.6));
+
+        /* Dimension Event */
+        $dimensionEvent = $this->getDimension($event, $fontSizeEvent, $angleEvent);
+        $xEvent = $dimensionEvent['width'] + $fontSizeEvent;
+
+        /* Set event position */
+        $this->x -= $align === self::ALIGN_LEFT ? 0 : $dimensionDay['width'];
+        $this->x += $xEvent;
+        $this->y -= intval(round(1.5 * $this->fontSizeDay));
+
+        /* Add Event */
+        $this->addText(text: $event, fontSize: $fontSizeEvent, color: $this->colors['white'], align: self::ALIGN_LEFT, angle: $angleEvent);
+    }
+
+    /**
+     * Adds events to days.
+     *
+     * @throws Exception
+     */
+    protected function addEvents(): void
+    {
+        foreach ($this->positionDays as $dayKey => $positionDay) {
+            $this->addEvent($dayKey);
         }
     }
 
@@ -973,10 +1027,16 @@ class CalendarBuilderService
         $this->addRectangle();
 
         /* Add title, position, etc. */
-        $this->addTitleAndPositionOnCalendarPage();
+        $this->addImageDescriptionAndPositionOnCalendarPage();
 
         /* Add calendar */
-        $this->addCalendar();
+        if ($this->month === 0) {
+            $this->addTitleOnTitlePage();
+        } else {
+            $this->addYearMonthAndDays();
+            $this->addCalendarWeeks();
+            $this->addEvents();
+        }
 
         /* Add qr code */
         $this->addQrCode();
