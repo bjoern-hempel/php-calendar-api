@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### [0.1.2] - 2022-01-03
 
-* #13
+* [#13](https://github.com/bjoern-hempel/php-calendar-api/issues/13) - Rename project from calendarBuilder to php-calendar-api
 
 ### [0.1.1] - 2022-01-03
 
