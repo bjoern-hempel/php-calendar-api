@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * MIT License
@@ -166,33 +168,33 @@ class CalendarBuilderService
     /** @var array<bool> $holidays */
     protected array $holidays = [];
 
-    const BIRTHDAY_YEAR_NOT_GIVEN = 2100;
+    public const BIRTHDAY_YEAR_NOT_GIVEN = 2100;
 
-    const ALIGN_LEFT = 1;
+    public const ALIGN_LEFT = 1;
 
-    const ALIGN_CENTER = 2;
+    public const ALIGN_CENTER = 2;
 
-    const ALIGN_RIGHT = 3;
+    public const ALIGN_RIGHT = 3;
 
-    const VALIGN_TOP = 1;
+    public const VALIGN_TOP = 1;
 
-    const VALIGN_BOTTOM = 2;
+    public const VALIGN_BOTTOM = 2;
 
-    const ZOOM_HEIGHT_100 = 4000;
+    public const ZOOM_HEIGHT_100 = 4000;
 
-    const DAY_SUNDAY = 0;
+    public const DAY_SUNDAY = 0;
 
-    const DAY_MONDAY = 1;
+    public const DAY_MONDAY = 1;
 
-    const IMAGE_PNG = 'png';
+    public const IMAGE_PNG = 'png';
 
-    const IMAGE_JPG = 'jpg';
+    public const IMAGE_JPG = 'jpg';
 
-    const EVENT_TYPE_BIRTHDAY = 0;
+    public const EVENT_TYPE_BIRTHDAY = 0;
 
-    const EVENT_TYPE_EVENT = 1;
+    public const EVENT_TYPE_EVENT = 1;
 
-    const EVENT_TYPE_EVENT_GROUP = 2;
+    public const EVENT_TYPE_EVENT_GROUP = 2;
 
     /**
      * Calendar constructor

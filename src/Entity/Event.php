@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * MIT License
@@ -146,7 +148,7 @@ class Event
 
     /**
      * Gets the date of this event.
-     * 
+     *
      * @return DateTimeInterface
      */
     public function getDate(): DateTimeInterface
