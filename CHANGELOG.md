@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
-### [0.1.0] - 2021-10-27
+### [0.1.1] - 2022-01-03
+
+* Add README.md
+
+### [0.1.0] - 2022-01-03
 
 * Initial release
 * Add PHPStan with the highest level
