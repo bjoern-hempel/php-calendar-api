@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * MIT License
@@ -96,7 +98,7 @@ class HolidayGroupLoaderService
     {
         /* Clears all objects */
         $this->clear();
-        
+
         /* Load user */
         $holidayGroup = $this->getHolidayGroupRepository()->findOneByName($holidayGroupName);
         if ($holidayGroup === null) {

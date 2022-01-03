@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * MIT License
@@ -38,7 +40,7 @@ use Exception;
  * @version 1.0 (2021-12-30)
  * @package App\Repository
  * @extends ServiceEntityRepository<HolidayGroup>
- *     
+ *
  * @method HolidayGroup|null find($id, $lockMode = null, $lockVersion = null)
  * @method HolidayGroup|null findOneBy(array $criteria, array $orderBy = null)
  * @method HolidayGroup[]    findAll()
@@ -48,7 +50,7 @@ class HolidayGroupRepository extends ServiceEntityRepository
 {
     /**
      * HolidayGroupRepository constructor.
-     * 
+     *
      * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)

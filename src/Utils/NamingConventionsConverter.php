@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * MIT License
@@ -81,13 +83,13 @@ class NamingConventionsConverter
         if ($raw === null) {
             throw new Exception(sprintf('Unable to replace given pattern (%s:%d).', __FILE__, __LINE__));
         }
-        
+
         /* Convert all _ or [SPACE] to [SPACE] */
         $raw = preg_replace('~[ _]+~', ' ', trim($raw));
         if ($raw === null) {
             throw new Exception(sprintf('Unable to replace given pattern (%s:%d).', __FILE__, __LINE__));
         }
-        
+
         /* Build single point of truth */
         return explode(' ', strtolower($raw));
     }
@@ -129,7 +131,9 @@ class NamingConventionsConverter
      */
     public function getPascalCase(): string
     {
-        return implode('', array_map(function ($word) { return ucfirst($word); }, $this->words));
+        return implode('', array_map(function ($word) {
+            return ucfirst($word);
+        }, $this->words));
     }
 
     /**

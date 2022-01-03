@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * MIT License
@@ -83,15 +85,15 @@ class CalendarImageRepository extends ServiceEntityRepository
             ->setParameter('month', $month)
             ->getQuery()
             ->getOneOrNullResult();
-        
+
         if ($result instanceof CalendarImage) {
             return $result;
         }
-        
+
         if ($result !== null) {
             throw new Exception(sprintf('Unsupported type (%s:%d).', __FILE__, __LINE__));
         }
-        
+
         return null;
     }
 }

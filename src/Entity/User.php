@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * MIT License
@@ -47,9 +49,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use TimestampsTrait;
 
-    const ROLE_USER = 'ROLE_USER';
+    public const ROLE_USER = 'ROLE_USER';
 
-    const ROLE_ADMIN = 'ROLE_ADMIN';
+    public const ROLE_ADMIN = 'ROLE_ADMIN';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -295,7 +297,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Adds a related event.
-     * 
+     *
      * @param Event $event
      * @return $this
      */
@@ -311,7 +313,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Removes a related event.
-     * 
+     *
      * @param Event $event
      * @return $this
      */
@@ -491,7 +493,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @see UserInterface
      */
-    public function getUserIdentifier():string
+    public function getUserIdentifier(): string
     {
         return $this->email;
     }

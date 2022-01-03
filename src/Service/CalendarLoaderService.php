@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * MIT License
@@ -210,7 +212,7 @@ class CalendarLoaderService
         if ($clearObjects) {
             $this->clear();
         }
-        
+
         /* Load user */
         $calendar = $this->loadCalendar($email, $calendarName, false);
 
