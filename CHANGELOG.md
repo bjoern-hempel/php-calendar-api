@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.2.0] - 2022-01-03
+
+* [#4](https://github.com/bjoern-hempel/php-calendar-api/issues/4) - Add badges to README.md
+
 ### [0.1.3] - 2022-01-03
 
 * [#13](https://github.com/bjoern-hempel/php-calendar-api/issues/13) - Rename project from calendarBuilder to php-calendar-api (including docker)
