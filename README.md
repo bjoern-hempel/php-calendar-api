@@ -1,6 +1,6 @@
-# calendarBuilder
+# php-calendar-api
 
-> The calendar building framework to build calendar pages and offer them via the API platform. Includes a user area and token management. The framework is secured via tests and static code analyzers.
+> An API for building ready-made calendars. Includes a user area and token management. The framework is secured via tests and static code analyzers.
 
 # Main Technologies
 
