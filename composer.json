@@ -84,7 +84,15 @@
             "@phpunit-unit",
             "@phpunit-api",
             "@sca"
-        ]
+        ],
+        "drop-schema-prod": "bin/console doctrine:schema:drop --force",
+        "drop-schema-test": "bin/console doctrine:schema:drop --force --env=test",
+        "create-schema-prod": "bin/console doctrine:schema:create",
+        "create-schema-test": "bin/console doctrine:schema:create --env=test",
+        "load-fixtures-prod": "bin/console doctrine:fixtures:load -n",
+        "load-fixtures-test": "bin/console doctrine:fixtures:load -n --env=test --group=test",
+        "migrate-prod": "bin/console doctrine:migrations:migrate -n",
+        "migrate-test": "bin/console doctrine:migrations:migrate -n --env=test"
     },
     "conflict": {
         "symfony/symfony": "*"
