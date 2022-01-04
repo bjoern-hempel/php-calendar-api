@@ -28,8 +28,6 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Entity\CalendarImage;
-use App\Entity\Event;
 use App\Service\CalendarBuilderService;
 use App\Service\CalendarLoaderService;
 use App\Service\HolidayGroupLoaderService;

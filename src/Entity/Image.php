@@ -32,6 +32,7 @@ use App\Repository\ImageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -95,10 +96,15 @@ class Image
     /**
      * Gets the user of this image.
      *
-     * @return User|null
+     * @return User
+     * @throws Exception
      */
-    public function getUser(): ?User
+    public function getUser(): User
     {
+        if (!isset($this->user)) {
+            throw new Exception(sprintf('No user was configured (%s:%d)', __FILE__, __LINE__));
+        }
+
         return $this->user;
     }
 
@@ -146,13 +152,17 @@ class Image
      * @param string|null $target
      * @return string
      */
-    public function getTargetPath(?string $target = 'calendar'): string
+    public function getTargetPath(?string $target = 'target'): string
     {
+        $pos = strpos($this->getPath(), '/');
+
+        $path = $pos !== false ? substr($this->getPath(), $pos + 1) : $this->getPath();
+
         if ($target === null) {
-            return $this->getPath();
+            return $path;
         }
 
-        return str_replace('/', sprintf('/%s/', $target), $this->getPath());
+        return sprintf('%s/%s', $target, $path);
     }
 
     /**
