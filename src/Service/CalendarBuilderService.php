@@ -70,7 +70,7 @@ class CalendarBuilderService
 
     protected string $pathRoot;
 
-    protected string $pathUpload;
+    protected string $pathData;
 
     protected string $pathSource;
 
@@ -130,10 +130,6 @@ class CalendarBuilderService
     protected int $x;
 
     protected int $y;
-
-    protected int $xRemember;
-
-    protected int $yRemember;
 
     /** @var int[] $colors */
     protected array $colors;
@@ -196,6 +192,8 @@ class CalendarBuilderService
 
     public const EVENT_TYPE_EVENT_GROUP = 2;
 
+    public const PATH_IMAGES = 'images';
+
     /**
      * Calendar constructor
      *
@@ -233,8 +231,8 @@ class CalendarBuilderService
         $this->pathRoot = $this->appKernel->getProjectDir();
 
         /* Font path */
-        $this->pathUpload = sprintf('%s/data/', $this->pathRoot);
-        $this->pathFont = sprintf('%s/font/%s', $this->pathUpload, $this->font);
+        $this->pathData = sprintf('%s/data', $this->pathRoot);
+        $this->pathFont = sprintf('%s/font/%s', $this->pathData, $this->font);
 
         /* Calculate zoom */
         $this->zoom = $this->height / self::ZOOM_HEIGHT_100;
@@ -407,6 +405,10 @@ class CalendarBuilderService
      */
     protected function createImageFromImage(string $filename, string $type = self::IMAGE_JPG): GdImage
     {
+        if (!file_exists($filename)) {
+            throw new Exception(sprintf('Unable to find image "%s" (%s:%d)', $filename, __FILE__, __LINE__));
+        }
+
         $image = match ($type) {
             self::IMAGE_JPG => imagecreatefromjpeg($filename),
             self::IMAGE_PNG => imagecreatefrompng($filename),
@@ -461,7 +463,7 @@ class CalendarBuilderService
     }
 
     /**
-     * Create the colors and save the integer values to colors.
+     * Create the colors and save the integer values to color.
      *
      * @throws Exception
      */
@@ -626,30 +628,6 @@ class CalendarBuilderService
     }
 
     /**
-     * Remember last x and y position.
-     */
-    protected function rememberPosition(): void
-    {
-        $this->xRemember = $this->x;
-        $this->yRemember = $this->y;
-    }
-
-    /**
-     * Resets the x and y position from remembered position.
-     *
-     * @throws Exception
-     */
-    protected function resetPosition(): void
-    {
-        if (!isset($this->xRemember) || !isset($this->yRemember)) {
-            throw new Exception(sprintf('Call rememberPosition before resetPosition (%s:%d)', __FILE__, __LINE__));
-        }
-
-        $this->x = $this->xRemember;
-        $this->y = $this->yRemember;
-    }
-
-    /**
      * Returns the y correction for all calendar box.
      *
      * $this->calendarBoxBottomSizeReference is the reference for all positions. Move some elements to keep valign: bottom.
@@ -674,6 +652,33 @@ class CalendarBuilderService
     protected function getDayKey(int $day): string
     {
         return sprintf('%04d-%02d-%02d', $this->year, $this->month, $day);
+    }
+
+    /**
+     * Checks and creates given directory or directory for given file
+     *
+     * @param string $path
+     * @param bool $isFile
+     * @return string
+     * @throws Exception
+     */
+    protected function checkAndCreateDirectory(string $path, bool $isFile = false): string
+    {
+        if ($isFile) {
+            $pathToCheck = dirname($path);
+        } else {
+            $pathToCheck = $path;
+        }
+
+        if (!file_exists($pathToCheck)) {
+            mkdir($pathToCheck);
+        }
+
+        if (!file_exists($pathToCheck)) {
+            throw new Exception(sprintf('Unable to create directory "%s" (%s:%d)', $pathToCheck, __FILE__, __LINE__));
+        }
+
+        return $pathToCheck;
     }
 
     /**
@@ -755,7 +760,6 @@ class CalendarBuilderService
         /* Add title */
         $fontSizeTitle = $this->fontSizeTitle;
         $angleAll = 0;
-        $dimensionTitle = $this->getDimension($this->textTitle, $this->fontSizeTitle, $angleAll);
         imagettftext($this->imageTarget, $this->fontSizeTitle, $angleAll, $x, $y + $fontSizeTitle, $this->colors['white'], $this->pathFont, $this->textTitle);
 
         /* Add position */
@@ -943,7 +947,6 @@ class CalendarBuilderService
             $eventOrHoliday['name'];
 
         /* Dimension Event */
-        $dimensionEvent = $this->getDimension($name, $fontSizeEvent, $angleEvent);
         $xEvent = $fontSizeEvent + intval(round(($dimensionDay['width'] - $fontSizeEvent) / 2));
 
         /* Set event position */
@@ -952,7 +955,7 @@ class CalendarBuilderService
         $this->y -= intval(round(1.5 * $this->fontSizeDay));
 
         /* Add Event */
-        $this->addText(text: $name, fontSize: $fontSizeEvent, color: $this->colors['white'], align: self::ALIGN_LEFT, angle: $angleEvent);
+        $this->addText(text: $name, fontSize: $fontSizeEvent, color: $this->colors['white'], angle: $angleEvent);
     }
 
     /**
@@ -1029,7 +1032,7 @@ class CalendarBuilderService
             sprintf('path%s', $keyPostfix) => $path,
             sprintf('width%s', $keyPostfix) => intval($image[0]),
             sprintf('height%s', $keyPostfix) => intval($image[1]),
-            sprintf('mime%s', $keyPostfix) => $image['mime'],
+            sprintf('mime%s', $keyPostfix) => strval($image['mime']),
             sprintf('size%s', $keyPostfix) => $sizeByte,
             sprintf('sizeHuman%s', $keyPostfix) => SizeConverter::getHumanReadableSize($sizeByte),
         ];
@@ -1198,15 +1201,21 @@ class CalendarBuilderService
      */
     public function build(): array
     {
+        /* Get user path */
+        $userPath = sprintf('%s/%s/%s', $this->pathData, self::PATH_IMAGES, $this->image->getUser()->getIdHash());
+
         /* Save given values */
-        $this->pathSource = sprintf('%s%s', $this->pathUpload, $this->image->getSourcePath());
-        $this->pathTarget = sprintf('%s%s', $this->pathUpload, $this->image->getTargetPath());
+        $this->pathSource = sprintf('%s/%s', $userPath, $this->image->getSourcePath());
+        $this->pathTarget = sprintf('%s/%s', $userPath, $this->image->getTargetPath());
         $this->pathQrCode = str_replace('.jpg', '.png', $this->pathSource);
         $this->textTitle = $this->calendarImage->getTitle() ?? '';
         $this->textPosition = $this->calendarImage->getPosition() ?? '';
         $this->year = $this->calendarImage->getYear();
         $this->month = $this->calendarImage->getMonth();
         $this->valignImage = $this->calendarImage->getConfigObject()->getValign() ?? self::VALIGN_TOP;
+
+        /* Check target path */
+        $this->checkAndCreateDirectory($this->pathTarget, true);
 
         /* Init */
         $this->prepare();

@@ -59,8 +59,8 @@ class AppFixtures extends Fixture
         /* Titel page */
         0 => [
             'height' => 4000,
-            'sourcePath' => 'images/00.jpg',
-            'targetPath' => 'images/calendar/00.jpg',
+            'sourcePath' => 'source/00.jpg',
+            'targetPath' => 'target/00.jpg',
             'title' => 'Las Palmas, Gran Canaria, Spanien, 2021',
             'position' => '28°09’42.9"N 15°26’05.1"W',
             'year' => 2022,
@@ -71,8 +71,8 @@ class AppFixtures extends Fixture
         /* 01 */
         1 => [
             'height' => 4000,
-            'sourcePath' => 'images/01.jpg',
-            'targetPath' => 'images/calendar/01.jpg',
+            'sourcePath' => 'source/01.jpg',
+            'targetPath' => 'target/01.jpg',
             'title' => 'Playa de las Canteras, Gran Canaria, Spanien, 2021',
             'position' => '28°08’53.9"N 15°25’53.0"W',
             'year' => 2022,
@@ -83,8 +83,8 @@ class AppFixtures extends Fixture
         /* 02 */
         2 => [
             'height' => 4000,
-            'sourcePath' => 'images/02.jpg',
-            'targetPath' => 'images/calendar/02.jpg',
+            'sourcePath' => 'source/02.jpg',
+            'targetPath' => 'target/02.jpg',
             'title' => 'Artenara, Gran Canaria, Spanien, 2021',
             'position' => '28°01’03.5"N 15°40’08.4"W',
             'year' => 2022,
@@ -95,8 +95,8 @@ class AppFixtures extends Fixture
         /* 03 */
         3 => [
             'height' => 4000,
-            'sourcePath' => 'images/03.jpg',
-            'targetPath' => 'images/calendar/03.jpg',
+            'sourcePath' => 'source/03.jpg',
+            'targetPath' => 'target/03.jpg',
             'title' => 'Brännö, Göteborg, Schweden, 2020',
             'position' => '57°38’12.3"N 11°46’02.6"E',
             'year' => 2022,
@@ -107,8 +107,8 @@ class AppFixtures extends Fixture
         /* 04 */
         4 => [
             'height' => 4000,
-            'sourcePath' => 'images/04.jpg',
-            'targetPath' => 'images/calendar/04.jpg',
+            'sourcePath' => 'source/04.jpg',
+            'targetPath' => 'target/04.jpg',
             'title' => 'Meersburg, Deutschland, 2021',
             'position' => '47°41’36.6"N 9°16’17.6"E',
             'year' => 2022,
@@ -119,8 +119,8 @@ class AppFixtures extends Fixture
         /* 05 */
         5 => [
             'height' => 4000,
-            'sourcePath' => 'images/05.jpg',
-            'targetPath' => 'images/calendar/05.jpg',
+            'sourcePath' => 'source/05.jpg',
+            'targetPath' => 'target/05.jpg',
             'title' => 'Norra Sjöslingan, Göteborg, Schweden, 2020',
             'position' => '57°41’26.3"N 12°02’10.3"E',
             'year' => 2022,
@@ -131,8 +131,8 @@ class AppFixtures extends Fixture
         /* 06 */
         6 => [
             'height' => 4000,
-            'sourcePath' => 'images/06.jpg',
-            'targetPath' => 'images/calendar/06.jpg',
+            'sourcePath' => 'source/06.jpg',
+            'targetPath' => 'target/06.jpg',
             'title' => 'Bregenz, Bodensee, Österreich, 2021',
             'position' => '47°30’29.4"N 9°45’31.6"E',
             'year' => 2022,
@@ -143,8 +143,8 @@ class AppFixtures extends Fixture
         /* 07 */
         7 => [
             'height' => 4000,
-            'sourcePath' => 'images/07.jpg',
-            'targetPath' => 'images/calendar/07.jpg',
+            'sourcePath' => 'source/07.jpg',
+            'targetPath' => 'target/07.jpg',
             'title' => 'Badi Triboltingen, Triboltingen, Schweiz, 2021',
             'position' => '47°39’57.2"N 9°06’37.9"E',
             'year' => 2022,
@@ -155,8 +155,8 @@ class AppFixtures extends Fixture
         /* 08 */
         8 => [
             'height' => 4000,
-            'sourcePath' => 'images/08.jpg',
-            'targetPath' => 'images/calendar/08.jpg',
+            'sourcePath' => 'source/08.jpg',
+            'targetPath' => 'target/08.jpg',
             'title' => 'Zürich, Schweiz, 2021',
             'position' => '47°22’22.9"N 8°32’29.0"E',
             'year' => 2022,
@@ -167,8 +167,8 @@ class AppFixtures extends Fixture
         /* 09 */
         9 => [
             'height' => 4000,
-            'sourcePath' => 'images/09.jpg',
-            'targetPath' => 'images/calendar/09.jpg',
+            'sourcePath' => 'source/09.jpg',
+            'targetPath' => 'target/09.jpg',
             'title' => 'Stein am Rhein, Schweiz, 2021',
             'position' => '47°39’37.2"N 8°51’30.6"E',
             'year' => 2022,
@@ -179,8 +179,8 @@ class AppFixtures extends Fixture
         /* 10 */
         10 => [
             'height' => 4000,
-            'sourcePath' => 'images/10.jpg',
-            'targetPath' => 'images/calendar/10.jpg',
+            'sourcePath' => 'source/10.jpg',
+            'targetPath' => 'target/10.jpg',
             'title' => 'Insel Mainau, Bodensee, Deutschland, 2021',
             'position' => '47°42’17.5"N 9°11’37.7"E',
             'year' => 2022,
@@ -191,8 +191,8 @@ class AppFixtures extends Fixture
         /* 11 */
         11 => [
             'height' => 4000,
-            'sourcePath' => 'images/11.jpg',
-            'targetPath' => 'images/calendar/11.jpg',
+            'sourcePath' => 'source/11.jpg',
+            'targetPath' => 'target/11.jpg',
             'title' => 'Casa Milà, Barcelona, Spanien, 2020',
             'position' => '41°23’43.2"N 2°09’42.4"E',
             'year' => 2022,
@@ -203,8 +203,8 @@ class AppFixtures extends Fixture
         /* 12 */
         12 => [
             'height' => 4000,
-            'sourcePath' => 'images/12.jpg',
-            'targetPath' => 'images/calendar/12.jpg',
+            'sourcePath' => 'source/12.jpg',
+            'targetPath' => 'target/12.jpg',
             'title' => 'Meersburg, Deutschland, 2021',
             'position' => '47°41’39.0"N 9°16’15.2"E',
             'year' => 2022,
@@ -298,6 +298,7 @@ class AppFixtures extends Fixture
             $user->setPassword($this->userPasswordHasher->hashPassword($user, sprintf('password%d', $i)));
             $user->setFirstname(sprintf('Firstname %d', $i));
             $user->setLastname(sprintf('Lastname %d', $i));
+            $user->setIdHash('cf6b37d2b5f805a0f76ef2b3610eff7a705a2290');
             $manager->persist($user);
 
             /* Add events to user */

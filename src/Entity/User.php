@@ -32,6 +32,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -404,6 +405,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @param Calendar $calendar
      * @return $this
+     * @throws Exception
      */
     public function removeCalendar(Calendar $calendar): self
     {
@@ -448,6 +450,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @param CalendarImage $calendarImage
      * @return $this
+     * @throws Exception
      */
     public function removeCalendarImage(CalendarImage $calendarImage): self
     {
