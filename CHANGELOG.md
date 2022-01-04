@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### [0.4.0] - 2022-01-04
 
+* [#6](https://github.com/bjoern-hempel/php-calendar-api/issues/6) - Connect source and destination images with user folder
+
+### [0.4.0] - 2022-01-04
+
 * [#7](https://github.com/bjoern-hempel/php-calendar-api/issues/7) - Add CI Pipeline
 
 ### [0.3.0] - 2022-01-04
