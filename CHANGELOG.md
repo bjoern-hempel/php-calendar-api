@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
-### [0.4.0] - 2022-01-04
+### [0.6.0] - 2022-01-04
+
+* [#23](https://github.com/bjoern-hempel/php-calendar-api/issues/23) - Add workflow badge
+
+### [0.5.0] - 2022-01-04
 
 * [#6](https://github.com/bjoern-hempel/php-calendar-api/issues/6) - Connect source and destination images with user folder
 
