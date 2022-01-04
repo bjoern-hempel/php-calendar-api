@@ -4,13 +4,13 @@ name: CI workflow
 on:
   push:
     branches-ignore:
-      - master
+      - main
     paths-ignore:
       - '**.md'
       - 'docs/**'
   pull_request:
     branches:
-      - master
+      - main
     paths-ignore:
       - '**.md'
       - 'docs/**'
