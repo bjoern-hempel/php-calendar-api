@@ -35,7 +35,7 @@ jobs:
         uses: php-actions/composer@v6
         with:
           php_version: ${{ matrix.php-versions }}
-          extensions: imagick, gd
+          php_extensions: imagick, gd
           version: 2
 
       # composer run ci
@@ -43,6 +43,6 @@ jobs:
         uses: php-actions/composer@v6
         with:
           php_version: ${{ matrix.php-versions }}
-          extensions: imagick, gd
+          php_extensions: imagick, gd
           version: 2
           command: run test
