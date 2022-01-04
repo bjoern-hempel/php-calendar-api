@@ -1,5 +1,6 @@
 # PHPCalendarApi
 
+[![CI workflow](https://github.com/bjoern-hempel/php-calendar-api/actions/workflows/ci-workflow.yml/badge.svg?branch=main)](https://github.com/bjoern-hempel/php-calendar-api/actions/workflows/ci-workflow.yml)
 [![Release](https://img.shields.io/github/v/release/bjoern-hempel/php-calendar-api)](https://github.com/bjoern-hempel/php-calendar-api/releases)
 [![PHP](https://img.shields.io/badge/PHP-^8.0-777bb3.svg?logo=php&logoColor=white&labelColor=555555&style=flat)](https://www.php.net/supported-versions.php)
 [![PHPStan](https://img.shields.io/badge/PHPStan-Level%208-brightgreen.svg?style=flat)](https://phpstan.org/user-guide/rule-levels)
