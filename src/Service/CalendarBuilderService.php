@@ -35,6 +35,8 @@ use App\Entity\Holiday;
 use App\Entity\HolidayGroup;
 use App\Entity\Image;
 use App\Utils\SizeConverter;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use DateTime;
 use Exception;
 use GdImage;
@@ -75,8 +77,6 @@ class CalendarBuilderService
     protected string $pathSource;
 
     protected string $pathTarget;
-
-    protected string $pathQrCode;
 
     protected string $pathFont;
 
@@ -121,10 +121,6 @@ class CalendarBuilderService
 
     protected int $heightSource;
 
-    protected int $widthSourceQrCode;
-
-    protected int $heightSourceQrCode;
-
     protected int $yCalendarBoxBottom;
 
     protected int $x;
@@ -138,14 +134,14 @@ class CalendarBuilderService
 
     protected int $valignImage;
 
+    protected string $url;
+
     /** @var array<string, array{x: int, y: int, align: int, dimension: int[], day: int}> $positionDays */
     protected array $positionDays = [];
 
     protected GdImage $imageTarget;
 
     protected GdImage $imageSource;
-
-    protected GdImage $imageQrCode;
 
     protected CalendarImage $calendarImage;
 
@@ -433,7 +429,6 @@ class CalendarBuilderService
     {
         $this->imageTarget = $this->createImage($this->width, $this->height);
         $this->imageSource = $this->createImageFromImage($this->pathSource);
-        $this->imageQrCode = $this->createImageFromImage($this->pathQrCode, self::IMAGE_PNG);
     }
 
     /**
@@ -494,15 +489,6 @@ class CalendarBuilderService
 
         $this->widthSource = $propertiesSource[0];
         $this->heightSource = $propertiesSource[1];
-
-        $propertiesQrCode = getimagesize($this->pathQrCode);
-
-        if ($propertiesQrCode === false) {
-            throw new Exception(sprintf('Unable to get image size (%s:%d)', __FILE__, __LINE__));
-        }
-
-        $this->widthSourceQrCode = $propertiesQrCode[0];
-        $this->heightSourceQrCode = $propertiesQrCode[1];
 
         $this->yCalendarBoxBottom = intval(floor($this->height * (1 - $this->calendarBoxBottomSize)));
     }
@@ -972,28 +958,56 @@ class CalendarBuilderService
 
     /**
      * Adds QR Code.
-     *
-     * ❯ qrencode -o 11.orig.png --margin=0 https://calendar2022.hempel.li/11/r
-     *
-     * ❯ convert 00.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 00.png
-     * ❯ convert 01.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 01.png
-     * ❯ convert 02.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 02.png
-     * ❯ convert 03.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 03.png
-     * ❯ convert 04.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 04.png
-     * ❯ convert 05.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 05.png
-     * ❯ convert 06.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 06.png
-     * ❯ convert 07.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 07.png
-     * ❯ convert 08.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 08.png
-     * ❯ convert 09.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 09.png
-     * ❯ convert 10.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 10.png
-     * ❯ convert 11.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 11.png
-     * ❯ convert 12.orig.png -fuzz 0% -fill transparent -opaque white -fill white -opaque black 12.png
+     * @throws Exception
      */
     protected function addQrCode(): void
     {
-        print $this->padding;
-        print "\n";
-        imagecopyresized($this->imageTarget, $this->imageQrCode, $this->padding, $this->height - $this->padding - $this->heightQrCode, 0, 0, $this->widthQrCode, $this->heightQrCode, $this->widthSourceQrCode, $this->heightSourceQrCode);
+        /* Set background color */
+        $backgroundColor = [255, 0, 0];
+
+        /* Matrix length of qrCode */
+        $matrixLength = 37;
+
+        /* Wanted width (and height) of qrCode */
+        $width = 800;
+
+        /* Calculate scale of qrCode */
+        $scale = intval(ceil($width / $matrixLength));
+
+        /* Set options for qrCode */
+        $options = [
+            'eccLevel' => QRCode::ECC_H,
+            'outputType' => QRCode::OUTPUT_IMAGICK,
+            'version' => 5,
+            'addQuietzone' => false,
+            'scale' => $scale,
+            'markupDark' => '#fff',
+            'markupLight' => '#f00',
+        ];
+
+        /* Get blob from qrCode image */
+        $qrCodeBlob = (new QRCode(new QROptions($options)))->render($this->url);
+
+        /* Create GDImage from blob */
+        $imageQrCode = imagecreatefromstring(strval($qrCodeBlob));
+
+        /* Check creating image. */
+        if ($imageQrCode === false) {
+            throw new Exception(sprintf('An error occurred while creating GDImage from blob (%s:%d)', __FILE__, __LINE__));
+        }
+
+        /* Get height from $imageQrCode */
+        $widthQrCode  = imagesx($imageQrCode);
+        $heightQrCode = imagesy($imageQrCode);
+
+        /* Create transparent color */
+        $transparentColor = imagecolorexact($imageQrCode, $backgroundColor[0], $backgroundColor[1], $backgroundColor[2]);
+
+        /* Set background color to transparent */
+        imagecolortransparent($imageQrCode, $transparentColor);
+
+        /* Add dynamically generated qr image to main image */
+        imagecopyresized($this->imageTarget, $imageQrCode, $this->padding, $this->height - $this->padding - $this->heightQrCode, 0, 0, $this->widthQrCode, $this->heightQrCode, $widthQrCode, $heightQrCode);
     }
 
     /**
@@ -1207,12 +1221,12 @@ class CalendarBuilderService
         /* Save given values */
         $this->pathSource = sprintf('%s/%s', $userPath, $this->image->getSourcePath());
         $this->pathTarget = sprintf('%s/%s', $userPath, $this->image->getTargetPath());
-        $this->pathQrCode = str_replace('.jpg', '.png', $this->pathSource);
         $this->textTitle = $this->calendarImage->getTitle() ?? '';
         $this->textPosition = $this->calendarImage->getPosition() ?? '';
         $this->year = $this->calendarImage->getYear();
         $this->month = $this->calendarImage->getMonth();
         $this->valignImage = $this->calendarImage->getConfigObject()->getValign() ?? self::VALIGN_TOP;
+        $this->url = $this->calendarImage->getUrl() ?? 'https://github.com/';
 
         /* Check target path */
         $this->checkAndCreateDirectory($this->pathTarget, true);

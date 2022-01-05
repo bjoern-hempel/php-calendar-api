@@ -66,6 +66,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 0,
             'valign' => CalendarBuilderService::VALIGN_TOP,
+            'url' => 'https://www.google.de',
         ],
 
         /* 01 */
@@ -78,6 +79,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 1,
             'valign' => CalendarBuilderService::VALIGN_TOP,
+            'url' => 'https://www.facebook.com',
         ],
 
         /* 02 */
@@ -90,6 +92,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 2,
             'valign' => CalendarBuilderService::VALIGN_TOP,
+            'url' => 'https://www.facebook.com',
         ],
 
         /* 03 */
@@ -102,6 +105,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 3,
             'valign' => CalendarBuilderService::VALIGN_TOP,
+            'url' => 'https://www.facebook.com',
         ],
 
         /* 04 */
@@ -114,6 +118,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 4,
             'valign' => CalendarBuilderService::VALIGN_TOP,
+            'url' => 'https://www.facebook.com',
         ],
 
         /* 05 */
@@ -126,6 +131,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 5,
             'valign' => CalendarBuilderService::VALIGN_TOP,
+            'url' => 'https://www.facebook.com',
         ],
 
         /* 06 */
@@ -138,6 +144,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 6,
             'valign' => CalendarBuilderService::VALIGN_BOTTOM,
+            'url' => 'https://www.facebook.com',
         ],
 
         /* 07 */
@@ -150,6 +157,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 7,
             'valign' => CalendarBuilderService::VALIGN_TOP,
+            'url' => 'https://www.facebook.com',
         ],
 
         /* 08 */
@@ -162,6 +170,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 8,
             'valign' => CalendarBuilderService::VALIGN_BOTTOM,
+            'url' => 'https://www.facebook.com',
         ],
 
         /* 09 */
@@ -174,6 +183,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 9,
             'valign' => CalendarBuilderService::VALIGN_TOP,
+            'url' => 'https://www.facebook.com',
         ],
 
         /* 10 */
@@ -186,6 +196,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 10,
             'valign' => CalendarBuilderService::VALIGN_BOTTOM,
+            'url' => 'https://www.facebook.com',
         ],
 
         /* 11 */
@@ -198,6 +209,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 11,
             'valign' => CalendarBuilderService::VALIGN_TOP,
+            'url' => 'https://www.facebook.com',
         ],
 
         /* 12 */
@@ -210,6 +222,7 @@ class AppFixtures extends Fixture
             'year' => 2022,
             'month' => 12,
             'valign' => CalendarBuilderService::VALIGN_BOTTOM,
+            'url' => 'https://www.facebook.com',
         ],
     ];
 
@@ -231,8 +244,6 @@ class AppFixtures extends Fixture
      */
     public function load(ObjectManager $manager): void
     {
-        $year = 2022;
-
         /* Add public holiday group */
         $holidayGroup = new HolidayGroup();
         $holidayGroup->setName('Saxony');
@@ -356,6 +367,7 @@ class AppFixtures extends Fixture
                 $calendarImage->setTitle(strval($calendarData['title']));
                 $calendarImage->setPosition(strval($calendarData['position']));
                 $calendarImage->setValign(intval($calendarData['valign']));
+                $calendarImage->setUrl(strval($calendarData['url']));
                 $calendarImage->setConfig([
                     'valign' => intval($calendarData['valign']),
                 ]);

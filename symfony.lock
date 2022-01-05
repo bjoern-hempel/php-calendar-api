@@ -1,4 +1,10 @@
 {
+    "chillerlan/php-qrcode": {
+        "version": "4.3.2"
+    },
+    "chillerlan/php-settings-container": {
+        "version": "2.1.2"
+    },
     "composer/package-versions-deprecated": {
         "version": "1.11.99.4"
     },
