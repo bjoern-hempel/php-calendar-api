@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.7.0] - 2022-01-06
+
+* [#21](https://github.com/bjoern-hempel/php-calendar-api/issues/21) - Build qr code dynamically
+
 ### [0.6.0] - 2022-01-04
 
 * [#23](https://github.com/bjoern-hempel/php-calendar-api/issues/23) - Add workflow badge
