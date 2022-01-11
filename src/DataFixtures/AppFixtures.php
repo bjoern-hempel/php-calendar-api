@@ -54,6 +54,8 @@ class AppFixtures extends Fixture
 {
     private UserPasswordHasherInterface $userPasswordHasher;
 
+    private ?ObjectManager $manager = null;
+
     /** @var string[][]|int[][] $calendars  */
     protected array $calendars = [
         /* Titel page */
@@ -226,14 +228,325 @@ class AppFixtures extends Fixture
         ],
     ];
 
+    /** @var string[][] $holidayDatas  */
+    protected array $holidayDatas = [
+        ['Neujahr', '2022-01-01T12:00:00Z'],
+        ['Karfreitag', '2022-04-15T12:00:00Z'],
+        ['Ostern', '2022-04-18T12:00:00Z'],
+        ['1. Mai', '2022-05-01T12:00:00Z'],
+        ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+        ['Pfingsten ', '2022-06-06T12:00:00Z'],
+        ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+        ['Reformationstag', '2022-10-31T12:00:00Z'],
+        ['Buß- und Bettag', '2022-11-16T12:00:00Z'],
+        ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+        ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+    ];
+
+    /** @var string[][]|int[][] $eventDatas  */
+    protected array $eventDatas = [
+        ['Angela Merkel', '1954-07-17T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Arnold Schwarzenegger', '1947-07-30T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Bernhard', '2100-12-25T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Björn', '1980-02-02T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Carolin Kebekus', '1980-05-09T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Daniel Radcliffe', '1989-07-23T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Erik', '1970-09-11T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Isabel', '1994-08-18T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Heike', '1970-05-06T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Manuel Neuer', '1986-03-27T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Olaf Scholz', '1958-06-14T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Otto Waalkes', '1948-07-22T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Rico', '2100-08-18T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Sebastian', '1997-05-22T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Sido', '1980-11-30T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['Elisabeth II.', '1926-04-21T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
+        ['New York City Marathon', '2022-11-06T12:00:00Z', CalendarBuilderService::EVENT_TYPE_EVENT],
+        ['Zrce Spring Break, Croatia', '2022-06-03T12:00:00Z', CalendarBuilderService::EVENT_TYPE_EVENT_GROUP],
+    ];
+
     /**
      * AppFixtures constructor.
      *
      * @param UserPasswordHasherInterface $userPasswordHasher
+     * @param ObjectManager|null $manager
      */
-    public function __construct(UserPasswordHasherInterface $userPasswordHasher)
+    public function __construct(UserPasswordHasherInterface $userPasswordHasher, ObjectManager $manager = null)
     {
         $this->userPasswordHasher = $userPasswordHasher;
+
+        if ($manager !== null) {
+            $this->setManager($manager);
+        }
+    }
+
+    /**
+     * Set ObjectManager.
+     *
+     * @param ObjectManager $manager
+     */
+    public function setManager(ObjectManager $manager): void
+    {
+        $this->manager = $manager;
+    }
+
+    /**
+     * Sets a Holiday resource.
+     *
+     * @param HolidayGroup $holidayGroup
+     * @param string $name
+     * @param string $date
+     * @return Holiday
+     * @throws Exception
+     */
+    protected function setHoliday(HolidayGroup $holidayGroup, string $name, string $date): Holiday
+    {
+        $holiday = new Holiday();
+        $holiday->setHolidayGroup($holidayGroup);
+        $holiday->setName($name);
+        $holiday->setDate(new DateTime($date));
+        $holiday->setColor('255,255,255,100');
+        $this->manager?->persist($holiday);
+
+        return $holiday;
+    }
+
+    /**
+     * Returns a HolidayGroup resource with its Holiday events.
+     *
+     * @return HolidayGroup
+     * @throws Exception
+     */
+    public function getHolidayGroup(): HolidayGroup
+    {
+        /* Get persisted public holiday group */
+        $holidayGroup = $this->setHolidayGroup();
+
+        /* Add holidays */
+        foreach ($this->holidayDatas as $holidayData) {
+            $this->setHoliday($holidayGroup, $holidayData[0], $holidayData[1]);
+        }
+
+        return $holidayGroup;
+    }
+
+    /**
+     * Sets a HolidayGroup resource.
+     *
+     * @return HolidayGroup
+     * @throws Exception
+     */
+    protected function setHolidayGroup(): HolidayGroup
+    {
+        $holidayGroup = new HolidayGroup();
+        $holidayGroup->setName('Saxony');
+        $this->manager?->persist($holidayGroup);
+
+        return $holidayGroup;
+    }
+
+    /**
+     * Returns a CalendarStyle resource.
+     *
+     * @return CalendarStyle
+     */
+    public function getCalendarStyle(): CalendarStyle
+    {
+        return $this->setCalendarStyle();
+    }
+
+    /**
+     * Sets a CalendarStyle resource.
+     *
+     * @return CalendarStyle
+     */
+    protected function setCalendarStyle(): CalendarStyle
+    {
+        $calendarStyle = new CalendarStyle();
+        $calendarStyle->setName('default');
+        $calendarStyle->setConfig([
+            'name' => 'default',
+        ]);
+        $this->manager?->persist($calendarStyle);
+
+        return $calendarStyle;
+    }
+
+    /**
+     * Returns a User resource.
+     *
+     * @param CalendarStyle $calendarStyle
+     * @param HolidayGroup $holidayGroup
+     * @param int|null $i
+     * @return User
+     * @throws Exception
+     */
+    public function getUser(CalendarStyle $calendarStyle, HolidayGroup $holidayGroup, ?int $i = 1): User
+    {
+        $user = $this->setUser($i);
+
+        /* Add events to user */
+        foreach ($this->eventDatas as $eventData) {
+            $this->setEvent($user, strval($eventData[0]), intval($eventData[2]), strval($eventData[1]));
+        }
+
+        /* Create calendar for user */
+        $calendar = $this->setCalendar($user, $calendarStyle, $holidayGroup);
+
+        foreach ($this->calendars as $calendarData) {
+            /* Create image */
+            $image = $this->setImage($user, strval($calendarData['sourcePath']));
+
+            /* Connect calendar with image */
+            $this->setCalendarImage(
+                $user,
+                $calendar,
+                $image,
+                intval($calendarData['year']),
+                intval($calendarData['month']),
+                strval($calendarData['title']),
+                strval($calendarData['position']),
+                intval($calendarData['valign']),
+                strval($calendarData['url'])
+            );
+        }
+
+        return $user;
+    }
+
+    /**
+     * Sets a User resource.
+     *
+     * @param int|null $i
+     * @return User
+     */
+    protected function setUser(?int $i = 1): User
+    {
+        $user = new User();
+        $user->setEmail(sprintf('user%d@domain.tld', $i));
+        $user->setUsername(sprintf('user%d', $i));
+        $user->setPassword($this->userPasswordHasher->hashPassword($user, sprintf('password%d', $i)));
+        $user->setFirstname(sprintf('Firstname %d', $i));
+        $user->setLastname(sprintf('Lastname %d', $i));
+        $user->setIdHash('cf6b37d2b5f805a0f76ef2b3610eff7a705a2290');
+        $this->manager?->persist($user);
+
+        return $user;
+    }
+
+    /**
+     * Sets a Event resource.
+     *
+     * @param User $user
+     * @param string $name
+     * @param int $type
+     * @param string $date
+     * @return Event
+     * @throws Exception
+     */
+    protected function setEvent(User $user, string $name, int $type, string $date): Event
+    {
+        $event = new Event();
+        $event->setUser($user);
+        $event->setName($name);
+        $event->setType($type);
+        $event->setDate(new DateTime($date));
+        $event->setColor('255,255,255,100');
+        $this->manager?->persist($event);
+
+        return $event;
+    }
+
+    /**
+     * Sets a Calendar resource.
+     *
+     * @param User $user
+     * @param CalendarStyle $calendarStyle
+     * @param HolidayGroup $holidayGroup
+     * @return Calendar
+     * @throws Exception
+     */
+    protected function setCalendar(User $user, CalendarStyle $calendarStyle, HolidayGroup $holidayGroup): Calendar
+    {
+        $calendar = new Calendar();
+        $calendar->setUser($user);
+        $calendar->setCalendarStyle($calendarStyle);
+        $calendar->setHolidayGroup($holidayGroup);
+        $calendar->setName(sprintf('Calendar %d', 1));
+        $calendar->setTitle('2022');
+        $calendar->setSubtitle('With love - Isa & Björn');
+        $calendar->setBackgroundColor('255,255,255,100');
+        $calendar->setPrintCalendarWeek(true);
+        $calendar->setPrintWeekNumber(true);
+        $calendar->setPrintQrCodeMonth(true);
+        $calendar->setPrintQrCodeTitle(true);
+        $calendar->setConfig([
+            'background-color' => '255,255,255,100',
+            'print-calendar-week' => true,
+            'print-week-number' => true,
+            'print-qr-code-month' => true,
+            'print-qr-code-title' => true,
+            'aspect-ratio' => round(sqrt(2), 3), /* 1:1.414 */
+            'height' => 4000,
+        ]);
+        $this->manager?->persist($calendar);
+
+        return $calendar;
+    }
+
+    /**
+     * Sets an Image resource.
+     *
+     * @param User $user
+     * @param string $sourcePath
+     * @return Image
+     */
+    protected function setImage(User $user, string $sourcePath): Image
+    {
+        $image = new Image();
+        $image->setUser($user);
+        $image->setPath($sourcePath);
+        $image->setWidth(6000);
+        $image->setHeight(4000);
+        $image->setSize(0);
+        $this->manager?->persist($image);
+
+        return $image;
+    }
+
+    /**
+     * Return a CalendarImage resource.
+     *
+     * @param User $user
+     * @param Calendar $calendar
+     * @param Image $image
+     * @param int $year
+     * @param int $month
+     * @param string $title
+     * @param string $position
+     * @param int $valign
+     * @param string $url
+     * @return CalendarImage
+     * @throws Exception
+     */
+    protected function setCalendarImage(User $user, Calendar $calendar, Image $image, int $year, int $month, string $title, string $position, int $valign, string $url): CalendarImage
+    {
+        $calendarImage = new CalendarImage();
+        $calendarImage->setUser($user);
+        $calendarImage->setCalendar($calendar);
+        $calendarImage->setImage($image);
+        $calendarImage->setYear($year);
+        $calendarImage->setMonth($month);
+        $calendarImage->setTitle($title);
+        $calendarImage->setPosition($position);
+        $calendarImage->setValign($valign);
+        $calendarImage->setUrl($url);
+        $calendarImage->setConfig([
+            'valign' => $valign,
+        ]);
+        $this->manager?->persist($calendarImage);
+
+        return $calendarImage;
     }
 
     /**
@@ -244,137 +557,21 @@ class AppFixtures extends Fixture
      */
     public function load(ObjectManager $manager): void
     {
-        /* Add public holiday group */
-        $holidayGroup = new HolidayGroup();
-        $holidayGroup->setName('Saxony');
-        $manager->persist($holidayGroup);
+        /* Set ObjectManager */
+        $this->setManager($manager);
 
-        $holidayDatas = [
-            ['Neujahr', '2022-01-01T12:00:00Z'],
-            ['Karfreitag', '2022-04-15T12:00:00Z'],
-            ['Ostern', '2022-04-18T12:00:00Z'],
-            ['1. Mai', '2022-05-01T12:00:00Z'],
-            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
-            ['Pfingsten ', '2022-06-06T12:00:00Z'],
-            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
-            ['Reformationstag', '2022-10-31T12:00:00Z'],
-            ['Buß- und Bettag', '2022-11-16T12:00:00Z'],
-            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
-            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ];
+        /* Get and create HolidayGroup resource. */
+        $holidayGroup = $this->getHolidayGroup();
 
-        $eventDatas = [
-            ['Angela Merkel', '1954-07-17T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Arnold Schwarzenegger', '1947-07-30T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Bernhard', '2100-12-25T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Björn', '1980-02-02T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Carolin Kebekus', '1980-05-09T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Daniel Radcliffe', '1989-07-23T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Erik', '1970-09-11T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Isabel', '1994-08-18T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Heike', '1970-05-06T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Manuel Neuer', '1986-03-27T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Olaf Scholz', '1958-06-14T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Otto Waalkes', '1948-07-22T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Rico', '2100-08-18T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Sebastian', '1997-05-22T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Sido', '1980-11-30T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['Elisabeth II.', '1926-04-21T12:00:00Z', CalendarBuilderService::EVENT_TYPE_BIRTHDAY],
-            ['New York City Marathon', '2022-11-06T12:00:00Z', CalendarBuilderService::EVENT_TYPE_EVENT],
-            ['Zrce Spring Break, Croatia', '2022-06-03T12:00:00Z', CalendarBuilderService::EVENT_TYPE_EVENT_GROUP],
-        ];
+        /* Get and create CalendarStyle resource. */
+        $calendarStyle = $this->getCalendarStyle();
 
-        foreach ($holidayDatas as $holidayData) {
-            $holiday = new Holiday();
-            $holiday->setHolidayGroup($holidayGroup);
-            $holiday->setName($holidayData[0]);
-            $holiday->setDate(new DateTime($holidayData[1]));
-            $holiday->setColor('255,255,255,100');
-            $manager->persist($holiday);
-        }
-
-        /* Create calendar style */
-        $calendarStyle = new CalendarStyle();
-        $calendarStyle->setName('default');
-        $calendarStyle->setConfig([
-            'name' => 'default',
-        ]);
-        $manager->persist($calendarStyle);
-
-        /* Add user and events */
+        /* Create User resources. */
         for ($i = 1; $i <= 1; $i++) {
-            $user = new User();
-            $user->setEmail(sprintf('user%d@domain.tld', $i));
-            $user->setUsername(sprintf('user%d', $i));
-            $user->setPassword($this->userPasswordHasher->hashPassword($user, sprintf('password%d', $i)));
-            $user->setFirstname(sprintf('Firstname %d', $i));
-            $user->setLastname(sprintf('Lastname %d', $i));
-            $user->setIdHash('cf6b37d2b5f805a0f76ef2b3610eff7a705a2290');
-            $manager->persist($user);
-
-            /* Add events to user */
-            foreach ($eventDatas as $eventData) {
-                $event = new Event();
-                $event->setUser($user);
-                $event->setName($eventData[0]);
-                $event->setType($eventData[2]);
-                $event->setDate(new DateTime($eventData[1]));
-                $event->setColor('255,255,255,100');
-                $manager->persist($event);
-            }
-
-            /* Create calendar for user */
-            $calendar = new Calendar();
-            $calendar->setUser($user);
-            $calendar->setCalendarStyle($calendarStyle);
-            $calendar->setHolidayGroup($holidayGroup);
-            $calendar->setName(sprintf('Calendar %d', 1));
-            $calendar->setTitle('2022');
-            $calendar->setSubtitle('With love - Isa & Björn');
-            $calendar->setBackgroundColor('255,255,255,100');
-            $calendar->setPrintCalendarWeek(true);
-            $calendar->setPrintWeekNumber(true);
-            $calendar->setPrintQrCodeMonth(true);
-            $calendar->setPrintQrCodeTitle(true);
-            $calendar->setConfig([
-                'background-color' => '255,255,255,100',
-                'print-calendar-week' => true,
-                'print-week-number' => true,
-                'print-qr-code-month' => true,
-                'print-qr-code-title' => true,
-                'aspect-ratio' => round(sqrt(2), 3), /* 1:1.414 */
-                'height' => 4000,
-            ]);
-            $manager->persist($calendar);
-
-            foreach ($this->calendars as $calendarData) {
-                /* Create image */
-                $image = new Image();
-                $image->setUser($user);
-                $image->setPath(strval($calendarData['sourcePath']));
-                $image->setWidth(6000);
-                $image->setHeight(4000);
-                $image->setSize(0);
-                $manager->persist($image);
-
-                /* Connect calendar with image */
-                $calendarImage = new CalendarImage();
-                $calendarImage->setUser($user);
-                $calendarImage->setCalendar($calendar);
-                $calendarImage->setImage($image);
-                $calendarImage->setYear(intval($calendarData['year']));
-                $calendarImage->setMonth(intval($calendarData['month']));
-                $calendarImage->setTitle(strval($calendarData['title']));
-                $calendarImage->setPosition(strval($calendarData['position']));
-                $calendarImage->setValign(intval($calendarData['valign']));
-                $calendarImage->setUrl(strval($calendarData['url']));
-                $calendarImage->setConfig([
-                    'valign' => intval($calendarData['valign']),
-                ]);
-                $manager->persist($calendarImage);
-            }
+            $this->getUser($calendarStyle, $holidayGroup, $i);
         }
 
+        /* Save all resources to db. */
         $manager->flush();
     }
 }

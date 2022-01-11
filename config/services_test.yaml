@@ -1,0 +1,33 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+
+services:
+    App\Service\CalendarLoaderService:
+        arguments:
+            - '@kernel'
+            - '@doctrine.orm.entity_manager'
+        public: true
+
+    App\Service\HolidayGroupLoaderService:
+        arguments:
+            - '@kernel'
+            - '@doctrine.orm.entity_manager'
+        public: true
+
+    App\Service\CalendarBuilderService:
+        arguments:
+            - '@kernel'
+        public: true
+
+    #App\DataFixtures\AppFixtures:
+    #    arguments:
+    #        - '@security.password_hasher'
+    #        - '@doctrine.orm.entity_manager'
+    #    public: true
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
