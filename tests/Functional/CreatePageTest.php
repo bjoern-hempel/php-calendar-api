@@ -28,22 +28,17 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional;
 
-use App\DataFixtures\AppFixtures;
 use App\Entity\CalendarImage;
 use App\Entity\HolidayGroup;
-use App\Entity\User;
 use App\Service\CalendarBuilderService;
 use App\Service\CalendarLoaderService;
 use App\Service\HolidayGroupLoaderService;
 use App\Tests\Library\DbHelper;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\Persistence\ObjectManager;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * Class CreatePageTest
