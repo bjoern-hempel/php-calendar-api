@@ -26,23 +26,13 @@ jobs:
         operating-system: [ubuntu-20.04]
         php-versions: ['8.0']
     steps:
-      # git clone
+      # https://github.com/actions/checkout (official)
       - name: Checkout
         uses: actions/checkout@v2
 
-      # composer install
-      - name: composer install
-        uses: php-actions/composer@v6
+      # https://github.com/shivammathur/setup-php (community)
+      - name: Setup PHP, extensions and composer with shivammathur/setup-php
+        uses: shivammathur/setup-php@verbose
         with:
-          php_version: ${{ matrix.php-versions }}
-          php_extensions: gd
-          version: 2
-
-      # composer run ci
-      - name: composer test
-        uses: php-actions/composer@v6
-        with:
-          php_version: ${{ matrix.php-versions }}
-          php_extensions: gd imagick
-          version: 2
-          command: run test
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, iconv, json, mbstring, pdo, imagick
