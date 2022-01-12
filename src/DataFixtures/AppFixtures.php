@@ -37,10 +37,14 @@ use App\Entity\HolidayGroup;
 use App\Entity\Image;
 use App\Entity\User;
 use App\Service\CalendarBuilderService;
+use App\Utils\ImageProperty;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Exception;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
@@ -50,17 +54,24 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  * @version 1.0 (2021-12-30)
  * @package App\Entity
  */
-class AppFixtures extends Fixture
+class AppFixtures extends Fixture implements ContainerAwareInterface
 {
     private UserPasswordHasherInterface $userPasswordHasher;
 
     private ?ObjectManager $manager = null;
 
+    private ContainerInterface $container;
+
+    private ImageProperty $imageProperty;
+
+    private const ENVIRONMENT_NAME_DEV = 'dev';
+
+    private const ENVIRONMENT_NAME_TEST = 'test';
+
     /** @var string[][]|int[][] $calendars  */
     protected array $calendars = [
         /* Titel page */
         0 => [
-            'height' => 4000,
             'sourcePath' => 'source/00.jpg',
             'targetPath' => 'target/00.jpg',
             'title' => 'Las Palmas, Gran Canaria, Spanien, 2021',
@@ -73,7 +84,6 @@ class AppFixtures extends Fixture
 
         /* 01 */
         1 => [
-            'height' => 4000,
             'sourcePath' => 'source/01.jpg',
             'targetPath' => 'target/01.jpg',
             'title' => 'Playa de las Canteras, Gran Canaria, Spanien, 2021',
@@ -86,7 +96,6 @@ class AppFixtures extends Fixture
 
         /* 02 */
         2 => [
-            'height' => 4000,
             'sourcePath' => 'source/02.jpg',
             'targetPath' => 'target/02.jpg',
             'title' => 'Artenara, Gran Canaria, Spanien, 2021',
@@ -99,7 +108,6 @@ class AppFixtures extends Fixture
 
         /* 03 */
         3 => [
-            'height' => 4000,
             'sourcePath' => 'source/03.jpg',
             'targetPath' => 'target/03.jpg',
             'title' => 'Brännö, Göteborg, Schweden, 2020',
@@ -112,7 +120,6 @@ class AppFixtures extends Fixture
 
         /* 04 */
         4 => [
-            'height' => 4000,
             'sourcePath' => 'source/04.jpg',
             'targetPath' => 'target/04.jpg',
             'title' => 'Meersburg, Deutschland, 2021',
@@ -125,7 +132,6 @@ class AppFixtures extends Fixture
 
         /* 05 */
         5 => [
-            'height' => 4000,
             'sourcePath' => 'source/05.jpg',
             'targetPath' => 'target/05.jpg',
             'title' => 'Norra Sjöslingan, Göteborg, Schweden, 2020',
@@ -138,7 +144,6 @@ class AppFixtures extends Fixture
 
         /* 06 */
         6 => [
-            'height' => 4000,
             'sourcePath' => 'source/06.jpg',
             'targetPath' => 'target/06.jpg',
             'title' => 'Bregenz, Bodensee, Österreich, 2021',
@@ -151,7 +156,6 @@ class AppFixtures extends Fixture
 
         /* 07 */
         7 => [
-            'height' => 4000,
             'sourcePath' => 'source/07.jpg',
             'targetPath' => 'target/07.jpg',
             'title' => 'Badi Triboltingen, Triboltingen, Schweiz, 2021',
@@ -164,7 +168,6 @@ class AppFixtures extends Fixture
 
         /* 08 */
         8 => [
-            'height' => 4000,
             'sourcePath' => 'source/08.jpg',
             'targetPath' => 'target/08.jpg',
             'title' => 'Zürich, Schweiz, 2021',
@@ -177,7 +180,6 @@ class AppFixtures extends Fixture
 
         /* 09 */
         9 => [
-            'height' => 4000,
             'sourcePath' => 'source/09.jpg',
             'targetPath' => 'target/09.jpg',
             'title' => 'Stein am Rhein, Schweiz, 2021',
@@ -190,7 +192,6 @@ class AppFixtures extends Fixture
 
         /* 10 */
         10 => [
-            'height' => 4000,
             'sourcePath' => 'source/10.jpg',
             'targetPath' => 'target/10.jpg',
             'title' => 'Insel Mainau, Bodensee, Deutschland, 2021',
@@ -203,7 +204,6 @@ class AppFixtures extends Fixture
 
         /* 11 */
         11 => [
-            'height' => 4000,
             'sourcePath' => 'source/11.jpg',
             'targetPath' => 'target/11.jpg',
             'title' => 'Casa Milà, Barcelona, Spanien, 2020',
@@ -216,7 +216,6 @@ class AppFixtures extends Fixture
 
         /* 12 */
         12 => [
-            'height' => 4000,
             'sourcePath' => 'source/12.jpg',
             'targetPath' => 'target/12.jpg',
             'title' => 'Meersburg, Deutschland, 2021',
@@ -269,11 +268,14 @@ class AppFixtures extends Fixture
      * AppFixtures constructor.
      *
      * @param UserPasswordHasherInterface $userPasswordHasher
+     * @param ImageProperty $imageProperty
      * @param ObjectManager|null $manager
      */
-    public function __construct(UserPasswordHasherInterface $userPasswordHasher, ObjectManager $manager = null)
+    public function __construct(UserPasswordHasherInterface $userPasswordHasher, ImageProperty $imageProperty, ObjectManager $manager = null)
     {
         $this->userPasswordHasher = $userPasswordHasher;
+
+        $this->imageProperty = $imageProperty;
 
         if ($manager !== null) {
             $this->setManager($manager);
@@ -487,7 +489,7 @@ class AppFixtures extends Fixture
             'print-qr-code-month' => true,
             'print-qr-code-title' => true,
             'aspect-ratio' => round(sqrt(2), 3), /* 1:1.414 */
-            'height' => 4000,
+            'height' => $this->getEnvironment() === self::ENVIRONMENT_NAME_TEST ? 800 : 4000,
         ]);
         $this->manager?->persist($calendar);
 
@@ -500,15 +502,14 @@ class AppFixtures extends Fixture
      * @param User $user
      * @param string $sourcePath
      * @return Image
+     * @throws Exception
      */
     protected function setImage(User $user, string $sourcePath): Image
     {
         $image = new Image();
         $image->setUser($user);
         $image->setPath($sourcePath);
-        $image->setWidth(6000);
-        $image->setHeight(4000);
-        $image->setSize(0);
+        $this->imageProperty->init($user, $image, $this->getEnvironment() === self::ENVIRONMENT_NAME_TEST);
         $this->manager?->persist($image);
 
         return $image;
@@ -557,6 +558,11 @@ class AppFixtures extends Fixture
      */
     public function load(ObjectManager $manager): void
     {
+        /* Check environment (only dev or test allowed). */
+        if (!in_array($this->getEnvironment(), array(self::ENVIRONMENT_NAME_DEV, self::ENVIRONMENT_NAME_TEST))) {
+            throw new Exception(sprintf('Illegal environment "%s" (%s:%d).', $this->getEnvironment(), __FILE__, __LINE__));
+        }
+
         /* Set ObjectManager */
         $this->setManager($manager);
 
@@ -573,5 +579,60 @@ class AppFixtures extends Fixture
 
         /* Save all resources to db. */
         $manager->flush();
+    }
+
+    /**
+     * Sets the container.
+     *
+     * @param ContainerInterface|null $container
+     * @return void
+     * @throws Exception
+     */
+    public function setContainer(ContainerInterface $container = null): void
+    {
+        /* Check container */
+        if ($container === null) {
+            throw new Exception(sprintf('Container is missing (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $this->container = $container;
+    }
+
+    /**
+     * Returns the container.
+     *
+     * @return ContainerInterface
+     */
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
+    }
+
+    /**
+     * Returns the kernel.
+     *
+     * @return KernelInterface
+     * @throws Exception
+     */
+    public function getKernel(): KernelInterface
+    {
+        $kernel = $this->container->get('kernel');
+
+        if (!$kernel instanceof KernelInterface) {
+            throw new Exception(sprintf('Kernel class expected (%s:%d)', __FILE__, __LINE__));
+        }
+
+        return $kernel;
+    }
+
+    /**
+     * Gets the environment.
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getEnvironment(): string
+    {
+        return $this->getKernel()->getEnvironment();
     }
 }

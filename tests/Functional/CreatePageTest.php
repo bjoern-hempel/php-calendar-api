@@ -207,12 +207,12 @@ final class CreatePageTest extends KernelTestCase
         /* Arrange */
         $calendarImage = $this->getCalendarImage($email, $calendarName, $year, $month);
         $holidayGroup = $this->getHolidayGroup($holidayGroupName);
-        $aspectRatio = floatval($calendarImage->getCalendar()->getConfigObject()->get('aspect-ratio'));
-        $height = intval($calendarImage->getCalendar()->getConfigObject()->get('height'));
+        $aspectRatio = $calendarImage->getCalendar()->getConfigObject()->getFloat('aspect-ratio');
+        $height = $calendarImage->getCalendar()->getConfigObject()->getInt('height');
         $width = intval(floor($height * $aspectRatio));
 
         /* Act */
-        $this->calendarBuilderService->init($calendarImage, $holidayGroup);
+        $this->calendarBuilderService->init($calendarImage, $holidayGroup, true);
         $file = $this->calendarBuilderService->build();
 
         /* Assert */

@@ -85,6 +85,30 @@ class ArrayToObject
     }
 
     /**
+     * Returns the value from given key as int.
+     *
+     * @param string $key
+     * @return int
+     * @throws Exception
+     */
+    public function getInt(string $key): int
+    {
+        return intval($this->get($key));
+    }
+
+    /**
+     * Returns the value from given key as float.
+     *
+     * @param string $key
+     * @return float
+     * @throws Exception
+     */
+    public function getFloat(string $key): float
+    {
+        return floatval($this->get($key));
+    }
+
+    /**
      * Returns data values.
      *
      * @param string $name

@@ -151,6 +151,8 @@ class CalendarBuilderService
 
     protected ?HolidayGroup $holidayGroup = null;
 
+    protected bool $test;
+
     /** @var array<array{name: string[]}> $eventsAndHolidaysRaw */
     protected array $eventsAndHolidaysRaw = [];
 
@@ -205,12 +207,16 @@ class CalendarBuilderService
      *
      * @param CalendarImage $calendarImage
      * @param HolidayGroup|null $holidayGroup
+     * @param bool $test
      * @throws Exception
      */
-    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null): void
+    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false): void
     {
         /* Clear positions */
         $this->positionDays = [];
+
+        /* Test mode */
+        $this->test = $test;
 
         /* calendar instances */
         $this->calendarImage = $calendarImage;
@@ -1216,7 +1222,8 @@ class CalendarBuilderService
     public function build(): array
     {
         /* Get user path */
-        $userPath = sprintf('%s/%s/%s', $this->pathData, self::PATH_IMAGES, $this->image->getUser()->getIdHash());
+        $imagePath = sprintf($this->test ? '%s/tests/%s' : '%s/%s', $this->pathData, self::PATH_IMAGES);
+        $userPath = sprintf('%s/%s', $imagePath, $this->image->getUser()->getIdHash());
 
         /* Save given values */
         $this->pathSource = sprintf('%s/%s', $userPath, $this->image->getSourcePath());
