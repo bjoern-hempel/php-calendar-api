@@ -51,9 +51,14 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
+      # Compose install
       - name: Install Composer dependencies
         run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
 
       # https://github.com/sensiolabs/security-checker
       - name: Security check installed dependencies
         uses: symfonycorp/security-checker-action@v2
+
+      # Composer test
+      - name: Analyse PHP Code (PHPStan)
+        run: composer test
