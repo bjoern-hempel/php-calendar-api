@@ -83,8 +83,8 @@
         "phpunit-functional": "phpunit tests/Functional",
         "phpunit-unit": "phpunit tests/Unit",
         "sca": "phpstan analyse --level max --memory-limit 256M src tests",
-        "phpcs-src": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 fix src",
-        "phpcs-tests": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 fix tests",
+        "phpcs-src": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 fix src 2>/dev/null",
+        "phpcs-tests": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 fix tests 2>/dev/null",
         "phpcs": [
             "@phpcs-src",
             "@phpcs-tests"
