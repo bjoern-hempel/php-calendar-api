@@ -27,7 +27,7 @@ jobs:
         php-versions: ['8.0']
     steps:
       # git clone
-      - name: checkout project
+      - name: Checkout
         uses: actions/checkout@v2
 
       # composer install
@@ -43,6 +43,6 @@ jobs:
         uses: php-actions/composer@v6
         with:
           php_version: ${{ matrix.php-versions }}
-          php_extensions: gd
+          php_extensions: gd imagick
           version: 2
           command: run test
