@@ -46,6 +46,12 @@ class ArrayToObject
     /** @var array<string|int|float|bool> $data */
     protected array $data;
 
+    protected const KEY_WIDTH = 'width';
+
+    protected const KEY_HEIGHT = 'height';
+
+    protected const KEY_ASPECT_RATIO = 'aspect-ratio';
+
     /**
      * ArrayToObject constructor.
      *
@@ -77,11 +83,27 @@ class ArrayToObject
      */
     public function get(string $key): string|int|float|bool
     {
+        $this->translate($key);
+
         if (!$this->has($key)) {
             throw new Exception(sprintf('Given key "%s" does not exist.', $key));
         }
 
         return $this->data[$key];
+    }
+
+    /**
+     * Sets value for given key.
+     *
+     * @param string $key
+     * @param bool|int|float|string $value
+     * @return bool|int|float|string
+     */
+    public function set(string $key, bool|int|float|string $value): bool|int|float|string
+    {
+        $this->data[$key] = $value;
+
+        return $value;
     }
 
     /**
@@ -106,6 +128,25 @@ class ArrayToObject
     public function getFloat(string $key): float
     {
         return floatval($this->get($key));
+    }
+
+    /**
+     * Translate given key.
+     *
+     * @param string $key
+     * @throws Exception
+     */
+    protected function translate(string $key): void
+    {
+        if ($this->has($key)) {
+            return;
+        }
+
+        switch (true) {
+            case $key === self::KEY_WIDTH && $this->has(self::KEY_HEIGHT) && $this->has(self::KEY_ASPECT_RATIO):
+                $this->set(self::KEY_WIDTH, floor($this->getInt(self::KEY_HEIGHT) * $this->getFloat(self::KEY_ASPECT_RATIO)));
+                break;
+        }
     }
 
     /**

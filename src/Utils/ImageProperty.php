@@ -28,6 +28,7 @@ declare(strict_types=1);
 
 namespace App\Utils;
 
+use App\Entity\CalendarImage;
 use App\Entity\Image;
 use App\Entity\User;
 use App\Service\CalendarBuilderService;
@@ -138,14 +139,87 @@ class ImageProperty
     /**
      * Returns the image path.
      *
-     * @param User $user
-     * @param Image $image
+     * @param CalendarImage|null $calendarImage
+     * @param Image|null $image
+     * @param User|null $user
+     * @param bool $test
+     * @param string $type
+     * @return string
+     * @throws Exception
+     */
+    public function getPathImage(CalendarImage $calendarImage = null, Image $image = null, User $user = null, bool $test = false, string $type = Image::PATH_TYPE_SOURCE): string
+    {
+        $format = '%s/%s';
+
+        if ($calendarImage !== null) {
+            return sprintf($format, $this->getPathUser($calendarImage->getUser(), $test), $calendarImage->getImage()->getPath($type));
+        }
+
+        if ($image !== null && $user !== null) {
+            return sprintf($format, $this->getPathUser($user, $test), $image->getPath($type));
+        }
+
+        throw new Exception(sprintf('Please specify $calendarImage or $image and $user (%s:%d).', __FILE__, __LINE__));
+    }
+
+    /**
+     * Returns the image source path.
+     *
+     * @param CalendarImage|null $calendarImage
+     * @param Image|null $image
+     * @param User|null $user
      * @param bool $test
      * @return string
+     * @throws Exception
      */
-    public function getPathImage(User $user, Image $image, bool $test = false): string
+    public function getPathImageSource(CalendarImage $calendarImage = null, Image $image = null, User $user = null, bool $test = false): string
     {
-        return sprintf('%s/%s', $this->getPathUser($user, $test), $image->getPath());
+        return $this->getPathImage($calendarImage, $image, $user, $test, Image::PATH_TYPE_SOURCE);
+    }
+
+    /**
+     * Returns the image source path.
+     *
+     * @param CalendarImage|null $calendarImage
+     * @param Image|null $image
+     * @param User|null $user
+     * @param bool $test
+     * @return string
+     * @throws Exception
+     */
+    public function getPathImageTarget(CalendarImage $calendarImage = null, Image $image = null, User $user = null, bool $test = false): string
+    {
+        return $this->getPathImage($calendarImage, $image, $user, $test, Image::PATH_TYPE_TARGET);
+    }
+
+    /**
+     * Returns the image source path.
+     *
+     * @param CalendarImage|null $calendarImage
+     * @param Image|null $image
+     * @param User|null $user
+     * @param bool $test
+     * @return string
+     * @throws Exception
+     */
+    public function getPathImageExpected(CalendarImage $calendarImage = null, Image $image = null, User $user = null, bool $test = false): string
+    {
+        return $this->getPathImage($calendarImage, $image, $user, $test, Image::PATH_TYPE_EXPECTED);
+    }
+
+    /**
+     * Returns the image source path.
+     *
+     * @param CalendarImage|null $calendarImage
+     * @param Image|null $image
+     * @param User|null $user
+     * @param bool $test
+     * @return string
+     * @throws Exception
+     */
+    public function getPathImageCompare(CalendarImage $calendarImage = null, Image $image = null, User $user = null, bool $test = false): string
+    {
+        return $this->getPathImage($calendarImage, $image, $user, $test, Image::PATH_TYPE_COMPARE);
     }
 
     /**
@@ -226,7 +300,7 @@ class ImageProperty
     public function init(User $user, Image $image, bool $test = false): void
     {
         /* Get image path. */
-        $pathImage = $this->getPathImage($user, $image, $test);
+        $pathImage = $this->getPathImageSource(image: $image, user: $user, test: $test);
 
         /* Check image path. */
         self::checkPathImage($pathImage);

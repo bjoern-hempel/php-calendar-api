@@ -34,9 +34,12 @@ use App\Service\CalendarBuilderService;
 use App\Service\CalendarLoaderService;
 use App\Service\HolidayGroupLoaderService;
 use App\Tests\Library\DbHelper;
+use App\Utils\ImageProperty;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
+use Imagick;
+use ImagickException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -190,6 +193,42 @@ final class CreatePageTest extends KernelTestCase
     }
 
     /**
+     * Compares the images.
+     *
+     * @param CalendarImage $calendarImage
+     * @param int $width
+     * @param int $height
+     * @return float
+     * @throws ImagickException
+     */
+    protected function compareImages(CalendarImage $calendarImage, int $width, int $height): float
+    {
+        /* Get ImageProperty service. */
+        $imageProperty = $this->getService(ImageProperty::class);
+
+        /* Init the image objects. */
+        $imageTarget = new Imagick();
+        $imageExpected = new Imagick();
+
+        /* Get image paths. */
+        $pathTarget = $imageProperty->getPathImageTarget(calendarImage: $calendarImage, test: true);
+        $pathExpected = $imageProperty->getPathImageExpected(calendarImage: $calendarImage, test: true);
+
+        /* Set the fuzz factor (must be done BEFORE reading in the images). */
+        $imageTarget->SetOption('fuzz', '2%');
+
+        /* Read in the images. */
+        $imageTarget->readImage($pathTarget);
+        $imageExpected->readImage($pathExpected);
+
+        /* Compare the images using METRIC=1 (Absolute Error). */
+        $result = $imageExpected->compareImages($imageTarget, 1);
+
+        /* Return the image comparison. */
+        return floatval($result[1] / $width / $height * 100);
+    }
+
+    /**
      * Create Page
      *
      * @test
@@ -207,16 +246,17 @@ final class CreatePageTest extends KernelTestCase
         /* Arrange */
         $calendarImage = $this->getCalendarImage($email, $calendarName, $year, $month);
         $holidayGroup = $this->getHolidayGroup($holidayGroupName);
-        $aspectRatio = $calendarImage->getCalendar()->getConfigObject()->getFloat('aspect-ratio');
         $height = $calendarImage->getCalendar()->getConfigObject()->getInt('height');
-        $width = intval(floor($height * $aspectRatio));
+        $width = $calendarImage->getCalendar()->getConfigObject()->getInt('width');
 
         /* Act */
         $this->calendarBuilderService->init($calendarImage, $holidayGroup, true);
         $file = $this->calendarBuilderService->build();
+        $differenceValue = $this->compareImages($calendarImage, intval($file['widthTarget']), intval($file['heightTarget']));
 
         /* Assert */
         $this->assertSame($file['widthTarget'], $width);
         $this->assertSame($file['heightTarget'], $height);
+        $this->assertLessThan(0.05, $differenceValue, sprintf('The difference is more than 0.05%% (%.2f%%).', $differenceValue));
     }
 }

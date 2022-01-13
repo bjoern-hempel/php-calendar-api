@@ -23,6 +23,11 @@ services:
             - '@kernel'
         public: true
 
+    App\Utils\ImageProperty:
+        arguments:
+            - '@kernel'
+        public: true
+
     #App\DataFixtures\AppFixtures:
     #    arguments:
     #        - '@security.password_hasher'

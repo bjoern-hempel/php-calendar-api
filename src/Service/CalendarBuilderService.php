@@ -1226,8 +1226,8 @@ class CalendarBuilderService
         $userPath = sprintf('%s/%s', $imagePath, $this->image->getUser()->getIdHash());
 
         /* Save given values */
-        $this->pathSource = sprintf('%s/%s', $userPath, $this->image->getSourcePath());
-        $this->pathTarget = sprintf('%s/%s', $userPath, $this->image->getTargetPath());
+        $this->pathSource = sprintf('%s/%s', $userPath, $this->image->getPathSource());
+        $this->pathTarget = sprintf('%s/%s', $userPath, $this->image->getPathTarget());
         $this->textTitle = $this->calendarImage->getTitle() ?? '';
         $this->textPosition = $this->calendarImage->getPosition() ?? '';
         $this->year = $this->calendarImage->getYear();
