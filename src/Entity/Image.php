@@ -74,6 +74,14 @@ class Image
     #[ORM\OneToMany(mappedBy: 'image', targetEntity: CalendarImage::class, orphanRemoval: true)]
     private Collection $calendarImages;
 
+    public const PATH_TYPE_SOURCE = 'source';
+
+    public const PATH_TYPE_TARGET = 'target';
+
+    public const PATH_TYPE_EXPECTED = 'expected';
+
+    public const PATH_TYPE_COMPARE = 'compare';
+
     /**
      * Image constructor.
      */
@@ -124,45 +132,60 @@ class Image
     /**
      * Gets the relative path of this image.
      *
+     * @param string $type
      * @return string
      */
-    public function getPath(): string
+    public function getPath(string $type = self::PATH_TYPE_SOURCE): string
     {
-        return $this->path;
+        if ($type === self::PATH_TYPE_SOURCE) {
+            return $this->path;
+        }
+
+        $pos = strpos($this->path, '/');
+
+        $path = $pos !== false ? substr($this->path, $pos + 1) : $this->path;
+
+        return sprintf('%s/%s', $type, $path);
     }
 
     /**
      * Gets the relative source path of this image.
      *
-     * @param string|null $source
      * @return string
      */
-    public function getSourcePath(?string $source = null): string
+    public function getPathSource(): string
     {
-        if ($source === null) {
-            return $this->getPath();
-        }
-
-        return str_replace('/', sprintf('/%s/', $source), $this->getPath());
+        return $this->getPath(self::PATH_TYPE_SOURCE);
     }
 
     /**
-     * Gets the relative target path of this image.
+     * Gets the relative source path of this image.
      *
-     * @param string|null $target
      * @return string
      */
-    public function getTargetPath(?string $target = 'target'): string
+    public function getPathTarget(): string
     {
-        $pos = strpos($this->getPath(), '/');
+        return $this->getPath(self::PATH_TYPE_TARGET);
+    }
 
-        $path = $pos !== false ? substr($this->getPath(), $pos + 1) : $this->getPath();
+    /**
+     * Gets the relative source path of this image.
+     *
+     * @return string
+     */
+    public function getPathExpected(): string
+    {
+        return $this->getPath(self::PATH_TYPE_EXPECTED);
+    }
 
-        if ($target === null) {
-            return $path;
-        }
-
-        return sprintf('%s/%s', $target, $path);
+    /**
+     * Gets the relative source path of this image.
+     *
+     * @return string
+     */
+    public function getPathCompare(): string
+    {
+        return $this->getPath(self::PATH_TYPE_COMPARE);
     }
 
     /**
