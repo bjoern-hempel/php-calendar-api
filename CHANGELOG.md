@@ -82,7 +82,7 @@ $ vi CHANGELOG.md
 $ bin/setVersion --patch
 
 # Push new version
-$ git add CHANGELOG.md VERSION && git commit -m "Add version $(cat VERSION)" && git push
+$ git add CHANGELOG.md VERSION .env && git commit -m "Add version $(cat VERSION)" && git push
 
 # Tag and push new version
 $ git tag -a "$(cat VERSION)" -m "Version $(cat VERSION)" && git push origin "$(cat VERSION)"
