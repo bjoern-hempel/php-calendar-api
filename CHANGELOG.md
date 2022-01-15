@@ -69,14 +69,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Add new version
 
 ```bash
-# checkout master branch
+# Checkout master branch
 $ git checkout main && git pull
 
-# add new version
-$ echo "0.1.1" > VERSION
+# Check current version
+$ bin/setVersion --current
 
 # Change changelog
 $ vi CHANGELOG.md
+
+# Add new version to .evn and VERSION file (increase patch version)
+$ bin/setVersion --patch
 
 # Push new version
 $ git add CHANGELOG.md VERSION && git commit -m "Add version $(cat VERSION)" && git push

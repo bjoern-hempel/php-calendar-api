@@ -1,7 +1,42 @@
 api_platform:
+
+    # The title of the API.
+    title: '%env(PROJECT_NAME)%'
+
+    # The description of the API.
+    description: 'An API for building ready-made calendars.'
+
+    # The version of the API.
+    version: '%env(VERSION_APP)%'
+
+    # Set this to false if you want Webby to disappear.
+    show_webby: true
+
+    # Enable the entrypoint.
+    enable_entrypoint: true
+
+    # Enable the docs.
+    enable_docs: true
+
+    # Set mapping paths
     mapping:
         paths: ['%kernel.project_dir%/src/Entity']
+
+    # Set patch formats
     patch_formats:
         json: ['application/merge-patch+json']
+
+    # Set swagger version
     swagger:
         versions: [3]
+
+    # Set defaults
+    defaults:
+        pagination_maximum_items_per_page: 50
+        pagination_items_per_page: 20
+        pagination_client_items_per_page: true
+
+    # Set collection
+    collection:
+        pagination:
+            items_per_page_parameter_name: itemsPerPage
