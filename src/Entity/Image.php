@@ -28,12 +28,14 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ImageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Entity class Image
@@ -44,6 +46,50 @@ use JetBrains\PhpStorm\Pure;
  */
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['image']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['image_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves the collection of extended Image resources.',
+                'summary' => 'Retrieves the collection of extended Image resources.',
+            ],
+            'path' => '/images/extended.{_format}',
+        ],
+        'post' => [
+            'normalization_context' => ['groups' => ['image']],
+        ],
+    ],
+    itemOperations: [
+        'delete' => [
+            'normalization_context' => ['groups' => ['image']],
+        ],
+        'get' => [
+            'normalization_context' => ['groups' => ['image']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['image_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves a extended Image resource.',
+                'summary' => 'Retrieves a extended Image resource.',
+            ],
+            'path' => '/images/{id}/extended.{_format}',
+        ],
+        'patch' => [
+            'normalization_context' => ['groups' => ['image']],
+        ],
+        'put' => [
+            'normalization_context' => ['groups' => ['image']],
+        ],
+    ],
+    normalizationContext: ['enable_max_depth' => true, 'groups' => ['image']],
+    order: ['id' => 'ASC'],
+)]
 class Image
 {
     use TimestampsTrait;
@@ -51,27 +97,34 @@ class Image
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['image', 'image_extended'])]
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'images')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['image', 'image_extended'])]
     /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?User $user;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['image', 'image_extended'])]
     private string $path;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['image', 'image_extended'])]
     private ?int $width;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['image', 'image_extended'])]
     private ?int $height;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['image', 'image_extended'])]
     private ?int $size;
 
     /** @var Collection<int, CalendarImage> */
     #[ORM\OneToMany(mappedBy: 'image', targetEntity: CalendarImage::class, orphanRemoval: true)]
+    #[Groups(['image', 'image_extended'])]
     private Collection $calendarImages;
 
     public const PATH_TYPE_SOURCE = 'source';

@@ -28,6 +28,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\CalendarRepository;
 use App\Utils\ArrayToObject;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -35,6 +37,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * Entity class Calendar
@@ -45,6 +49,50 @@ use JetBrains\PhpStorm\Pure;
  */
 #[ORM\Entity(repositoryClass: CalendarRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['calendar']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['calendar_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves the collection of extended Calendar resources.',
+                'summary' => 'Retrieves the collection of extended Calendar resources.',
+            ],
+            'path' => '/calendars/extended.{_format}',
+        ],
+        'post' => [
+            'normalization_context' => ['groups' => ['calendar']],
+        ],
+    ],
+    itemOperations: [
+        'delete' => [
+            'normalization_context' => ['groups' => ['calendar']],
+        ],
+        'get' => [
+            'normalization_context' => ['groups' => ['calendar']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['calendar_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves a extended Calendar resource.',
+                'summary' => 'Retrieves a extended Calendar resource.',
+            ],
+            'path' => '/calendars/{id}/extended.{_format}',
+        ],
+        'patch' => [
+            'normalization_context' => ['groups' => ['calendar']],
+        ],
+        'put' => [
+            'normalization_context' => ['groups' => ['calendar']],
+        ],
+    ],
+    normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar']],
+    order: ['id' => 'ASC'],
+)]
 class Calendar
 {
     use TimestampsTrait;
@@ -52,51 +100,49 @@ class Calendar
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups('calendar')]
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'calendars')]
     #[ORM\JoinColumn(nullable: false)]
+    #[MaxDepth(1)]
+    #[Groups(['calendar_extended', 'calendar'])]
     /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?User $user;
 
     #[ORM\ManyToOne(targetEntity: CalendarStyle::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[MaxDepth(1)]
+    #[Groups(['calendar_extended', 'calendar'])]
     /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?CalendarStyle $calendar_style;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['calendar_extended', 'calendar'])]
     private string $name;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['calendar_extended', 'calendar'])]
     private ?string $title;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['calendar_extended', 'calendar'])]
     private ?string $subtitle;
 
-    #[ORM\Column(type: 'string', length: 15, nullable: true)]
-    private ?string $background_color;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $print_calendar_week;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $print_week_number;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $print_qr_code_month;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $print_qr_code_title;
-
     #[ORM\ManyToOne(targetEntity: HolidayGroup::class)]
+    #[Groups(['calendar_extended', 'calendar'])]
     private ?HolidayGroup $holiday_group;
 
     /** @var Collection<int, CalendarImage> $calendarImages  */
     #[ORM\OneToMany(mappedBy: 'calendar', targetEntity: CalendarImage::class, orphanRemoval: true)]
+    #[MaxDepth(1)]
+    #[Groups('calendar_extended')]
+    #[ApiSubresource]
     private Collection $calendarImages;
 
     /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
+    #[Groups(['calendar_extended', 'calendar'])]
     private array $config = [];
 
     private ArrayToObject $configObject;
@@ -236,121 +282,6 @@ class Calendar
     public function setSubtitle(?string $subtitle): self
     {
         $this->subtitle = $subtitle;
-
-        return $this;
-    }
-
-    /**
-     * Gets the color of this calendar.
-     *
-     * @return string|null
-     */
-    public function getBackgroundColor(): ?string
-    {
-        return $this->background_color;
-    }
-
-    /**
-     * Sets the name of this calendar.
-     *
-     * @param string|null $background_color
-     * @return $this
-     */
-    public function setBackgroundColor(?string $background_color): self
-    {
-        $this->background_color = $background_color;
-
-        return $this;
-    }
-
-    /**
-     * Gets the print calendar week property of this calendar.
-     *
-     * @return bool
-     */
-    public function getPrintCalendarWeek(): bool
-    {
-        return $this->print_calendar_week;
-    }
-
-    /**
-     * Sets the print calendar week property of this calendar.
-     *
-     * @param bool $print_calendar_week
-     * @return $this
-     */
-    public function setPrintCalendarWeek(bool $print_calendar_week): self
-    {
-        $this->print_calendar_week = $print_calendar_week;
-
-        return $this;
-    }
-
-    /**
-     * Gets the print week number property of this calendar.
-     *
-     * @return bool
-     */
-    public function getPrintWeekNumber(): bool
-    {
-        return $this->print_week_number;
-    }
-
-    /**
-     * Sets the print week number property of this calendar.
-     *
-     * @param bool $print_week_number
-     * @return $this
-     */
-    public function setPrintWeekNumber(bool $print_week_number): self
-    {
-        $this->print_week_number = $print_week_number;
-
-        return $this;
-    }
-
-    /**
-     * Gets the print qr code month property of this calendar.
-     *
-     * @return bool
-     */
-    public function getPrintQrCodeMonth(): bool
-    {
-        return $this->print_qr_code_month;
-    }
-
-    /**
-     * Sets the print qr code month property of this calendar.
-     *
-     * @param bool $print_qr_code_month
-     * @return $this
-     */
-    public function setPrintQrCodeMonth(bool $print_qr_code_month): self
-    {
-        $this->print_qr_code_month = $print_qr_code_month;
-
-        return $this;
-    }
-
-    /**
-     * Gets the print qr code title property of this calendar.
-     *
-     * @return bool
-     */
-    public function getPrintQrCodeTitle(): bool
-    {
-        return $this->print_qr_code_title;
-    }
-
-    /**
-     * Sets the print qr code title property of this calendar.
-     *
-     * @param bool $print_qr_code_title
-     * @return $this
-     */
-    public function setPrintQrCodeTitle(bool $print_qr_code_title): self
-    {
-        $this->print_qr_code_title = $print_qr_code_title;
 
         return $this;
     }

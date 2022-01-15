@@ -307,7 +307,9 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         $holiday->setHolidayGroup($holidayGroup);
         $holiday->setName($name);
         $holiday->setDate(new DateTime($date));
-        $holiday->setColor('255,255,255,100');
+        $holiday->setConfig([
+            'color' => '255,255,255,100',
+        ]);
         $this->manager?->persist($holiday);
 
         return $holiday;
@@ -453,7 +455,9 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         $event->setName($name);
         $event->setType($type);
         $event->setDate(new DateTime($date));
-        $event->setColor('255,255,255,100');
+        $event->setConfig([
+            'color' => '255,255,255,100',
+        ]);
         $this->manager?->persist($event);
 
         return $event;
@@ -477,11 +481,6 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         $calendar->setName(sprintf('Calendar %d', 1));
         $calendar->setTitle('2022');
         $calendar->setSubtitle('With love - Isa & Björn');
-        $calendar->setBackgroundColor('255,255,255,100');
-        $calendar->setPrintCalendarWeek(true);
-        $calendar->setPrintWeekNumber(true);
-        $calendar->setPrintQrCodeMonth(true);
-        $calendar->setPrintQrCodeTitle(true);
         $calendar->setConfig([
             'background-color' => '255,255,255,100',
             'print-calendar-week' => true,
@@ -540,7 +539,6 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         $calendarImage->setMonth($month);
         $calendarImage->setTitle($title);
         $calendarImage->setPosition($position);
-        $calendarImage->setValign($valign);
         $calendarImage->setUrl($url);
         $calendarImage->setConfig([
             'valign' => $valign,

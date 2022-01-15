@@ -28,9 +28,13 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\HolidayRepository;
+use App\Utils\ArrayToObject;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Entity class Holiday
@@ -41,6 +45,50 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity(repositoryClass: HolidayRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['holiday']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['holiday_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves the collection of extended Holiday resources.',
+                'summary' => 'Retrieves the collection of extended Holiday resources.',
+            ],
+            'path' => '/holidays/extended.{_format}',
+        ],
+        'post' => [
+            'normalization_context' => ['groups' => ['holiday']],
+        ],
+    ],
+    itemOperations: [
+        'delete' => [
+            'normalization_context' => ['groups' => ['holiday']],
+        ],
+        'get' => [
+            'normalization_context' => ['groups' => ['holiday']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['holiday_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves a extended Holiday resource.',
+                'summary' => 'Retrieves a extended Holiday resource.',
+            ],
+            'path' => '/holidays/{id}/extended.{_format}',
+        ],
+        'patch' => [
+            'normalization_context' => ['groups' => ['holiday']],
+        ],
+        'put' => [
+            'normalization_context' => ['groups' => ['holiday']],
+        ],
+    ],
+    normalizationContext: ['enable_max_depth' => true, 'groups' => ['holiday']],
+    order: ['id' => 'ASC'],
+)]
 class Holiday
 {
     use TimestampsTrait;
@@ -48,19 +96,27 @@ class Holiday
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['holiday', 'holiday_extended'])]
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: HolidayGroup::class, inversedBy: 'holidays')]
+    #[Groups(['holiday', 'holiday_extended'])]
     private ?HolidayGroup $holiday_group;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['holiday', 'holiday_extended'])]
     private string $name;
 
     #[ORM\Column(type: 'date')]
+    #[Groups(['holiday', 'holiday_extended'])]
     private DateTimeInterface $date;
 
-    #[ORM\Column(type: 'string', length: 15, nullable: true)]
-    private ?string $color;
+    /** @var array<string|int|float|bool> $config */
+    #[ORM\Column(type: 'json')]
+    #[Groups(['holiday', 'holiday_extended'])]
+    private array $config = [];
+
+    private ArrayToObject $configObject;
 
     /**
      * Gets the id of this holiday.
@@ -142,24 +198,42 @@ class Holiday
     }
 
     /**
-     * Gets the color of this holiday.
+     * Gets the config.
      *
-     * @return string|null
+     * @return array<string|int|float|bool>
      */
-    public function getColor(): ?string
+    public function getConfig(): array
     {
-        return $this->color;
+        return $this->config;
     }
 
     /**
-     * Sets the color of this holiday.
+     * Gets the config as object.
      *
-     * @param string|null $color
-     * @return $this
+     * @return ArrayToObject
+     * @throws Exception
      */
-    public function setColor(?string $color): self
+    public function getConfigObject(): ArrayToObject
     {
-        $this->color = $color;
+        if (!isset($this->configObject)) {
+            $this->configObject = new ArrayToObject($this->config);
+        }
+
+        return $this->configObject;
+    }
+
+    /**
+     * Sets the config.
+     *
+     * @param array<string|int|float|bool> $config
+     * @return $this
+     * @throws Exception
+     */
+    public function setConfig(array $config): self
+    {
+        $this->config = $config;
+
+        $this->configObject = new ArrayToObject($config);
 
         return $this;
     }
