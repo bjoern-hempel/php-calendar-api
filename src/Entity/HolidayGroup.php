@@ -28,11 +28,13 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\HolidayGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Entity class HolidayGroup
@@ -43,6 +45,50 @@ use JetBrains\PhpStorm\Pure;
  */
 #[ORM\Entity(repositoryClass: HolidayGroupRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['holiday_group']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['holiday_group_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves the collection of extended HolidayGroup resources.',
+                'summary' => 'Retrieves the collection of extended HolidayGroup resources.',
+            ],
+            'path' => '/holiday_groups/extended.{_format}',
+        ],
+        'post' => [
+            'normalization_context' => ['groups' => ['holiday_group']],
+        ],
+    ],
+    itemOperations: [
+        'delete' => [
+            'normalization_context' => ['groups' => ['holiday_group']],
+        ],
+        'get' => [
+            'normalization_context' => ['groups' => ['holiday_group']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['holiday_group_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves a extended HolidayGroup resource.',
+                'summary' => 'Retrieves a extended HolidayGroup resource.',
+            ],
+            'path' => '/holiday_groups/{id}/extended.{_format}',
+        ],
+        'patch' => [
+            'normalization_context' => ['groups' => ['holiday_group']],
+        ],
+        'put' => [
+            'normalization_context' => ['groups' => ['holiday_group']],
+        ],
+    ],
+    normalizationContext: ['enable_max_depth' => true, 'groups' => ['holiday_group']],
+    order: ['id' => 'ASC'],
+)]
 class HolidayGroup
 {
     use TimestampsTrait;
@@ -50,13 +96,16 @@ class HolidayGroup
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['holiday_group', 'holiday_group_extended'])]
     private int $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['holiday_group', 'holiday_group_extended'])]
     private string $name;
 
     /** @var Collection<int, Holiday> $holidays */
     #[ORM\OneToMany(mappedBy: 'holiday_group', targetEntity: Holiday::class)]
+    #[Groups(['holiday_group', 'holiday_group_extended'])]
     private Collection $holidays;
 
     /**

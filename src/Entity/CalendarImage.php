@@ -28,11 +28,12 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\CalendarImageRepository;
 use App\Utils\ArrayToObject;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
-use phpDocumentor\Reflection\Types\Integer;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Entity class CalendarImage
@@ -43,6 +44,50 @@ use phpDocumentor\Reflection\Types\Integer;
  */
 #[ORM\Entity(repositoryClass: CalendarImageRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['calendar_image']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['calendar_image_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves the collection of extended CalendarImage resources.',
+                'summary' => 'Retrieves the collection of extended CalendarImage resources.',
+            ],
+            'path' => '/calendar_images/extended.{_format}',
+        ],
+        'post' => [
+            'normalization_context' => ['groups' => ['calendar_image']],
+        ],
+    ],
+    itemOperations: [
+        'delete' => [
+            'normalization_context' => ['groups' => ['calendar_image']],
+        ],
+        'get' => [
+            'normalization_context' => ['groups' => ['calendar_image']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['calendar_image_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves a extended CalendarImage resource.',
+                'summary' => 'Retrieves a extended CalendarImage resource.',
+            ],
+            'path' => '/calendar_images/{id}/extended.{_format}',
+        ],
+        'patch' => [
+            'normalization_context' => ['groups' => ['calendar_image']],
+        ],
+        'put' => [
+            'normalization_context' => ['groups' => ['calendar_image']],
+        ],
+    ],
+    normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar_image']],
+    order: ['id' => 'ASC'],
+)]
 class CalendarImage
 {
     use TimestampsTrait;
@@ -50,43 +95,50 @@ class CalendarImage
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['calendar_image', 'calendar_image_extended'])]
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'calendarImages')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['calendar_image', 'calendar_image_extended'])]
     /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?User $user;
 
     #[ORM\ManyToOne(targetEntity: Calendar::class, inversedBy: 'calendarImages')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['calendar_image', 'calendar_image_extended'])]
     /** @phpstan-ignore-next-line → Calendar must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?Calendar $calendar;
 
     #[ORM\ManyToOne(targetEntity: Image::class, inversedBy: 'calendarImages')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['calendar_image', 'calendar_image_extended'])]
     /** @phpstan-ignore-next-line → Image must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?Image $image;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['calendar_image', 'calendar_image_extended'])]
     private int $year;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['calendar_image', 'calendar_image_extended'])]
     private int $month;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups('calendar_image_extended')]
     private ?string $title;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups('calendar_image_extended')]
     private ?string $position;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups('calendar_image_extended')]
     private ?string $url;
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $valign;
 
     /** @var array<string|int|bool> $config */
     #[ORM\Column(type: 'json')]
+    #[Groups('calendar_image_extended')]
     private array $config = [];
 
     private ArrayToObject $configObject;
@@ -296,29 +348,6 @@ class CalendarImage
     public function setUrl(?string $url): self
     {
         $this->url = $url;
-
-        return $this;
-    }
-
-    /**
-     * Gets the valign of this calendar image.
-     *
-     * @return int|null
-     */
-    public function getValign(): ?int
-    {
-        return $this->valign;
-    }
-
-    /**
-     * Sets the valign of this calendar image.
-     *
-     * @param int|null $valign
-     * @return $this
-     */
-    public function setValign(?int $valign): self
-    {
-        $this->valign = $valign;
 
         return $this;
     }

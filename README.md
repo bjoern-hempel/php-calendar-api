@@ -70,3 +70,7 @@
 ❯ docker-compose exec php composer migrate-prod
 ❯ docker-compose exec php composer test
 ```
+
+# 2. Documentation
+
+* [API - v1](docs/api/README.md)

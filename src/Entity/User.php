@@ -28,6 +28,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -36,6 +38,8 @@ use Exception;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * Entity class User
@@ -46,6 +50,49 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['user']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['user_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves the collection of extended User resources.',
+                'summary' => 'Retrieves the collection of extended User resources.',
+            ],
+            'path' => '/users/extended.{_format}',
+        ],
+        'post' => [
+            'normalization_context' => ['groups' => ['user']],
+        ],
+    ],
+    itemOperations: [
+        'delete' => [
+            'normalization_context' => ['groups' => ['user']],
+        ],
+        'get' => [
+            'normalization_context' => ['groups' => ['user']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['user_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves a extended User resource.',
+                'summary' => 'Retrieves a extended User resource.',
+            ],
+            'path' => '/users/{id}/extended.{_format}',
+        ],
+        'patch' => [
+            'normalization_context' => ['groups' => ['user']],
+        ],
+        'put' => [
+            'normalization_context' => ['groups' => ['user']],
+        ],
+    ],
+    normalizationContext: ['enable_max_depth' => true, 'groups' => ['user']],
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use TimestampsTrait;
@@ -57,6 +104,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['user', 'user_extended'])]
     private int $id;
 
     #[ORM\Column(name: 'id_hash', type: 'string', length: 40, unique: true, nullable: false)]
@@ -64,38 +112,53 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $idHash = null;
 
     #[ORM\Column(type: 'string', length: 255, unique: true)]
+    #[Groups(['user', 'user_extended'])]
     private string $email;
 
     #[ORM\Column(type: 'string', length: 255, unique: true)]
+    #[Groups(['user', 'user_extended'])]
     private string $username;
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $password;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['user', 'user_extended'])]
     private ?string $firstname;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['user', 'user_extended'])]
     private ?string $lastname;
 
     /** @var string[] $roles */
     #[ORM\Column(type: 'json', nullable: false)]
+    #[Groups(['user', 'user_extended'])]
     private array $roles = [];
 
     /** @var Collection<int, Event> $events */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Event::class, orphanRemoval: true)]
+    #[MaxDepth(1)]
+    #[Groups('user_extended')]
     private Collection $events;
 
     /** @var Collection<int, Image> $images */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Image::class, orphanRemoval: true)]
+    #[MaxDepth(1)]
+    #[Groups('user_extended')]
+    #[ApiSubresource]
     private Collection $images;
 
     /** @var Collection<int, Calendar> $calendars */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Calendar::class, orphanRemoval: true)]
+    #[MaxDepth(1)]
+    #[Groups('user_extended')]
+    #[ApiSubresource]
     private Collection $calendars;
 
     /** @var Collection<int, CalendarImage> $calendarImages */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: CalendarImage::class, orphanRemoval: true)]
+    #[MaxDepth(1)]
+    #[ApiSubresource]
     private Collection $calendarImages;
 
     /**
@@ -361,6 +424,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @param Image $image
      * @return $this
+     * @throws Exception
      */
     public function removeImage(Image $image): self
     {

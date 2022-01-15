@@ -28,8 +28,10 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\CalendarStyleRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Entity class CalendarStyle
@@ -40,6 +42,50 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity(repositoryClass: CalendarStyleRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['calendar_style']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['calendar_style_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves the collection of extended CalendarStyle resources.',
+                'summary' => 'Retrieves the collection of extended CalendarStyle resources.',
+            ],
+            'path' => '/calendar_styles/extended.{_format}',
+        ],
+        'post' => [
+            'normalization_context' => ['groups' => ['calendar_style']],
+        ],
+    ],
+    itemOperations: [
+        'delete' => [
+            'normalization_context' => ['groups' => ['calendar_style']],
+        ],
+        'get' => [
+            'normalization_context' => ['groups' => ['calendar_style']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['calendar_style_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves a extended CalendarStyle resource.',
+                'summary' => 'Retrieves a extended CalendarStyle resource.',
+            ],
+            'path' => '/calendar_styles/{id}/extended.{_format}',
+        ],
+        'patch' => [
+            'normalization_context' => ['groups' => ['calendar_style']],
+        ],
+        'put' => [
+            'normalization_context' => ['groups' => ['calendar_style']],
+        ],
+    ],
+    normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar_style']],
+    order: ['id' => 'ASC'],
+)]
 class CalendarStyle
 {
     use TimestampsTrait;
@@ -47,13 +93,16 @@ class CalendarStyle
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['calendar_style', 'calendar_style_extended'])]
     private int $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['calendar_style', 'calendar_style_extended'])]
     private string $name;
 
     /** @var array<string|int|bool> $config */
     #[ORM\Column(type: 'json')]
+    #[Groups(['calendar_style', 'calendar_style_extended'])]
     private array $config = [];
 
     /**

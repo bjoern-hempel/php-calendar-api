@@ -28,9 +28,13 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\EventRepository;
+use App\Utils\ArrayToObject;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Entity class Event
@@ -41,6 +45,50 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['event']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['event_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves the collection of extended Event resources.',
+                'summary' => 'Retrieves the collection of extended Event resources.',
+            ],
+            'path' => '/events/extended.{_format}',
+        ],
+        'post' => [
+            'normalization_context' => ['groups' => ['event']],
+        ],
+    ],
+    itemOperations: [
+        'delete' => [
+            'normalization_context' => ['groups' => ['event']],
+        ],
+        'get' => [
+            'normalization_context' => ['groups' => ['event']],
+        ],
+        'get_extended' => [
+            'method' => 'GET',
+            'normalization_context' => ['groups' => ['event_extended']],
+            'openapi_context' => [
+                'description' => 'Retrieves a extended Event resource.',
+                'summary' => 'Retrieves a extended Event resource.',
+            ],
+            'path' => '/events/{id}/extended.{_format}',
+        ],
+        'patch' => [
+            'normalization_context' => ['groups' => ['event']],
+        ],
+        'put' => [
+            'normalization_context' => ['groups' => ['event']],
+        ],
+    ],
+    normalizationContext: ['enable_max_depth' => true, 'groups' => ['event']],
+    order: ['id' => 'ASC'],
+)]
 class Event
 {
     use TimestampsTrait;
@@ -48,24 +96,33 @@ class Event
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['event', 'event_extended'])]
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups('event')]
     /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?User $user;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['event', 'event_extended'])]
     private string $name;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['event', 'event_extended'])]
     private int $type;
 
     #[ORM\Column(type: 'date')]
+    #[Groups(['event', 'event_extended'])]
     private DateTimeInterface $date;
 
-    #[ORM\Column(type: 'string', length: 15, nullable: true)]
-    private ?string $color;
+    /** @var array<string|int|float|bool> $config */
+    #[ORM\Column(type: 'json')]
+    #[Groups(['event', 'event_extended'])]
+    private array $config = [];
+
+    private ArrayToObject $configObject;
 
     /**
      * Gets the id of this event.
@@ -170,24 +227,42 @@ class Event
     }
 
     /**
-     * Gets the color of this event.
+     * Gets the config.
      *
-     * @return string|null
+     * @return array<string|int|float|bool>
      */
-    public function getColor(): ?string
+    public function getConfig(): array
     {
-        return $this->color;
+        return $this->config;
     }
 
     /**
-     * Sets the color of this event.
+     * Gets the config as object.
      *
-     * @param string|null $color
-     * @return $this
+     * @return ArrayToObject
+     * @throws Exception
      */
-    public function setColor(?string $color): self
+    public function getConfigObject(): ArrayToObject
     {
-        $this->color = $color;
+        if (!isset($this->configObject)) {
+            $this->configObject = new ArrayToObject($this->config);
+        }
+
+        return $this->configObject;
+    }
+
+    /**
+     * Sets the config.
+     *
+     * @param array<string|int|float|bool> $config
+     * @return $this
+     * @throws Exception
+     */
+    public function setConfig(array $config): self
+    {
+        $this->config = $config;
+
+        $this->configObject = new ArrayToObject($config);
 
         return $this;
     }
