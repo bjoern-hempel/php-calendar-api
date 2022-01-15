@@ -1,0 +1,425 @@
+#!/usr/bin/env bash
+
+# ------------
+# This sets the version of this project. Replaces some variables if needed.
+#
+# @author    Björn Hempel <bjoern@hempel.li>
+# @version   1.0.0 (2021-01-15)
+#
+# @copyright MIT License
+# @copyright
+# @copyright Copyright (c) 2017 Björn Hempel
+# @copyright
+# @copyright Permission is hereby granted, free of charge, to any person obtaining a copy
+# @copyright of this software and associated documentation files (the "Software"), to deal
+# @copyright in the Software without restriction, including without limitation the rights
+# @copyright to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# @copyright copies of the Software, and to permit persons to whom the Software is
+# @copyright furnished to do so, subject to the following conditions:
+# @copyright
+# @copyright The above copyright notice and this permission notice shall be included in all
+# @copyright copies or substantial portions of the Software.
+# @copyright
+# @copyright THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# @copyright IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# @copyright FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# @copyright AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# @copyright LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# @copyright OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# @copyright SOFTWARE.
+# @copyright
+# @copyright Written by Björn Hempel <bjoern@hempel.li>.
+# ------------
+
+# script configs
+PATH_SCRIPT_ABSOLUTE="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1; pwd -P)"
+PATH_ROOT=$(dirname "$PATH_SCRIPT_ABSOLUTE")
+
+# some environment variables
+ENV_SCRIPT_NAME=$(basename "${BASH_SOURCE[0]}")
+ENV_VERSION="1.0.0"
+ENV_AUTHOR='Björn Hempel'
+ENV_EMAIL='bjoern@hempel.li'
+
+# file variables
+PATH_VERSION_RELATIVE="VERSION"
+PATH_ENV_RELATIVE=".env"
+
+# =====
+#
+# Reads parameter
+#
+# =====
+function readParameter
+{
+    # help:
+    # help: Usage: %scriptname% [...options] [version]
+    while [[ $# > 0 ]]; do
+        case "$1" in
+
+            # help:
+            # help:  -c,    --current                     Shows the current version.
+            -c|--current)
+                echo && showVersion && showCurrentVersion && exit 0
+                ;;
+
+
+            # help:
+            # help:  -X,    --major                       Will increase the major version (x.0.0).
+            -X|--major)
+                PARAMETERS+=("$(getMajorVersion)")
+                ;;
+
+            # help:  -m,    --minor                       Will increase the minor version (0.x.0).
+            -m|--minor)
+                PARAMETERS+=("$(getMinorVersion)")
+                ;;
+
+            # help:  -p,    --patch                       Will increase the patch version (0.0.x).
+            -p|--patch)
+                PARAMETERS+=("$(getPatchVersion)")
+                ;;
+
+
+            # help:
+            # help:  -h,    --help                        Shows this help.
+            -h|--help)
+                echo && showVersion && showHelp && exit 0
+                ;;
+
+            # help:  -V,    --version                     Shows the version number.
+            -V|--version)
+                showVersion && exit 0
+                ;;
+
+	          # help:
+            # collect all unknown parameters
+            *)
+                local parameter="$1"
+
+                if [[ "$parameter" = -* ]]; then
+                    echo && error "Unknown option \"$parameter\". Abort."
+                    echo && showVersion && showHelp && exit 1
+                fi
+
+                PARAMETERS+=("$parameter")
+                ;;
+        esac
+        shift
+    done
+}
+
+# =====
+#
+# Returns the major version.
+#
+# =====
+function getMajorVersion()
+{
+    local currentVersion=$(getCurrentVersion)
+    local majorVersion=$(echo "$currentVersion" | sed 's/^\([0-9]\+\)\.[0-9]\+\.[0-9]\+$/\1/')
+
+    # Increase version
+    ((majorVersion=majorVersion+1))
+
+    echo "$currentVersion" | sed "s/^[0-9]\+\(\.[0-9]\+\)\(\.[0-9]\+\)$/$majorVersion\1\2/"
+}
+
+# =====
+#
+# Returns the minor version.
+#
+# =====
+function getMinorVersion()
+{
+    local currentVersion=$(getCurrentVersion)
+    local minorVersion=$(echo "$currentVersion" | sed 's/^[0-9]\+\.\([0-9]\+\)\.[0-9]\+$/\1/')
+
+    # Increase version
+    ((minorVersion=minorVersion+1))
+
+    echo "$currentVersion" | sed "s/^\([0-9]\+\.\)[0-9]\+\(\.[0-9]\+\)$/\1$minorVersion\2/"
+}
+
+# =====
+#
+# Returns the patch version.
+#
+# =====
+function getPatchVersion()
+{
+    local currentVersion=$(getCurrentVersion)
+    local patchVersion=$(echo "$currentVersion" | sed 's/^[0-9]\+\.[0-9]\+\.\([0-9]\+\)$/\1/')
+
+    # Increase version
+    ((patchVersion=patchVersion+1))
+
+    echo "$currentVersion" | sed "s/^\([0-9]\+\.\)\([0-9]\+\.\)[0-9]\+$/\1\2$patchVersion/"
+}
+
+# =====
+#
+# Show current version
+#
+# =====
+function showCurrentVersion
+{
+    local currentVersion=$(getCurrentVersion)
+
+    echo
+    echo "Current version: $currentVersion"
+    echo
+}
+
+# =====
+#
+# Checks parameter
+#
+# =====
+function checkParameter
+{
+    # get number of parameters
+    numberParameters=${#PARAMETERS[@]}
+
+    # check number of parameters
+    if [ "$numberParameters" -le 0 ]; then
+        echo && error "No version was given. Abort."
+        echo && showVersion && showHelp && exit 1
+    fi
+
+    # get given version
+    local version="${PARAMETERS[0]}"
+
+    # check version format
+    if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo && error "Unsupported version \"$version\". Expect something like \"1.2.3\". Abort."
+        echo && showVersion && showHelp && exit 1
+    fi
+}
+
+# =====
+#
+# Get version from parameter
+#
+# =====
+function getVersion()
+{
+    local version="${PARAMETERS[0]}"
+
+    echo "$version"
+}
+
+# =====
+#
+# Get current version from file
+#
+# =====
+function getCurrentVersion()
+{
+    local versionPath="$PATH_ROOT/$PATH_VERSION_RELATIVE"
+
+    if [ ! -f "$versionPath" ]; then
+        echo && error "Version file \"$versionPath\" not found. Abort."
+        echo && showVersion && showHelp && exit 1
+    fi
+
+    # shellcheck disable=SC2155
+    local version=$(cat "$versionPath")
+
+    echo "$version"
+}
+
+# =====
+#
+# Show versions
+#
+# =====
+function showVersions()
+{
+    local currentVersion="$1"
+    local newVersion="$2"
+
+    echo
+    echo "Current version: $currentVersion"
+    echo "New version:     $newVersion"
+    echo
+}
+
+# =====
+#
+# Ask user to add new version
+#
+# =====
+function askUser()
+{
+    # Ask user
+    echo -n "Do you want to set the new version \"$newVersion\" (y/n)? "
+
+    # Read key
+    # shellcheck disable=SC2162
+    read -s -n 1 key && echo "$key"
+
+    # Check key
+    case "$key" in
+
+        # y pressed
+        y|Y)
+            echo
+            ;;
+
+        # n pressed
+        n|N)
+            echo
+            info "The operation was canceled by the user. Abort."
+            echo
+            exit
+            ;;
+
+        # invalid key
+        *)
+            echo
+            error "Please press y or n. Abort."
+            echo
+            exit
+            ;;
+    esac
+}
+
+# =====
+#
+# Set version
+#
+# =====
+function setVersion()
+{
+    local versionPath="$PATH_ROOT/$PATH_VERSION_RELATIVE"
+    local envPath="$PATH_ROOT/$PATH_ENV_RELATIVE"
+    local newVersion="$1"
+
+    info "Set version \"$newVersion\" to \"$versionPath\""
+    echo "$newVersion" > "$versionPath"
+    success "Done."
+
+    info "Set version \"$newVersion\" to \"$envPath\""
+    sed -i "s/^VERSION_APP=.*/VERSION_APP=$newVersion/" "$envPath"
+    success "Done."
+}
+
+# =====
+#
+# Helper function: Print info/error message
+#
+# =====
+function message
+{
+    local message="$1"
+    local messageType="${2:-info}"
+    local lineBreak=${3:-true}
+    local first=${4:-true}
+    local logTime=${6:-$SETTING_SHOW_TIME}
+    local startTime=$(date '+%Y-%m-%d %H:%M:%S')
+
+    # Print the start of the message
+    if $first; then
+        $logTime && echo -n "[$startTime] "
+
+        printf "%-9s → " "($messageType)"
+    fi
+
+    # Print the given message
+    echo -n "$message"
+
+    # Adds a line break
+    if $lineBreak; then
+        echo
+    else
+        echo -n " "
+    fi
+
+    # remove color
+    echo -ne "$RESET"
+}
+
+# =====
+#
+# Helper function: Print info
+#
+# =====
+function info
+{
+    # show message(string $message, bool $lineBreak = true, bool $firstPart = true, bool $logToFile = false)
+    message "$1" "info" ${2:-true} ${3:-true} ${4:-false}
+}
+
+# =====
+#
+# Helper function: Print success
+#
+# =====
+function success
+{
+    # set color
+    echo -ne "$GREEN"
+
+    # show message(string $message, bool $lineBreak = true, bool $firstPart = true, bool $logToFile = false)
+    message "$1" "success" ${2:-true} ${3:-true} ${4:-false}
+
+    # remove color
+    echo -ne "$RESET"
+}
+
+# =====
+#
+# Helper function: Print error
+#
+# =====
+function error
+{
+    # set color
+    echo -ne "$RED"
+
+    # show message(string $message, bool $lineBreak = true, bool $firstPart = true, bool $logToFile = true)
+    message "$1" "error" ${2:-true} ${3:-true} ${4:-true}
+
+    # remove color
+    echo -ne "$RESET"
+}
+
+
+# =====
+#
+# Helper function: show help
+#
+# =====
+function showHelp
+{
+    cat "${BASH_SOURCE[0]}" | grep --color=never "# help:" | grep -v 'cat parameter' | sed 's/[ ]*# help:\([ ]\|\)//g' | sed "s~%scriptname%~$ENV_SCRIPT_NAME~g"
+}
+
+# =====
+#
+# Helper function: show version
+#
+# =====
+function showVersion
+{
+    echo "$ENV_SCRIPT_NAME $ENV_VERSION - $ENV_AUTHOR <$ENV_EMAIL>"
+}
+
+# a) Read parameters
+readParameter "$@"
+
+# b) Check parameter
+checkParameter && newVersion=$(getVersion) && currentVersion=$(getCurrentVersion)
+
+# c) show versions
+showVersions "$currentVersion" "$newVersion"
+
+# d) ask user to set new version
+askUser
+
+# e) set version -> VERSION
+setVersion "$newVersion"
+
+echo
+
