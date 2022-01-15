@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.9.0] - 2022-01-15
+
+* [#29](https://github.com/bjoern-hempel/php-calendar-api/issues/29) - Add app version to API platform
+
 ### [0.8.1] - 2022-01-15
 
 * Fix documentation CHANGELOG.md
