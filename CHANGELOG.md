@@ -74,20 +74,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ```bash
 # Checkout master branch
-$ git checkout main && git pull
+❯ git checkout main && git pull
 
 # Check current version
-$ bin/setVersion --current
+❯ bin/version-manager --current
 
 # Change changelog
-$ vi CHANGELOG.md
+❯ vi CHANGELOG.md
 
 # Add new version to .evn and VERSION file (increase patch version)
-$ bin/setVersion --patch
+❯ bin/version-manager --patch
 
 # Push new version
-$ git add CHANGELOG.md VERSION .env && git commit -m "Add version $(cat VERSION)" && git push
+❯ git add CHANGELOG.md VERSION .env && git commit -m "Add version $(cat VERSION)" && git push
 
 # Tag and push new version
-$ git tag -a "$(cat VERSION)" -m "Version $(cat VERSION)" && git push origin "$(cat VERSION)"
+❯ git tag -a "$(cat VERSION)" -m "Version $(cat VERSION)" && git push origin "$(cat VERSION)"
 ```
