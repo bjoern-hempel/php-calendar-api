@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.10.0] - 2022-01-16
+
+* [#32](https://github.com/bjoern-hempel/php-calendar-api/issues/32) - Add https://github.com/ixnode/bash-version-manager to repo
+
 ### [0.9.0] - 2022-01-15
 
 * [#29](https://github.com/bjoern-hempel/php-calendar-api/issues/29) - Add app version to API platform
@@ -79,11 +83,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 # Check current version
 ❯ bin/version-manager --current
 
-# Change changelog
-❯ vi CHANGELOG.md
-
 # Add new version to .evn and VERSION file (increase patch version)
 ❯ bin/version-manager --patch
+
+# Change changelog
+❯ vi CHANGELOG.md
 
 # Push new version
 ❯ git add CHANGELOG.md VERSION .env && git commit -m "Add version $(cat VERSION)" && git push
