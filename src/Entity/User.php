@@ -330,7 +330,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
 
-        // guarantee every user at least has ROLE_USER
+        /* Guarantee every user at least has ROLE_USER */
         $roles[] = self::ROLE_USER;
 
         return array_unique($roles);
