@@ -1,0 +1,3 @@
+# Ignore jwt keys
+/config/jwt/*.pem
+

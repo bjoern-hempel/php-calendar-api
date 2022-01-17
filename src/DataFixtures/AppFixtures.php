@@ -426,15 +426,22 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
      */
     protected function setUser(?int $i = 1): User
     {
+        /* Create credentials. */
+        $email = sprintf('user%d@domain.tld', $i);
+        $username = sprintf('user%d', $i);
+        $password = sprintf('password%d', $i);
+
+        /* Create a new user. */
         $user = new User();
-        $user->setEmail(sprintf('user%d@domain.tld', $i));
-        $user->setUsername(sprintf('user%d', $i));
-        $user->setPassword($this->userPasswordHasher->hashPassword($user, sprintf('password%d', $i)));
+        $user->setEmail($email);
+        $user->setUsername($username);
+        $user->setPassword($this->userPasswordHasher->hashPassword($user, $password));
         $user->setFirstname(sprintf('Firstname %d', $i));
         $user->setLastname(sprintf('Lastname %d', $i));
         $user->setIdHash('cf6b37d2b5f805a0f76ef2b3610eff7a705a2290');
         $this->manager?->persist($user);
 
+        /* Return the user */
         return $user;
     }
 
