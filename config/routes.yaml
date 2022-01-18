@@ -9,3 +9,8 @@ kernel:
 authentication_token:
     path: /api/v1/token/get
     methods: ['POST']
+
+gesdinet_jwt_refresh_token:
+    path: /api/v1/token/refresh
+    controller: gesdinet.jwtrefreshtoken::refresh
+

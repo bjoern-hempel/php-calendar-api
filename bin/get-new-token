@@ -38,8 +38,7 @@
 # ------------
 
 # read parameter
-email="$1"
-password="$2"
+refreshToken="$1"
 
 # get token
 json=$(
@@ -47,8 +46,8 @@ json=$(
       -s \
       -X POST \
       -H "Content-Type: application/json" \
-      -d "{\"email\":\"$email\",\"password\":\"$password\"}" \
-      http://localhost/api/v1/token/get
+      -d '{"refresh_token":"'$refreshToken'"}' \
+      http://localhost/api/v1/token/refresh | jq .
 )
 
 # extract token and token_refresh

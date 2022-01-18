@@ -144,6 +144,9 @@
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.5"
     },
+    "gesdinet/jwt-refresh-token-bundle": {
+        "version": "v1.0.0"
+    },
     "jetbrains/phpstorm-attributes": {
         "version": "1.0"
     },
