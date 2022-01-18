@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.12.0] - 2022-01-18
+
+* [#3](https://github.com/bjoern-hempel/php-calendar-api/issues/3) - Add JWT refresh token bundle
+
 ### [0.11.0] - 2022-01-17
 
 * [#2](https://github.com/bjoern-hempel/php-calendar-api/issues/2) - Add JWT Authentication
