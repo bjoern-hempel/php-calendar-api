@@ -551,8 +551,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
-        /* Erase sensitive data on the user */
-        $this->setPassword('');
     }
 
     /**

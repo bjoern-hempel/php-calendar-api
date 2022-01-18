@@ -19,7 +19,7 @@ security:
         # -----------------------
         # $ curl -X POST -H "Content-Type: application/json" http://localhost/api/v1/authentication_token \
         #     -d '{"email":"bjoern@hempel.li","password":"<PASSWORD>"}' | jq .
-        login:
+        token_get:
             pattern: ^/api/v1/token/get
             stateless: true
             provider: app_user_provider
@@ -29,6 +29,14 @@ security:
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        # Get new token with refresh token:
+        # ---------------------------------
+        # $ curl
+        token_refresh:
+            pattern: ^/api/v1/token/refresh
+            stateless: true
+            refresh_jwt: ~
 
         # Protect the api:
         # ----------------
@@ -61,8 +69,9 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/api/v1/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
-        - { path: ^/api/v1/token/get, roles: PUBLIC_ACCESS }
-        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/v1/token/refresh, roles: PUBLIC_ACCESS } # Allows getting new tokens
+        - { path: ^/api/v1/token/get, roles: PUBLIC_ACCESS } # Allows getting token with login
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY } # Protect all others pages
 
 when@test:
     security:

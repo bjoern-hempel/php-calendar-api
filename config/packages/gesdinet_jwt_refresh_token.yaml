@@ -1,0 +1,6 @@
+gesdinet_jwt_refresh_token:
+  ttl: 2592000 # 30 * 86400
+  ttl_update: false #  refresh token TTL when it is used
+  user_identity_field: email
+  single_use: false
+  firewall: token_refresh
