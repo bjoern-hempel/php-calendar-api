@@ -46,6 +46,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
+    # Security filter for collection operations at App\Doctrine\CurrentUserExtension
     collectionOperations: [
         'get' => [
             'normalization_context' => ['groups' => ['event']],
@@ -61,29 +62,41 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ],
         'post' => [
             'normalization_context' => ['groups' => ['event']],
+            'security_post_denormalize' => 'is_granted("'.self::ATTRIBUTE_EVENT_POST.'")',
+            'security_post_denormalize_message' => "Only own events can be added.",
         ],
     ],
     itemOperations: [
         'delete' => [
             'normalization_context' => ['groups' => ['event']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_EVENT_DELETE.'", object.user)',
+            'security_message' => 'Only own events can be deleted.',
         ],
         'get' => [
             'normalization_context' => ['groups' => ['event']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_EVENT_GET.'", object.user)',
+            'security_message' => 'Only own events can be read.',
         ],
         'get_extended' => [
             'method' => 'GET',
             'normalization_context' => ['groups' => ['event_extended']],
             'openapi_context' => [
-                'description' => 'Retrieves a extended Event resource.',
-                'summary' => 'Retrieves a extended Event resource.',
+                'description' => 'Retrieves an extended Event resource.',
+                'summary' => 'Retrieves an extended Event resource.',
             ],
             'path' => '/events/{id}/extended.{_format}',
+            'security' => 'is_granted("'.self::ATTRIBUTE_EVENT_GET.'", object.user)',
+            'security_message' => 'Only own events can be read.',
         ],
         'patch' => [
             'normalization_context' => ['groups' => ['event']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_EVENT_PATCH.'", object.user)',
+            'security_message' => 'Only own events can be modified.',
         ],
         'put' => [
             'normalization_context' => ['groups' => ['event']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_EVENT_PUT.'", object.user)',
+            'security_message' => 'Only own events can be modified.',
         ],
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['event']],
@@ -92,6 +105,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Event
 {
     use TimestampsTrait;
+
+    public const ATTRIBUTE_EVENT_DELETE = 'EVENT_DELETE';
+
+    public const ATTRIBUTE_EVENT_GET = 'EVENT_GET';
+
+    public const ATTRIBUTE_EVENT_PATCH = 'EVENT_PATCH';
+
+    public const ATTRIBUTE_EVENT_POST = 'EVENT_POST';
+
+    public const ATTRIBUTE_EVENT_PUT = 'EVENT_PUT';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -103,7 +126,7 @@ class Event
     #[ORM\JoinColumn(nullable: false)]
     #[Groups('event')]
     /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
-    private ?User $user;
+    public ?User $user;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['event', 'event_extended'])]

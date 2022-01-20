@@ -293,6 +293,23 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
     }
 
     /**
+     * Get hash from given (user) id.
+     *
+     * @param int $i
+     * @return string
+     */
+    public function getHash(int $i): string
+    {
+        $salt = 'S4Lt';
+
+        return match ($i) {
+            1 => 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290',
+            2 => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
+            default => sha1(sprintf('%s-%s', $salt, $i)),
+        };
+    }
+
+    /**
      * Sets a Holiday resource.
      *
      * @param HolidayGroup $holidayGroup
@@ -381,11 +398,11 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
      *
      * @param CalendarStyle $calendarStyle
      * @param HolidayGroup $holidayGroup
-     * @param int|null $i
+     * @param int $i
      * @return User
      * @throws Exception
      */
-    public function getUser(CalendarStyle $calendarStyle, HolidayGroup $holidayGroup, ?int $i = 1): User
+    public function getUser(CalendarStyle $calendarStyle, HolidayGroup $holidayGroup, int $i = 1): User
     {
         $user = $this->setUser($i);
 
@@ -421,10 +438,10 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
     /**
      * Sets a User resource.
      *
-     * @param int|null $i
+     * @param int $i
      * @return User
      */
-    protected function setUser(?int $i = 1): User
+    protected function setUser(int $i = 1): User
     {
         /* Create credentials. */
         $email = sprintf('user%d@domain.tld', $i);
@@ -438,7 +455,7 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         $user->setPassword($this->userPasswordHasher->hashPassword($user, $password));
         $user->setFirstname(sprintf('Firstname %d', $i));
         $user->setLastname(sprintf('Lastname %d', $i));
-        $user->setIdHash('cf6b37d2b5f805a0f76ef2b3610eff7a705a2290');
+        $user->setIdHash($this->getHash($i));
         $this->manager?->persist($user);
 
         /* Return the user */
@@ -578,7 +595,7 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         $calendarStyle = $this->getCalendarStyle();
 
         /* Create User resources. */
-        for ($i = 1; $i <= 1; $i++) {
+        for ($i = 1; $i <= 2; $i++) {
             $this->getUser($calendarStyle, $holidayGroup, $i);
         }
 

@@ -45,6 +45,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: CalendarImageRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
+    # Security filter for collection operations at App\Doctrine\CurrentUserExtension
     collectionOperations: [
         'get' => [
             'normalization_context' => ['groups' => ['calendar_image']],
@@ -60,29 +61,41 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ],
         'post' => [
             'normalization_context' => ['groups' => ['calendar_image']],
+            'security_post_denormalize' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_IMAGE_POST.'")',
+            'security_post_denormalize_message' => "Only own calendar images can be added.",
         ],
     ],
     itemOperations: [
         'delete' => [
             'normalization_context' => ['groups' => ['calendar_image']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_IMAGE_DELETE.'", object.user)',
+            'security_message' => 'Only own calendar images can be deleted.',
         ],
         'get' => [
             'normalization_context' => ['groups' => ['calendar_image']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_IMAGE_GET.'", object.user)',
+            'security_message' => 'Only own calendar images can be read.',
         ],
         'get_extended' => [
             'method' => 'GET',
             'normalization_context' => ['groups' => ['calendar_image_extended']],
             'openapi_context' => [
-                'description' => 'Retrieves a extended CalendarImage resource.',
-                'summary' => 'Retrieves a extended CalendarImage resource.',
+                'description' => 'Retrieves an extended CalendarImage resource.',
+                'summary' => 'Retrieves an extended CalendarImage resource.',
             ],
             'path' => '/calendar_images/{id}/extended.{_format}',
+            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_IMAGE_GET.'", object.user)',
+            'security_message' => 'Only own calendar images can be read.',
         ],
         'patch' => [
             'normalization_context' => ['groups' => ['calendar_image']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_IMAGE_PATCH.'", object.user)',
+            'security_message' => 'Only own calendar images can be modified.',
         ],
         'put' => [
             'normalization_context' => ['groups' => ['calendar_image']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_IMAGE_PUT.'", object.user)',
+            'security_message' => 'Only own calendar images can be modified.',
         ],
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar_image']],
@@ -91,6 +104,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class CalendarImage
 {
     use TimestampsTrait;
+
+    public const ATTRIBUTE_CALENDAR_IMAGE_DELETE = 'CALENDAR_IMAGE_DELETE';
+
+    public const ATTRIBUTE_CALENDAR_IMAGE_GET = 'CALENDAR_IMAGE_GET';
+
+    public const ATTRIBUTE_CALENDAR_IMAGE_PATCH = 'CALENDAR_IMAGE_PATCH';
+
+    public const ATTRIBUTE_CALENDAR_IMAGE_POST = 'CALENDAR_IMAGE_POST';
+
+    public const ATTRIBUTE_CALENDAR_IMAGE_PUT = 'CALENDAR_IMAGE_PUT';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -102,7 +125,7 @@ class CalendarImage
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['calendar_image', 'calendar_image_extended'])]
     /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
-    private ?User $user;
+    public ?User $user;
 
     #[ORM\ManyToOne(targetEntity: Calendar::class, inversedBy: 'calendarImages')]
     #[ORM\JoinColumn(nullable: false)]
