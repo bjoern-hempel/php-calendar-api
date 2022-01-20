@@ -50,6 +50,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 #[ORM\Entity(repositoryClass: CalendarRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
+    # Security filter for collection operations at App\Doctrine\CurrentUserExtension
     collectionOperations: [
         'get' => [
             'normalization_context' => ['groups' => ['calendar']],
@@ -65,29 +66,41 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
         ],
         'post' => [
             'normalization_context' => ['groups' => ['calendar']],
+            'security_post_denormalize' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_POST.'")',
+            'security_post_denormalize_message' => "Only own calendars can be added.",
         ],
     ],
     itemOperations: [
         'delete' => [
             'normalization_context' => ['groups' => ['calendar']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_DELETE.'", object.user)',
+            'security_message' => 'Only own calendars can be deleted.',
         ],
         'get' => [
             'normalization_context' => ['groups' => ['calendar']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_GET.'", object.user)',
+            'security_message' => 'Only own calendars can be read.',
         ],
         'get_extended' => [
             'method' => 'GET',
             'normalization_context' => ['groups' => ['calendar_extended']],
             'openapi_context' => [
-                'description' => 'Retrieves a extended Calendar resource.',
-                'summary' => 'Retrieves a extended Calendar resource.',
+                'description' => 'Retrieves an extended Calendar resource.',
+                'summary' => 'Retrieves an extended Calendar resource.',
             ],
             'path' => '/calendars/{id}/extended.{_format}',
+            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_GET.'", object.user)',
+            'security_message' => 'Only own calendars can be read.',
         ],
         'patch' => [
             'normalization_context' => ['groups' => ['calendar']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_PATCH.'", object.user)',
+            'security_message' => 'Only own calendars can be modified.',
         ],
         'put' => [
             'normalization_context' => ['groups' => ['calendar']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_PUT.'", object.user)',
+            'security_message' => 'Only own calendars can be modified.',
         ],
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar']],
@@ -96,6 +109,16 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 class Calendar
 {
     use TimestampsTrait;
+
+    public const ATTRIBUTE_CALENDAR_DELETE = 'CALENDAR_DELETE';
+
+    public const ATTRIBUTE_CALENDAR_GET = 'CALENDAR_GET';
+
+    public const ATTRIBUTE_CALENDAR_PATCH = 'CALENDAR_PATCH';
+
+    public const ATTRIBUTE_CALENDAR_POST = 'CALENDAR_POST';
+
+    public const ATTRIBUTE_CALENDAR_PUT = 'CALENDAR_PUT';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -108,7 +131,7 @@ class Calendar
     #[MaxDepth(1)]
     #[Groups(['calendar_extended', 'calendar'])]
     /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
-    private ?User $user;
+    public ?User $user;
 
     #[ORM\ManyToOne(targetEntity: CalendarStyle::class)]
     #[ORM\JoinColumn(nullable: false)]

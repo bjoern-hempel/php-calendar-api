@@ -36,11 +36,21 @@ api_platform:
 
     # Set defaults
     defaults:
-        pagination_maximum_items_per_page: 50
-        pagination_items_per_page: 20
+        pagination_maximum_items_per_page: 100
+        pagination_items_per_page: 100
         pagination_client_items_per_page: true
 
     # Set collection
     collection:
         pagination:
             items_per_page_parameter_name: itemsPerPage
+
+    exception_to_status:
+        # The 4 following handlers are registered by default, keep those lines to prevent unexpected side effects
+        Symfony\Component\Serializer\Exception\ExceptionInterface: 400 # Use a raw status code (recommended)
+        ApiPlatform\Core\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+        ApiPlatform\Core\Exception\FilterValidationException: 400
+        Doctrine\ORM\OptimisticLockException: 409
+
+        # Validation exception
+        ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_UNPROCESSABLE_ENTITY

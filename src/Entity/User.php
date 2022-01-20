@@ -51,6 +51,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
+    # Security filter for collection operations at App\Doctrine\CurrentUserExtension
     collectionOperations: [
         'get' => [
             'normalization_context' => ['groups' => ['user']],
@@ -66,29 +67,41 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
         ],
         'post' => [
             'normalization_context' => ['groups' => ['user']],
+            'security_post_denormalize' => 'is_granted("'.self::ROLE_ADMIN.'")',
+            'security_post_denormalize_message' => "Only admins can add users.",
         ],
     ],
     itemOperations: [
         'delete' => [
             'normalization_context' => ['groups' => ['user']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_USER_DELETE.'", object)',
+            'security_message' => 'Only own users can be deleted.',
         ],
         'get' => [
             'normalization_context' => ['groups' => ['user']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_USER_GET.'", object)',
+            'security_message' => 'Only own users can be read.',
         ],
         'get_extended' => [
             'method' => 'GET',
             'normalization_context' => ['groups' => ['user_extended']],
             'openapi_context' => [
-                'description' => 'Retrieves a extended User resource.',
-                'summary' => 'Retrieves a extended User resource.',
+                'description' => 'Retrieves an extended User resource.',
+                'summary' => 'Retrieves an extended User resource.',
             ],
             'path' => '/users/{id}/extended.{_format}',
+            'security' => 'is_granted("'.self::ATTRIBUTE_USER_GET.'", object)',
+            'security_message' => 'Only own users can be read.',
         ],
         'patch' => [
             'normalization_context' => ['groups' => ['user']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_USER_PATCH.'", object)',
+            'security_message' => 'Only own users can be modified.',
         ],
         'put' => [
             'normalization_context' => ['groups' => ['user']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_USER_PUT.'", object)',
+            'security_message' => 'Only own users can be modified.',
         ],
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['user']],
@@ -96,6 +109,16 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use TimestampsTrait;
+
+    public const ATTRIBUTE_USER_DELETE = 'USER_DELETE';
+
+    public const ATTRIBUTE_USER_GET = 'USER_GET';
+
+    public const ATTRIBUTE_USER_PATCH = 'USER_PATCH';
+
+    public const ATTRIBUTE_USER_POST = 'USER_POST';
+
+    public const ATTRIBUTE_USER_PUT = 'USER_PUT';
 
     public const ROLE_USER = 'ROLE_USER';
 

@@ -47,6 +47,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
+    # Security filter for collection operations at App\Doctrine\CurrentUserExtension
     collectionOperations: [
         'get' => [
             'normalization_context' => ['groups' => ['image']],
@@ -62,29 +63,41 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ],
         'post' => [
             'normalization_context' => ['groups' => ['image']],
+            'security_post_denormalize' => 'is_granted("'.self::ATTRIBUTE_IMAGE_POST.'")',
+            'security_post_denormalize_message' => "Only own images can be added.",
         ],
     ],
     itemOperations: [
         'delete' => [
             'normalization_context' => ['groups' => ['image']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_IMAGE_DELETE.'", object.user)',
+            'security_message' => 'Only own images can be deleted.',
         ],
         'get' => [
             'normalization_context' => ['groups' => ['image']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_IMAGE_GET.'", object.user)',
+            'security_message' => 'Only own images can be read.',
         ],
         'get_extended' => [
             'method' => 'GET',
             'normalization_context' => ['groups' => ['image_extended']],
             'openapi_context' => [
-                'description' => 'Retrieves a extended Image resource.',
-                'summary' => 'Retrieves a extended Image resource.',
+                'description' => 'Retrieves an extended Image resource.',
+                'summary' => 'Retrieves an extended Image resource.',
             ],
             'path' => '/images/{id}/extended.{_format}',
+            'security' => 'is_granted("'.self::ATTRIBUTE_IMAGE_GET.'", object.user)',
+            'security_message' => 'Only own images can be read.',
         ],
         'patch' => [
             'normalization_context' => ['groups' => ['image']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_IMAGE_PATCH.'", object.user)',
+            'security_message' => 'Only own images can be modified.',
         ],
         'put' => [
             'normalization_context' => ['groups' => ['image']],
+            'security' => 'is_granted("'.self::ATTRIBUTE_IMAGE_PUT.'", object.user)',
+            'security_message' => 'Only own images can be modified.',
         ],
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['image']],
@@ -93,6 +106,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Image
 {
     use TimestampsTrait;
+
+    public const ATTRIBUTE_IMAGE_DELETE = 'IMAGE_DELETE';
+
+    public const ATTRIBUTE_IMAGE_GET = 'IMAGE_GET';
+
+    public const ATTRIBUTE_IMAGE_PATCH = 'IMAGE_PATCH';
+
+    public const ATTRIBUTE_IMAGE_POST = 'IMAGE_POST';
+
+    public const ATTRIBUTE_IMAGE_PUT = 'IMAGE_PUT';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -104,7 +127,7 @@ class Image
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['image', 'image_extended'])]
     /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
-    private ?User $user;
+    public ?User $user;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['image', 'image_extended'])]
