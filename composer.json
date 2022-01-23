@@ -48,6 +48,7 @@
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "6.0.*",
         "symfony/css-selector": "6.0.*",
+        "symfony/http-client": "6.0.*",
         "symfony/maker-bundle": "^1.36",
         "symfony/phpunit-bridge": "^6.0",
         "symfony/stopwatch": "6.0.*",
@@ -87,7 +88,8 @@
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "lexik:jwt:generate-keypair --skip-if-exists": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"
@@ -125,7 +127,8 @@
         "load-fixtures-prod": "bin/console doctrine:fixtures:load -n",
         "load-fixtures-test": "bin/console doctrine:fixtures:load -n --env=test --group=test",
         "migrate-prod": "bin/console doctrine:migrations:migrate -n",
-        "migrate-test": "bin/console doctrine:migrations:migrate -n --env=test"
+        "migrate-test": "bin/console doctrine:migrations:migrate -n --env=test",
+        "jwt-generate-keypair": "bin/console lexik:jwt:generate-keypair --skip-if-exists"
     },
     "conflict": {
         "symfony/symfony": "*"

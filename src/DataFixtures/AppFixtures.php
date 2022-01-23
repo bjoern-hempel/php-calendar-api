@@ -3,27 +3,12 @@
 declare(strict_types=1);
 
 /*
- * MIT License
+ * This file is part of the bjoern-hempel/php-calendar-api project.
  *
- * Copyright (c) 2021 Björn Hempel <bjoern@hempel.li>
+ * (c) Björn Hempel <https://www.hempel.li/>
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
  */
 
 namespace App\DataFixtures;
@@ -42,6 +27,8 @@ use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Exception;
+use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Pure;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -63,6 +50,16 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
     private ContainerInterface $container;
 
     private ImageProperty $imageProperty;
+
+    public const FIXTURE_TEMPLATE_EMAIL = 'user%d@domain.tld';
+
+    public const FIXTURE_TEMPLATE_USERNAME = 'user%d';
+
+    public const FIXTURE_TEMPLATE_PASSWORD = 'password%d';
+
+    public const FIXTURE_TEMPLATE_FIRSTNAME = 'Firstname %d';
+
+    public const FIXTURE_TEMPLATE_LASTNAME = 'Lastname %d';
 
     private const ENVIRONMENT_NAME_DEV = 'dev';
 
@@ -310,6 +307,81 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
     }
 
     /**
+     * Returns a fixture email.
+     *
+     * @param int $i
+     * @return string
+     */
+    public static function getEmail(int $i): string
+    {
+        return sprintf(self::FIXTURE_TEMPLATE_EMAIL, $i);
+    }
+
+    /**
+     * Returns a fixture username.
+     *
+     * @param int $i
+     * @return string
+     */
+    public static function getUsername(int $i): string
+    {
+        return sprintf(self::FIXTURE_TEMPLATE_USERNAME, $i);
+    }
+
+    /**
+     * Returns a fixture password.
+     *
+     * @param int $i
+     * @return string
+     */
+    public static function getPassword(int $i): string
+    {
+        return sprintf(self::FIXTURE_TEMPLATE_PASSWORD, $i);
+    }
+
+    /**
+     * Returns a fixture firstname.
+     *
+     * @param int $i
+     * @return string
+     */
+    public static function getFirstname(int $i): string
+    {
+        return sprintf(self::FIXTURE_TEMPLATE_FIRSTNAME, $i);
+    }
+
+    /**
+     * Returns a fixture lastname.
+     *
+     * @param int $i
+     * @return string
+     */
+    public static function getLastname(int $i): string
+    {
+        return sprintf(self::FIXTURE_TEMPLATE_LASTNAME, $i);
+    }
+
+    /**
+     * Returns a user as JSON.
+     *
+     * @param int $i
+     * @return array{id: int, email: string, username: string, firstname: string, lastname: string, roles: string[]}
+     */
+    #[ArrayShape(['id' => "int", 'email' => "string", 'username' => "string", 'firstname' => "string", 'lastname' => "string", 'roles' => "array"])]
+    #[Pure]
+    public static function getUserAsJson(int $i): array
+    {
+        return [
+            'id' => $i,
+            'email' => AppFixtures::getEmail($i),
+            'username' => AppFixtures::getUsername($i),
+            'firstname' => AppFixtures::getFirstname($i),
+            'lastname' => AppFixtures::getLastname($i),
+            'roles' => [User::ROLE_USER],
+        ];
+    }
+
+    /**
      * Sets a Holiday resource.
      *
      * @param HolidayGroup $holidayGroup
@@ -444,17 +516,17 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
     protected function setUser(int $i = 1): User
     {
         /* Create credentials. */
-        $email = sprintf('user%d@domain.tld', $i);
-        $username = sprintf('user%d', $i);
-        $password = sprintf('password%d', $i);
+        $email = self::getEmail($i);
+        $username = self::getUsername($i);
+        $password = self::getPassword($i);
 
         /* Create a new user. */
         $user = new User();
         $user->setEmail($email);
         $user->setUsername($username);
         $user->setPassword($this->userPasswordHasher->hashPassword($user, $password));
-        $user->setFirstname(sprintf('Firstname %d', $i));
-        $user->setLastname(sprintf('Lastname %d', $i));
+        $user->setFirstname(self::getFirstname($i));
+        $user->setLastname(self::getLastname($i));
         $user->setIdHash($this->getHash($i));
         $this->manager?->persist($user);
 

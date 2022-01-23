@@ -3,31 +3,17 @@
 declare(strict_types=1);
 
 /*
- * MIT License
+ * This file is part of the bjoern-hempel/php-calendar-api project.
  *
- * Copyright (c) 2021 Björn Hempel <bjoern@hempel.li>
+ * (c) Björn Hempel <https://www.hempel.li/>
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
  */
 
 namespace App\Tests\Functional;
 
+use App\DataFixtures\AppFixtures;
 use App\Entity\CalendarImage;
 use App\Entity\HolidayGroup;
 use App\Service\CalendarBuilderService;
@@ -200,6 +186,7 @@ final class CreatePageTest extends KernelTestCase
      * @param int $height
      * @return float
      * @throws ImagickException
+     * @throws Exception
      */
     protected function compareImages(CalendarImage $calendarImage, int $width, int $height): float
     {
@@ -237,7 +224,7 @@ final class CreatePageTest extends KernelTestCase
     public function main(): void
     {
         /* Parameter */
-        $email = 'user1@domain.tld';
+        $email = AppFixtures::getEmail(1);
         $calendarName = 'Calendar 1';
         $year = 2022;
         $month = 1;
