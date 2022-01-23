@@ -124,6 +124,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public const ROLE_ADMIN = 'ROLE_ADMIN';
 
+    public const API_ENDPOINT_COLLECTION = '/api/v1/users';
+
+    public const API_ENDPOINT_ITEM = '/api/v1/users/%d';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
