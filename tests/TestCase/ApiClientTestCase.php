@@ -86,22 +86,19 @@ abstract class ApiClientTestCase extends ApiTestCase
      *
      * @param string $endpoint
      * @param string $method
-     * @param string[] $options
+     * @param string[]|string[][] $options
+     * @param string|null $bearer
      * @return ResponseInterface
      * @throws TransportExceptionInterface
      */
-    public function doRequest(string $endpoint, string $method = Request::METHOD_GET, array $options = []): ResponseInterface
+    public function doRequest(string $endpoint, string $method = Request::METHOD_GET, array $options = [], string $bearer = null): ResponseInterface
     {
         return self::$client->request($method, $endpoint, array_merge([
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ],
-            'json' => [
-                'email' => AppFixtures::getEmail(1),
-                'password' => AppFixtures::getPassword(1),
-            ],
-        ], $options));
+            ]
+        ], $bearer !== null ? ['auth_bearer' => $bearer] : [], $options));
     }
 
     /**

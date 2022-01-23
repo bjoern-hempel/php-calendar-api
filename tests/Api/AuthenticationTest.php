@@ -19,6 +19,7 @@ use App\OpenApi\JwtDecorator;
 use App\Tests\TestCase\ApiClientTestCase;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -27,8 +28,11 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class AuthenticationTest extends ApiClientTestCase
 {
-    /** @var string[] $credentials */
-    protected static array $credentials;
+    /** @var string[] $credentialsUser1 */
+    protected static array $credentialsUser1;
+
+    /** @var string[] $credentialsUser2 */
+    protected static array $credentialsUser2;
 
     /**
      * This method is called before class.
@@ -38,6 +42,36 @@ class AuthenticationTest extends ApiClientTestCase
     public static function setUpBeforeClass(): void
     {
         self::initClientEnvironment();
+    }
+
+    /**
+     * Test wrong login.
+     *
+     * @test
+     * @return void
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function wrongLoginUser1(): void
+    {
+        /* Arrange */
+        $endpoint = JwtDecorator::API_ENDPOINT;
+        $method = JwtDecorator::API_ENDPOINT_METHOD;
+        $userId = 1;
+        $options = [
+            'json' => [
+                'email' => AppFixtures::getEmail($userId),
+                'password' => 'wrong-password',
+            ]
+        ];
+
+        /* Act */
+        $this->doRequest($endpoint, $method, $options);
+
+        /* Assert */
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
     }
 
     /**
@@ -51,19 +85,26 @@ class AuthenticationTest extends ApiClientTestCase
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    public function login(): void
+    public function loginUser1(): void
     {
         /* Arrange */
         $endpoint = JwtDecorator::API_ENDPOINT;
         $method = JwtDecorator::API_ENDPOINT_METHOD;
+        $userId = 1;
+        $options = [
+            'json' => [
+                'email' => AppFixtures::getEmail($userId),
+                'password' => AppFixtures::getPassword($userId),
+            ]
+        ];
 
         /* Act */
-        $response = $this->doRequest($endpoint, $method);
-        self::$credentials = $response->toArray();
+        $response = $this->doRequest($endpoint, $method, $options);
+        self::$credentialsUser1 = $response->toArray();
 
         /* Assert */
         $this->assertResponseIsSuccessful();
-        $this->assertArrayHasKey('token', self::$credentials);
+        $this->assertArrayHasKey('token', self::$credentialsUser1);
     }
 
     /**
@@ -73,7 +114,7 @@ class AuthenticationTest extends ApiClientTestCase
      * @return void
      * @throws TransportExceptionInterface
      */
-    public function withoutToken(): void
+    public function withoutTokenUser1(): void
     {
         /* Arrange */
         $endpoint = $this->getApiEndpointItem(User::API_ENDPOINT_ITEM, 1);
@@ -83,7 +124,7 @@ class AuthenticationTest extends ApiClientTestCase
         $this->doRequest($endpoint, $method);
 
         /* Assert */
-        $this->assertResponseStatusCodeSame(401);
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
     }
 
     /**
@@ -97,19 +138,129 @@ class AuthenticationTest extends ApiClientTestCase
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    public function withToken(): void
+    public function withTokenUser1(): void
     {
         /* Arrange */
-        $endpoint = $this->getApiEndpointItem(User::API_ENDPOINT_ITEM, 1);
+        $userId = 1;
+        $endpoint = $this->getApiEndpointItem(User::API_ENDPOINT_ITEM, $userId);
         $method = Request::METHOD_GET;
-        $expected = AppFixtures::getUserAsJson(1);
+        $expected = AppFixtures::getUserAsJson($userId);
 
         /* Act */
-        $response = $this->doRequest($endpoint, $method, ['auth_bearer' => self::$credentials['token']]);
+        $response = $this->doRequest($endpoint, $method, bearer: self::$credentialsUser1['token']);
         $current = $response->toArray();
 
         /* Assert */
         $this->assertResponseIsSuccessful();
         $this->assertSame($expected, $current);
+    }
+
+    /**
+     * Test getting forbidden user.
+     *
+     * @test
+     * @return void
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function tryForbiddenUser1(): void
+    {
+        /* Arrange */
+        $userId = 2;
+        $endpoint = $this->getApiEndpointItem(User::API_ENDPOINT_ITEM, $userId);
+        $method = Request::METHOD_GET;
+
+        /* Act */
+        $this->doRequest($endpoint, $method, bearer: self::$credentialsUser1['token']);
+
+        /* Assert */
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * Test login.
+     *
+     * @test
+     * @return void
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function loginUser2(): void
+    {
+        /* Arrange */
+        $endpoint = JwtDecorator::API_ENDPOINT;
+        $method = JwtDecorator::API_ENDPOINT_METHOD;
+        $userId = 2;
+        $options = [
+            'json' => [
+                'email' => AppFixtures::getEmail($userId),
+                'password' => AppFixtures::getPassword($userId),
+            ]
+        ];
+
+        /* Act */
+        $response = $this->doRequest($endpoint, $method, $options);
+        self::$credentialsUser2 = $response->toArray();
+
+        /* Assert */
+        $this->assertResponseIsSuccessful();
+        $this->assertArrayHasKey('token', self::$credentialsUser2);
+    }
+
+    /**
+     * Test getting user with a token
+     *
+     * @test
+     * @return void
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function withTokenUser2(): void
+    {
+        /* Arrange */
+        $userId = 2;
+        $endpoint = $this->getApiEndpointItem(User::API_ENDPOINT_ITEM, $userId);
+        $method = Request::METHOD_GET;
+        $expected = AppFixtures::getUserAsJson($userId);
+
+        /* Act */
+        $response = $this->doRequest($endpoint, $method, bearer: self::$credentialsUser2['token']);
+        $current = $response->toArray();
+
+        /* Assert */
+        $this->assertResponseIsSuccessful();
+        $this->assertSame($expected, $current);
+    }
+
+    /**
+     * Test getting forbidden user.
+     *
+     * @test
+     * @return void
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function tryForbiddenUser2(): void
+    {
+        /* Arrange */
+        $userId = 1;
+        $endpoint = $this->getApiEndpointItem(User::API_ENDPOINT_ITEM, $userId);
+        $method = Request::METHOD_GET;
+
+        /* Act */
+        $this->doRequest($endpoint, $method, bearer: self::$credentialsUser2['token']);
+
+        /* Assert */
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 }
