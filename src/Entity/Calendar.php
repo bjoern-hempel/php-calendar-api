@@ -15,6 +15,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use App\Entity\Trait\TimestampsTrait;
 use App\Repository\CalendarRepository;
 use App\Utils\ArrayToObject;
 use Doctrine\Common\Collections\ArrayCollection;

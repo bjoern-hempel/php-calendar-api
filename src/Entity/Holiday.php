@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Entity\Trait\TimestampsTrait;
 use App\Repository\HolidayRepository;
 use App\Utils\ArrayToObject;
 use DateTimeInterface;
