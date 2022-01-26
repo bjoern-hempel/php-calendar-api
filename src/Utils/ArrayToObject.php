@@ -35,7 +35,7 @@ class ArrayToObject
 
     protected const KEY_HEIGHT = 'height';
 
-    protected const KEY_ASPECT_RATIO = 'aspect-ratio';
+    protected const KEY_ASPECT_RATIO = 'aspectRatio';
 
     /**
      * ArrayToObject constructor.
@@ -71,7 +71,7 @@ class ArrayToObject
         $this->translate($key);
 
         if (!$this->has($key)) {
-            throw new Exception(sprintf('Given key "%s" does not exist.', $key));
+            throw new Exception(sprintf('Given key "%s" does not exist (%s:%d).', $key, __FILE__, __LINE__));
         }
 
         return $this->data[$key];

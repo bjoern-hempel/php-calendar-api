@@ -578,12 +578,12 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         $calendar->setTitle('2022');
         $calendar->setSubtitle('With love - Isa & Björn');
         $calendar->setConfig([
-            'background-color' => '255,255,255,100',
-            'print-calendar-week' => true,
-            'print-week-number' => true,
-            'print-qr-code-month' => true,
-            'print-qr-code-title' => true,
-            'aspect-ratio' => round(sqrt(2), 3), /* 1:1.414 */
+            'backgroundColor' => '255,255,255,100',
+            'printCalendarWeek' => true,
+            'printWeekNumber' => true,
+            'printQrCodeMonth' => true,
+            'printQrCodeTitle' => true,
+            'aspectRatio' => round(sqrt(2), 3), /* 1:1.414 */
             'height' => $this->getEnvironment() === self::ENVIRONMENT_NAME_TEST ? 800 : 4000,
         ]);
         $this->manager?->persist($calendar);
