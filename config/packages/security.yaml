@@ -38,6 +38,14 @@ security:
             stateless: true
             refresh_jwt: ~
 
+        # Get new token with refresh token:
+        # ---------------------------------
+        # $ curl
+        version:
+            pattern: ^/api/v1/version
+            stateless: true
+            refresh_jwt: ~
+
         # Protect the api:
         # ----------------
         # $ curl -X 'GET' -s http://localhost/api/v1/calendars.json \
@@ -71,6 +79,7 @@ security:
         - { path: ^/api/v1/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/v1/token/refresh, roles: PUBLIC_ACCESS } # Allows getting new tokens
         - { path: ^/api/v1/token/get, roles: PUBLIC_ACCESS } # Allows getting token with login
+        - { path: ^/api/v1/version, roles: PUBLIC_ACCESS } # Allows getting the version
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY } # Protect all others pages
 
 when@test:
