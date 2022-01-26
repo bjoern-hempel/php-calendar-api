@@ -124,7 +124,7 @@ class Calendar
     #[MaxDepth(1)]
     #[Groups(['calendar_extended', 'calendar'])]
     /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
-    private ?CalendarStyle $calendar_style;
+    private ?CalendarStyle $calendarStyle;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['calendar_extended', 'calendar'])]
@@ -210,18 +210,18 @@ class Calendar
      */
     public function getCalendarStyle(): ?CalendarStyle
     {
-        return $this->calendar_style;
+        return $this->calendarStyle;
     }
 
     /**
      * Sets the calendar style of this calendar.
      *
-     * @param CalendarStyle|null $calendar_style
+     * @param CalendarStyle|null $calendarStyle
      * @return $this
      */
-    public function setCalendarStyle(?CalendarStyle $calendar_style): self
+    public function setCalendarStyle(?CalendarStyle $calendarStyle): self
     {
-        $this->calendar_style = $calendar_style;
+        $this->calendarStyle = $calendarStyle;
 
         return $this;
     }

@@ -16,6 +16,7 @@ namespace App\Controller;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -47,13 +48,12 @@ class VersionController
     }
 
     /**
-     * Returns the version as JSON.
+     * Get app version.
      *
-     * @return JsonResponse
+     * @return string
      * @throws Exception
      */
-    #[Route(path: '/api/v1/version', name: 'version', methods: ['GET'])]
-    public function __invoke(): JsonResponse
+    protected function getAppVersion(): string
     {
         $pathVersion = sprintf('%s/%s', $this->appKernel->getProjectDir(), self::PATH_VERSION);
 
@@ -67,6 +67,27 @@ class VersionController
             throw new Exception(sprintf('Unable to read file "%s" (%s:%d).', $pathVersion, __FILE__, __LINE__));
         }
 
-        return new JsonResponse(['version' => trim($version)]);
+        return trim($version);
+    }
+
+    protected function getPhpVersion(): string
+    {
+        return phpversion();
+    }
+
+    /**
+     * Returns the version as JSON.
+     *
+     * @return JsonResponse
+     * @throws Exception
+     */
+    #[Route(path: '/api/v1/version', name: 'version', methods: ['GET'])]
+    public function __invoke(): JsonResponse
+    {
+        return new JsonResponse([
+            'appVersion' => $this->getAppVersion(),
+            'phpVersion' => $this->getPhpVersion(),
+            'symfonyVersion' => Kernel::VERSION,
+        ]);
     }
 }

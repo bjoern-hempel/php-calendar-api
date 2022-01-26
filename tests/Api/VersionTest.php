@@ -65,10 +65,12 @@ class VersionTest extends ApiClientTestCase
         $this->assertResponseIsSuccessful();
         $this->assertIsObject($object);
         if (is_object($object)) {
-            $this->assertObjectHasAttribute('version', $object);
+            $this->assertObjectHasAttribute('appVersion', $object);
+            $this->assertObjectHasAttribute('phpVersion', $object);
+            $this->assertObjectHasAttribute('symfonyVersion', $object);
             $this->assertFileExists($versionFile);
-            if (property_exists($object, 'version')) {
-                $this->assertEquals(trim($version), $object->version);
+            if (property_exists($object, 'appVersion')) {
+                $this->assertEquals(trim($version), $object->appVersion);
             }
         }
     }
