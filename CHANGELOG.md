@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.16.0] - 2022-01-29
+
+* [#45](https://github.com/bjoern-hempel/php-calendar-api/issues/45) - Possibility to disable the JWT locally for debugging processes
+
 ### [0.15.1] - 2022-01-26
 
 * [#43](https://github.com/bjoern-hempel/php-calendar-api/issues/43) - Add other versions to /version
