@@ -26,6 +26,16 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
+/**
+ * Class AuthenticationTest
+ *
+ * @author Björn Hempel <bjoern@hempel.li>
+ * @version 1.0.1 (2022-01-29)
+ * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 1.0.0 Add API tests (#28)
+ * @package App\Tests\Api
+ * @see https://api-platform.com/docs/core/security/#hooking-custom-permission-checks-using-voters
+ */
 class AuthenticationTest extends ApiClientTestCase
 {
     /** @var string[] $credentialsUser1 */
@@ -105,6 +115,54 @@ class AuthenticationTest extends ApiClientTestCase
         /* Assert */
         $this->assertResponseIsSuccessful();
         $this->assertArrayHasKey('token', self::$credentialsUser1);
+    }
+
+    /**
+     * Test getting users without a token
+     *
+     * @test
+     * @return void
+     * @throws TransportExceptionInterface
+     */
+    public function withoutTokenUserCollection1(): void
+    {
+        /* Arrange */
+        $endpoint = $this->getApiEndpoint(User::API_ENDPOINT_COLLECTION);
+        $method = Request::METHOD_GET;
+
+        /* Act */
+        $this->doRequest($endpoint, $method);
+
+        /* Assert */
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * Test getting user with a token
+     *
+     * @test
+     * @return void
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function withTokenUserCollection1(): void
+    {
+        /* Arrange */
+        $userId = 1;
+        $endpoint = $this->getApiEndpoint(User::API_ENDPOINT_COLLECTION);
+        $method = Request::METHOD_GET;
+        $expected = [AppFixtures::getUserAsJson($userId)];
+
+        /* Act */
+        $response = $this->doRequest($endpoint, $method, bearer: self::$credentialsUser1['token']);
+        $current = $response->toArray();
+
+        /* Assert */
+        $this->assertResponseIsSuccessful();
+        $this->assertSame($expected, $current);
     }
 
     /**

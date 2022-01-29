@@ -16,6 +16,7 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\Trait\TimestampsTrait;
 use App\Repository\CalendarImageRepository;
+use App\Security\Voter\UserVoter;
 use App\Utils\ArrayToObject;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
@@ -25,7 +26,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Entity class CalendarImage
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2021-12-30)
+ * @version 1.0.1 (2022-01-29)
+ * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 1.0.0 First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: CalendarImageRepository::class)]
@@ -47,19 +50,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ],
         'post' => [
             'normalization_context' => ['groups' => ['calendar_image']],
-            'security_post_denormalize' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_IMAGE_POST.'")',
+            'security_post_denormalize' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_POST.'")',
             'security_post_denormalize_message' => "Only own calendar images can be added.",
         ],
     ],
     itemOperations: [
         'delete' => [
             'normalization_context' => ['groups' => ['calendar_image']],
-            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_IMAGE_DELETE.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_DELETE.'", object.user)',
             'security_message' => 'Only own calendar images can be deleted.',
         ],
         'get' => [
             'normalization_context' => ['groups' => ['calendar_image']],
-            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_IMAGE_GET.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_GET.'", object.user)',
             'security_message' => 'Only own calendar images can be read.',
         ],
         'get_extended' => [
@@ -70,17 +73,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'summary' => 'Retrieves an extended CalendarImage resource.',
             ],
             'path' => '/calendar_images/{id}/extended.{_format}',
-            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_IMAGE_GET.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_GET.'", object.user)',
             'security_message' => 'Only own calendar images can be read.',
         ],
         'patch' => [
             'normalization_context' => ['groups' => ['calendar_image']],
-            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_IMAGE_PATCH.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_PATCH.'", object.user)',
             'security_message' => 'Only own calendar images can be modified.',
         ],
         'put' => [
             'normalization_context' => ['groups' => ['calendar_image']],
-            'security' => 'is_granted("'.self::ATTRIBUTE_CALENDAR_IMAGE_PUT.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_PUT.'", object.user)',
             'security_message' => 'Only own calendar images can be modified.',
         ],
     ],
@@ -90,16 +93,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class CalendarImage
 {
     use TimestampsTrait;
-
-    public const ATTRIBUTE_CALENDAR_IMAGE_DELETE = 'CALENDAR_IMAGE_DELETE';
-
-    public const ATTRIBUTE_CALENDAR_IMAGE_GET = 'CALENDAR_IMAGE_GET';
-
-    public const ATTRIBUTE_CALENDAR_IMAGE_PATCH = 'CALENDAR_IMAGE_PATCH';
-
-    public const ATTRIBUTE_CALENDAR_IMAGE_POST = 'CALENDAR_IMAGE_POST';
-
-    public const ATTRIBUTE_CALENDAR_IMAGE_PUT = 'CALENDAR_IMAGE_PUT';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

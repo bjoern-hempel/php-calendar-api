@@ -16,6 +16,7 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\Trait\TimestampsTrait;
 use App\Repository\EventRepository;
+use App\Security\Voter\UserVoter;
 use App\Utils\ArrayToObject;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
@@ -26,7 +27,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Entity class Event
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2021-12-30)
+ * @version 1.0.1 (2022-01-29)
+ * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 1.0.0 First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: EventRepository::class)]
@@ -48,19 +51,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ],
         'post' => [
             'normalization_context' => ['groups' => ['event']],
-            'security_post_denormalize' => 'is_granted("'.self::ATTRIBUTE_EVENT_POST.'")',
+            'security_post_denormalize' => 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_POST.'")',
             'security_post_denormalize_message' => "Only own events can be added.",
         ],
     ],
     itemOperations: [
         'delete' => [
             'normalization_context' => ['groups' => ['event']],
-            'security' => 'is_granted("'.self::ATTRIBUTE_EVENT_DELETE.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_DELETE.'", object.user)',
             'security_message' => 'Only own events can be deleted.',
         ],
         'get' => [
             'normalization_context' => ['groups' => ['event']],
-            'security' => 'is_granted("'.self::ATTRIBUTE_EVENT_GET.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_GET.'", object.user)',
             'security_message' => 'Only own events can be read.',
         ],
         'get_extended' => [
@@ -71,17 +74,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'summary' => 'Retrieves an extended Event resource.',
             ],
             'path' => '/events/{id}/extended.{_format}',
-            'security' => 'is_granted("'.self::ATTRIBUTE_EVENT_GET.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_GET.'", object.user)',
             'security_message' => 'Only own events can be read.',
         ],
         'patch' => [
             'normalization_context' => ['groups' => ['event']],
-            'security' => 'is_granted("'.self::ATTRIBUTE_EVENT_PATCH.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_PATCH.'", object.user)',
             'security_message' => 'Only own events can be modified.',
         ],
         'put' => [
             'normalization_context' => ['groups' => ['event']],
-            'security' => 'is_granted("'.self::ATTRIBUTE_EVENT_PUT.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_PUT.'", object.user)',
             'security_message' => 'Only own events can be modified.',
         ],
     ],
@@ -91,16 +94,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Event
 {
     use TimestampsTrait;
-
-    public const ATTRIBUTE_EVENT_DELETE = 'EVENT_DELETE';
-
-    public const ATTRIBUTE_EVENT_GET = 'EVENT_GET';
-
-    public const ATTRIBUTE_EVENT_PATCH = 'EVENT_PATCH';
-
-    public const ATTRIBUTE_EVENT_POST = 'EVENT_POST';
-
-    public const ATTRIBUTE_EVENT_PUT = 'EVENT_PUT';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

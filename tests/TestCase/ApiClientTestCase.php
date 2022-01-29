@@ -15,7 +15,6 @@ namespace App\Tests\TestCase;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client;
-use App\DataFixtures\AppFixtures;
 use App\Tests\Library\DbHelper;
 use Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -27,7 +26,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * TestCase ApiClientTestCase
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-01-23)
+ * @version 1.0.1 (2022-01-29)
+ * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 1.0.0 First version.
  * @package App\Tests\TestCase
  */
 abstract class ApiClientTestCase extends ApiTestCase
@@ -116,6 +117,17 @@ abstract class ApiClientTestCase extends ApiTestCase
     {
         static::ensureKernelShutdown();
         static::$booted = false;
+    }
+
+    /**
+     * Returns the full api endpoint.
+     *
+     * @param string $apiEndpointItem
+     * @return string
+     */
+    protected function getApiEndpoint(string $apiEndpointItem): string
+    {
+        return $apiEndpointItem;
     }
 
     /**
