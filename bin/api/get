@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+# ------------
+# Gets version from api via endpoint.
+#
+# @author    Björn Hempel <bjoern@hempel.li>
+# @version   0.1.0 (2022-01-29)
+# ------------
+
+# ------------
+# This file is part of the bjoern-hempel/php-calendar-api project.
+#
+# (c) Björn Hempel <https://www.hempel.li/>
+#
+# For the full copyright and license information, please view the LICENSE.md
+# file that was distributed with this source code.
+# ------------
+
+#curl -sLi -H 'accept: application/json' http://localhost/api/v1/users |
+#   awk -v bl=1 'bl{bl=0; h=($0 ~ /HTTP\/1/)} /^\r?$/{bl=1} {print $0>(h?"header":"body")}'
+#
+#header=$(<header)
+#body=$(<body)
+#
+#echo "$header"
+#echo "$body"
+#
+#exit
+
+# Check number of arguments.
+if [ "$#" -lt 1 ]; then
+    echo "Missing arguments (ENDPOINT_PATH). Abort." && exit 1
+fi
+
+# Some defaults
+RAW=false
+ACCEPT="application/json"
+ENDPOINT_URL="http://localhost"
+ENDPOINT_PATH="$1"
+
+# Check first argument (type of accept).
+if [ "$#" -gt 1 ] && [ "$2" -gt 0 ]; then
+    RAW=true
+fi
+
+# Check first argument (raw or not).
+if [ "$#" -gt 2 ] && [ "$3" -gt 0 ]; then
+    ACCEPT="application/ld+json"
+fi
+
+# Builds the command.
+COMMAND="curl -sLi -X 'GET' \ \n"
+
+# Add header
+COMMAND+="  -H 'accept: $ACCEPT' \ \n"
+
+if [ "$API_TOKEN" != "" ]; then
+    COMMAND+="  -H 'Authorization: Bearer $API_TOKEN' \ \n"
+fi
+
+# Add url
+COMMAND+="  '$ENDPOINT_URL$ENDPOINT_PATH'"
+
+echo
+echo -e "\$ $COMMAND"
+echo
+
+# Executes request to API.
+return=$(eval "$COMMAND")
+
+# Split header from body
+echo "$return" | awk -v bl=1 'bl{bl=0; h=($0 ~ /HTTP\/1/)} /^\r?$/{bl=1} {print $0>(h?"header":"body")}'
+
+# Get header and body
+header=$(<header)
+body=$(<body)
+
+# Print header
+echo
+echo "$header"
+
+# Print body
+echo
+if $RAW; then
+    echo "$body"
+else
+    echo "$body" | jq 'del(.trace?)'
+fi
+echo
