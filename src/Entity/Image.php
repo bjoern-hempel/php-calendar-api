@@ -16,6 +16,7 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\Trait\TimestampsTrait;
 use App\Repository\ImageRepository;
+use App\Security\Voter\UserVoter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -27,7 +28,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Entity class Image
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2021-12-30)
+ * @version 1.0.1 (2022-01-29)
+ * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 1.0.0 First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
@@ -49,19 +52,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ],
         'post' => [
             'normalization_context' => ['groups' => ['image']],
-            'security_post_denormalize' => 'is_granted("'.self::ATTRIBUTE_IMAGE_POST.'")',
+            'security_post_denormalize' => 'is_granted("'.UserVoter::ATTRIBUTE_IMAGE_POST.'")',
             'security_post_denormalize_message' => "Only own images can be added.",
         ],
     ],
     itemOperations: [
         'delete' => [
             'normalization_context' => ['groups' => ['image']],
-            'security' => 'is_granted("'.self::ATTRIBUTE_IMAGE_DELETE.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_IMAGE_DELETE.'", object.user)',
             'security_message' => 'Only own images can be deleted.',
         ],
         'get' => [
             'normalization_context' => ['groups' => ['image']],
-            'security' => 'is_granted("'.self::ATTRIBUTE_IMAGE_GET.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_IMAGE_GET.'", object.user)',
             'security_message' => 'Only own images can be read.',
         ],
         'get_extended' => [
@@ -72,17 +75,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'summary' => 'Retrieves an extended Image resource.',
             ],
             'path' => '/images/{id}/extended.{_format}',
-            'security' => 'is_granted("'.self::ATTRIBUTE_IMAGE_GET.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_IMAGE_GET.'", object.user)',
             'security_message' => 'Only own images can be read.',
         ],
         'patch' => [
             'normalization_context' => ['groups' => ['image']],
-            'security' => 'is_granted("'.self::ATTRIBUTE_IMAGE_PATCH.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_IMAGE_PATCH.'", object.user)',
             'security_message' => 'Only own images can be modified.',
         ],
         'put' => [
             'normalization_context' => ['groups' => ['image']],
-            'security' => 'is_granted("'.self::ATTRIBUTE_IMAGE_PUT.'", object.user)',
+            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_IMAGE_PUT.'", object.user)',
             'security_message' => 'Only own images can be modified.',
         ],
     ],
@@ -92,16 +95,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Image
 {
     use TimestampsTrait;
-
-    public const ATTRIBUTE_IMAGE_DELETE = 'IMAGE_DELETE';
-
-    public const ATTRIBUTE_IMAGE_GET = 'IMAGE_GET';
-
-    public const ATTRIBUTE_IMAGE_PATCH = 'IMAGE_PATCH';
-
-    public const ATTRIBUTE_IMAGE_POST = 'IMAGE_POST';
-
-    public const ATTRIBUTE_IMAGE_PUT = 'IMAGE_PUT';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

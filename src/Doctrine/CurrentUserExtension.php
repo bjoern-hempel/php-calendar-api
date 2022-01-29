@@ -23,27 +23,38 @@ use App\Entity\Image;
 use App\Entity\User;
 use Doctrine\ORM\QueryBuilder;
 use Exception;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Security;
 
 /**
  * Class CurrentUserExtension
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-01-20)
+ * @version 1.0.1 (2022-01-29)
+ * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 1.0.0 First version.
  * @package App\Doctrine
  */
 final class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
     private Security $security;
 
+    private ParameterBagInterface $parameterBag;
+
+    public const PARAMETER_NAME_JWT_ROLE = 'jwt.role';
+
     /**
      * CurrentUserExtension constructor.
      *
      * @param Security $security
+     * @param ParameterBagInterface $parameterBag
      */
-    public function __construct(Security $security)
+    public function __construct(Security $security, ParameterBagInterface $parameterBag)
     {
         $this->security = $security;
+
+        $this->parameterBag = $parameterBag;
     }
 
     /**
@@ -98,6 +109,11 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
 
         /* Get current user. */
         $user = $this->security->getUser();
+
+        /* JWT is disabled */
+        if ($this->parameterBag->get(self::PARAMETER_NAME_JWT_ROLE) === AuthenticatedVoter::PUBLIC_ACCESS) {
+            return;
+        }
 
         /* Expect User entity. */
         if (!$user instanceof User) {

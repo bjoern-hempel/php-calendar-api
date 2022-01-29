@@ -80,7 +80,7 @@ security:
         - { path: ^/api/v1/token/refresh, roles: PUBLIC_ACCESS } # Allows getting new tokens
         - { path: ^/api/v1/token/get, roles: PUBLIC_ACCESS } # Allows getting token with login
         - { path: ^/api/v1/version, roles: PUBLIC_ACCESS } # Allows getting the version
-        - { path: ^/, roles: IS_AUTHENTICATED_FULLY } # Protect all others pages
+        - { path: ^/, roles: '%env(resolve:JWT_ROLE)%' } # Protect all others pages
 
 when@test:
     security:
