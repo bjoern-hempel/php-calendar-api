@@ -90,7 +90,7 @@ class HolidayGroup
     private string $name;
 
     /** @var Collection<int, Holiday> $holidays */
-    #[ORM\OneToMany(mappedBy: 'holiday_group', targetEntity: Holiday::class)]
+    #[ORM\OneToMany(mappedBy: 'holidayGroup', targetEntity: Holiday::class)]
     #[Groups(['holiday_group', 'holiday_group_extended'])]
     private Collection $holidays;
 
@@ -144,6 +144,19 @@ class HolidayGroup
     public function getHolidays(): Collection
     {
         return $this->holidays;
+    }
+
+    /**
+     * Gets all related holidays as simple id list.
+     *
+     * @return Collection<int, int>
+     */
+    #[Groups(['holiday_group', 'holiday_group_extended'])]
+    public function getHolidayIds(): Collection
+    {
+        return $this->getHolidays()->map(function (Holiday $holiday) {
+            return $holiday->getId();
+        });
     }
 
     /**

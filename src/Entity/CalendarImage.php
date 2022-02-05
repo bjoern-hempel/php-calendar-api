@@ -20,6 +20,7 @@ use App\Security\Voter\UserVoter;
 use App\Utils\ArrayToObject;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
+use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -171,6 +172,18 @@ class CalendarImage
     }
 
     /**
+     * Gets the user id of this calendar.
+     *
+     * @return int|null
+     * @throws Exception
+     */
+    #[Groups(['calendar_image', 'calendar_image_extended'])]
+    public function getUserId(): ?int
+    {
+        return $this->getUser()->getId();
+    }
+
+    /**
      * Sets the user of this calendar image.
      *
      * @param User|null $user
@@ -199,6 +212,18 @@ class CalendarImage
     }
 
     /**
+     * Gets the calendar id of this calendar image.
+     *
+     * @return int
+     * @throws Exception
+     */
+    #[Groups(['calendar_image', 'calendar_image_extended'])]
+    public function getCalendarId(): int
+    {
+        return $this->getCalendar()->getId();
+    }
+
+    /**
      * Gets the calendar of this calendar image.
      *
      * @param Calendar|null $calendar
@@ -224,6 +249,18 @@ class CalendarImage
         }
 
         return $this->image;
+    }
+
+    /**
+     * Gets the image id of this calendar image.
+     *
+     * @return int
+     * @throws Exception
+     */
+    #[Groups(['calendar_image', 'calendar_image_extended'])]
+    public function getImageId(): int
+    {
+        return $this->getImage()->getId();
     }
 
     /**
@@ -352,6 +389,19 @@ class CalendarImage
         $this->url = $url;
 
         return $this;
+    }
+
+    /**
+     * Gets the name of this calendar image.
+     *
+     * @return string
+     * @throws Exception
+     */
+    #[Pure]
+    #[Groups(['calendar_image', 'calendar_image_extended'])]
+    public function getName(): string
+    {
+        return sprintf('%d - %d', $this->getMonth(), $this->getYear());
     }
 
     /**

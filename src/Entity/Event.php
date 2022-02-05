@@ -21,6 +21,7 @@ use App\Utils\ArrayToObject;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
+use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -144,6 +145,19 @@ class Event
     public function getUser(): ?User
     {
         return $this->user;
+    }
+
+    /**
+     * Gets the user id of this event.
+     *
+     * @return int|null
+     * @throws Exception
+     */
+    #[Pure]
+    #[Groups(['event', 'event_extended'])]
+    public function getUserId(): ?int
+    {
+        return $this->getUser()?->getId();
     }
 
     /**

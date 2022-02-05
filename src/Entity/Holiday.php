@@ -87,7 +87,7 @@ class Holiday
 
     #[ORM\ManyToOne(targetEntity: HolidayGroup::class, inversedBy: 'holidays')]
     #[Groups(['holiday', 'holiday_extended'])]
-    private ?HolidayGroup $holiday_group;
+    private ?HolidayGroup $holidayGroup;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['holiday', 'holiday_extended'])]
@@ -121,18 +121,29 @@ class Holiday
      */
     public function getHolidayGroup(): ?HolidayGroup
     {
-        return $this->holiday_group;
+        return $this->holidayGroup;
+    }
+
+    /**
+     * Gets the holiday group id of this holiday.
+     *
+     * @return int|null
+     */
+    #[Groups(['holiday', 'holiday_extended'])]
+    public function getHolidayGroupId(): ?int
+    {
+        return $this->getHolidayGroup()?->getId();
     }
 
     /**
      * Sets the holiday group of this holiday.
      *
-     * @param HolidayGroup|null $holiday_group
+     * @param HolidayGroup|null $holidayGroup
      * @return $this
      */
-    public function setHolidayGroup(?HolidayGroup $holiday_group): self
+    public function setHolidayGroup(?HolidayGroup $holidayGroup): self
     {
-        $this->holiday_group = $holiday_group;
+        $this->holidayGroup = $holidayGroup;
 
         return $this;
     }
