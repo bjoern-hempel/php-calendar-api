@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.17.0] - 2022-02-05
+
+* [#45](https://github.com/bjoern-hempel/php-calendar-api/issues/48) - Add X-Total-Count to header
+
 ### [0.16.0] - 2022-01-29
 
 * [#45](https://github.com/bjoern-hempel/php-calendar-api/issues/45) - Possibility to disable the JWT locally for debugging processes
