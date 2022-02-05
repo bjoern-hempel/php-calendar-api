@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.18.0] - 2022-02-05
+
+* [#50](https://github.com/bjoern-hempel/php-calendar-api/issues/50) - Add direct ids to response
+
 ### [0.17.0] - 2022-02-05
 
-* [#45](https://github.com/bjoern-hempel/php-calendar-api/issues/48) - Add X-Total-Count to header
+* [#48](https://github.com/bjoern-hempel/php-calendar-api/issues/48) - Add X-Total-Count to header
 
 ### [0.16.0] - 2022-01-29
 
