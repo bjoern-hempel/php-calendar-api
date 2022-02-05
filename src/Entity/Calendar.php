@@ -133,7 +133,7 @@ class Calendar
 
     #[ORM\ManyToOne(targetEntity: HolidayGroup::class)]
     #[Groups(['calendar_extended', 'calendar'])]
-    private ?HolidayGroup $holiday_group;
+    private ?HolidayGroup $holidayGroup;
 
     /** @var Collection<int, CalendarImage> $calendarImages  */
     #[ORM\OneToMany(mappedBy: 'calendar', targetEntity: CalendarImage::class, orphanRemoval: true)]
@@ -184,6 +184,18 @@ class Calendar
     }
 
     /**
+     * Gets the user id of this calendar.
+     *
+     * @return int|null
+     * @throws Exception
+     */
+    #[Groups(['calendar_extended', 'calendar'])]
+    public function getUserId(): ?int
+    {
+        return $this->getUser()->getId();
+    }
+
+    /**
      * Sets the user of this calendar.
      *
      * @param User|null $user
@@ -204,6 +216,17 @@ class Calendar
     public function getCalendarStyle(): ?CalendarStyle
     {
         return $this->calendarStyle;
+    }
+
+    /**
+     * Gets the calendar style id of this calendar.
+     *
+     * @return int|null
+     */
+    #[Groups(['calendar_extended', 'calendar'])]
+    public function getCalendarStyleId(): ?int
+    {
+        return $this->getCalendarStyle()?->getId();
     }
 
     /**
@@ -295,18 +318,29 @@ class Calendar
      */
     public function getHolidayGroup(): ?HolidayGroup
     {
-        return $this->holiday_group;
+        return $this->holidayGroup;
+    }
+
+    /**
+     * Gets the holiday group id of this calendar.
+     *
+     * @return int|null
+     */
+    #[Groups(['calendar_extended', 'calendar'])]
+    public function getHolidayGroupId(): ?int
+    {
+        return $this->getHolidayGroup()?->getId();
     }
 
     /**
      * Sets the holiday group of this calendar.
      *
-     * @param HolidayGroup|null $holiday_group
+     * @param HolidayGroup|null $holidayGroup
      * @return $this
      */
-    public function setHolidayGroup(?HolidayGroup $holiday_group): self
+    public function setHolidayGroup(?HolidayGroup $holidayGroup): self
     {
-        $this->holiday_group = $holiday_group;
+        $this->holidayGroup = $holidayGroup;
 
         return $this;
     }

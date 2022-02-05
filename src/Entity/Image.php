@@ -172,6 +172,18 @@ class Image
     }
 
     /**
+     * Gets the user id of this calendar.
+     *
+     * @return int|null
+     * @throws Exception
+     */
+    #[Groups(['image', 'image_extended'])]
+    public function getUserId(): ?int
+    {
+        return $this->getUser()->getId();
+    }
+
+    /**
      * Sets the user of this image.
      *
      * @param User|null $user
@@ -333,6 +345,19 @@ class Image
     public function getCalendarImages(): Collection
     {
         return $this->calendarImages;
+    }
+
+    /**
+     * Gets all related calendar images as simple id list.
+     *
+     * @return Collection<int, int>
+     */
+    #[Groups(['image', 'image_extended'])]
+    public function getCalendarImageIds(): Collection
+    {
+        return $this->getCalendarImages()->map(function (CalendarImage $calendarImage) {
+            return $calendarImage->getId();
+        });
     }
 
     /**
