@@ -13,6 +13,9 @@ admin:
     calendarStyle:
       label: 'CalendarStyle'
 
+    event:
+      label: 'Event'
+
   calendarStyle:
     fields:
       id:
@@ -21,6 +24,33 @@ admin:
       name:
         label: 'Name'
         help: 'The name of this entry.'
+      config:
+        label: 'Config'
+        help: 'The current configuration of this entry in JSON format.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
+  event:
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      user:
+        label: 'User'
+        help: 'The user of this entry.'
+      name:
+        label: 'Name'
+        help: 'The name of this entry.'
+      type:
+        label: 'Type'
+        help: 'The type of this entry.'
+      date:
+        label: 'Date'
+        help: 'The date of this entry.'
       config:
         label: 'Config'
         help: 'The current configuration of this entry in JSON format.'

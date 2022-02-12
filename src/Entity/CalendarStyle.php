@@ -102,7 +102,7 @@ class CalendarStyle
     #[Groups(['calendar_style', 'calendar_style_extended'])]
     private string $name;
 
-    /** @var array<string|int|bool> $config */
+    /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
     #[Groups(['calendar_style', 'calendar_style_extended'])]
     private array $config = [];
@@ -143,7 +143,7 @@ class CalendarStyle
     /**
      * Gets the config.
      *
-     * @return array<string|int|bool>
+     * @return array<string|int|float|bool>
      */
     public function getConfig(): array
     {
@@ -153,7 +153,7 @@ class CalendarStyle
     /**
      * Sets the config.
      *
-     * @param array<string|int|bool> $config
+     * @param array<string|int|float|bool> $config
      * @return $this
      */
     public function setConfig(array $config): self

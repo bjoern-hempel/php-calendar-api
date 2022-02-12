@@ -41,7 +41,7 @@ trait JsonHelper
      * Returns a decoded JSON array (and null if error occurs).
      *
      * @param string $json
-     * @return array<string|int|bool>|null
+     * @return array<string|int|float|bool>|null
      */
     public static function jsonDecode(string $json): ?array
     {
@@ -62,7 +62,7 @@ trait JsonHelper
      * Returns a decoded JSON array.
      *
      * @param string $json
-     * @return array<string|int|bool>
+     * @return array<string|int|float|bool>
      */
     public static function jsonDecodeArray(string $json): array
     {
@@ -74,7 +74,7 @@ trait JsonHelper
     /**
      * Returns an encoded JSON string.
      *
-     * @param array<string|int|bool> $data
+     * @param array<string|int|float|bool> $data
      * @param bool $beautify
      * @param int $indentation
      * @param int $lines

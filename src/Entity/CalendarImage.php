@@ -139,7 +139,7 @@ class CalendarImage
     #[Groups('calendar_image_extended')]
     private ?string $url;
 
-    /** @var array<string|int|bool> $config */
+    /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
     #[Groups('calendar_image_extended')]
     private array $config = [];
@@ -407,7 +407,7 @@ class CalendarImage
     /**
      * Gets the config as array.
      *
-     * @return array<string|int|bool>
+     * @return array<string|int|float|bool>
      */
     public function getConfig(): array
     {
@@ -432,7 +432,7 @@ class CalendarImage
     /**
      * Sets the config.
      *
-     * @param array<string|int|bool> $config
+     * @param array<string|int|float|bool> $config
      * @return $this
      * @throws Exception
      */

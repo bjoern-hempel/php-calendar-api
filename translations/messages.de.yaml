@@ -13,6 +13,9 @@ admin:
     calendarStyle:
       label: 'CalendarStyle'
 
+    event:
+      label: 'Event'
+
   calendarStyle:
     fields:
       id:
@@ -21,6 +24,33 @@ admin:
       name:
         label: 'Name'
         help: 'Der Name dieses Eintrags.'
+      config:
+        label: 'Konfiguration'
+        help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+
+  event:
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      user:
+        label: 'User'
+        help: 'Der User dieses Eintrags.'
+      name:
+        label: 'Name'
+        help: 'Der Name dieses Eintrags.'
+      type:
+        label: 'Typ'
+        help: 'Der Typ dieses Eintrags.'
+      date:
+        label: 'Datum'
+        help: 'Das Datum dieses Eintrags.'
       config:
         label: 'Konfiguration'
         help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'

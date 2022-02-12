@@ -178,6 +178,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * __toString method.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->email;
+    }
+
+    /**
      * Gets the id of this user.
      *
      * @return int|null

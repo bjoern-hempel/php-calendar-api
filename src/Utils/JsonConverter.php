@@ -36,7 +36,7 @@ class JsonConverter
     /**
      * JsonConverter constructor.
      *
-     * @param string|array<string|int|bool> $data
+     * @param array<string|int|float|bool> $data
      * @throws Exception
      */
     public function __construct(string|array $data)
