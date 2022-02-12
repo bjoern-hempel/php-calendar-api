@@ -126,6 +126,15 @@
     "doctrine/sql-formatter": {
         "version": "1.1.2"
     },
+    "easycorp/easyadmin-bundle": {
+        "version": "4.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.0",
+            "ref": "b131e6cbfe1b898a508987851963fff485986285"
+        }
+    },
     "fig/link-util": {
         "version": "1.2.0"
     },
@@ -395,6 +404,9 @@
             ".env"
         ]
     },
+    "symfony/form": {
+        "version": "v6.0.3"
+    },
     "symfony/framework-bundle": {
         "version": "6.0",
         "recipe": {
@@ -425,6 +437,9 @@
     },
     "symfony/http-kernel": {
         "version": "v6.0.2"
+    },
+    "symfony/intl": {
+        "version": "v6.0.3"
     },
     "symfony/maker-bundle": {
         "version": "1.36",
@@ -477,6 +492,9 @@
     "symfony/polyfill-intl-grapheme": {
         "version": "v1.23.1"
     },
+    "symfony/polyfill-intl-icu": {
+        "version": "v1.24.0"
+    },
     "symfony/polyfill-intl-normalizer": {
         "version": "v1.23.0"
     },
@@ -488,6 +506,9 @@
     },
     "symfony/polyfill-php81": {
         "version": "v1.23.0"
+    },
+    "symfony/polyfill-uuid": {
+        "version": "v1.24.0"
     },
     "symfony/process": {
         "version": "v6.0.2"
@@ -550,6 +571,19 @@
     "symfony/string": {
         "version": "v6.0.2"
     },
+    "symfony/translation": {
+        "version": "6.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "5.3",
+            "ref": "da64f5a2b6d96f5dc24914517c0350a5f91dee43"
+        },
+        "files": [
+            "config/packages/translation.yaml",
+            "translations/.gitignore"
+        ]
+    },
     "symfony/translation-contracts": {
         "version": "v3.0.0"
     },
@@ -568,6 +602,9 @@
             "config/packages/twig.yaml",
             "templates/base.html.twig"
         ]
+    },
+    "symfony/uid": {
+        "version": "v6.0.3"
     },
     "symfony/validator": {
         "version": "6.0",
