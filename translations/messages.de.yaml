@@ -34,6 +34,39 @@ admin:
         label: 'Angelegt am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
 
+  calendar:
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      user:
+        label: 'User'
+        help: 'Der User dieses Eintrags.'
+      calendarStyle:
+        label: 'Kalender Stil'
+        help: 'Der Kalender Stil dieses Eintrags.'
+      holidayGroup:
+        label: 'Feiertag Gruppe'
+        help: 'Die Feiertag Gruppe dieses Eintrags.'
+      name:
+        label: 'Name'
+        help: 'Der Name dieses Eintrags.'
+      title:
+        label: 'Titel'
+        help: 'Der Titel dieses Eintrags.'
+      subtitle:
+        label: 'Untertitel'
+        help: 'Der Untertitel dieses Eintrags.'
+      config:
+        label: 'Konfiguration'
+        help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+
   event:
     fields:
       id:

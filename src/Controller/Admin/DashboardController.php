@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
+use App\Entity\Calendar;
 use App\Entity\CalendarStyle;
 use App\Entity\Event;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -74,6 +75,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToDashboard('admin.dashboard.label', 'fa fa-home');
 
         yield MenuItem::section('admin.section.calendar.label');
+        yield MenuItem::linkToCrud('admin.section.calendar.label', 'fas fa-list', Calendar::class);
         yield MenuItem::linkToCrud('admin.section.calendarStyle.label', 'fas fa-list', CalendarStyle::class);
         yield MenuItem::linkToCrud('admin.section.event.label', 'fas fa-list', Event::class);
     }

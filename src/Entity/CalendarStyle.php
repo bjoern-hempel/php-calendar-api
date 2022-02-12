@@ -108,6 +108,16 @@ class CalendarStyle
     private array $config = [];
 
     /**
+     * __toString method.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->name;
+    }
+
+    /**
      * Gets the id of this calendar style.
      *
      * @return int

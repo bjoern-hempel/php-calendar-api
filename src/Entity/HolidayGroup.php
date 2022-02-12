@@ -104,6 +104,16 @@ class HolidayGroup
     }
 
     /**
+     * __toString method.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->name;
+    }
+
+    /**
      * Gets the id of this holiday group.
      *
      * @return int

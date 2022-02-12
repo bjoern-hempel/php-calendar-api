@@ -34,6 +34,39 @@ admin:
         label: 'Created At'
         help: 'The date and time when this entry was created.'
 
+  cakebdar:
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      user:
+        label: 'User'
+        help: 'The user of this entry.'
+      calendarStyle:
+        label: 'Calendar Style'
+        help: 'The calendar style of this entry.'
+      holidayGroup:
+        label: 'Holiday Group'
+        help: 'The holiday group of this entry.'
+      name:
+        label: 'Name'
+        help: 'The name of this entry.'
+      title:
+        label: 'Title'
+        help: 'The title of this entry.'
+      subtitle:
+        label: 'Subtitle'
+        help: 'The subtitle of this entry.'
+      config:
+        label: 'Config'
+        help: 'The current configuration of this entry in JSON format.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
   event:
     fields:
       id:
