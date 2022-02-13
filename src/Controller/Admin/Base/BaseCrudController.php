@@ -18,6 +18,7 @@ use App\Entity\CalendarStyle;
 use App\Entity\Event;
 use App\Entity\Holiday;
 use App\Entity\HolidayGroup;
+use App\Entity\Image;
 use App\Entity\User;
 use App\Utils\JsonConverter;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -123,6 +124,19 @@ abstract class BaseCrudController extends AbstractCrudController
                 }
                 break;
 
+            case 'image':
+                switch ($name) {
+
+                    /* Association field. */
+                    case 'width':
+                    case 'height':
+                    case 'size':
+                        return IntegerField::new($name)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name));
+                }
+                break;
+
             case 'user':
                 switch ($name) {
 
@@ -218,6 +232,12 @@ abstract class BaseCrudController extends AbstractCrudController
             serialize(HolidayGroup::CRUD_FIELDS_NEW),
             serialize(HolidayGroup::CRUD_FIELDS_EDIT),
             serialize(HolidayGroup::CRUD_FIELDS_DETAIL),
+
+            serialize(Image::CRUD_FIELDS_REGISTERED),
+            serialize(Image::CRUD_FIELDS_INDEX),
+            serialize(Image::CRUD_FIELDS_NEW),
+            serialize(Image::CRUD_FIELDS_EDIT),
+            serialize(Image::CRUD_FIELDS_DETAIL),
 
             serialize(User::CRUD_FIELDS_REGISTERED),
             serialize(User::CRUD_FIELDS_INDEX),

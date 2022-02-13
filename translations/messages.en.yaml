@@ -25,6 +25,9 @@ admin:
     holidayGroup:
       label: 'Holiday group'
 
+    image:
+      label: 'Image'
+
     user:
       label: 'User'
 
@@ -143,6 +146,34 @@ admin:
       name:
         label: 'Name'
         help: 'The name of this entry.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
+  # Image section
+  iamge:
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      user:
+        label: 'User'
+        help: 'The user of this entry.'
+      path:
+        label: 'Path'
+        help: 'The path of this entry.'
+      width:
+        label: 'Width'
+        help: 'The width of this entry.'
+      height:
+        label: 'Height'
+        help: 'The height of this entry.'
+      size:
+        label: 'Size'
+        help: 'The size of this entry.'
       updatedAt:
         label: 'Updated At'
         help: 'The date and time when this entry was last edited.'

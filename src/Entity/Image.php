@@ -96,6 +96,16 @@ class Image
 {
     use TimestampsTrait;
 
+    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_INDEX = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_NEW = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+
+    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

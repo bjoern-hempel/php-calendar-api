@@ -18,6 +18,7 @@ use App\Entity\CalendarStyle;
 use App\Entity\Event;
 use App\Entity\Holiday;
 use App\Entity\HolidayGroup;
+use App\Entity\Image;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -86,5 +87,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('admin.section.holiday.label', 'fas fa-list', Holiday::class);
         yield MenuItem::linkToCrud('admin.section.holidayGroup.label', 'fas fa-list', HolidayGroup::class);
         yield MenuItem::linkToCrud('admin.section.user.label', 'fas fa-list', User::class);
+        yield MenuItem::linkToCrud('admin.section.image.label', 'fas fa-list', Image::class);
     }
 }
