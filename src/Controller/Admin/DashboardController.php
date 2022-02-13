@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Entity\Calendar;
+use App\Entity\CalendarImage;
 use App\Entity\CalendarStyle;
 use App\Entity\Event;
 use App\Entity\Holiday;
@@ -84,6 +85,7 @@ class DashboardController extends AbstractDashboardController
 
         yield MenuItem::section('admin.section.administration.label');
         yield MenuItem::linkToCrud('admin.section.calendarStyle.label', 'fas fa-list', CalendarStyle::class);
+        yield MenuItem::linkToCrud('admin.section.calendarImage.label', 'fas fa-list', CalendarImage::class);
         yield MenuItem::linkToCrud('admin.section.holiday.label', 'fas fa-list', Holiday::class);
         yield MenuItem::linkToCrud('admin.section.holidayGroup.label', 'fas fa-list', HolidayGroup::class);
         yield MenuItem::linkToCrud('admin.section.user.label', 'fas fa-list', User::class);

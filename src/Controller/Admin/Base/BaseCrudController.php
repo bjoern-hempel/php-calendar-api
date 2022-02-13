@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Controller\Admin\Base;
 
 use App\Entity\Calendar;
+use App\Entity\CalendarImage;
 use App\Entity\CalendarStyle;
 use App\Entity\Event;
 use App\Entity\Holiday;
@@ -89,6 +90,26 @@ abstract class BaseCrudController extends AbstractCrudController
                     case 'calendarStyle':
                         return AssociationField::new($name)
                             ->setRequired(true)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name));
+                }
+                break;
+
+            case 'calendarImage':
+                switch ($name) {
+
+                    /* Association field. */
+                    case 'user':
+                    case 'calendar':
+                    case 'image':
+                        return AssociationField::new($name)
+                            ->setRequired(true)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name));
+
+                    case 'year':
+                    case 'month':
+                        return IntegerField::new($name)
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
                             ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name));
                 }
@@ -208,6 +229,12 @@ abstract class BaseCrudController extends AbstractCrudController
             serialize(Calendar::CRUD_FIELDS_NEW),
             serialize(Calendar::CRUD_FIELDS_EDIT),
             serialize(Calendar::CRUD_FIELDS_DETAIL),
+
+            serialize(CalendarImage::CRUD_FIELDS_REGISTERED),
+            serialize(CalendarImage::CRUD_FIELDS_INDEX),
+            serialize(CalendarImage::CRUD_FIELDS_NEW),
+            serialize(CalendarImage::CRUD_FIELDS_EDIT),
+            serialize(CalendarImage::CRUD_FIELDS_DETAIL),
 
             serialize(CalendarStyle::CRUD_FIELDS_REGISTERED),
             serialize(CalendarStyle::CRUD_FIELDS_INDEX),

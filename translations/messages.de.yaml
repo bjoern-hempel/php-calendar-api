@@ -13,6 +13,9 @@ admin:
     calendar:
       label: 'Kalender'
 
+    calendarImage:
+      label: 'Kalender Bild'
+
     calendarStyle:
       label: 'Kalender Stil'
 
@@ -55,6 +58,46 @@ admin:
       subtitle:
         label: 'Untertitel'
         help: 'Der Untertitel dieses Eintrags.'
+      configJson:
+        label: 'Konfiguration'
+        help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+
+  # CalendarImage section
+  calendarImage:
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      user:
+        label: 'User'
+        help: 'Der User dieses Eintrags.'
+      calendar:
+        label: 'Kalender'
+        help: 'Der Kalender dieses Eintrags.'
+      image:
+        label: 'Bild'
+        help: 'Das Bild dieses Eintrags.'
+      year:
+        label: 'Jahr'
+        help: 'Das Jahr dieses Eintrags.'
+      month:
+        label: 'Monat'
+        help: 'Der Monat dieses Eintrags.'
+      title:
+        label: 'Titel'
+        help: 'Der Titel dieses Eintrags.'
+      position:
+        label: 'Position'
+        help: 'Die Position dieses Eintrags.'
+      url:
+        label: 'URL'
+        help: 'Die URL dieses Eintrags.'
       configJson:
         label: 'Konfiguration'
         help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
