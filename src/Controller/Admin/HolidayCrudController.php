@@ -14,17 +14,17 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\Admin\Base\BaseCrudController;
-use App\Entity\CalendarStyle;
+use App\Entity\Holiday;
 use JetBrains\PhpStorm\Pure;
 
 /**
- * Class CalendarStyleCrudController.
+ * Class HolidayCrudController.
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2022-02-10)
  * @package App\Controller\Admin
  */
-class CalendarStyleCrudController extends BaseCrudController
+class HolidayCrudController extends BaseCrudController
 {
     /**
      * Return fqcn of this class.
@@ -33,7 +33,7 @@ class CalendarStyleCrudController extends BaseCrudController
      */
     public static function getEntityFqcn(): string
     {
-        return CalendarStyle::class;
+        return Holiday::class;
     }
 
     /**

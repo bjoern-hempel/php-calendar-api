@@ -106,14 +106,18 @@ trait JsonHelper
      * @param int $lines
      * @param int $columns
      * @param string $indicant
+     * @param string $lineBreak
      * @return string
      * @throws Exception
      */
-    public static function beautifyJson(string $json, int $indentation = 4, int $lines = -1, int $columns = -1, string $indicant = '...'): string
+    public static function beautifyJson(string $json, int $indentation = 4, int $lines = -1, int $columns = -1, string $indicant = '...', string $lineBreak = "\n"): string
     {
         /* Check parameter. */
         if (!in_array($indentation, [2, 4])) {
             throw new Exception(sprintf('Only an indentation of 2 or 4 is allowed. %d given (%s:%d).', $indentation, __FILE__, __LINE__));
+        }
+        if (empty($lineBreak)) {
+            throw new Exception(sprintf('Given line break is empty (%s:%d', __FILE__, __LINE__));
         }
 
         $isJson = self::isJson($json);
@@ -141,7 +145,7 @@ trait JsonHelper
         }
 
         if ($lines > -1) {
-            $jsonLinesAll = explode(self::LINE_BREAK, $beautified);
+            $jsonLinesAll = explode($lineBreak, $beautified);
 
             $jsonLines = array_slice($jsonLinesAll, 0, $lines);
 
@@ -149,11 +153,11 @@ trait JsonHelper
                 $jsonLines[] = $indicant;
             }
 
-            $beautified = implode(self::LINE_BREAK, $jsonLines);
+            $beautified = implode($lineBreak, $jsonLines);
         }
 
         if ($columns > -1) {
-            $jsonLines = explode(self::LINE_BREAK, $beautified);
+            $jsonLines = explode($lineBreak, $beautified);
 
             foreach ($jsonLines as &$jsonLine) {
                 if (strlen($jsonLine) > $columns) {
@@ -162,7 +166,7 @@ trait JsonHelper
                 }
             }
 
-            $beautified = implode(self::LINE_BREAK, $jsonLines);
+            $beautified = implode($lineBreak, $jsonLines);
         }
 
         return $beautified;

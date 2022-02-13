@@ -7,33 +7,25 @@ admin:
 
   # Admin sections
   section:
+    administration:
+      label: 'Administration'
+
     calendar:
-      label: 'Calendar'
+      label: 'Kalender'
 
     calendarStyle:
-      label: 'CalendarStyle'
+      label: 'Kalender Stil'
 
     event:
       label: 'Event'
 
-  calendarStyle:
-    fields:
-      id:
-        label: 'ID'
-        help: 'Der ID dieses Eintrags.'
-      name:
-        label: 'Name'
-        help: 'Der Name dieses Eintrags.'
-      config:
-        label: 'Konfiguration'
-        help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
-      updatedAt:
-        label: 'Geändert am'
-        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
-      createdAt:
-        label: 'Angelegt am'
-        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+    holiday:
+      label: 'Feiertage'
 
+    user:
+      label: 'User'
+
+  # Calendar section
   calendar:
     fields:
       id:
@@ -57,7 +49,7 @@ admin:
       subtitle:
         label: 'Untertitel'
         help: 'Der Untertitel dieses Eintrags.'
-      config:
+      configJson:
         label: 'Konfiguration'
         help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
       updatedAt:
@@ -67,6 +59,26 @@ admin:
         label: 'Angelegt am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
 
+  # CalendarStyle section
+  calendarStyle:
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      name:
+        label: 'Name'
+        help: 'Der Name dieses Eintrags.'
+      configJson:
+        label: 'Konfiguration'
+        help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+
+  # Event section
   event:
     fields:
       id:
@@ -84,7 +96,7 @@ admin:
       date:
         label: 'Datum'
         help: 'Das Datum dieses Eintrags.'
-      config:
+      configJson:
         label: 'Konfiguration'
         help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
       updatedAt:
@@ -94,5 +106,61 @@ admin:
         label: 'Angelegt am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
 
-    user:
-      label: 'User'
+  # Holiday section
+  holiday:
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      holidayGroup:
+        label: 'Feiertag Gruppe'
+        help: 'Die Feiertag Gruppe dieses Eintrags.'
+      name:
+        label: 'Name'
+        help: 'Der Name dieses Eintrags.'
+      date:
+        label: 'Datum'
+        help: 'Das Datum dieses Eintrags.'
+      configJson:
+        label: 'Konfiguration'
+        help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+
+  # User section
+  user:
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      idHash:
+        label: 'ID Hash'
+        help: 'Der ID Hash dieses Eintrags.'
+      email:
+        label: 'Email'
+        help: 'Die Email dieses Eintrags.'
+      username:
+        label: 'Username'
+        help: 'Der Username dieses Eintrags.'
+      password:
+        label: 'Passwort'
+        help: 'Das Passwort dieses Eintrags.'
+      firstname:
+        label: 'Vorname'
+        help: 'Der Vorname dieses Eintrags.'
+      lastname:
+        label: 'Nachname'
+        help: 'Der Nachname dieses Eintrags.'
+      roles:
+        label: 'Rollen'
+        help: 'Die Rollen dieses Eintrags.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'

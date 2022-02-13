@@ -17,6 +17,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\Trait\TimestampsTrait;
 use App\Repository\HolidayRepository;
 use App\Utils\ArrayToObject;
+use App\Utils\Traits\JsonHelper;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
@@ -78,6 +79,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Holiday
 {
     use TimestampsTrait;
+
+    use JsonHelper;
+
+    public const CRUD_FIELDS_REGISTERED = ['id', 'holidayGroup', 'name', 'date', 'configJson', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_INDEX = ['id', 'holidayGroup', 'name', 'date', 'configJson', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_NEW = ['id', 'holidayGroup', 'name', 'date', 'configJson', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+
+    public const CRUD_FIELDS_DETAIL = ['id', 'holidayGroup', 'name', 'date', 'configJson', 'updatedAt', 'createdAt'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -233,5 +246,53 @@ class Holiday
         $this->configObject = new ArrayToObject($config);
 
         return $this;
+    }
+
+    /**
+     * Gets the config element as JSON.
+     *
+     * @param bool $beautify
+     * @return string
+     * @throws Exception
+     */
+    public function getConfigJson(bool $beautify = true): string
+    {
+        return self::jsonEncode($this->config, $beautify, 2);
+    }
+
+    /**
+     * Sets the config element from JSON.
+     *
+     * @param string $json
+     * @return $this
+     */
+    public function setConfigJson(string $json): self
+    {
+        $this->config = self::jsonDecodeArray($json);
+
+        return $this;
+    }
+
+    /**
+     * Gets the config element as JSON.
+     *
+     * @param bool $beautify
+     * @return string
+     * @throws Exception
+     */
+    public function getConfigJsonRaw(bool $beautify = true): string
+    {
+        return $this->getConfigJson(false);
+    }
+
+    /**
+     * Sets the config element from JSON.
+     *
+     * @param string $json
+     * @return $this
+     */
+    public function setConfigJsonRaw(string $json): self
+    {
+        return $this->setConfigJson($json);
     }
 }

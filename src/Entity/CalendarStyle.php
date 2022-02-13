@@ -90,8 +90,6 @@ class CalendarStyle
 
     public const CRUD_FIELDS_DETAIL = ['id', 'name', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const LINE_BREAK = "\n";
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

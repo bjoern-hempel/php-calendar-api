@@ -7,6 +7,9 @@ admin:
 
   # Admin sections
   section:
+    administration:
+      label: 'Administration'
+
     calendar:
       label: 'Calendar'
 
@@ -16,25 +19,14 @@ admin:
     event:
       label: 'Event'
 
-  calendarStyle:
-    fields:
-      id:
-        label: 'ID'
-        help: 'This id of this entry.'
-      name:
-        label: 'Name'
-        help: 'The name of this entry.'
-      config:
-        label: 'Config'
-        help: 'The current configuration of this entry in JSON format.'
-      updatedAt:
-        label: 'Updated At'
-        help: 'The date and time when this entry was last edited.'
-      createdAt:
-        label: 'Created At'
-        help: 'The date and time when this entry was created.'
+    holiday:
+      label: 'Holiday'
 
-  cakebdar:
+    user:
+      label: 'User'
+
+  # Calendar section
+  calendar:
     fields:
       id:
         label: 'ID'
@@ -57,7 +49,7 @@ admin:
       subtitle:
         label: 'Subtitle'
         help: 'The subtitle of this entry.'
-      config:
+      configJson:
         label: 'Config'
         help: 'The current configuration of this entry in JSON format.'
       updatedAt:
@@ -67,6 +59,26 @@ admin:
         label: 'Created At'
         help: 'The date and time when this entry was created.'
 
+  # CalendarStyle section
+  calendarStyle:
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      name:
+        label: 'Name'
+        help: 'The name of this entry.'
+      configJson:
+        label: 'Config'
+        help: 'The current configuration of this entry in JSON format.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
+  # Event section
   event:
     fields:
       id:
@@ -84,7 +96,7 @@ admin:
       date:
         label: 'Date'
         help: 'The date of this entry.'
-      config:
+      configJson:
         label: 'Config'
         help: 'The current configuration of this entry in JSON format.'
       updatedAt:
@@ -94,5 +106,61 @@ admin:
         label: 'Created At'
         help: 'The date and time when this entry was created.'
 
-    user:
-      label: 'User'
+  # Event section
+  holiday:
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      holidayGroup:
+        label: 'Holiday group'
+        help: 'The holiday group of this entry.'
+      name:
+        label: 'Name'
+        help: 'The name of this entry.'
+      date:
+        label: 'Date'
+        help: 'The date of this entry.'
+      configJson:
+        label: 'Config'
+        help: 'The current configuration of this entry in JSON format.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
+  # User section
+  user:
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      idHash:
+        label: 'ID Hash'
+        help: 'The id hash of this entry.'
+      email:
+        label: 'Email'
+        help: 'The email of this entry.'
+      username:
+        label: 'Username'
+        help: 'The username of this entry.'
+      password:
+        label: 'Password'
+        help: 'The password of this entry.'
+      firstname:
+        label: 'Firstname'
+        help: 'The firstname of this entry.'
+      lastname:
+        label: 'Lastname'
+        help: 'The lastname of this entry.'
+      roles:
+        label: 'Roles'
+        help: 'The roles of this entry.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'

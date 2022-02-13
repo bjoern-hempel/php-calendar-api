@@ -109,8 +109,6 @@ class Event
 
     public const CRUD_FIELDS_DETAIL = ['id', 'name', 'type', 'user', 'date', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const LINE_BREAK = "\n";
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
