@@ -22,6 +22,9 @@ admin:
     holiday:
       label: 'Feiertage'
 
+    holidayGroup:
+      label: 'Feiertagsgruppe'
+
     user:
       label: 'User'
 
@@ -124,6 +127,22 @@ admin:
       configJson:
         label: 'Konfiguration'
         help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+
+  # HolidayGroup section
+  holidayGroup:
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      name:
+        label: 'Name'
+        help: 'Der Name dieses Eintrags.'
       updatedAt:
         label: 'Geändert am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'

@@ -14,13 +14,16 @@ admin:
       label: 'Calendar'
 
     calendarStyle:
-      label: 'CalendarStyle'
+      label: 'Calendar style'
 
     event:
       label: 'Event'
 
     holiday:
       label: 'Holiday'
+
+    holidayGroup:
+      label: 'Holiday group'
 
     user:
       label: 'User'
@@ -106,7 +109,7 @@ admin:
         label: 'Created At'
         help: 'The date and time when this entry was created.'
 
-  # Event section
+  # Holiday section
   holiday:
     fields:
       id:
@@ -124,6 +127,22 @@ admin:
       configJson:
         label: 'Config'
         help: 'The current configuration of this entry in JSON format.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
+  # HolidayGroup section
+  holidayGroup:
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      name:
+        label: 'Name'
+        help: 'The name of this entry.'
       updatedAt:
         label: 'Updated At'
         help: 'The date and time when this entry was last edited.'

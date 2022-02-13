@@ -17,6 +17,7 @@ use App\Entity\Calendar;
 use App\Entity\CalendarStyle;
 use App\Entity\Event;
 use App\Entity\Holiday;
+use App\Entity\HolidayGroup;
 use App\Entity\User;
 use App\Utils\JsonConverter;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -188,17 +189,17 @@ abstract class BaseCrudController extends AbstractCrudController
 
         /* Check given constant */
         if (!in_array(serialize($constant), array_unique([
-            serialize(CalendarStyle::CRUD_FIELDS_REGISTERED),
-            serialize(CalendarStyle::CRUD_FIELDS_INDEX),
-            serialize(CalendarStyle::CRUD_FIELDS_NEW),
-            serialize(CalendarStyle::CRUD_FIELDS_EDIT),
-            serialize(CalendarStyle::CRUD_FIELDS_DETAIL),
-
             serialize(Calendar::CRUD_FIELDS_REGISTERED),
             serialize(Calendar::CRUD_FIELDS_INDEX),
             serialize(Calendar::CRUD_FIELDS_NEW),
             serialize(Calendar::CRUD_FIELDS_EDIT),
             serialize(Calendar::CRUD_FIELDS_DETAIL),
+
+            serialize(CalendarStyle::CRUD_FIELDS_REGISTERED),
+            serialize(CalendarStyle::CRUD_FIELDS_INDEX),
+            serialize(CalendarStyle::CRUD_FIELDS_NEW),
+            serialize(CalendarStyle::CRUD_FIELDS_EDIT),
+            serialize(CalendarStyle::CRUD_FIELDS_DETAIL),
 
             serialize(Event::CRUD_FIELDS_REGISTERED),
             serialize(Event::CRUD_FIELDS_INDEX),
@@ -211,6 +212,12 @@ abstract class BaseCrudController extends AbstractCrudController
             serialize(Holiday::CRUD_FIELDS_NEW),
             serialize(Holiday::CRUD_FIELDS_EDIT),
             serialize(Holiday::CRUD_FIELDS_DETAIL),
+
+            serialize(HolidayGroup::CRUD_FIELDS_REGISTERED),
+            serialize(HolidayGroup::CRUD_FIELDS_INDEX),
+            serialize(HolidayGroup::CRUD_FIELDS_NEW),
+            serialize(HolidayGroup::CRUD_FIELDS_EDIT),
+            serialize(HolidayGroup::CRUD_FIELDS_DETAIL),
 
             serialize(User::CRUD_FIELDS_REGISTERED),
             serialize(User::CRUD_FIELDS_INDEX),
