@@ -96,7 +96,7 @@ class Image
 {
     use TimestampsTrait;
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'path', 'pathSource', 'pathTarget', 'pathSourceFull', 'pathTargetFull', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_INDEX = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
@@ -104,7 +104,7 @@ class Image
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'pathSourceFull', 'pathTargetFull', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -147,6 +147,10 @@ class Image
 
     public const PATH_TYPE_COMPARE = 'compare';
 
+    public const PATH_IMAGES = 'images';
+
+    public const PATH_DATA = 'data';
+
     /**
      * Image constructor.
      */
@@ -154,6 +158,16 @@ class Image
     public function __construct()
     {
         $this->calendarImages = new ArrayCollection();
+    }
+
+    /**
+     * __toString method.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->path;
     }
 
     /**
@@ -226,43 +240,118 @@ class Image
     }
 
     /**
-     * Gets the relative source path of this image.
+     * Gets the relative path of this image.
      *
+     * @param string $type
+     * @param bool $test
+     * @param string $rootPath
      * @return string
+     * @throws Exception
      */
-    public function getPathSource(): string
+    public function getPathFull(string $type = self::PATH_TYPE_SOURCE, bool $test = false, string $rootPath = ''): string
     {
-        return $this->getPath(self::PATH_TYPE_SOURCE);
+        $imagePath = sprintf($test ? '%s/tests/%s' : '%s/%s', self::PATH_DATA, self::PATH_IMAGES);
+        $userPath = sprintf('%s/%s', $imagePath, $this->getUser()->getIdHash());
+
+        return sprintf('%s/%s/%s', $rootPath, $userPath, $this->getPath($type));
     }
 
     /**
      * Gets the relative source path of this image.
      *
+     * @param bool $full
+     * @param bool $test
+     * @param string $rootPath
      * @return string
+     * @throws Exception
      */
-    public function getPathTarget(): string
+    public function getPathSource(bool $full = false, bool $test = false, string $rootPath = ''): string
     {
+        if ($full) {
+            return $this->getPathFull(self::PATH_TYPE_SOURCE, $test, $rootPath);
+        }
+
+        return $this->getPath();
+    }
+
+    /**
+     * Gets the relative source path of this image.
+     *
+     * @param bool $full
+     * @param bool $test
+     * @param string $rootPath
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTarget(bool $full = false, bool $test = false, string $rootPath = ''): string
+    {
+        if ($full) {
+            return $this->getPathFull(self::PATH_TYPE_TARGET, $test, $rootPath);
+        }
+
         return $this->getPath(self::PATH_TYPE_TARGET);
     }
 
     /**
      * Gets the relative source path of this image.
      *
+     * @param bool $full
+     * @param bool $test
+     * @param string $rootPath
      * @return string
+     * @throws Exception
      */
-    public function getPathExpected(): string
+    public function getPathExpected(bool $full = false, bool $test = false, string $rootPath = ''): string
     {
+        if ($full) {
+            return $this->getPathFull(self::PATH_TYPE_EXPECTED, $test, $rootPath);
+        }
+
         return $this->getPath(self::PATH_TYPE_EXPECTED);
     }
 
     /**
      * Gets the relative source path of this image.
      *
+     * @param bool $full
+     * @param bool $test
+     * @param string $rootPath
      * @return string
+     * @throws Exception
      */
-    public function getPathCompare(): string
+    public function getPathCompare(bool $full = false, bool $test = false, string $rootPath = ''): string
     {
+        if ($full) {
+            return $this->getPathFull(self::PATH_TYPE_COMPARE, $test, $rootPath);
+        }
+
         return $this->getPath(self::PATH_TYPE_COMPARE);
+    }
+
+    /**
+     * Gets the relative source path of this image.
+     *
+     * @param bool $test
+     * @param string $rootPath
+     * @return string
+     * @throws Exception
+     */
+    public function getPathSourceFull(bool $test = false, string $rootPath = ''): string
+    {
+        return $this->getPathSource(true, $test, $rootPath);
+    }
+
+    /**
+     * Gets the relative source path of this image.
+     *
+     * @param bool $test
+     * @param string $rootPath
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTargetFull(bool $test = false, string $rootPath = ''): string
+    {
+        return $this->getPathTarget(true, $test, $rootPath);
     }
 
     /**
@@ -391,6 +480,7 @@ class Image
      *
      * @param CalendarImage $calendarImage
      * @return $this
+     * @throws Exception
      */
     public function removeCalendarImage(CalendarImage $calendarImage): self
     {

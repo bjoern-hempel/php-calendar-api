@@ -141,6 +141,16 @@ class Event
     private ArrayToObject $configObject;
 
     /**
+     * __toString method.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->name;
+    }
+
+    /**
      * Gets the id of this event.
      *
      * @return int|null

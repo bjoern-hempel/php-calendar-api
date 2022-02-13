@@ -22,6 +22,7 @@ use App\Entity\HolidayGroup;
 use App\Entity\Image;
 use App\Entity\User;
 use App\Utils\JsonConverter;
+use App\Utils\SizeConverter;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -48,138 +49,162 @@ abstract class BaseCrudController extends AbstractCrudController
 {
     abstract public function getEntity(): string;
 
+    protected string $crudName;
+
     /**
      * Returns the entity of this class.
      *
+     * @param string|null $entity
+     * @param bool $doNotUseCache
      * @return string
      * @throws Exception
      */
-    public function getCrudName(): string
+    public function getCrudName(?string $entity = null, bool $doNotUseCache = false): string
     {
-        $split = preg_split('~\\\\~', $this->getEntity());
+        if ($entity === null && isset($this->crudName) && !$doNotUseCache) {
+            return $this->crudName;
+        }
+
+        $split = preg_split('~\\\\~', $entity ?? $this->getEntity());
 
         if ($split === false) {
             throw new Exception(sprintf('Unable to split string (%s:%d)', __FILE__, __LINE__));
         }
 
-        return lcfirst($split[count($split) - 1]);
+        $crudName = lcfirst($split[count($split) - 1]);
+
+        if ($entity === null) {
+            $this->crudName = $crudName;
+        }
+
+        return $crudName;
     }
 
     /**
      * Returns the field by given name.
      *
-     * @param string $name
+     * @param string $fieldName
      * @return FieldInterface
      * @throws Exception
      */
-    protected function getField(string $name): FieldInterface
+    protected function getField(string $fieldName): FieldInterface
     {
         /* Check if given field name is a registered name. */
-        if (!in_array($name, $this->getConstant('CRUD_FIELDS_REGISTERED'))) {
-            throw new Exception(sprintf('Unknown FieldInterface "%s" (%s:%d).', $name, __FILE__, __LINE__));
+        if (!in_array($fieldName, $this->getConstant('CRUD_FIELDS_REGISTERED'))) {
+            throw new Exception(sprintf('Unknown FieldInterface "%s" (%s:%d).', $fieldName, __FILE__, __LINE__));
         }
 
         /* Special crud names. */
         switch ($this->getCrudName()) {
-            case 'calendar':
-                switch ($name) {
+
+            case $this->getCrudName(Calendar::class):
+                switch ($fieldName) {
 
                     /* Association field. */
                     case 'user':
                     case 'holidayGroup':
                     case 'calendarStyle':
-                        return AssociationField::new($name)
+                        return AssociationField::new($fieldName)
                             ->setRequired(true)
-                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name));
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
                 }
                 break;
 
-            case 'calendarImage':
-                switch ($name) {
+            case $this->getCrudName(CalendarImage::class):
+                switch ($fieldName) {
 
                     /* Association field. */
                     case 'user':
                     case 'calendar':
                     case 'image':
-                        return AssociationField::new($name)
+                        return AssociationField::new($fieldName)
                             ->setRequired(true)
-                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name));
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
 
                     case 'year':
                     case 'month':
-                        return IntegerField::new($name)
-                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name));
+                        return IntegerField::new($fieldName)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
                 }
                 break;
 
-            case 'event':
-                switch ($name) {
+            case $this->getCrudName(Event::class):
+                switch ($fieldName) {
 
                     /* Association field. */
                     case 'user':
-                        return AssociationField::new($name)
+                        return AssociationField::new($fieldName)
                             ->setRequired(true)
-                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name));
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
 
                     /* Field type */
                     case 'type':
-                        return IntegerField::new($name)
-                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name));
+                        return IntegerField::new($fieldName)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
                 }
                 break;
 
-            case 'holiday':
-                switch ($name) {
+            case $this->getCrudName(Holiday::class):
+                switch ($fieldName) {
 
                     /* Association field. */
                     case 'holidayGroup':
-                        return AssociationField::new($name)
+                        return AssociationField::new($fieldName)
                             ->setRequired(true)
-                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name));
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
                 }
                 break;
 
-            case 'image':
-                switch ($name) {
+            case $this->getCrudName(Image::class):
+                switch ($fieldName) {
 
                     /* Association field. */
                     case 'width':
                     case 'height':
+                    return IntegerField::new($fieldName)
+                        ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                        ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName))
+                        ->formatValue(function ($value) {
+                            return sprintf('%d px', $value);
+                        });
                     case 'size':
-                        return IntegerField::new($name)
-                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name));
+                        return IntegerField::new($fieldName)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName))
+                            ->formatValue(function ($value) {
+                                return SizeConverter::getHumanReadableSize($value);
+                            });
                 }
                 break;
 
-            case 'user':
-                switch ($name) {
+            case $this->getCrudName(User::class):
+                switch ($fieldName) {
 
                     /* Field roles */
                     case 'roles':
-                        return ArrayField::new($name)
-                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name));
+                        return ArrayField::new($fieldName)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
                 }
         }
 
         /* All other crud names (default fields for all other entities) */
-        return match ($name) {
+        return match ($fieldName) {
 
             /* Field id */
-            'id' => IdField::new($name)
+            'id' => IdField::new($fieldName)
                 ->hideOnForm()
-                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name)),
+                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
 
             /* Field configJson */
-            'configJson' => CodeEditorField::new($name)
+            'configJson' => CodeEditorField::new($fieldName)
                 /* Not called within formulas. */
                 ->formatValue(
                     function ($json) {
@@ -187,23 +212,23 @@ abstract class BaseCrudController extends AbstractCrudController
                     }
                 )
                 ->setLanguage('css')
-                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name)),
+                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
 
             /* DateTime fields. */
-            'date' => DateField::new($name)
-                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name)),
+            'date' => DateField::new($fieldName)
+                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
 
             /* DateTime fields. */
-            'updatedAt', 'createdAt' => DateTimeField::new($name)
-                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name)),
+            'updatedAt', 'createdAt' => DateTimeField::new($fieldName)
+                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
 
             /* All other fields. */
-            default => TextField::new($name)
-                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $name))
-                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $name)),
+            default => TextField::new($fieldName)
+                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
         };
     }
 
@@ -358,5 +383,19 @@ abstract class BaseCrudController extends AbstractCrudController
             Crud::PAGE_DETAIL => $this->configureFieldsDetail(),
             default => $this->configureFieldsIndex(),
         };
+    }
+
+    /**
+     * Configures crud.
+     *
+     * @param Crud $crud
+     * @return Crud
+     * @throws Exception
+     */
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular(sprintf('admin.%s.singular', $this->getCrudName()))
+            ->setEntityLabelInPlural(sprintf('admin.%s.plural', $this->getCrudName()));
     }
 }

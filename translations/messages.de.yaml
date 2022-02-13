@@ -14,28 +14,30 @@ admin:
       label: 'Kalender'
 
     calendarImage:
-      label: 'Kalender Bild'
+      label: 'Kalender Bilder'
 
     calendarStyle:
-      label: 'Kalender Stil'
+      label: 'Kalender Stile'
 
     event:
-      label: 'Event'
+      label: 'Events'
 
     holiday:
       label: 'Feiertage'
 
     holidayGroup:
-      label: 'Feiertagsgruppe'
+      label: 'Feiertagsgruppen'
 
     image:
-      label: 'Bild'
+      label: 'Bilder'
 
     user:
       label: 'User'
 
   # Calendar section
   calendar:
+    singular: Kalender
+    plural: Kalender
     fields:
       id:
         label: 'ID'
@@ -70,6 +72,8 @@ admin:
 
   # CalendarImage section
   calendarImage:
+    singular: Kalender Bild
+    plural: Kalender Bilder
     fields:
       id:
         label: 'ID'
@@ -110,6 +114,8 @@ admin:
 
   # CalendarStyle section
   calendarStyle:
+    singular: Kalender Stil
+    plural: Kalender Stile
     fields:
       id:
         label: 'ID'
@@ -129,6 +135,8 @@ admin:
 
   # Event section
   event:
+    singular: Event
+    plural: Events
     fields:
       id:
         label: 'ID'
@@ -157,6 +165,8 @@ admin:
 
   # Holiday section
   holiday:
+    singular: Feiertag
+    plural: Feiertage
     fields:
       id:
         label: 'ID'
@@ -182,6 +192,8 @@ admin:
 
   # HolidayGroup section
   holidayGroup:
+    singular: Feiertagsgruppe
+    plural: Feiertagsgruppen
     fields:
       id:
         label: 'ID'
@@ -198,6 +210,8 @@ admin:
 
   # Image section
   image:
+    singular: Bild
+    plural: Bilder
     fields:
       id:
         label: 'ID'
@@ -208,6 +222,18 @@ admin:
       path:
         label: 'Pfad'
         help: 'Der Pfad dieses Eintrags.'
+      pathSource:
+        label: 'Quellpfad'
+        help: 'Der Quellpfad dieses Eintrags.'
+      pathTarget:
+        label: 'Zielpfad'
+        help: 'Der Zielpfad dieses Eintrags.'
+      pathSourceFull:
+        label: 'Vollständiger Quellpfad'
+        help: 'Der vollständige Quellpfad dieses Eintrags.'
+      pathTargetFull:
+        label: 'Vollständiger Zielpfad'
+        help: 'Der vollständige Zielpfad dieses Eintrags.'
       width:
         label: 'Weite'
         help: 'Die Weite dieses Eintrags.'
@@ -226,6 +252,8 @@ admin:
 
   # User section
   user:
+    singular: Benutzer
+    plural: Benutzer
     fields:
       id:
         label: 'ID'

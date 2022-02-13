@@ -11,31 +11,33 @@ admin:
       label: 'Administration'
 
     calendar:
-      label: 'Calendar'
+      label: 'Calendars'
 
     calendarImage:
-      label: 'Calendar image'
+      label: 'Calendar images'
 
     calendarStyle:
-      label: 'Calendar style'
+      label: 'Calendar styles'
 
     event:
-      label: 'Event'
+      label: 'Events'
 
     holiday:
-      label: 'Holiday'
+      label: 'Holidays'
 
     holidayGroup:
-      label: 'Holiday group'
+      label: 'Holiday groups'
 
     image:
-      label: 'Image'
+      label: 'Images'
 
     user:
-      label: 'User'
+      label: 'Users'
 
   # Calendar section
   calendar:
+    singular: Calendar
+    plural: Calendars
     fields:
       id:
         label: 'ID'
@@ -70,6 +72,8 @@ admin:
 
   # CalendarImage section
   calendarImage:
+    singular: Calendar image
+    plural: Calendar images
     fields:
       id:
         label: 'ID'
@@ -110,6 +114,8 @@ admin:
 
   # CalendarStyle section
   calendarStyle:
+    singular: Calendar style
+    plural: Calendar styles
     fields:
       id:
         label: 'ID'
@@ -129,6 +135,8 @@ admin:
 
   # Event section
   event:
+    singular: Event
+    plural: Events
     fields:
       id:
         label: 'ID'
@@ -157,6 +165,8 @@ admin:
 
   # Holiday section
   holiday:
+    singular: Holiday
+    plural: Holidays
     fields:
       id:
         label: 'ID'
@@ -182,6 +192,8 @@ admin:
 
   # HolidayGroup section
   holidayGroup:
+    singular: Holiday group
+    plural: Holiday groups
     fields:
       id:
         label: 'ID'
@@ -198,6 +210,8 @@ admin:
 
   # Image section
   iamge:
+    singular: Image
+    plural: Images
     fields:
       id:
         label: 'ID'
@@ -208,6 +222,18 @@ admin:
       path:
         label: 'Path'
         help: 'The path of this entry.'
+      pathSource:
+        label: 'Source path'
+        help: 'The source path of this entry.'
+      pathTarget:
+        label: 'Target path'
+        help: 'The source path of this entry.'
+      pathSourceFull:
+        label: 'Full source path'
+        help: 'The full source path of this entry.'
+      pathTargetFull:
+        label: 'Full target path'
+        help: 'The full target path of this entry.'
       width:
         label: 'Width'
         help: 'The width of this entry.'
@@ -226,6 +252,8 @@ admin:
 
   # User section
   user:
+    singular: User
+    plural: Users
     fields:
       id:
         label: 'ID'

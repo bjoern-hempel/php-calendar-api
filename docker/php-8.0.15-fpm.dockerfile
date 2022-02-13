@@ -1,5 +1,5 @@
-# Use PHP 8.0.14 fpm image
-FROM php:8.0.14-fpm
+# Use PHP 8.0.15 fpm image
+FROM php:8.0.15-fpm
 
 # Working dir
 WORKDIR /var/www/web
