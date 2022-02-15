@@ -96,15 +96,15 @@ class Image
 {
     use TimestampsTrait;
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'path', 'pathSource', 'pathTarget', 'pathSourceFull', 'pathTargetFull', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'path', 'pathSource', 'pathTarget', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_INDEX = ['id', 'user', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_NEW = ['id', 'user', 'path'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'pathSourceFull', 'pathTargetFull', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'pathTarget', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -116,7 +116,7 @@ class Image
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['image', 'image_extended'])]
     /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
-    public ?User $user;
+    public ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['image', 'image_extended'])]
@@ -183,15 +183,10 @@ class Image
     /**
      * Gets the user of this image.
      *
-     * @return User
-     * @throws Exception
+     * @return User|null
      */
-    public function getUser(): User
+    public function getUser(): ?User
     {
-        if (!isset($this->user)) {
-            throw new Exception(sprintf('No user was configured (%s:%d)', __FILE__, __LINE__));
-        }
-
         return $this->user;
     }
 
@@ -204,7 +199,7 @@ class Image
     #[Groups(['image', 'image_extended'])]
     public function getUserId(): ?int
     {
-        return $this->getUser()->getId();
+        return $this->getUser()?->getId();
     }
 
     /**
@@ -225,6 +220,7 @@ class Image
      *
      * @param string $type
      * @return string
+     * @throws Exception
      */
     public function getPath(string $type = self::PATH_TYPE_SOURCE): string
     {
@@ -232,15 +228,17 @@ class Image
             return $this->path;
         }
 
-        $pos = strpos($this->path, '/');
+        $replacedPath = preg_replace(sprintf('~(^[a-z0-9]{40,40}/)%s(/)~', self::PATH_TYPE_SOURCE), sprintf('$1%s$2', $type), $this->path);
 
-        $path = $pos !== false ? substr($this->path, $pos + 1) : $this->path;
+        if (!is_string($replacedPath)) {
+            throw new Exception(sprintf('Unexpected replaced path (%s:%d).', __FILE__, __LINE__));
+        }
 
-        return sprintf('%s/%s', $type, $path);
+        return $replacedPath;
     }
 
     /**
-     * Gets the relative path of this image.
+     * Gets the absolute path of this image.
      *
      * @param string $type
      * @param bool $test
@@ -251,13 +249,12 @@ class Image
     public function getPathFull(string $type = self::PATH_TYPE_SOURCE, bool $test = false, string $rootPath = ''): string
     {
         $imagePath = sprintf($test ? '%s/tests/%s' : '%s/%s', self::PATH_DATA, self::PATH_IMAGES);
-        $userPath = sprintf('%s/%s', $imagePath, $this->getUser()->getIdHash());
 
-        return sprintf('%s/%s/%s', $rootPath, $userPath, $this->getPath($type));
+        return sprintf('%s/%s/%s', $rootPath, $imagePath, $this->getPath($type));
     }
 
     /**
-     * Gets the relative source path of this image.
+     * Gets the relative or absolute source path of this image.
      *
      * @param bool $full
      * @param bool $test
@@ -275,7 +272,7 @@ class Image
     }
 
     /**
-     * Gets the relative source path of this image.
+     * Gets the relative or absolute source path of this image.
      *
      * @param bool $full
      * @param bool $test
@@ -293,7 +290,7 @@ class Image
     }
 
     /**
-     * Gets the relative source path of this image.
+     * Gets the relative or absolute source path of this image.
      *
      * @param bool $full
      * @param bool $test
@@ -311,7 +308,7 @@ class Image
     }
 
     /**
-     * Gets the relative source path of this image.
+     * Gets the relative or absolute source path of this image.
      *
      * @param bool $full
      * @param bool $test
@@ -329,7 +326,7 @@ class Image
     }
 
     /**
-     * Gets the relative source path of this image.
+     * Gets the absolute source path of this image.
      *
      * @param bool $test
      * @param string $rootPath
@@ -342,7 +339,7 @@ class Image
     }
 
     /**
-     * Gets the relative source path of this image.
+     * Gets the absolute target path of this image.
      *
      * @param bool $test
      * @param string $rootPath
@@ -352,6 +349,32 @@ class Image
     public function getPathTargetFull(bool $test = false, string $rootPath = ''): string
     {
         return $this->getPathTarget(true, $test, $rootPath);
+    }
+
+    /**
+     * Gets the absolute source path of this image.
+     *
+     * @param bool $test
+     * @param string $rootPath
+     * @return string
+     * @throws Exception
+     */
+    public function getPathExpectedFull(bool $test = false, string $rootPath = ''): string
+    {
+        return $this->getPathExpected(true, $test, $rootPath);
+    }
+
+    /**
+     * Gets the absolute target path of this image.
+     *
+     * @param bool $test
+     * @param string $rootPath
+     * @return string
+     * @throws Exception
+     */
+    public function getPathCompareFull(bool $test = false, string $rootPath = ''): string
+    {
+        return $this->getPathCompare(true, $test, $rootPath);
     }
 
     /**

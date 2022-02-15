@@ -18,6 +18,18 @@ services:
             - '@doctrine.orm.entity_manager'
         public: true
 
+    App\Service\ImageLoaderService:
+        arguments:
+            - '@kernel'
+            - '@doctrine.orm.entity_manager'
+        public: true
+
+    App\Service\UserLoaderService:
+        arguments:
+            - '@kernel'
+            - '@doctrine.orm.entity_manager'
+        public: true
+
     App\Service\CalendarBuilderService:
         arguments:
             - '@kernel'

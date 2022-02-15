@@ -270,6 +270,9 @@ admin:
       password:
         label: 'Passwort'
         help: 'Das Passwort dieses Eintrags.'
+      plainPassword:
+        label: 'Passwort'
+        help: 'Das Passwort dieses Eintrags.'
       firstname:
         label: 'Vorname'
         help: 'Der Vorname dieses Eintrags.'
@@ -279,6 +282,10 @@ admin:
       roles:
         label: 'Rollen'
         help: 'Die Rollen dieses Eintrags.'
+        entries:
+          roleUser: 'Benutzer'
+          roleAdmin: 'Administrator (einfach)'
+          roleSuperAdmin: 'Administrator (erweitert)'
       updatedAt:
         label: 'Geändert am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'

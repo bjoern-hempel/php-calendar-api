@@ -270,6 +270,9 @@ admin:
       password:
         label: 'Password'
         help: 'The password of this entry.'
+      plainPassword:
+        label: 'Password'
+        help: 'The password of this entry.'
       firstname:
         label: 'Firstname'
         help: 'The firstname of this entry.'
@@ -279,6 +282,10 @@ admin:
       roles:
         label: 'Roles'
         help: 'The roles of this entry.'
+        entries:
+          roleUser: 'User'
+          roleAdmin: 'Administrator (simple)'
+          roleSuperAdmin: 'Administrator (extended)'
       updatedAt:
         label: 'Updated At'
         help: 'The date and time when this entry was last edited.'

@@ -28,6 +28,7 @@
         "symfony/expression-language": "6.0.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.0.*",
+        "symfony/mime": "6.0.*",
         "symfony/monolog-bundle": "^3.7",
         "symfony/password-hasher": "6.0.*",
         "symfony/property-access": "6.0.*",

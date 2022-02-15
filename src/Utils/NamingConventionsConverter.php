@@ -35,6 +35,7 @@ class NamingConventionsConverter
      * NamingConventionsConverter constructor.
      *
      * @param string|array<int, string> $raw
+     * @throws Exception
      */
     public function __construct(string|array $raw)
     {

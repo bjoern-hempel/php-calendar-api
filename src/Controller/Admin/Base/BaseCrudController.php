@@ -21,22 +21,24 @@ use App\Entity\Holiday;
 use App\Entity\HolidayGroup;
 use App\Entity\Image;
 use App\Entity\User;
+use App\Field\PathImageField;
+use App\Utils\EasyAdminField;
 use App\Utils\JsonConverter;
 use App\Utils\SizeConverter;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Exception;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
 /**
  * Class BaseCrudController.
@@ -50,6 +52,18 @@ abstract class BaseCrudController extends AbstractCrudController
     abstract public function getEntity(): string;
 
     protected string $crudName;
+
+    protected EasyAdminField $easyAdminField;
+
+    /**
+     * BaseCrudController constructor.
+     *
+     * @throws Exception
+     */
+    public function __construct()
+    {
+        $this->easyAdminField = new EasyAdminField($this->getCrudName());
+    }
 
     /**
      * Returns the entity of this class.
@@ -78,6 +92,16 @@ abstract class BaseCrudController extends AbstractCrudController
         }
 
         return $crudName;
+    }
+
+    /**
+     * Returns the entity instance if possible.
+     *
+     * @return object|null
+     */
+    protected function getEntityInstance(): ?object
+    {
+        return $this->getContext()?->getEntity()->getInstance();
     }
 
     /**
@@ -137,9 +161,9 @@ abstract class BaseCrudController extends AbstractCrudController
                     /* Association field. */
                     case 'user':
                         return AssociationField::new($fieldName)
-                            ->setRequired(true)
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
-                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName))
+                            ->setRequired(true);
 
                     /* Field type */
                     case 'type':
@@ -165,6 +189,13 @@ abstract class BaseCrudController extends AbstractCrudController
                 switch ($fieldName) {
 
                     /* Association field. */
+                    case 'user':
+                        return AssociationField::new($fieldName)
+                            ->setRequired(true)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
+
+                    /* Dimension fields. */
                     case 'width':
                     case 'height':
                     return IntegerField::new($fieldName)
@@ -173,6 +204,8 @@ abstract class BaseCrudController extends AbstractCrudController
                         ->formatValue(function ($value) {
                             return sprintf('%d px', $value);
                         });
+
+                    /* Size field */
                     case 'size':
                         return IntegerField::new($fieldName)
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
@@ -180,17 +213,38 @@ abstract class BaseCrudController extends AbstractCrudController
                             ->formatValue(function ($value) {
                                 return SizeConverter::getHumanReadableSize($value);
                             });
+
+                    /* Full path fields */
+                    case 'pathSourceFull':
+                    case 'pathTargetFull':
+                        return PathImageField::new($fieldName)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
                 }
                 break;
 
             case $this->getCrudName(User::class):
                 switch ($fieldName) {
 
+                    /* Email field */
+                    case 'email':
+                        return $this->easyAdminField->getEmailField($fieldName);
+
+                    /* Password field */
+                    case 'password':
+                        return $this->easyAdminField->getTextField($fieldName)
+                            ->setFormType(PasswordType::class);
+
+                    case 'plainPassword':
+                        return $this->easyAdminField->getTextField($fieldName);
+
                     /* Field roles */
                     case 'roles':
-                        return ArrayField::new($fieldName)
-                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
-                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
+                        return $this->easyAdminField->getChoiceField($fieldName, [
+                            'roleUser' => User::ROLE_USER,
+                            'roleAdmin' => User::ROLE_ADMIN,
+                            'roleSuperAdmin' => User::ROLE_SUPER_ADMIN,
+                        ])->allowMultipleChoices(true)->renderExpanded();
                 }
         }
 
@@ -226,9 +280,7 @@ abstract class BaseCrudController extends AbstractCrudController
                 ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
 
             /* All other fields. */
-            default => TextField::new($fieldName)
-                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
-                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
+            default => $this->easyAdminField->getTextField($fieldName),
         };
     }
 
