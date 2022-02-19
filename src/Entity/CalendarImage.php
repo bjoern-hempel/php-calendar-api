@@ -18,6 +18,7 @@ use App\Entity\Trait\TimestampsTrait;
 use App\Repository\CalendarImageRepository;
 use App\Security\Voter\UserVoter;
 use App\Utils\ArrayToObject;
+use App\Utils\Traits\JsonHelper;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
 use JetBrains\PhpStorm\Pure;
@@ -95,6 +96,18 @@ class CalendarImage
 {
     use TimestampsTrait;
 
+    use JsonHelper;
+
+    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_INDEX = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_NEW = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson'];
+
+    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+
+    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -139,7 +152,7 @@ class CalendarImage
     #[Groups('calendar_image_extended')]
     private ?string $url;
 
-    /** @var array<string|int|bool> $config */
+    /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
     #[Groups('calendar_image_extended')]
     private array $config = [];
@@ -407,7 +420,7 @@ class CalendarImage
     /**
      * Gets the config as array.
      *
-     * @return array<string|int|bool>
+     * @return array<string|int|float|bool>
      */
     public function getConfig(): array
     {
@@ -432,7 +445,7 @@ class CalendarImage
     /**
      * Sets the config.
      *
-     * @param array<string|int|bool> $config
+     * @param array<string|int|float|bool> $config
      * @return $this
      * @throws Exception
      */
@@ -443,5 +456,53 @@ class CalendarImage
         $this->configObject = new ArrayToObject($config);
 
         return $this;
+    }
+
+    /**
+     * Gets the config element as JSON.
+     *
+     * @param bool $beautify
+     * @return string
+     * @throws Exception
+     */
+    public function getConfigJson(bool $beautify = true): string
+    {
+        return self::jsonEncode($this->config, $beautify, 2);
+    }
+
+    /**
+     * Sets the config element from JSON.
+     *
+     * @param string $json
+     * @return $this
+     */
+    public function setConfigJson(string $json): self
+    {
+        $this->config = self::jsonDecodeArray($json);
+
+        return $this;
+    }
+
+    /**
+     * Gets the config element as JSON.
+     *
+     * @param bool $beautify
+     * @return string
+     * @throws Exception
+     */
+    public function getConfigJsonRaw(bool $beautify = true): string
+    {
+        return $this->getConfigJson(false);
+    }
+
+    /**
+     * Sets the config element from JSON.
+     *
+     * @param string $json
+     * @return $this
+     */
+    public function setConfigJsonRaw(string $json): self
+    {
+        return $this->setConfigJson($json);
     }
 }

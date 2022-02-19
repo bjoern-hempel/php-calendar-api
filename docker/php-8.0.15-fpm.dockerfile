@@ -1,5 +1,5 @@
-# Use PHP 8.0.14 fpm image
-FROM php:8.0.14-fpm
+# Use PHP 8.0.15 fpm image
+FROM php:8.0.15-fpm
 
 # Working dir
 WORKDIR /var/www/web
@@ -31,18 +31,23 @@ RUN apt-get update && apt-get install -y \
     unzip \
     cron \
     imagemagick \
+    libmagickwand-dev \
     nodejs \
-    supervisor
+    supervisor --no-install-recommends
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Pecl install alternative
+RUN mkdir -p /usr/src/php/ext/imagick; \
+    curl -fsSL https://github.com/Imagick/imagick/archive/06116aa24b76edaf6b1693198f79e6c295eda8a9.tar.gz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1
 
 # Add supervisor messenger-worker.conf
 COPY php/conf.d/messenger-worker.conf  /etc/supervisor/conf.d/messenger-worker.conf
 
 # Install php extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-RUN docker-php-ext-install mysqli pdo pdo_mysql zip intl opcache soap gd
+RUN docker-php-ext-install mysqli pdo pdo_mysql zip intl opcache soap gd imagick
 
 # Install npm
 RUN npm install -g npm

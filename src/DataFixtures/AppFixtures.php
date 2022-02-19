@@ -466,6 +466,18 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
     }
 
     /**
+     * Gets source path of image.
+     *
+     * @param User $user
+     * @param string[]|int[] $calendarData
+     * @return string
+     */
+    protected function getSourcePath(User $user, array $calendarData): string
+    {
+        return sprintf('%s/%s', $user->getIdHash(), strval($calendarData['sourcePath']));
+    }
+
+    /**
      * Returns a User resource.
      *
      * @param CalendarStyle $calendarStyle
@@ -488,7 +500,7 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
 
         foreach ($this->calendars as $calendarData) {
             /* Create image */
-            $image = $this->setImage($user, strval($calendarData['sourcePath']));
+            $image = $this->setImage($user, $this->getSourcePath($user, $calendarData));
 
             /* Connect calendar with image */
             $this->setCalendarImage(

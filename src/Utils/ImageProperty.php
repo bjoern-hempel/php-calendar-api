@@ -16,7 +16,6 @@ namespace App\Utils;
 use App\Entity\CalendarImage;
 use App\Entity\Image;
 use App\Entity\User;
-use App\Service\CalendarBuilderService;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
@@ -118,7 +117,7 @@ class ImageProperty
     #[Pure]
     public function getPathUser(User $user, bool $test = false): string
     {
-        return sprintf('%s/%s', $this->getPathImages($test), $user->getIdHash());
+        return $this->getPathImages($test);
     }
 
     /**
@@ -245,8 +244,8 @@ class ImageProperty
         return [
             'width' => intval($imageSize[0]),
             'height' => intval($imageSize[1]),
-            'bits' => intval($imageSize['bits']),
-            'channels' => intval($imageSize['channels']),
+            'bits' => array_key_exists('bits', $imageSize) ? intval($imageSize['bits']) : 0,
+            'channels' => array_key_exists('channels', $imageSize) ? intval($imageSize['channels']) : 0,
             'mime' => strval($imageSize['mime']),
         ];
     }

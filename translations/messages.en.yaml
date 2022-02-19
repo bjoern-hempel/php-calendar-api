@@ -1,0 +1,295 @@
+# Admin texts
+admin:
+
+  # Dashboard
+  dashboard:
+    label: 'Dashboard'
+
+  # Admin sections
+  section:
+    administration:
+      label: 'Administration'
+
+    calendar:
+      label: 'Calendars'
+
+    calendarImage:
+      label: 'Calendar images'
+
+    calendarStyle:
+      label: 'Calendar styles'
+
+    event:
+      label: 'Events'
+
+    holiday:
+      label: 'Holidays'
+
+    holidayGroup:
+      label: 'Holiday groups'
+
+    image:
+      label: 'Images'
+
+    user:
+      label: 'Users'
+
+  # Calendar section
+  calendar:
+    singular: Calendar
+    plural: Calendars
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      user:
+        label: 'User'
+        help: 'The user of this entry.'
+      calendarStyle:
+        label: 'Calendar Style'
+        help: 'The calendar style of this entry.'
+      holidayGroup:
+        label: 'Holiday Group'
+        help: 'The holiday group of this entry.'
+      name:
+        label: 'Name'
+        help: 'The name of this entry.'
+      title:
+        label: 'Title'
+        help: 'The title of this entry.'
+      subtitle:
+        label: 'Subtitle'
+        help: 'The subtitle of this entry.'
+      configJson:
+        label: 'Config'
+        help: 'The current configuration of this entry in JSON format.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
+  # CalendarImage section
+  calendarImage:
+    singular: Calendar image
+    plural: Calendar images
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      user:
+        label: 'User'
+        help: 'The user of this entry.'
+      calendar:
+        label: 'Calendar'
+        help: 'The calendar of this entry.'
+      image:
+        label: 'Image'
+        help: 'The image of this entry.'
+      year:
+        label: 'Year'
+        help: 'The year of this entry.'
+      month:
+        label: 'Month'
+        help: 'The month of this entry.'
+      title:
+        label: 'Title'
+        help: 'The title of this entry.'
+      position:
+        label: 'Position'
+        help: 'The position of this entry.'
+      url:
+        label: 'URL'
+        help: 'The URL of this entry.'
+      configJson:
+        label: 'Config'
+        help: 'The current configuration of this entry in JSON format.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
+  # CalendarStyle section
+  calendarStyle:
+    singular: Calendar style
+    plural: Calendar styles
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      name:
+        label: 'Name'
+        help: 'The name of this entry.'
+      configJson:
+        label: 'Config'
+        help: 'The current configuration of this entry in JSON format.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
+  # Event section
+  event:
+    singular: Event
+    plural: Events
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      user:
+        label: 'User'
+        help: 'The user of this entry.'
+      name:
+        label: 'Name'
+        help: 'The name of this entry.'
+      type:
+        label: 'Type'
+        help: 'The type of this entry.'
+      date:
+        label: 'Date'
+        help: 'The date of this entry.'
+      configJson:
+        label: 'Config'
+        help: 'The current configuration of this entry in JSON format.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
+  # Holiday section
+  holiday:
+    singular: Holiday
+    plural: Holidays
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      holidayGroup:
+        label: 'Holiday group'
+        help: 'The holiday group of this entry.'
+      name:
+        label: 'Name'
+        help: 'The name of this entry.'
+      date:
+        label: 'Date'
+        help: 'The date of this entry.'
+      configJson:
+        label: 'Config'
+        help: 'The current configuration of this entry in JSON format.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
+  # HolidayGroup section
+  holidayGroup:
+    singular: Holiday group
+    plural: Holiday groups
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      name:
+        label: 'Name'
+        help: 'The name of this entry.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
+  # Image section
+  iamge:
+    singular: Image
+    plural: Images
+    notGenerated: 'This image has not been generated yet.'
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      user:
+        label: 'User'
+        help: 'The user of this entry.'
+      path:
+        label: 'Path'
+        help: 'The path of this entry.'
+      pathSource:
+        label: 'Source path'
+        help: 'The source path of this entry.'
+      pathTarget:
+        label: 'Target path'
+        help: 'The source path of this entry.'
+      pathSourceFull:
+        label: 'Full source path'
+        help: 'The full source path of this entry.'
+      pathTargetFull:
+        label: 'Full target path'
+        help: 'The full target path of this entry.'
+      width:
+        label: 'Width'
+        help: 'The width of this entry.'
+      height:
+        label: 'Height'
+        help: 'The height of this entry.'
+      size:
+        label: 'Size'
+        help: 'The size of this entry.'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'
+
+  # User section
+  user:
+    singular: User
+    plural: Users
+    fields:
+      id:
+        label: 'ID'
+        help: 'This id of this entry.'
+      idHash:
+        label: 'ID Hash'
+        help: 'The id hash of this entry.'
+      email:
+        label: 'Email'
+        help: 'The email of this entry.'
+      username:
+        label: 'Username'
+        help: 'The username of this entry.'
+      password:
+        label: 'Password'
+        help: 'The password of this entry.'
+      plainPassword:
+        label: 'Password'
+        help: 'The password of this entry.'
+      firstname:
+        label: 'Firstname'
+        help: 'The firstname of this entry.'
+      lastname:
+        label: 'Lastname'
+        help: 'The lastname of this entry.'
+      roles:
+        label: 'Roles'
+        help: 'The roles of this entry.'
+        entries:
+          roleUser: 'User'
+          roleAdmin: 'Administrator (simple)'
+          roleSuperAdmin: 'Administrator (extended)'
+      updatedAt:
+        label: 'Updated At'
+        help: 'The date and time when this entry was last edited.'
+      createdAt:
+        label: 'Created At'
+        help: 'The date and time when this entry was created.'

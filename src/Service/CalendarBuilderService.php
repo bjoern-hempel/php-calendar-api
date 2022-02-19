@@ -175,8 +175,6 @@ class CalendarBuilderService
 
     public const EVENT_TYPE_EVENT_GROUP = 2;
 
-    public const PATH_IMAGES = 'images';
-
     /**
      * Calendar constructor
      *
@@ -1207,13 +1205,10 @@ class CalendarBuilderService
      */
     public function build(): array
     {
-        /* Get user path */
-        $imagePath = sprintf($this->test ? '%s/tests/%s' : '%s/%s', $this->pathData, self::PATH_IMAGES);
-        $userPath = sprintf('%s/%s', $imagePath, $this->image->getUser()->getIdHash());
-
         /* Save given values */
-        $this->pathSource = sprintf('%s/%s', $userPath, $this->image->getPathSource());
-        $this->pathTarget = sprintf('%s/%s', $userPath, $this->image->getPathTarget());
+        $this->pathSource = $this->image->getPathFull(Image::PATH_TYPE_SOURCE, $this->test, $this->pathRoot);
+        $this->pathTarget = $this->image->getPathFull(Image::PATH_TYPE_TARGET, $this->test, $this->pathRoot);
+
         $this->textTitle = $this->calendarImage->getTitle() ?? '';
         $this->textPosition = $this->calendarImage->getPosition() ?? '';
         $this->year = $this->calendarImage->getYear();

@@ -101,9 +101,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public const ROLE_ADMIN = 'ROLE_ADMIN';
 
+    public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
+
     public const API_ENDPOINT_COLLECTION = '/api/v1/users';
 
     public const API_ENDPOINT_ITEM = '/api/v1/users/%d';
+
+    public const PASSWORD_UNCHANGED = '**********';
+
+    public const CRUD_FIELDS_REGISTERED = ['id', 'idHash', 'email', 'username', 'password', 'plainPassword', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_INDEX = ['id', 'idHash', 'email', 'username', 'password', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_NEW = ['id', 'email', 'username', 'plainPassword', 'firstname', 'lastname', 'roles'];
+
+    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+
+    public const CRUD_FIELDS_DETAIL = ['id', 'idHash', 'email', 'username', 'password', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -125,6 +139,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $password;
+
+    private string $plainPassword;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['user', 'user_extended'])]
@@ -178,6 +194,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * __toString method.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return sprintf('%s %s', $this->firstname, $this->lastname);
+    }
+
+    /**
      * Gets the id of this user.
      *
      * @return int|null
@@ -190,22 +216,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Gets the hash id of this user.
      *
-     * @return string|null
+     * @return string
      */
-    public function getIdHash(): ?string
+    public function getIdHash(): string
     {
-        return $this->idHash;
+        return $this->idHash ?? $this->getIdHashNew();
+    }
+
+    /**
+     * Gets the hash id of this user.
+     *
+     * @return string
+     */
+    public function getIdHashNew(): string
+    {
+        return sha1(rand(1000000, 9999999).rand(1000000, 9999999));
     }
 
     /**
      * Sets the hash id of this user.
      *
-     * @param string $idHash
+     * @param string|null $idHash
      * @return $this
      */
-    public function setIdHash(string $idHash): self
+    public function setIdHash(?string $idHash = null): self
     {
-        $this->idHash = $idHash;
+        $this->idHash = $idHash ?? $this->getIdHashNew();
 
         return $this;
     }
@@ -275,6 +311,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * Gets the plain password of this user.
+     *
+     * @return string
+     */
+    public function getPlainPassword(): string
+    {
+        return $this->plainPassword ?? self::PASSWORD_UNCHANGED;
+    }
+
+    /**
+     * Sets the plain password of this user.
+     *
+     * @param string $plainPassword
+     * @return User
+     */
+    public function setPlainPassword(string $plainPassword): User
+    {
+        $this->plainPassword = $plainPassword;
 
         return $this;
     }
