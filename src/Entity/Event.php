@@ -103,7 +103,7 @@ class Event
 
     public const CRUD_FIELDS_INDEX = ['id', 'name', 'type', 'user', 'date', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name', 'type', 'user', 'date', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_NEW = ['id', 'name', 'type', 'user', 'date', 'configJson'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 

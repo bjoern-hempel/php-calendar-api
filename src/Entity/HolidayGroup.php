@@ -83,7 +83,7 @@ class HolidayGroup
 
     public const CRUD_FIELDS_INDEX = ['id', 'name', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_NEW = ['id', 'name'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 

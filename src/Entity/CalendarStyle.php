@@ -84,7 +84,7 @@ class CalendarStyle
 
     public const CRUD_FIELDS_INDEX = ['id', 'name', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_NEW = ['id', 'name', 'configJson'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 

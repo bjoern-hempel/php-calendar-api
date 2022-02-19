@@ -106,7 +106,7 @@ class Calendar
 
     public const CRUD_FIELDS_INDEX = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_NEW = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'configJson'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
