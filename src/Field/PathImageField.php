@@ -15,12 +15,14 @@ namespace App\Field;
 
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FieldTrait;
+use InvalidArgumentException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
  * PathImageField class.
  *
- * @author Javier Eguiluz <javier.eguiluz@gmail.com> * @author Björn Hempel <bjoern@hempel.li>
+ * @author Javier Eguiluz <javier.eguiluz@gmail.com>
+ * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2022-02-15)
  * @package App\Field
  */
@@ -62,7 +64,7 @@ final class PathImageField implements FieldInterface
     public function setMaxLength(int $length): self
     {
         if ($length < 1) {
-            throw new \InvalidArgumentException(sprintf('The argument of the "%s()" method must be 1 or higher (%d given).', __METHOD__, $length));
+            throw new InvalidArgumentException(sprintf('The argument of the "%s()" method must be 1 or higher (%d given).', __METHOD__, $length));
         }
 
         $this->setCustomOption(self::OPTION_MAX_LENGTH, $length);

@@ -212,6 +212,7 @@ admin:
   image:
     singular: Bild
     plural: Bilder
+    notGenerated: 'Dieses Bild wurde noch nicht generiert.'
     fields:
       id:
         label: 'ID'
