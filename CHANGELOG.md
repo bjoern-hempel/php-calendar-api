@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.20.0] - 2022-02-22
+
+* [#57](https://github.com/bjoern-hempel/php-calendar-api/issues/57) - Add authentication to admin panel
+
 ### [0.19.0] - 2022-02-19
 
 * [#54](https://github.com/bjoern-hempel/php-calendar-api/issues/54) - Add easyAdmin to API
