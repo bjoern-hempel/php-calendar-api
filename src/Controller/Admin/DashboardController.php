@@ -21,6 +21,8 @@ use App\Entity\Holiday;
 use App\Entity\HolidayGroup;
 use App\Entity\Image;
 use App\Entity\User;
+use App\Service\ConfigService;
+use App\Service\VersionService;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -30,9 +32,11 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class DashboardController.
+ * IS_AUTHENTICATED_FULLY
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2022-02-07)
@@ -40,6 +44,28 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class DashboardController extends AbstractDashboardController
 {
+    protected TranslatorInterface $translator;
+
+    protected ConfigService $configService;
+
+    protected VersionService $versionService;
+
+    /**
+     * DashboardController constructor.
+     *
+     * @param TranslatorInterface $translator
+     * @param ConfigService $configService
+     * @param VersionService $versionService
+     */
+    public function __construct(TranslatorInterface $translator, ConfigService $configService, VersionService $versionService)
+    {
+        $this->translator = $translator;
+
+        $this->configService = $configService;
+
+        $this->versionService = $versionService;
+    }
+
     /**
      * Index page of dashboard controller.
      *
@@ -50,13 +76,28 @@ class DashboardController extends AbstractDashboardController
     #[Route('/admin', name: 'admin')]
     public function index(): Response
     {
+        if (!$this->isGranted(User::ROLE_ADMIN)) {
+            return $this->render('admin/page/insufficient_rights.html.twig', [
+
+                /* title and other variables */
+                'page_title' => $this->configService->getConfig(ConfigService::PARAMETER_NAME_BACKEND_TITLE_MAIN),
+                'version' => $this->versionService->getVersion(),
+
+                /* labels */
+                'sign_out_label' => $this->translator->trans('admin.login.labelLogout'),
+
+                /* content */
+                'text' => 'admin.login.insufficientRights',
+            ]);
+        }
+
         $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
 
         if (!$adminUrlGenerator instanceof AdminUrlGenerator) {
             throw new Exception(sprintf('AdminUrlGenerator class expected (%s:%d).', __FILE__, __LINE__));
         }
 
-        return $this->redirect($adminUrlGenerator->setController(CalendarStyleCrudController::class)->generateUrl());
+        return $this->redirect($adminUrlGenerator->setController(UserCrudController::class)->generateUrl());
     }
 
     /**

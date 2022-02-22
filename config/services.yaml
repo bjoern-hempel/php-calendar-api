@@ -6,6 +6,8 @@
 parameters:
     api.base_url: '%env(resolve:API_BASE_URL)%'
     jwt.role: '%env(resolve:JWT_ROLE)%'
+    backend.title.login: 'API Backend Login'
+    backend.title.main: 'API Backend'
 
 services:
     # default configuration for services in *this* file

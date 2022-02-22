@@ -65,7 +65,12 @@ security:
         # ----------------
         main:
             lazy: true
-            stateless: true
+            provider: app_user_provider
+            logout:
+                path: app_admin_logout
+                target: /admin
+            custom_authenticators:
+                - App\Security\LoginFormAuthenticator
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -76,6 +81,8 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/admin/login$, roles: PUBLIC_ACCESS } # Allows /admin/login into backend
+        - { path: ^/admin, roles: IS_AUTHENTICATED_FULLY  } # Easy admin backend
         - { path: ^/api/v1/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/v1/token/refresh, roles: PUBLIC_ACCESS } # Allows getting new tokens
         - { path: ^/api/v1/token/get, roles: PUBLIC_ACCESS } # Allows getting token with login

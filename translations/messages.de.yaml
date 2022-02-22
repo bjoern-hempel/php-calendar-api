@@ -5,6 +5,14 @@ admin:
   dashboard:
     label: 'Dashboard'
 
+  # Login
+  login:
+    labelEmail: 'E-Mail-Adresse'
+    labelPassword: 'Passwort'
+    labelLogin: 'Einloggen'
+    labelLogout: 'Ausloggen'
+    insufficientRights: 'Unzureichende Rechte für den Zugang verfügbar.'
+
   # Admin sections
   section:
     administration:
