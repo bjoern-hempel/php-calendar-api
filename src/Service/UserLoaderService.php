@@ -13,16 +13,14 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Entity\Image;
 use App\Entity\User;
-use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Class ImageLoaderService
+ * Class UserLoaderService
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2022-02-15)
