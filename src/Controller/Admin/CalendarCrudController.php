@@ -16,9 +16,9 @@ namespace App\Controller\Admin;
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\Calendar;
 use App\Service\SecurityService;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use Exception;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CalendarCrudController.
@@ -33,11 +33,12 @@ class CalendarCrudController extends BaseCrudController
      * CalendarCrudController constructor.
      *
      * @param SecurityService $securityService
+     * @param TranslatorInterface $translator
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator)
     {
-        parent::__construct($securityService);
+        parent::__construct($securityService, $translator);
     }
 
     /**
@@ -59,20 +60,5 @@ class CalendarCrudController extends BaseCrudController
     public function getEntity(): string
     {
         return self::getEntityFqcn();
-    }
-
-    /**
-     * Configures filters.
-     *
-     * @param Filters $filters
-     * @return Filters
-     */
-    public function configureFilters(Filters $filters): Filters
-    {
-        return $filters
-            ->add('name')
-            ->add('title')
-            ->add('subtitle')
-            ->add('user');
     }
 }

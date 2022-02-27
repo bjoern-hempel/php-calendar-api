@@ -94,6 +94,8 @@ class CalendarStyle implements EntityInterface
 
     public const CRUD_FIELDS_DETAIL = ['id', 'name', 'updatedAt', 'createdAt', 'configJson'];
 
+    public const CRUD_FIELDS_FILTER = ['name', 'updatedAt', 'createdAt'];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

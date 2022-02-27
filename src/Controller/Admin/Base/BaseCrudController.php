@@ -32,11 +32,13 @@ use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -44,6 +46,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use Exception;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class BaseCrudController.
@@ -60,6 +63,8 @@ abstract class BaseCrudController extends AbstractCrudController
 
     protected SecurityService $securityService;
 
+    protected TranslatorInterface $translator;
+
     protected EasyAdminField $easyAdminField;
 
     protected const CRUD_FIELDS_ADMIN = 'CRUD_FIELDS_ADMIN';
@@ -69,9 +74,11 @@ abstract class BaseCrudController extends AbstractCrudController
      *
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator)
     {
         $this->securityService = $securityService;
+
+        $this->translator = $translator;
 
         $this->easyAdminField = new EasyAdminField($this->getCrudName());
     }
@@ -178,7 +185,12 @@ abstract class BaseCrudController extends AbstractCrudController
 
                     /* Field type */
                     case 'type':
-                        return IntegerField::new($fieldName)
+                        return ChoiceField::new($fieldName)
+                            ->setChoices([
+                                $this->translator->trans(sprintf('admin.event.fields.type.entries.entry%d', 0)) => 0,
+                                $this->translator->trans(sprintf('admin.event.fields.type.entries.entry%d', 1)) => 1,
+                                $this->translator->trans(sprintf('admin.event.fields.type.entries.entry%d', 2)) => 2,
+                            ])
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                             ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
                 }
@@ -299,18 +311,29 @@ abstract class BaseCrudController extends AbstractCrudController
      * Returns the constant from fqcn entity (raw).
      *
      * @param string $name
+     * @param string[]|null $default
      * @return string[]
      * @throws Exception
      */
-    protected function getConstantRaw(string $name): array
+    protected function getConstantRaw(string $name, ?array $default = null): array
     {
-        $constant = constant(sprintf('%s::%s', $this->getEntity(), $name));
+        $constantName = sprintf('%s::%s', $this->getEntity(), $name);
 
-        if (!is_array($constant)) {
+        if (!defined($constantName) && $default !== null) {
+            return $default;
+        }
+
+        if (!defined($constantName)) {
+            throw new Exception(sprintf('The constant "%s" does not exist (%s:%d).', $constantName, __FILE__, __LINE__));
+        }
+
+        $value = constant($constantName);
+
+        if (!is_array($value)) {
             throw new Exception(sprintf('Unexpected constant returned (%s:%d).', __FILE__, __LINE__));
         }
 
-        return $constant;
+        return $value;
     }
 
     /**
@@ -332,6 +355,7 @@ abstract class BaseCrudController extends AbstractCrudController
             serialize(Calendar::CRUD_FIELDS_NEW),
             serialize(Calendar::CRUD_FIELDS_EDIT),
             serialize(Calendar::CRUD_FIELDS_DETAIL),
+            serialize(Calendar::CRUD_FIELDS_FILTER),
 
             serialize(CalendarImage::CRUD_FIELDS_ADMIN),
             serialize(CalendarImage::CRUD_FIELDS_REGISTERED),
@@ -339,6 +363,7 @@ abstract class BaseCrudController extends AbstractCrudController
             serialize(CalendarImage::CRUD_FIELDS_NEW),
             serialize(CalendarImage::CRUD_FIELDS_EDIT),
             serialize(CalendarImage::CRUD_FIELDS_DETAIL),
+            serialize(CalendarImage::CRUD_FIELDS_FILTER),
 
             serialize(CalendarStyle::CRUD_FIELDS_ADMIN),
             serialize(CalendarStyle::CRUD_FIELDS_REGISTERED),
@@ -346,6 +371,7 @@ abstract class BaseCrudController extends AbstractCrudController
             serialize(CalendarStyle::CRUD_FIELDS_NEW),
             serialize(CalendarStyle::CRUD_FIELDS_EDIT),
             serialize(CalendarStyle::CRUD_FIELDS_DETAIL),
+            serialize(CalendarStyle::CRUD_FIELDS_FILTER),
 
             serialize(Event::CRUD_FIELDS_ADMIN),
             serialize(Event::CRUD_FIELDS_REGISTERED),
@@ -353,6 +379,7 @@ abstract class BaseCrudController extends AbstractCrudController
             serialize(Event::CRUD_FIELDS_NEW),
             serialize(Event::CRUD_FIELDS_EDIT),
             serialize(Event::CRUD_FIELDS_DETAIL),
+            serialize(Event::CRUD_FIELDS_FILTER),
 
             serialize(Holiday::CRUD_FIELDS_ADMIN),
             serialize(Holiday::CRUD_FIELDS_REGISTERED),
@@ -360,6 +387,7 @@ abstract class BaseCrudController extends AbstractCrudController
             serialize(Holiday::CRUD_FIELDS_NEW),
             serialize(Holiday::CRUD_FIELDS_EDIT),
             serialize(Holiday::CRUD_FIELDS_DETAIL),
+            serialize(Holiday::CRUD_FIELDS_FILTER),
 
             serialize(HolidayGroup::CRUD_FIELDS_ADMIN),
             serialize(HolidayGroup::CRUD_FIELDS_REGISTERED),
@@ -367,6 +395,7 @@ abstract class BaseCrudController extends AbstractCrudController
             serialize(HolidayGroup::CRUD_FIELDS_NEW),
             serialize(HolidayGroup::CRUD_FIELDS_EDIT),
             serialize(HolidayGroup::CRUD_FIELDS_DETAIL),
+            serialize(HolidayGroup::CRUD_FIELDS_FILTER),
 
             serialize(Image::CRUD_FIELDS_ADMIN),
             serialize(Image::CRUD_FIELDS_REGISTERED),
@@ -374,6 +403,7 @@ abstract class BaseCrudController extends AbstractCrudController
             serialize(Image::CRUD_FIELDS_NEW),
             serialize(Image::CRUD_FIELDS_EDIT),
             serialize(Image::CRUD_FIELDS_DETAIL),
+            serialize(Image::CRUD_FIELDS_FILTER),
 
             serialize(User::CRUD_FIELDS_ADMIN),
             serialize(User::CRUD_FIELDS_REGISTERED),
@@ -381,6 +411,7 @@ abstract class BaseCrudController extends AbstractCrudController
             serialize(User::CRUD_FIELDS_NEW),
             serialize(User::CRUD_FIELDS_EDIT),
             serialize(User::CRUD_FIELDS_DETAIL),
+            serialize(User::CRUD_FIELDS_FILTER),
         ]))) {
             throw new Exception(sprintf('Unsupported constant (%s:%d).', __FILE__, __LINE__));
         }
@@ -553,5 +584,23 @@ abstract class BaseCrudController extends AbstractCrudController
             /* Do not filter */
             default => $qb,
         };
+    }
+
+    /**
+     * Configures filters.
+     *
+     * @param Filters $filters
+     * @return Filters
+     * @throws Exception
+     */
+    public function configureFilters(Filters $filters): Filters
+    {
+        $filterFields = $this->getConstant('CRUD_FIELDS_FILTER');
+
+        foreach ($filterFields as $filterField) {
+            $filters->add($filterField);
+        }
+
+        return $filters;
     }
 }

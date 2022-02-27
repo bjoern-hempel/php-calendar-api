@@ -116,6 +116,8 @@ class Calendar implements EntityInterface
 
     public const CRUD_FIELDS_DETAIL = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson'];
 
+    public const CRUD_FIELDS_FILTER = ['name', 'title', 'subtitle', 'user'];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

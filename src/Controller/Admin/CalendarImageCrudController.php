@@ -18,6 +18,7 @@ use App\Entity\CalendarImage;
 use App\Service\SecurityService;
 use Exception;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CalendarImageCrudController.
@@ -32,11 +33,12 @@ class CalendarImageCrudController extends BaseCrudController
      * CalendarImageCrudController constructor.
      *
      * @param SecurityService $securityService
+     * @param TranslatorInterface $translator
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator)
     {
-        parent::__construct($securityService);
+        parent::__construct($securityService, $translator);
     }
 
     /**

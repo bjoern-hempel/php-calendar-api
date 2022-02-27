@@ -110,6 +110,8 @@ class Image implements EntityInterface
 
     public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'pathTarget', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
+    public const CRUD_FIELDS_FILTER = ['user', 'width', 'height', 'size'];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

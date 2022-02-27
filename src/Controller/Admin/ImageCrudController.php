@@ -28,6 +28,7 @@ use Exception;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class ImageCrudController.
@@ -62,7 +63,7 @@ class ImageCrudController extends BaseCrudController
      * @param IdHashService $idHashService
      * @throws Exception
      */
-    public function __construct(ImageProperty $imageProperty, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, RequestStack $requestStack, ImageService $imageService, IdHashService $idHashService, SecurityService $securityService)
+    public function __construct(ImageProperty $imageProperty, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, RequestStack $requestStack, ImageService $imageService, IdHashService $idHashService, SecurityService $securityService, TranslatorInterface $translator)
     {
         $this->imageProperty = $imageProperty;
 
@@ -76,7 +77,7 @@ class ImageCrudController extends BaseCrudController
 
         $this->idHashService = $idHashService;
 
-        parent::__construct($securityService);
+        parent::__construct($securityService, $translator);
     }
 
     /**

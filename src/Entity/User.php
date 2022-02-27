@@ -124,6 +124,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityI
 
     public const CRUD_FIELDS_DETAIL = ['id', 'idHash', 'email', 'username', 'password', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
 
+    public const CRUD_FIELDS_FILTER = ['email', 'username', 'firstname', 'lastname'];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

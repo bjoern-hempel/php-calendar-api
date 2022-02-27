@@ -113,6 +113,8 @@ class Event implements EntityInterface
 
     public const CRUD_FIELDS_DETAIL = ['id', 'name', 'type', 'user', 'date', 'updatedAt', 'createdAt', 'configJson'];
 
+    public const CRUD_FIELDS_FILTER = ['name', 'type', 'user', 'date', 'updatedAt', 'createdAt'];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

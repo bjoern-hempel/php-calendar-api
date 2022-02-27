@@ -93,6 +93,8 @@ class HolidayGroup implements EntityInterface
 
     public const CRUD_FIELDS_DETAIL = ['id', 'name', 'updatedAt', 'createdAt'];
 
+    public const CRUD_FIELDS_FILTER = ['name'];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
