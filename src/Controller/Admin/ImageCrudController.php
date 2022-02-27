@@ -15,7 +15,9 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\Image;
+use App\Service\IdHashService;
 use App\Service\ImageLoaderService;
+use App\Service\ImageService;
 use App\Service\SecurityService;
 use App\Service\UserLoaderService;
 use App\Utils\ImageProperty;
@@ -44,6 +46,10 @@ class ImageCrudController extends BaseCrudController
 
     protected RequestStack $requestStack;
 
+    protected ImageService $imageService;
+
+    protected IdHashService $idHashService;
+
     /**
      * UserCrudController constructor.
      *
@@ -51,10 +57,12 @@ class ImageCrudController extends BaseCrudController
      * @param ImageLoaderService $imageLoaderService
      * @param UserLoaderService $userLoaderService
      * @param RequestStack $requestStack
+     * @param ImageService $imageService
      * @param SecurityService $securityService
+     * @param IdHashService $idHashService
      * @throws Exception
      */
-    public function __construct(ImageProperty $imageProperty, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, RequestStack $requestStack, SecurityService $securityService)
+    public function __construct(ImageProperty $imageProperty, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, RequestStack $requestStack, ImageService $imageService, IdHashService $idHashService, SecurityService $securityService)
     {
         $this->imageProperty = $imageProperty;
 
@@ -63,6 +71,10 @@ class ImageCrudController extends BaseCrudController
         $this->userLoaderService = $userLoaderService;
 
         $this->requestStack = $requestStack;
+
+        $this->imageService = $imageService;
+
+        $this->idHashService = $idHashService;
 
         parent::__construct($securityService);
     }
@@ -89,50 +101,6 @@ class ImageCrudController extends BaseCrudController
     }
 
     /**
-     * Returns id hash.
-     *
-     * @return string
-     * @throws Exception
-     */
-    protected function getIdHash(): string
-    {
-        /** @var Image|null $image */
-        $image = $this->getEntityInstance();
-
-        if ($image !== null && $image->getUser() !== null) {
-            return $image->getUser()->getIdHash();
-        }
-
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ($request === null) {
-            return '';
-        }
-
-        if ($request->get('Image') !== null) {
-            $image = $request->get('Image');
-
-            if (!is_array($image)) {
-                return '';
-            }
-
-            if (!array_key_exists('user', $image)) {
-                return '';
-            }
-
-            $user = $this->userLoaderService->getUserRepository()->find($image['user']);
-
-            if ($user === null) {
-                return '';
-            }
-
-            return $user->getIdHash();
-        }
-
-        return '';
-    }
-
-    /**
      * Returns the field by given name.
      *
      * @param string $fieldName
@@ -144,7 +112,10 @@ class ImageCrudController extends BaseCrudController
         switch ($fieldName) {
             case 'path':
             case 'pathTarget':
-                $idHash = $this->getIdHash();
+                $idHash = $this->idHashService->getIdHash($this->getEntityInstance());
+
+                /* Create source and target path if needed. */
+                $this->imageService->checkPath($idHash);
 
                 return ImageField::new($fieldName)
                     ->setBasePath(sprintf('%s/%s', Image::PATH_DATA, Image::PATH_IMAGES))
@@ -167,6 +138,10 @@ class ImageCrudController extends BaseCrudController
      */
     protected function updateImageProperties(Image $image): void
     {
+        if (!$this->securityService->isGrantedByAnAdmin()) {
+            $image->setUser($this->securityService->getUser());
+        }
+
         if ($image->getUser() === null) {
             throw new Exception(sprintf('User expected (%s:%d).', __FILE__, __LINE__));
         }

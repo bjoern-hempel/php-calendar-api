@@ -60,6 +60,16 @@ class SecurityService
     }
 
     /**
+     * Returns if User is logged in.
+     *
+     * @return bool
+     */
+    public function isUserLoggedIn(): bool
+    {
+        return $this->security->getUser() instanceof User;
+    }
+
+    /**
      * Returns User entity.
      *
      * @return User

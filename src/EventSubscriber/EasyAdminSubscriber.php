@@ -49,7 +49,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            AfterEntityBuiltEvent::class => ['checkImage'],
+            AfterEntityBuiltEvent::class => ['checkTargetImage'],
         ];
     }
 
@@ -59,8 +59,8 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      * @param AfterEntityBuiltEvent $event
      * @throws Exception
      */
-    public function checkImage(AfterEntityBuiltEvent $event): void
+    public function checkTargetImage(AfterEntityBuiltEvent $event): void
     {
-        $this->imageService->checkImage($event);
+        $this->imageService->checkTargetImage($event);
     }
 }

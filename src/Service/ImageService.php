@@ -97,47 +97,13 @@ class ImageService
     }
 
     /**
-     * Returns user id hash from request.
-     *
-     * @return string|null
-     * @throws Exception
-     */
-    protected function getUserIdHashFromRequest(): ?string
-    {
-        $request = $this->getCurrentRequest();
-
-        $image = $request->get('Image');
-
-        if (!is_array($image)) {
-            return null;
-        }
-
-        if (!array_key_exists('user', $image)) {
-            return null;
-        }
-
-        $user = $this->userLoaderService->getUserRepository()->find($image['user']);
-
-        if (!$user instanceof User) {
-            return null;
-        }
-
-        return $user->getIdHash();
-    }
-
-    /**
      * Creates the source and target directory from user id hash.
      *
+     * @param string $idHash
      * @throws Exception
      */
-    protected function createSourceAndTargetFromIdHash(): void
+    protected function createSourceAndTargetFromIdHash(string $idHash): void
     {
-        $idHash = $this->getUserIdHashFromRequest();
-
-        if ($idHash === null) {
-            return;
-        }
-
         $imageDirectory = sprintf('%s/%s/%s/%s', $this->appKernel->getProjectDir(), Image::PATH_DATA, Image::PATH_IMAGES, $idHash);
 
         $imageDirectorySource = sprintf('%s/%s', $imageDirectory, Image::PATH_TYPE_SOURCE);
@@ -257,11 +223,19 @@ class ImageService
     /**
      * Checks target image.
      *
-     * @param Image $image
+     * @param AfterEntityBuiltEvent $event
      * @throws Exception
      */
-    protected function checkTargetImage(Image $image): void
+    public function checkTargetImage(AfterEntityBuiltEvent $event): void
     {
+        $entity = $event->getEntity()->getInstance();
+
+        if (!$entity instanceof Image) {
+            return;
+        }
+
+        $image = $entity;
+
         $sourcePathFull = $image->getPathSource(true, false, $this->appKernel->getProjectDir());
         $targetPathFull = $image->getPathTarget(true, false, $this->appKernel->getProjectDir());
 
@@ -277,24 +251,16 @@ class ImageService
     }
 
     /**
-     * Checks image directories and target image.
+     * Checks target and source path.
      *
-     * @param AfterEntityBuiltEvent $event
+     * @param string $idHash
+     * @return bool
      * @throws Exception
      */
-    public function checkImage(AfterEntityBuiltEvent $event): void
+    public function checkPath(string $idHash): bool
     {
-        /** Image was posted. */
-        if ($this->isImagePosted()) {
-            $this->createSourceAndTargetFromIdHash();
-            return;
-        }
+        $this->createSourceAndTargetFromIdHash($idHash);
 
-        $entity = $event->getEntity()->getInstance();
-
-        /* Create target image if necessary */
-        if ($entity instanceof Image) {
-            $this->checkTargetImage($entity);
-        }
+        return true;
     }
 }

@@ -48,6 +48,74 @@ class UserListener
     }
 
     /**
+     * Pre persist.
+     *
+     * @param EntityInterface $entity
+     * @param LifecycleEventArgs $event
+     * @throws Exception
+     */
+    #[ORM\PrePersist]
+    public function prePersistHandler(EntityInterface $entity, LifecycleEventArgs $event): void
+    {
+        /* Check if we do have a logged-in user. */
+        if (!$this->securityService->isUserLoggedIn()) {
+            return;
+        }
+
+        /* Check permission. */
+        switch (true) {
+            /* Check indirect User. */
+            case $entity instanceof Calendar:
+            case $entity instanceof CalendarImage:
+            case $entity instanceof Event:
+                if (!$this->securityService->isGrantedByAnAdmin()) {
+                    $entity->setUser($this->securityService->getUser());
+                }
+
+                if ($entity->getUser() === null) {
+                    throw new Exception(sprintf('No user was given (%s:%d).', __LINE__, __FILE__));
+                }
+                break;
+
+            /* Check indirect User. */
+            case $entity instanceof Image:
+                if ($entity->getUser() === null) {
+                    throw new Exception(sprintf('No user was given (%s:%d).', __LINE__, __FILE__));
+                }
+                break;
+        }
+    }
+
+    /**
+     * Post persist.
+     *
+     * @param EntityInterface $entity
+     * @param LifecycleEventArgs $event
+     * @throws Exception
+     */
+    #[ORM\PostPersist]
+    public function postPersistHandler(EntityInterface $entity, LifecycleEventArgs $event): void
+    {
+        /* Check if we do have a logged-in user. */
+        if (!$this->securityService->isUserLoggedIn()) {
+            return;
+        }
+
+        /* Check permission. */
+        switch (true) {
+            /* Check indirect User. */
+            case $entity instanceof Calendar:
+            case $entity instanceof CalendarImage:
+            case $entity instanceof Event:
+            case $entity instanceof Image:
+                if ($entity->getUser() === null) {
+                    throw new Exception(sprintf('No user was given (%s:%d).', __LINE__, __FILE__));
+                }
+                break;
+        }
+    }
+
+    /**
      * Check permissions.
      *
      * @param EntityInterface $entity
