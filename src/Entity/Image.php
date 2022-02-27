@@ -15,6 +15,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\UserListener;
 use App\Repository\ImageRepository;
 use App\Security\Voter\UserVoter;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -34,6 +35,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     # Security filter for collection operations at App\Doctrine\CurrentUserExtension
@@ -92,9 +94,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['image']],
     order: ['id' => 'ASC'],
 )]
-class Image
+class Image implements EntityInterface
 {
     use TimestampsTrait;
+
+    public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
     public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'path', 'pathSource', 'pathTarget', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 

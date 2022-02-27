@@ -15,6 +15,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\UserListener;
 use App\Repository\HolidayRepository;
 use App\Utils\ArrayToObject;
 use App\Utils\Traits\JsonHelper;
@@ -31,6 +32,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: HolidayRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     collectionOperations: [
@@ -76,11 +78,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['holiday']],
     order: ['id' => 'ASC'],
 )]
-class Holiday
+class Holiday implements EntityInterface
 {
     use TimestampsTrait;
 
     use JsonHelper;
+
+    public const CRUD_FIELDS_ADMIN = [];
 
     public const CRUD_FIELDS_REGISTERED = ['id', 'holidayGroup', 'name', 'date', 'configJson', 'updatedAt', 'createdAt'];
 

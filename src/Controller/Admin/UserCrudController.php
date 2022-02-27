@@ -15,6 +15,7 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\User;
+use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use JetBrains\PhpStorm\Pure;
@@ -35,13 +36,14 @@ class UserCrudController extends BaseCrudController
      * UserCrudController constructor.
      *
      * @param UserPasswordHasherInterface $imageProperty
+     * @param SecurityService $securityService
      * @throws Exception
      */
-    public function __construct(UserPasswordHasherInterface $imageProperty)
+    public function __construct(UserPasswordHasherInterface $imageProperty, SecurityService $securityService)
     {
         $this->userPasswordHasher = $imageProperty;
 
-        parent::__construct();
+        parent::__construct($securityService);
     }
 
     /**

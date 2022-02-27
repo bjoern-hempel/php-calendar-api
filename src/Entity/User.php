@@ -16,12 +16,14 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\UserListener;
 use App\Repository\UserRepository;
 use App\Security\Voter\UserVoter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
+use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -36,6 +38,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     # Security filter for collection operations at App\Doctrine\CurrentUserExtension
@@ -93,7 +96,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['user']],
 )]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityInterface
 {
     use TimestampsTrait;
 
@@ -108,6 +111,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public const API_ENDPOINT_ITEM = '/api/v1/users/%d';
 
     public const PASSWORD_UNCHANGED = '**********';
+
+    public const CRUD_FIELDS_ADMIN = ['id'];
 
     public const CRUD_FIELDS_REGISTERED = ['id', 'idHash', 'email', 'username', 'password', 'plainPassword', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
 
@@ -198,9 +203,43 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return string
      */
+    #[Pure]
     public function __toString(): string
     {
+        return $this->getFullName();
+    }
+
+    /**
+     * Returns the full name of user.
+     *
+     * @param bool $withRole
+     * @return string
+     */
+    public function getFullName(bool $withRole = false): string
+    {
         return sprintf('%s %s', $this->firstname, $this->lastname);
+    }
+
+    /**
+     * Returns the config of user.
+     *
+     * @return string[]
+     * @throws Exception
+     */
+    #[ArrayShape(['fullName' => 'string', 'roleI18n' => 'string'])]
+    public function getConfig(): array
+    {
+        $roleI18n = match (true) {
+            in_array(User::ROLE_SUPER_ADMIN, $this->roles) => 'admin.user.fields.roles.entries.roleSuperAdmin',
+            in_array(User::ROLE_ADMIN, $this->roles) => 'admin.user.fields.roles.entries.roleAdmin',
+            in_array(User::ROLE_USER, $this->roles), $this->roles === [] => 'admin.user.fields.roles.entries.roleUser',
+            default => throw new Exception(sprintf('Unknown role (%s:%d).', __FILE__, __LINE__)),
+        };
+
+        return [
+            'fullName' => sprintf('%s %s', $this->firstname, $this->lastname),
+            'roleI18n' => $roleI18n,
+        ];
     }
 
     /**

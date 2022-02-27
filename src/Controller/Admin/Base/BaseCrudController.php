@@ -22,15 +22,20 @@ use App\Entity\HolidayGroup;
 use App\Entity\Image;
 use App\Entity\User;
 use App\Field\PathImageField;
+use App\Service\SecurityService;
 use App\Utils\EasyAdminField;
 use App\Utils\JsonConverter;
 use App\Utils\SizeConverter;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
@@ -53,15 +58,21 @@ abstract class BaseCrudController extends AbstractCrudController
 
     protected string $crudName;
 
+    protected SecurityService $securityService;
+
     protected EasyAdminField $easyAdminField;
+
+    protected const CRUD_FIELDS_ADMIN = 'CRUD_FIELDS_ADMIN';
 
     /**
      * BaseCrudController constructor.
      *
      * @throws Exception
      */
-    public function __construct()
+    public function __construct(SecurityService $securityService)
     {
+        $this->securityService = $securityService;
+
         $this->easyAdminField = new EasyAdminField($this->getCrudName());
     }
 
@@ -285,6 +296,24 @@ abstract class BaseCrudController extends AbstractCrudController
     }
 
     /**
+     * Returns the constant from fqcn entity (raw).
+     *
+     * @param string $name
+     * @return string[]
+     * @throws Exception
+     */
+    protected function getConstantRaw(string $name): array
+    {
+        $constant = constant(sprintf('%s::%s', $this->getEntity(), $name));
+
+        if (!is_array($constant)) {
+            throw new Exception(sprintf('Unexpected constant returned (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $constant;
+    }
+
+    /**
      * Returns the constant from fqcn entity.
      *
      * @param string $name
@@ -293,56 +322,60 @@ abstract class BaseCrudController extends AbstractCrudController
      */
     public function getConstant(string $name): array
     {
-        $constant = constant(sprintf('%s::%s', $this->getEntity(), $name));
-
-        if (!is_array($constant)) {
-            throw new Exception(sprintf('Unexpected constant returned (%s:%d).', __FILE__, __LINE__));
-        }
+        $constant = $this->getConstantRaw($name);
 
         /* Check given constant */
         if (!in_array(serialize($constant), array_unique([
+            serialize(Calendar::CRUD_FIELDS_ADMIN),
             serialize(Calendar::CRUD_FIELDS_REGISTERED),
             serialize(Calendar::CRUD_FIELDS_INDEX),
             serialize(Calendar::CRUD_FIELDS_NEW),
             serialize(Calendar::CRUD_FIELDS_EDIT),
             serialize(Calendar::CRUD_FIELDS_DETAIL),
 
+            serialize(CalendarImage::CRUD_FIELDS_ADMIN),
             serialize(CalendarImage::CRUD_FIELDS_REGISTERED),
             serialize(CalendarImage::CRUD_FIELDS_INDEX),
             serialize(CalendarImage::CRUD_FIELDS_NEW),
             serialize(CalendarImage::CRUD_FIELDS_EDIT),
             serialize(CalendarImage::CRUD_FIELDS_DETAIL),
 
+            serialize(CalendarStyle::CRUD_FIELDS_ADMIN),
             serialize(CalendarStyle::CRUD_FIELDS_REGISTERED),
             serialize(CalendarStyle::CRUD_FIELDS_INDEX),
             serialize(CalendarStyle::CRUD_FIELDS_NEW),
             serialize(CalendarStyle::CRUD_FIELDS_EDIT),
             serialize(CalendarStyle::CRUD_FIELDS_DETAIL),
 
+            serialize(Event::CRUD_FIELDS_ADMIN),
             serialize(Event::CRUD_FIELDS_REGISTERED),
             serialize(Event::CRUD_FIELDS_INDEX),
             serialize(Event::CRUD_FIELDS_NEW),
             serialize(Event::CRUD_FIELDS_EDIT),
             serialize(Event::CRUD_FIELDS_DETAIL),
 
+            serialize(Holiday::CRUD_FIELDS_ADMIN),
             serialize(Holiday::CRUD_FIELDS_REGISTERED),
             serialize(Holiday::CRUD_FIELDS_INDEX),
             serialize(Holiday::CRUD_FIELDS_NEW),
             serialize(Holiday::CRUD_FIELDS_EDIT),
             serialize(Holiday::CRUD_FIELDS_DETAIL),
 
+            serialize(HolidayGroup::CRUD_FIELDS_ADMIN),
             serialize(HolidayGroup::CRUD_FIELDS_REGISTERED),
             serialize(HolidayGroup::CRUD_FIELDS_INDEX),
             serialize(HolidayGroup::CRUD_FIELDS_NEW),
             serialize(HolidayGroup::CRUD_FIELDS_EDIT),
             serialize(HolidayGroup::CRUD_FIELDS_DETAIL),
 
+            serialize(Image::CRUD_FIELDS_ADMIN),
             serialize(Image::CRUD_FIELDS_REGISTERED),
             serialize(Image::CRUD_FIELDS_INDEX),
             serialize(Image::CRUD_FIELDS_NEW),
             serialize(Image::CRUD_FIELDS_EDIT),
             serialize(Image::CRUD_FIELDS_DETAIL),
 
+            serialize(User::CRUD_FIELDS_ADMIN),
             serialize(User::CRUD_FIELDS_REGISTERED),
             serialize(User::CRUD_FIELDS_INDEX),
             serialize(User::CRUD_FIELDS_NEW),
@@ -352,7 +385,11 @@ abstract class BaseCrudController extends AbstractCrudController
             throw new Exception(sprintf('Unsupported constant (%s:%d).', __FILE__, __LINE__));
         }
 
-        return $constant;
+        if ($this->securityService->isGrantedByAnAdmin()) {
+            return $constant;
+        }
+
+        return array_diff($constant, $this->getConstantRaw(self::CRUD_FIELDS_ADMIN));
     }
 
     /**
@@ -449,5 +486,72 @@ abstract class BaseCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular(sprintf('admin.%s.singular', $this->getCrudName()))
             ->setEntityLabelInPlural(sprintf('admin.%s.plural', $this->getCrudName()));
+    }
+
+    /**
+     * Adds user filter.
+     *
+     * @param QueryBuilder $qb
+     * @param bool $own
+     * @return QueryBuilder
+     */
+    protected function addUserFilter(QueryBuilder $qb, bool $own = false): QueryBuilder
+    {
+        /* These roles are allowed to see all entities. */
+        if ($this->securityService->isGrantedByAnAdmin()) {
+            return $qb;
+        }
+
+        /* Filter by user */
+        $qb->andWhere($own ? 'entity.id = :user' : 'entity.user = :user');
+        $qb->setParameter('user', $this->getUser());
+
+        return $qb;
+    }
+
+    /**
+     * Check permissions.
+     *
+     * @param QueryBuilder $qb
+     * @param string $entityName
+     * @return QueryBuilder
+     * @throws Exception
+     */
+    protected function checkPermissions(QueryBuilder $qb, string $entityName): QueryBuilder
+    {
+        /* These roles are allowed to see all entities. */
+        if ($this->securityService->isGrantedByAnAdmin()) {
+            return $qb;
+        }
+
+        /* Every list will be empty -> If a non-permitted class is called anyway */
+        throw new Exception(sprintf('You do not have permission to call the "%s" entity (%s:%d).', $entityName, __FILE__, __LINE__));
+    }
+
+    /**
+     * Filters list by roles.
+     *
+     * @param SearchDto $searchDto
+     * @param EntityDto $entityDto
+     * @param FieldCollection $fields
+     * @param FilterCollection $filters
+     * @return QueryBuilder
+     * @throws Exception
+     */
+    public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
+    {
+        $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
+
+        return match ($this->getEntity()) {
+            /* Filter classes by user */
+            Calendar::class, CalendarImage::class, Event::class, Image::class => $this->addUserFilter($qb),
+            User::class => $this->addUserFilter($qb, true),
+
+            /* Disable classes for user */
+            CalendarStyle::class, Holiday::class, HolidayGroup::class => $this->checkPermissions($qb, $this->getEntity()),
+
+            /* Do not filter */
+            default => $qb,
+        };
     }
 }

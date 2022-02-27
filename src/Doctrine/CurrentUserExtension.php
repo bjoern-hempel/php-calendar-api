@@ -21,14 +21,14 @@ use App\Entity\CalendarImage;
 use App\Entity\Event;
 use App\Entity\Image;
 use App\Entity\User;
+use App\Service\SecurityService;
 use Doctrine\ORM\QueryBuilder;
 use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
-use Symfony\Component\Security\Core\Security;
 
 /**
- * Class CurrentUserExtension
+ * Class CurrentUserExtension (used by JWT/API platform)
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0.1 (2022-01-29)
@@ -38,7 +38,7 @@ use Symfony\Component\Security\Core\Security;
  */
 final class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    private Security $security;
+    private SecurityService $securityService;
 
     private ParameterBagInterface $parameterBag;
 
@@ -47,12 +47,12 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
     /**
      * CurrentUserExtension constructor.
      *
-     * @param Security $security
+     * @param SecurityService $securityService
      * @param ParameterBagInterface $parameterBag
      */
-    public function __construct(Security $security, ParameterBagInterface $parameterBag)
+    public function __construct(SecurityService $securityService, ParameterBagInterface $parameterBag)
     {
-        $this->security = $security;
+        $this->securityService = $securityService;
 
         $this->parameterBag = $parameterBag;
     }
@@ -103,21 +103,16 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
         }
 
         /* Admin role can do this. */
-        if ($this->security->isGranted(User::ROLE_ADMIN)) {
+        if ($this->securityService->isGrantedByAnAdmin()) {
             return;
         }
 
         /* Get current user. */
-        $user = $this->security->getUser();
+        $user = $this->securityService->getUser();
 
         /* JWT is disabled */
         if ($this->parameterBag->get(self::PARAMETER_NAME_JWT_ROLE) === AuthenticatedVoter::PUBLIC_ACCESS) {
             return;
-        }
-
-        /* Expect User entity. */
-        if (!$user instanceof User) {
-            throw new Exception(sprintf('Expect user class (%s:%d)', __FILE__, __LINE__));
         }
 
         $rootAlias = $queryBuilder->getRootAliases()[0];

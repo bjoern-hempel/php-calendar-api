@@ -47,5 +47,9 @@ services:
     App\Form\Type\FileUploadEmptyType:
         arguments: [ '%kernel.project_dir%' ]
 
+    App\EventListener\Entity\UserListener:
+        tags:
+            - { name: doctrine.orm.entity_listener }
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -16,6 +16,7 @@ namespace App\Controller\Admin;
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\Image;
 use App\Service\ImageLoaderService;
+use App\Service\SecurityService;
 use App\Service\UserLoaderService;
 use App\Utils\ImageProperty;
 use Doctrine\ORM\EntityManagerInterface;
@@ -50,9 +51,10 @@ class ImageCrudController extends BaseCrudController
      * @param ImageLoaderService $imageLoaderService
      * @param UserLoaderService $userLoaderService
      * @param RequestStack $requestStack
+     * @param SecurityService $securityService
      * @throws Exception
      */
-    public function __construct(ImageProperty $imageProperty, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, RequestStack $requestStack)
+    public function __construct(ImageProperty $imageProperty, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, RequestStack $requestStack, SecurityService $securityService)
     {
         $this->imageProperty = $imageProperty;
 
@@ -62,7 +64,7 @@ class ImageCrudController extends BaseCrudController
 
         $this->requestStack = $requestStack;
 
-        parent::__construct();
+        parent::__construct($securityService);
     }
 
     /**

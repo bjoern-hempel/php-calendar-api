@@ -16,6 +16,7 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\UserListener;
 use App\Repository\CalendarRepository;
 use App\Security\Voter\UserVoter;
 use App\Utils\ArrayToObject;
@@ -38,6 +39,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: CalendarRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     # Security filter for collection operations at App\Doctrine\CurrentUserExtension
@@ -96,11 +98,13 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar']],
     order: ['id' => 'ASC'],
 )]
-class Calendar
+class Calendar implements EntityInterface
 {
     use TimestampsTrait;
 
     use JsonHelper;
+
+    public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
     public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson'];
 

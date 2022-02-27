@@ -15,6 +15,8 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\Holiday;
+use App\Service\SecurityService;
+use Exception;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -26,6 +28,17 @@ use JetBrains\PhpStorm\Pure;
  */
 class HolidayCrudController extends BaseCrudController
 {
+    /**
+     * HolidayCrudController constructor.
+     *
+     * @param SecurityService $securityService
+     * @throws Exception
+     */
+    public function __construct(SecurityService $securityService)
+    {
+        parent::__construct($securityService);
+    }
+
     /**
      * Return fqcn of this class.
      *
