@@ -136,7 +136,13 @@ class ImageProperty
         $format = '%s/%s';
 
         if ($calendarImage !== null) {
-            return sprintf($format, $this->getPathUser($calendarImage->getUser(), $test), $calendarImage->getImage()->getPath($type));
+            $image = $calendarImage->getImage();
+
+            if ($image === null) {
+                throw new Exception(sprintf('Unable to get Image class (%s:%d).', __FILE__, __LINE__));
+            }
+
+            return sprintf($format, $this->getPathUser($calendarImage->getUser(), $test), $image->getPath($type));
         }
 
         if ($image !== null && $user !== null) {

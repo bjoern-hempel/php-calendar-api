@@ -204,6 +204,24 @@ class CalendarBuilderService
     }
 
     /**
+     * Gets image from given calendar image.
+     *
+     * @param CalendarImage $calendarImage
+     * @return Image
+     * @throws Exception
+     */
+    protected function getImage(CalendarImage $calendarImage): Image
+    {
+        $image = $calendarImage->getImage();
+
+        if ($image === null) {
+            throw new Exception(sprintf('Calendar is missing (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $image;
+    }
+
+    /**
      * Init function.
      *
      * @param CalendarImage $calendarImage
@@ -223,7 +241,7 @@ class CalendarBuilderService
         $this->calendarImage = $calendarImage;
         $this->holidayGroup = $holidayGroup;
         $this->calendar = $this->getCalendar($this->calendarImage);
-        $this->image = $this->calendarImage->getImage();
+        $this->image = $this->getImage($this->calendarImage);
 
         /* sizes */
         $this->aspectRatio = $this->calendar->getConfigObject()->getAspectRatio() ?? 3 / 2;

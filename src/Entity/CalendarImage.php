@@ -277,28 +277,24 @@ class CalendarImage implements EntityInterface
     /**
      * Gets the image of this calendar image.
      *
-     * @return Image
+     * @return Image|null
      * @throws Exception
      */
-    public function getImage(): Image
+    public function getImage(): ?Image
     {
-        if (!isset($this->image)) {
-            throw new Exception(sprintf('No image was configured (%s:%d)', __FILE__, __LINE__));
-        }
-
         return $this->image;
     }
 
     /**
      * Gets the image id of this calendar image.
      *
-     * @return int
+     * @return int|null
      * @throws Exception
      */
     #[Groups(['calendar_image', 'calendar_image_extended'])]
-    public function getImageId(): int
+    public function getImageId(): ?int
     {
-        return $this->getImage()->getId();
+        return $this->getImage()?->getId();
     }
 
     /**

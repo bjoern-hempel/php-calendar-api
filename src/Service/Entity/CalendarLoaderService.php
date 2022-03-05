@@ -232,7 +232,11 @@ class CalendarLoaderService extends BaseLoaderService
         $this->calendarImage = $calendarImage;
 
         /* Load image */
-        $this->image = $calendarImage->getImage();
+        $image = $this->calendarImage->getImage();
+        if ($image === null) {
+            throw new Exception(sprintf('Image not found (%s:%d).', __FILE__, __LINE__));
+        }
+        $this->image = $image;
 
         /* Returns the calendar image */
         return $this->getCalendarImage();
