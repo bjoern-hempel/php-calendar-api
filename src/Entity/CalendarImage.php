@@ -166,6 +166,28 @@ class CalendarImage implements EntityInterface
     private ArrayToObject $configObject;
 
     /**
+     * __toString method.
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function __toString(): string
+    {
+        return $this->getTitleName();
+    }
+
+    /**
+     * Returns the name of this calendar image.
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getTitleName(): string
+    {
+        return sprintf('%s (%s/%s)', $this->getCalendar()->getName(), $this->getYear(), $this->getMonth());
+    }
+
+    /**
      * Gets the id of this calendar image.
      *
      * @return int

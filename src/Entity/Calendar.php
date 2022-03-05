@@ -182,9 +182,10 @@ class Calendar implements EntityInterface
      *
      * @return string
      */
+    #[Pure]
     public function __toString(): string
     {
-        return $this->name;
+        return sprintf('%s (%s)', $this->getName(), $this->getTitle());
     }
 
     /**

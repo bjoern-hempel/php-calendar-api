@@ -11,10 +11,12 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace App\Service;
+namespace App\Service\Entity;
 
 use App\Entity\HolidayGroup;
 use App\Repository\HolidayGroupRepository;
+use App\Service\Entity\Base\BaseLoaderService;
+use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -26,11 +28,13 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * @version 1.0 (2022-01-02)
  * @package App\Command
  */
-class HolidayGroupLoaderService
+class HolidayGroupLoaderService extends BaseLoaderService
 {
     protected KernelInterface $appKernel;
 
     protected EntityManagerInterface $manager;
+
+    protected SecurityService $securityService;
 
     protected HolidayGroup $holidayGroup;
 
@@ -39,12 +43,15 @@ class HolidayGroupLoaderService
      *
      * @param KernelInterface $appKernel
      * @param EntityManagerInterface $manager
+     * @param SecurityService $securityService
      */
-    public function __construct(KernelInterface $appKernel, EntityManagerInterface $manager)
+    public function __construct(KernelInterface $appKernel, EntityManagerInterface $manager, SecurityService $securityService)
     {
         $this->appKernel = $appKernel;
 
         $this->manager = $manager;
+
+        $this->securityService = $securityService;
     }
 
     /**

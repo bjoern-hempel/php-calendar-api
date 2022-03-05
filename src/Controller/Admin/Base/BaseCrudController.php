@@ -154,26 +154,6 @@ abstract class BaseCrudController extends AbstractCrudController
                 }
                 break;
 
-            case $this->getCrudName(CalendarImage::class):
-                switch ($fieldName) {
-
-                    /* Association field. */
-                    case 'user':
-                    case 'calendar':
-                    case 'image':
-                        return AssociationField::new($fieldName)
-                            ->setRequired(true)
-                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
-                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
-
-                    case 'year':
-                    case 'month':
-                        return IntegerField::new($fieldName)
-                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
-                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
-                }
-                break;
-
             case $this->getCrudName(Event::class):
                 switch ($fieldName) {
 
@@ -188,9 +168,9 @@ abstract class BaseCrudController extends AbstractCrudController
                     case 'type':
                         return ChoiceField::new($fieldName)
                             ->setChoices([
-                                $this->translator->trans(sprintf('admin.event.fields.type.entries.entry%d', 0)) => 0,
-                                $this->translator->trans(sprintf('admin.event.fields.type.entries.entry%d', 1)) => 1,
-                                $this->translator->trans(sprintf('admin.event.fields.type.entries.entry%d', 2)) => 2,
+                                sprintf('admin.event.fields.type.entries.entry%d', 0) => 0,
+                                sprintf('admin.event.fields.type.entries.entry%d', 1) => 1,
+                                sprintf('admin.event.fields.type.entries.entry%d', 2) => 2,
                             ])
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                             ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
@@ -221,7 +201,9 @@ abstract class BaseCrudController extends AbstractCrudController
 
                     /* Property fields */
                     case 'name':
-                        return TextField::new($fieldName);
+                        return TextField::new($fieldName)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
 
                     /* Dimension fields. */
                     case 'width':
@@ -306,7 +288,9 @@ abstract class BaseCrudController extends AbstractCrudController
                 ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
 
             /* All other fields. */
-            default => $this->easyAdminField->getTextField($fieldName),
+            default => $this->easyAdminField->getTextField($fieldName)
+                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
         };
     }
 

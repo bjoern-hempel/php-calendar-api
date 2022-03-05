@@ -232,6 +232,9 @@ admin:
       user:
         label: 'User'
         help: 'The user of this entry.'
+      name:
+        label: 'Name'
+        help: 'The name of this entry.'
       path:
         label: 'Path'
         help: 'The path of this entry.'

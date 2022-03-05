@@ -15,11 +15,11 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\Image;
+use App\Service\Entity\ImageLoaderService;
+use App\Service\Entity\UserLoaderService;
 use App\Service\IdHashService;
-use App\Service\ImageLoaderService;
 use App\Service\ImageService;
 use App\Service\SecurityService;
-use App\Service\UserLoaderService;
 use App\Utils\ImageProperty;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
@@ -132,7 +132,9 @@ class ImageCrudController extends BaseCrudController
                                 $file->getClientOriginalName()
                             );
                         }
-                    );
+                    )
+                    ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                    ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
 
             case 'pathSource400':
             case 'pathTarget400':

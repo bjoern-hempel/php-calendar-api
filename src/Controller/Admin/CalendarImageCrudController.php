@@ -15,7 +15,13 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\CalendarImage;
+use App\Service\Entity\CalendarLoaderService;
+use App\Service\Entity\ImageLoaderService;
+use App\Service\Entity\UserLoaderService;
 use App\Service\SecurityService;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use Exception;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -29,15 +35,30 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CalendarImageCrudController extends BaseCrudController
 {
+    protected CalendarLoaderService $calendarLoaderService;
+
+    protected ImageLoaderService $imageLoaderService;
+
+    protected UserLoaderService $userLoaderService;
+
     /**
      * CalendarImageCrudController constructor.
      *
      * @param SecurityService $securityService
      * @param TranslatorInterface $translator
+     * @param CalendarLoaderService $calendarLoaderService
+     * @param ImageLoaderService $imageLoaderService
+     * @param UserLoaderService $userLoaderService
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarLoaderService $calendarLoaderService, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService)
     {
+        $this->calendarLoaderService = $calendarLoaderService;
+
+        $this->imageLoaderService = $imageLoaderService;
+
+        $this->userLoaderService = $userLoaderService;
+
         parent::__construct($securityService, $translator);
     }
 
@@ -60,5 +81,37 @@ class CalendarImageCrudController extends BaseCrudController
     public function getEntity(): string
     {
         return self::getEntityFqcn();
+    }
+
+    /**
+     * Returns the field by given name.
+     *
+     * @param string $fieldName
+     * @return FieldInterface
+     * @throws Exception
+     */
+    protected function getField(string $fieldName): FieldInterface
+    {
+        return match ($fieldName) {
+            'user' => AssociationField::new($fieldName)
+                ->setFormTypeOption('choices', $this->userLoaderService->loadUsers())
+                ->setRequired(true)
+                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
+            'calendar' => AssociationField::new($fieldName)
+                ->setFormTypeOption('choices', $this->calendarLoaderService->loadCalendars())
+                ->setRequired(true)
+                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
+            'image' => AssociationField::new($fieldName)
+                ->setFormTypeOption('choices', $this->imageLoaderService->loadImages())
+                ->setRequired(true)
+                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
+            'year', 'month' => IntegerField::new($fieldName)
+                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
+            default => parent::getField($fieldName),
+        };
     }
 }

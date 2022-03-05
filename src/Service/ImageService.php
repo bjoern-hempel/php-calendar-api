@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Image;
+use App\Service\Entity\UserLoaderService;
 use Exception;
 use GdImage;
 use Symfony\Component\HttpFoundation\Request;

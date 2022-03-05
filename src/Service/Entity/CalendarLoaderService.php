@@ -11,15 +11,18 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace App\Service;
+namespace App\Service\Entity;
 
 use App\Entity\Calendar;
 use App\Entity\CalendarImage;
+use App\Entity\EntityInterface;
 use App\Entity\Image;
 use App\Entity\User;
 use App\Repository\CalendarImageRepository;
 use App\Repository\CalendarRepository;
 use App\Repository\UserRepository;
+use App\Service\Entity\Base\BaseLoaderService;
+use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
@@ -32,11 +35,13 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * @version 1.0 (2021-12-31)
  * @package App\Command
  */
-class CalendarLoaderService
+class CalendarLoaderService extends BaseLoaderService
 {
     protected KernelInterface $appKernel;
 
     protected EntityManagerInterface $manager;
+
+    protected SecurityService $securityService;
 
     protected CalendarLoaderService $calendarLoaderService;
 
@@ -53,16 +58,19 @@ class CalendarLoaderService
      *
      * @param KernelInterface $appKernel
      * @param EntityManagerInterface $manager
+     * @param SecurityService $securityService
      */
-    public function __construct(KernelInterface $appKernel, EntityManagerInterface $manager)
+    public function __construct(KernelInterface $appKernel, EntityManagerInterface $manager, SecurityService $securityService)
     {
         $this->appKernel = $appKernel;
 
         $this->manager = $manager;
+
+        $this->securityService = $securityService;
     }
 
     /**
-     * Returns the DocumentRepository.
+     * Returns the UserRepository.
      *
      * @return UserRepository
      * @throws Exception
@@ -121,6 +129,21 @@ class CalendarLoaderService
         unset($this->calendar);
         unset($this->calendarImage);
         unset($this->image);
+    }
+
+    /**
+     * Loads all calendars.
+     *
+     * @return Calendar[]
+     * @throws Exception
+     */
+    public function loadCalendars(): array
+    {
+        if ($this->securityService->isGrantedByAnAdmin()) {
+            return $this->getCalendarRepository()->findAll();
+        }
+
+        return $this->getCalendarRepository()->findBy(['user' => $this->securityService->getUser()]);
     }
 
     /**

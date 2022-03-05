@@ -15,6 +15,7 @@ namespace App\Service;
 
 use App\Entity\Image;
 use App\Entity\User;
+use App\Service\Entity\UserLoaderService;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
