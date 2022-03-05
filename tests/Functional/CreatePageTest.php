@@ -233,8 +233,12 @@ final class CreatePageTest extends KernelTestCase
         /* Arrange */
         $calendarImage = $this->getCalendarImage($email, $calendarName, $year, $month);
         $holidayGroup = $this->getHolidayGroup($holidayGroupName);
-        $height = $calendarImage->getCalendar()->getConfigObject()->getInt('height');
-        $width = $calendarImage->getCalendar()->getConfigObject()->getInt('width');
+        $calendar = $calendarImage->getCalendar();
+        if ($calendar === null) {
+            throw new Exception(sprintf('Calendar class is missing (%s:%d).', __FILE__, __LINE__));
+        }
+        $height = $calendar->getConfigObject()->getInt('height');
+        $width = $calendar->getConfigObject()->getInt('width');
 
         /* Act */
         $this->calendarBuilderService->init($calendarImage, $holidayGroup, true);

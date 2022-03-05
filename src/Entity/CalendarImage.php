@@ -184,7 +184,7 @@ class CalendarImage implements EntityInterface
      */
     public function getTitleName(): string
     {
-        return sprintf('%s (%s/%s)', $this->getCalendar()->getName(), $this->getYear(), $this->getMonth());
+        return sprintf('%s (%s/%s)', $this->getCalendar()?->getName(), $this->getYear(), $this->getMonth());
     }
 
     /**
@@ -240,28 +240,25 @@ class CalendarImage implements EntityInterface
     /**
      * Gets the calendar of this calendar image.
      *
-     * @return Calendar
+     * @return Calendar|null
      * @throws Exception
      */
-    public function getCalendar(): Calendar
+    public function getCalendar(): ?Calendar
     {
-        if (!isset($this->calendar)) {
-            throw new Exception(sprintf('No calendar was configured (%s:%d)', __FILE__, __LINE__));
-        }
-
         return $this->calendar;
     }
 
     /**
      * Gets the calendar id of this calendar image.
      *
-     * @return int
+     * @return int|null
      * @throws Exception
      */
+    #[Pure]
     #[Groups(['calendar_image', 'calendar_image_extended'])]
-    public function getCalendarId(): int
+    public function getCalendarId(): ?int
     {
-        return $this->getCalendar()->getId();
+        return $this->getCalendar()?->getId();
     }
 
     /**

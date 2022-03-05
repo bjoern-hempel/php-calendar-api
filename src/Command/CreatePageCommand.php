@@ -123,7 +123,7 @@ EOT
 
         /* Print details */
         $output->writeln(sprintf('Email:          %s', $calendarImage->getUser()->getEmail()));
-        $output->writeln(sprintf('Calendar name:  %s', $calendarImage->getCalendar()->getName()));
+        $output->writeln(sprintf('Calendar name:  %s', $calendarImage->getCalendar()?->getName()));
         $output->writeln(sprintf('Year:           %d', $calendarImage->getYear()));
         $output->writeln(sprintf('Month:          %d', $calendarImage->getMonth()));
         $output->writeln(sprintf('Holiday group:  %s', $holidayGroup->getName()));
