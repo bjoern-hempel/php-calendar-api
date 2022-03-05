@@ -51,16 +51,35 @@ class FileNameConverter
      * @param string $rootPath
      * @param bool $test
      * @param string $outputMode
+     * @throws Exception
      */
     public function __construct(string $filename, string $rootPath = '', bool $test = false, string $outputMode = self::MODE_OUTPUT_FILE)
     {
-        $this->filename = $filename;
+        $this->filename = $this->filterFilename($filename);
 
         $this->rootPath = $rootPath;
 
         $this->test = $test;
 
         $this->outputMode = $outputMode;
+    }
+
+    /**
+     * Filters the given filename.
+     *
+     * @param string $filename
+     * @return string
+     * @throws Exception
+     */
+    protected function filterFilename(string $filename): string
+    {
+        $filename = preg_replace('~^/~', '', $filename);
+
+        if (!is_string($filename)) {
+            throw new Exception(sprintf('Unable to replace given string (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $filename;
     }
 
     /**

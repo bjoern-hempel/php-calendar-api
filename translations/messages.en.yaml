@@ -238,7 +238,13 @@ admin:
       pathSource:
         label: 'Source path'
         help: 'The source path of this entry.'
+      pathSource400:
+        label: 'Path'
+        help: 'The path of this entry.'
       pathTarget:
+        label: 'Target path'
+        help: 'The source path of this entry.'
+      pathTarget400:
         label: 'Target path'
         help: 'The source path of this entry.'
       pathSourceFull:

@@ -44,6 +44,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Exception;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -218,6 +219,10 @@ abstract class BaseCrudController extends AbstractCrudController
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                             ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
 
+                    /* Property fields */
+                    case 'name':
+                        return TextField::new($fieldName);
+
                     /* Dimension fields. */
                     case 'width':
                     case 'height':
@@ -254,12 +259,10 @@ abstract class BaseCrudController extends AbstractCrudController
                         return $this->easyAdminField->getEmailField($fieldName);
 
                     /* Password field */
+                    case 'plainPassword':
                     case 'password':
                         return $this->easyAdminField->getTextField($fieldName)
                             ->setFormType(PasswordType::class);
-
-                    case 'plainPassword':
-                        return $this->easyAdminField->getTextField($fieldName);
 
                     /* Field roles */
                     case 'roles':

@@ -101,9 +101,9 @@ class Image implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'path', 'pathSource', 'pathTarget', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'name', 'path', 'pathSource', 'pathSource400', 'pathTarget', 'pathTarget400', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'user', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_INDEX = ['id', 'user', 'name', 'pathSource400', 'pathTarget400', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_NEW = ['id', 'user', 'path'];
 
@@ -162,6 +162,8 @@ class Image implements EntityInterface
 
     public const PATH_DATA = 'data';
 
+    public const WIDTH_400 = 400;
+
     /**
      * Image constructor.
      */
@@ -177,6 +179,16 @@ class Image implements EntityInterface
      * @return string
      */
     public function __toString(): string
+    {
+        return $this->getName();
+    }
+
+    /**
+     * Gets the name of the image.
+     *
+     * @return string
+     */
+    public function getName(): string
     {
         $array = explode('/', $this->path);
 
@@ -233,13 +245,14 @@ class Image implements EntityInterface
      *
      * @param string $type
      * @param bool $tmp
-     * @param bool $full
      * @param bool $test
+     * @param bool $full
      * @param string $rootPath
+     * @param int|null $width
      * @return string
      * @throws Exception
      */
-    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false, bool $test = false, bool $full = false, string $rootPath = ''): string
+    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false, bool $test = false, bool $full = false, string $rootPath = '', ?int $width = null): string
     {
         $path = match (true) {
             $type === self::PATH_TYPE_SOURCE && $this->pathSource !== null => $this->pathSource,
@@ -253,7 +266,7 @@ class Image implements EntityInterface
             $fileNameConverter->setOutputMode(FileNameConverter::MODE_OUTPUT_ABSOLUTE);
         }
 
-        return $fileNameConverter->getFilename($type, null, $tmp, $test);
+        return $fileNameConverter->getFilename($type, $width, $tmp, $test);
     }
 
     /**
@@ -263,12 +276,13 @@ class Image implements EntityInterface
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
      * @return string
      * @throws Exception
      */
-    public function getPathFull(string $type = self::PATH_TYPE_SOURCE, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathFull(string $type = self::PATH_TYPE_SOURCE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
     {
-        return $this->getPath($type, $tmp, $test, true, $rootPath);
+        return $this->getPath($type, $tmp, $test, true, $rootPath, $width);
     }
 
     /**
@@ -278,16 +292,28 @@ class Image implements EntityInterface
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
      * @return string
      * @throws Exception
      */
-    public function getPathSource(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathSource(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
     {
-        if ($full) {
-            return $this->getPathFull(self::PATH_TYPE_SOURCE, $test, $rootPath, $tmp);
-        }
+        return $this->getPath(self::PATH_TYPE_SOURCE, $tmp, $test, $full, $rootPath, $width);
+    }
 
-        return $this->getPath(self::PATH_TYPE_SOURCE, $tmp);
+    /**
+     * Gets the relative or absolute source path of this image with 400px width.
+     *
+     * @param bool $full
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @return string
+     * @throws Exception
+     */
+    public function getPathSource400(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    {
+        return $this->getPathSource($full, $test, $rootPath, $tmp, self::WIDTH_400);
     }
 
     /**
@@ -297,16 +323,28 @@ class Image implements EntityInterface
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
      * @return string
      * @throws Exception
      */
-    public function getPathTarget(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathTarget(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
     {
-        if ($full) {
-            return $this->getPathFull(self::PATH_TYPE_TARGET, $test, $rootPath, $tmp);
-        }
+        return $this->getPath(self::PATH_TYPE_TARGET, $tmp, $test, $full, $rootPath, $width);
+    }
 
-        return $this->getPath(self::PATH_TYPE_TARGET, $tmp);
+    /**
+     * Gets the relative or absolute source path of this image with 400px width.
+     *
+     * @param bool $full
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTarget400(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    {
+        return $this->getPathTarget($full, $test, $rootPath, $tmp, self::WIDTH_400);
     }
 
     /**
@@ -316,16 +354,13 @@ class Image implements EntityInterface
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
      * @return string
      * @throws Exception
      */
-    public function getPathExpected(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathExpected(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
     {
-        if ($full) {
-            return $this->getPathFull(self::PATH_TYPE_EXPECTED, $test, $rootPath, $tmp);
-        }
-
-        return $this->getPath(self::PATH_TYPE_EXPECTED, $tmp);
+        return $this->getPath(self::PATH_TYPE_EXPECTED, $tmp, $test, $full, $rootPath, $width);
     }
 
     /**
@@ -335,16 +370,13 @@ class Image implements EntityInterface
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
      * @return string
      * @throws Exception
      */
-    public function getPathCompare(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathCompare(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
     {
-        if ($full) {
-            return $this->getPathFull(self::PATH_TYPE_COMPARE, $test, $rootPath, $tmp);
-        }
-
-        return $this->getPath(self::PATH_TYPE_COMPARE, $tmp);
+        return $this->getPath(self::PATH_TYPE_COMPARE, $tmp, $test, $full, $rootPath, $width);
     }
 
     /**

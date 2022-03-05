@@ -14,9 +14,8 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Image;
-use App\Entity\User;
-use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityBuiltEvent;
 use Exception;
+use GdImage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -135,6 +134,141 @@ class ImageService
     }
 
     /**
+     * Gets image info.
+     *
+     * @param string $path
+     * @return string[]|int[]
+     * @throws Exception
+     */
+    protected function getImageInfo(string $path): array
+    {
+        /* Get information about image. */
+        $imageInfo = getimagesize($path);
+
+        if ($imageInfo === false) {
+            throw new Exception(sprintf('Unable to get image information from "%s" (%s:%d).', $path, __FILE__, __LINE__));
+        }
+
+        return $imageInfo;
+    }
+
+    /**
+     * Creates image from given path.
+     *
+     * @param string $path
+     * @return GdImage
+     * @throws Exception
+     */
+    protected function createGdImageFromGivenPath(string $path): GdImage
+    {
+        $imageInfo = $this->getImageInfo($path);
+
+        /* Create image. */
+        $gdImage = match ($imageInfo[2]) {
+            IMAGETYPE_GIF => imagecreatefromgif($path),
+            IMAGETYPE_PNG => imagecreatefrompng($path),
+            IMAGETYPE_JPEG => imagecreatefromjpeg($path),
+            default => throw new Exception(sprintf('Unsupported image type %d - %s (%s:%d)', $imageInfo[2], $imageInfo['mime'], __FILE__, __LINE__)),
+        };
+
+        if ($gdImage === false) {
+            throw new Exception(sprintf('Unable to load image (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $gdImage;
+    }
+
+    /**
+     * Creates an empty image from given width and height.
+     *
+     * @param int $width
+     * @param int $height
+     * @return GdImage
+     * @throws Exception
+     */
+    protected function createEmptyGdImage(int $width, int $height): GdImage
+    {
+        /* Create resized image. */
+        $gdImage = imagecreatetruecolor($width, $height);
+
+        if ($gdImage === false) {
+            throw new Exception(sprintf('Unable to create image (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $gdImage;
+    }
+
+    /**
+     * Saves given gd image to path.
+     *
+     * @param GdImage $image
+     * @param string $path
+     * @param int $imageType
+     * @param string $mimeType
+     * @return bool
+     * @throws Exception
+     */
+    protected function saveImage(GdImage $image, string $path, int $imageType = IMAGETYPE_JPEG, string $mimeType = 'image/jpeg'): bool
+    {
+        /* Create resized image. */
+        $status = match ($imageType) {
+            IMAGETYPE_GIF => imagegif($image, $path),
+            IMAGETYPE_PNG => imagepng($image, $path),
+            IMAGETYPE_JPEG => imagejpeg($image, $path),
+            default => throw new Exception(sprintf('Unsupported image type %d - %s (%s:%d)', $imageType, $mimeType, __FILE__, __LINE__)),
+        };
+
+        /* Check image */
+        if ($status === false || !file_exists($path)) {
+            throw new Exception(sprintf('Unable to generate picture (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return true;
+    }
+
+    /**
+     * Resizes the given image with given width.
+     *
+     * @param Image $image
+     * @param int $widthResize
+     * @param string $type
+     * @return string
+     * @throws Exception
+     */
+    protected function resizeImageWidth(Image $image, int $widthResize, string $type = Image::PATH_TYPE_SOURCE): string
+    {
+        $pathFull = $image->getPath($type, false, false, true, $this->appKernel->getProjectDir());
+        $pathResizedFull = $image->getPath($type, false, false, true, $this->appKernel->getProjectDir(), $widthResize);
+
+        /* Get information about image. */
+        $imageInfo = $this->getImageInfo($pathFull);
+
+        /* Create image. */
+        $imageSource = $this->createGdImageFromGivenPath($pathFull);
+
+        /* Get width and height */
+        $width = intval($imageInfo[0]);
+        $height = intval($imageInfo[1]);
+        $imageType = intval($imageInfo[2]);
+        $mimeType = strval($imageInfo['mime']);
+
+        /* Calculate resized image. */
+        $heightResize = intval(round($widthResize * $height / $width));
+
+        /* Create resized image. */
+        $imageResized = $this->createEmptyGdImage($widthResize, $heightResize);
+
+        /* Copy resized image. */
+        imagecopyresampled($imageResized, $imageSource, 0, 0, 0, 0, $widthResize, $heightResize, $width, $height);
+
+        /* Create resized image. */
+        $this->saveImage($imageResized, $pathResizedFull, $imageType, $mimeType);
+
+        /* Return relative path */
+        return $image->getPath($type, false, false, false, $this->appKernel->getProjectDir(), $widthResize);
+    }
+
+    /**
      * Creates a temporary target image.
      *
      * @param Image $image
@@ -144,30 +278,20 @@ class ImageService
     protected function createTmpTargetImage(Image $image): string
     {
         $sourcePathFull = $image->getPathSource(true, false, $this->appKernel->getProjectDir());
+        $targetPathFullTmp = $image->getPathTarget(true, false, $this->appKernel->getProjectDir(), true);
 
         /* Get information about image. */
-        $imageInfo = getimagesize($sourcePathFull);
-
-        if ($imageInfo === false) {
-            throw new Exception(sprintf('Unable to get image information (%s:%d).', __FILE__, __LINE__));
-        }
+        $imageInfo = $this->getImageInfo($sourcePathFull);
 
         /* Create image. */
-        $imageGp = match ($imageInfo[2]) {
-            IMAGETYPE_GIF => imagecreatefromgif($sourcePathFull),
-            IMAGETYPE_PNG => imagecreatefrompng($sourcePathFull),
-            IMAGETYPE_JPEG => imagecreatefromjpeg($sourcePathFull),
-            default => throw new Exception(sprintf('Unsupported image type %d - %s (%s:%d)', $imageInfo[2], $imageInfo['mime'], __FILE__, __LINE__)),
-        };
-
-        if ($imageGp === false) {
-            throw new Exception(sprintf('Unable to load image (%s:%d).', __FILE__, __LINE__));
-        }
+        $sourceImage = $this->createGdImageFromGivenPath($sourcePathFull);
 
         /* Image properties. */
-        $width = $imageInfo[0];
-        $height = $imageInfo[1];
-        $color = imagecolorallocate($imageGp, 255, 255, 0);
+        $width = intval($imageInfo[0]);
+        $height = intval($imageInfo[1]);
+        $imageType = intval($imageInfo[2]);
+        $mimeType = strval($imageInfo['mime']);
+        $color = imagecolorallocate($sourceImage, 255, 255, 0);
         $font = sprintf('%s/%s', $this->appKernel->getProjectDir(), self::PATH_FONT);
         $text = $this->translator->trans(self::TEXT_NOT_GENERATED);
         $fontSize = intval($height / 20);
@@ -200,53 +324,111 @@ class ImageService
         $y = $centerY + $top_offset;
 
         /* Add text. */
-        imagettftext($imageGp, $fontSize, $angle, $x, $y, $color, $font, $text);
+        imagettftext($sourceImage, $fontSize, $angle, $x, $y, $color, $font, $text);
 
-        /* Create image. */
-        $targetPathFullTmp = $image->getPathTarget(true, false, $this->appKernel->getProjectDir(), true);
-        $status = match ($imageInfo[2]) {
-            IMAGETYPE_GIF => imagegif($imageGp, $targetPathFullTmp),
-            IMAGETYPE_PNG => imagepng($imageGp, $targetPathFullTmp),
-            IMAGETYPE_JPEG => imagejpeg($imageGp, $targetPathFullTmp),
-            default => throw new Exception(sprintf('Unsupported image type %d - %s (%s:%d)', $imageInfo[2], $imageInfo['mime'], __FILE__, __LINE__)),
-        };
-
-        /* Check image */
-        if ($status === false || !file_exists($targetPathFullTmp)) {
-            throw new Exception(sprintf('Unable to generate picture (%s:%d).', __FILE__, __LINE__));
-        }
+        /* Create tmp image. */
+        $this->saveImage($sourceImage, $targetPathFullTmp, $imageType, $mimeType);
 
         /* Return relative path */
         return $image->getPathTarget(false, false, '', true);
     }
 
     /**
-     * Checks target image.
+     * Checks source image.
      *
-     * @param AfterEntityBuiltEvent $event
+     * @param Image $image
      * @throws Exception
      */
-    public function checkTargetImage(AfterEntityBuiltEvent $event): void
+    public function checkSourceImage(Image $image): void
     {
-        $entity = $event->getEntity()->getInstance();
-
-        if (!$entity instanceof Image) {
-            return;
-        }
-
-        $image = $entity;
-
         $sourcePathFull = $image->getPathSource(true, false, $this->appKernel->getProjectDir());
-        $targetPathFull = $image->getPathTarget(true, false, $this->appKernel->getProjectDir());
 
         if (!file_exists($sourcePathFull)) {
             throw new Exception(sprintf('Unable to load source image "%s" (%s:%d)', $sourcePathFull, __FILE__, __LINE__));
         }
+    }
+
+    /**
+     * Checks target image.
+     *
+     * @param Image $image
+     * @throws Exception
+     */
+    public function checkTargetImage(Image $image): void
+    {
+        $targetPathFull = $image->getPathSource(true, false, $this->appKernel->getProjectDir());
+
+        if (!file_exists($targetPathFull)) {
+            throw new Exception(sprintf('Unable to load target image "%s" (%s:%d)', $targetPathFull, __FILE__, __LINE__));
+        }
+    }
+
+    /**
+     * Creates source image (unsupported method).
+     *
+     * @param Image $image
+     * @return void
+     * @throws Exception
+     */
+    public function createSourceImage(Image $image): void
+    {
+        throw new Exception(sprintf('Unsupported method (%s:%d).', __FILE__, __LINE__));
+    }
+
+    /**
+     * Creates target image.
+     *
+     * @param Image $image
+     * @throws Exception
+     */
+    public function createTargetImage(Image $image): void
+    {
+        $this->checkSourceImage($image);
+
+        $targetPathFull = $image->getPathTarget(true, false, $this->appKernel->getProjectDir());
 
         if (!file_exists($targetPathFull)) {
             $targetPathTmp = $this->createTmpTargetImage($image);
 
+            $this->checkTargetImage($image);
+
             $image->setPathTarget($targetPathTmp);
+        }
+    }
+
+    /**
+     * Checks source image with given width.
+     *
+     * @param Image $image
+     * @param int $width
+     * @throws Exception
+     */
+    public function createSourceImageWidth(Image $image, int $width): void
+    {
+        $this->checkSourceImage($image);
+
+        $sourcePathFullWidth = $image->getPathSource(true, false, $this->appKernel->getProjectDir(), false, $width);
+
+        if (!file_exists($sourcePathFullWidth)) {
+            $this->resizeImageWidth($image, $width);
+        }
+    }
+
+    /**
+     * Checks source image with given width.
+     *
+     * @param Image $image
+     * @param int $width
+     * @throws Exception
+     */
+    public function createTargetImageWidth(Image $image, int $width): void
+    {
+        $this->checkTargetImage($image);
+
+        $targetPathFullWidth = $image->getPathTarget(true, false, $this->appKernel->getProjectDir(), false, $width);
+
+        if (!file_exists($targetPathFullWidth)) {
+            $this->resizeImageWidth($image, $width, Image::PATH_TYPE_TARGET);
         }
     }
 
