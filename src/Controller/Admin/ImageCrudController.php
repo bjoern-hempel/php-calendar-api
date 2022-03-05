@@ -59,8 +59,9 @@ class ImageCrudController extends BaseCrudController
      * @param UserLoaderService $userLoaderService
      * @param RequestStack $requestStack
      * @param ImageService $imageService
-     * @param SecurityService $securityService
      * @param IdHashService $idHashService
+     * @param SecurityService $securityService
+     * @param TranslatorInterface $translator
      * @throws Exception
      */
     public function __construct(ImageProperty $imageProperty, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, RequestStack $requestStack, ImageService $imageService, IdHashService $idHashService, SecurityService $securityService, TranslatorInterface $translator)
@@ -123,7 +124,13 @@ class ImageCrudController extends BaseCrudController
                     ->setUploadDir(sprintf('%s/%s/%s/%s', Image::PATH_DATA, Image::PATH_IMAGES, $idHash, Image::PATH_TYPE_SOURCE))
                     ->setUploadedFileNamePattern(
                         function (UploadedFile $file) use ($idHash) {
-                            return sprintf('%s/%s/%s', $idHash, Image::PATH_TYPE_SOURCE, $file->getClientOriginalName());
+                            return sprintf(
+                                '%s/%s/%s.%s',
+                                $idHash,
+                                Image::PATH_TYPE_SOURCE,
+                                substr(md5(sprintf('%s.%s', $file->getClientOriginalName(), random_int(1000, 9999))), 0, 10),
+                                $file->getClientOriginalName()
+                            );
                         }
                     );
         }

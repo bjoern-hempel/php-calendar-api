@@ -18,6 +18,7 @@ use App\Entity\Trait\TimestampsTrait;
 use App\EventListener\Entity\UserListener;
 use App\Repository\ImageRepository;
 use App\Security\Voter\UserVoter;
+use App\Utils\FileNameConverter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -177,7 +178,9 @@ class Image implements EntityInterface
      */
     public function __toString(): string
     {
-        return $this->path;
+        $array = explode('/', $this->path);
+
+        return end($array);
     }
 
     /**
@@ -230,10 +233,13 @@ class Image implements EntityInterface
      *
      * @param string $type
      * @param bool $tmp
+     * @param bool $full
+     * @param bool $test
+     * @param string $rootPath
      * @return string
      * @throws Exception
      */
-    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false): string
+    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false, bool $test = false, bool $full = false, string $rootPath = ''): string
     {
         $path = match (true) {
             $type === self::PATH_TYPE_SOURCE && $this->pathSource !== null => $this->pathSource,
@@ -241,25 +247,13 @@ class Image implements EntityInterface
             default => $this->path,
         };
 
-        if ($tmp) {
-            $path = preg_replace('~\.([a-z]+)$~', '.tmp.$1', $path);
+        $fileNameConverter = new FileNameConverter($path, $rootPath, $full);
 
-            if ($path === null) {
-                throw new Exception(sprintf('Unable to replace path (%s:%d).', __FILE__, __LINE__));
-            }
+        if ($full) {
+            $fileNameConverter->setOutputMode(FileNameConverter::MODE_OUTPUT_ABSOLUTE);
         }
 
-        if ($type === self::PATH_TYPE_SOURCE) {
-            return $path;
-        }
-
-        $replacedPath = preg_replace(sprintf('~(^[a-z0-9]{40,40}/)%s(/)~', self::PATH_TYPE_SOURCE), sprintf('$1%s$2', $type), $path);
-
-        if (!is_string($replacedPath)) {
-            throw new Exception(sprintf('Unexpected replaced path (%s:%d).', __FILE__, __LINE__));
-        }
-
-        return $replacedPath;
+        return $fileNameConverter->getFilename($type, null, $tmp, $test);
     }
 
     /**
@@ -274,9 +268,7 @@ class Image implements EntityInterface
      */
     public function getPathFull(string $type = self::PATH_TYPE_SOURCE, bool $test = false, string $rootPath = '', bool $tmp = false): string
     {
-        $imagePath = sprintf($test ? '%s/tests/%s' : '%s/%s', self::PATH_DATA, self::PATH_IMAGES);
-
-        return sprintf('%s/%s/%s', $rootPath, $imagePath, $this->getPath($type, $tmp));
+        return $this->getPath($type, $tmp, $test, true, $rootPath);
     }
 
     /**

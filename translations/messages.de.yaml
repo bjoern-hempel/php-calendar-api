@@ -158,6 +158,10 @@ admin:
       type:
         label: 'Typ'
         help: 'Der Typ dieses Eintrags.'
+        entries:
+          entry0: 'Geburtstag'
+          entry1: 'Event (eintägig)'
+          entry2: 'Event (mehrtägig)'
       date:
         label: 'Datum'
         help: 'Das Datum dieses Eintrags.'

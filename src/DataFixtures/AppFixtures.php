@@ -53,13 +53,23 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
 
     public const FIXTURE_TEMPLATE_EMAIL = 'user%d@domain.tld';
 
+    public const FIXTURE_TEMPLATE_EMAIL_ADMIN = 'admin%d@domain.tld';
+
     public const FIXTURE_TEMPLATE_USERNAME = 'user%d';
+
+    public const FIXTURE_TEMPLATE_USERNAME_ADMIN = 'admin%d';
 
     public const FIXTURE_TEMPLATE_PASSWORD = 'password%d';
 
+    public const FIXTURE_TEMPLATE_PASSWORD_ADMIN = 'password%d';
+
     public const FIXTURE_TEMPLATE_FIRSTNAME = 'Firstname %d';
 
+    public const FIXTURE_TEMPLATE_FIRSTNAME_ADMIN = 'Admin %d';
+
     public const FIXTURE_TEMPLATE_LASTNAME = 'Lastname %d';
+
+    public const FIXTURE_TEMPLATE_LASTNAME_ADMIN = 'Admin %d';
 
     private const ENVIRONMENT_NAME_DEV = 'dev';
 
@@ -293,15 +303,18 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
      * Get hash from given (user) id.
      *
      * @param int $i
+     * @param bool $admin
      * @return string
      */
-    public function getHash(int $i): string
+    public function getHash(int $i, bool $admin = false): string
     {
         $salt = 'S4Lt';
 
-        return match ($i) {
-            1 => 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290',
-            2 => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
+        return match (true) {
+            !$admin && $i === 1 => 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290',
+            !$admin && $i === 2 => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
+            $admin && $i === 1 => '9cc28538cd413685762993a2376412393be29ccf',
+            $admin && $i === 2 => '8768be4811c6bc1df185440b82b41aeca048f319',
             default => sha1(sprintf('%s-%s', $salt, $i)),
         };
     }
@@ -310,74 +323,91 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
      * Returns a fixture email.
      *
      * @param int $i
+     * @param bool $admin
      * @return string
      */
-    public static function getEmail(int $i): string
+    public static function getEmail(int $i, bool $admin = false): string
     {
-        return sprintf(self::FIXTURE_TEMPLATE_EMAIL, $i);
+        return sprintf($admin ? self::FIXTURE_TEMPLATE_EMAIL_ADMIN : self::FIXTURE_TEMPLATE_EMAIL, $i);
     }
 
     /**
      * Returns a fixture username.
      *
      * @param int $i
+     * @param bool $admin
      * @return string
      */
-    public static function getUsername(int $i): string
+    public static function getUsername(int $i, bool $admin = false): string
     {
-        return sprintf(self::FIXTURE_TEMPLATE_USERNAME, $i);
+        return sprintf($admin ? self::FIXTURE_TEMPLATE_USERNAME_ADMIN : self::FIXTURE_TEMPLATE_USERNAME, $i);
     }
 
     /**
      * Returns a fixture password.
      *
      * @param int $i
+     * @param bool $admin
      * @return string
      */
-    public static function getPassword(int $i): string
+    public static function getPassword(int $i, bool $admin = false): string
     {
-        return sprintf(self::FIXTURE_TEMPLATE_PASSWORD, $i);
+        return sprintf($admin ? self::FIXTURE_TEMPLATE_PASSWORD_ADMIN : self::FIXTURE_TEMPLATE_PASSWORD, $i);
     }
 
     /**
      * Returns a fixture firstname.
      *
      * @param int $i
+     * @param bool $admin
      * @return string
      */
-    public static function getFirstname(int $i): string
+    public static function getFirstname(int $i, bool $admin = false): string
     {
-        return sprintf(self::FIXTURE_TEMPLATE_FIRSTNAME, $i);
+        return sprintf($admin ? self::FIXTURE_TEMPLATE_FIRSTNAME_ADMIN : self::FIXTURE_TEMPLATE_FIRSTNAME, $i);
     }
 
     /**
      * Returns a fixture lastname.
      *
      * @param int $i
+     * @param bool $admin
      * @return string
      */
-    public static function getLastname(int $i): string
+    public static function getLastname(int $i, bool $admin = false): string
     {
-        return sprintf(self::FIXTURE_TEMPLATE_LASTNAME, $i);
+        return sprintf($admin ? self::FIXTURE_TEMPLATE_LASTNAME_ADMIN : self::FIXTURE_TEMPLATE_LASTNAME, $i);
+    }
+
+    /**
+     * Returns user roles.
+     *
+     * @param bool $admin
+     * @return string[]
+     */
+    public static function getRoles(bool $admin = false): array
+    {
+        return $admin ? [User::ROLE_USER, User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN] : [User::ROLE_USER];
     }
 
     /**
      * Returns a user as JSON.
      *
      * @param int $i
+     * @param bool $admin
      * @return array{id: int, email: string, username: string, firstname: string, lastname: string, roles: string[]}
      */
     #[ArrayShape(['id' => "int", 'email' => "string", 'username' => "string", 'firstname' => "string", 'lastname' => "string", 'roles' => "array"])]
     #[Pure]
-    public static function getUserAsJson(int $i): array
+    public static function getUserAsJson(int $i, bool $admin = false): array
     {
         return [
-            'id' => $i,
-            'email' => AppFixtures::getEmail($i),
-            'username' => AppFixtures::getUsername($i),
-            'firstname' => AppFixtures::getFirstname($i),
-            'lastname' => AppFixtures::getLastname($i),
-            'roles' => [User::ROLE_USER],
+            'id' => $admin ? $i + 2 : $i,
+            'email' => AppFixtures::getEmail($i, $admin),
+            'username' => AppFixtures::getUsername($i, $admin),
+            'firstname' => AppFixtures::getFirstname($i, $admin),
+            'lastname' => AppFixtures::getLastname($i, $admin),
+            'roles' => AppFixtures::getRoles($admin),
         ];
     }
 
@@ -483,12 +513,13 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
      * @param CalendarStyle $calendarStyle
      * @param HolidayGroup $holidayGroup
      * @param int $i
+     * @param bool $admin
      * @return User
      * @throws Exception
      */
-    public function getUser(CalendarStyle $calendarStyle, HolidayGroup $holidayGroup, int $i = 1): User
+    public function getUser(CalendarStyle $calendarStyle, HolidayGroup $holidayGroup, int $i = 1, bool $admin = false): User
     {
-        $user = $this->setUser($i);
+        $user = $this->setUser($i, $admin);
 
         /* Add events to user */
         foreach ($this->eventDatas as $eventData) {
@@ -523,23 +554,25 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
      * Sets a User resource.
      *
      * @param int $i
+     * @param bool $admin
      * @return User
      */
-    protected function setUser(int $i = 1): User
+    protected function setUser(int $i = 1, bool $admin = false): User
     {
         /* Create credentials. */
-        $email = self::getEmail($i);
-        $username = self::getUsername($i);
-        $password = self::getPassword($i);
+        $email = self::getEmail($i, $admin);
+        $username = self::getUsername($i, $admin);
+        $password = self::getPassword($i, $admin);
 
         /* Create a new user. */
         $user = new User();
         $user->setEmail($email);
         $user->setUsername($username);
         $user->setPassword($this->userPasswordHasher->hashPassword($user, $password));
-        $user->setFirstname(self::getFirstname($i));
-        $user->setLastname(self::getLastname($i));
-        $user->setIdHash($this->getHash($i));
+        $user->setFirstname(self::getFirstname($i, $admin));
+        $user->setLastname(self::getLastname($i, $admin));
+        $user->setIdHash($this->getHash($i, $admin));
+        $user->setRoles(self::getRoles($admin));
         $this->manager?->persist($user);
 
         /* Return the user */
@@ -681,6 +714,11 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         /* Create User resources. */
         for ($i = 1; $i <= 2; $i++) {
             $this->getUser($calendarStyle, $holidayGroup, $i);
+        }
+
+        /* Create User resources. */
+        for ($i = 1; $i <= 2; $i++) {
+            $this->getUser($calendarStyle, $holidayGroup, $i, true);
         }
 
         /* Save all resources to db. */
