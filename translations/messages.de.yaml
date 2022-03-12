@@ -96,17 +96,17 @@ admin:
         label: 'Bild'
         help: 'Das Bild dieses Eintrags.'
       pathSource:
-        label: 'Quellpfad'
-        help: 'Der Quellpfad dieses Eintrags.'
+        label: 'Bild'
+        help: 'Das Bild dieses Eintrags.'
       pathSource400:
-        label: 'Quellpfad'
-        help: 'Der Quellpfad dieses Eintrags.'
+        label: 'Bild'
+        help: 'Der Bild dieses Eintrags.'
       pathTarget:
-        label: 'Zielpfad'
-        help: 'Der Zielpfad dieses Eintrags.'
+        label: 'Kalenderblatt'
+        help: 'Der Kalenderblatt dieses Eintrags.'
       pathTarget400:
-        label: 'Zielpfad'
-        help: 'Der Zielpfad dieses Eintrags.'
+        label: 'Kalenderblatt'
+        help: 'Der Kalenderblatt dieses Eintrags.'
       year:
         label: 'Jahr'
         help: 'Das Jahr dieses Eintrags.'
