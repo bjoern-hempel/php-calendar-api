@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
+use App\Entity\CalendarImage;
 use App\Entity\Image;
 use App\Service\ImageService;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
@@ -61,14 +62,15 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      * Checks missing image on single Image instance.
      *
      * @param Image $image
+     * @param CalendarImage|null $calendarImage
      * @return void
      * @throws Exception
      */
-    protected function checkMissingImages(Image $image): void
+    protected function checkMissingImages(Image $image, ?CalendarImage $calendarImage = null): void
     {
-        $this->imageService->createTargetImage($image);
+        $this->imageService->createTargetImage($image, $calendarImage);
         $this->imageService->createSourceImageWidth($image, Image::WIDTH_400);
-        $this->imageService->createTargetImageWidth($image, Image::WIDTH_400);
+        $this->imageService->createTargetImageWidth($image, Image::WIDTH_400, $calendarImage);
     }
 
     /**
@@ -107,12 +109,23 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         foreach ($event->getResponseParameters()->get('entities') as $entity) {
             $instance = $entity->getInstance();
 
+            $image = match (true) {
+                $instance instanceof Image => $instance,
+                $instance instanceof CalendarImage => $instance->getImage(),
+                default => null,
+            };
+
+            $calendarImage = match (true) {
+                $instance instanceof CalendarImage => $instance,
+                default => null,
+            };
+
             /* Checks if list element is an image element. */
-            if (!$instance instanceof Image) {
+            if ($image === null) {
                 return;
             }
 
-            $this->checkMissingImages($instance);
+            $this->checkMissingImages($image, $calendarImage);
         }
     }
 }

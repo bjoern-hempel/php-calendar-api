@@ -103,13 +103,13 @@ class Image implements EntityInterface
 
     public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'name', 'path', 'pathSource', 'pathSource400', 'pathTarget', 'pathTarget400', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'user', 'name', 'pathSource400', 'pathTarget400', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_INDEX = ['id', 'user', 'name', 'pathSource400', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_NEW = ['id', 'user', 'path'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'pathTarget', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_FILTER = ['user', 'width', 'height', 'size'];
 
@@ -249,10 +249,11 @@ class Image implements EntityInterface
      * @param bool $full
      * @param string $rootPath
      * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false, bool $test = false, bool $full = false, string $rootPath = '', ?int $width = null): string
+    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false, bool $test = false, bool $full = false, string $rootPath = '', ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
         $path = match (true) {
             $type === self::PATH_TYPE_SOURCE && $this->pathSource !== null => $this->pathSource,
@@ -262,11 +263,14 @@ class Image implements EntityInterface
 
         $fileNameConverter = new FileNameConverter($path, $rootPath, $full);
 
-        if ($full) {
-            $fileNameConverter->setOutputMode(FileNameConverter::MODE_OUTPUT_ABSOLUTE);
-        }
-
-        return $fileNameConverter->getFilename($type, $width, $tmp, $test);
+        return $fileNameConverter->getFilename(
+            $type,
+            $width,
+            $tmp,
+            $test,
+            $full ? FileNameConverter::MODE_OUTPUT_ABSOLUTE : FileNameConverter::MODE_OUTPUT_FILE,
+            $calendarImage ? strval($calendarImage->getId()) : null
+        );
     }
 
     /**
@@ -277,12 +281,13 @@ class Image implements EntityInterface
      * @param string $rootPath
      * @param bool $tmp
      * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathFull(string $type = self::PATH_TYPE_SOURCE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    public function getPathFull(string $type = self::PATH_TYPE_SOURCE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath($type, $tmp, $test, true, $rootPath, $width);
+        return $this->getPath($type, $tmp, $test, true, $rootPath, $width, $calendarImage);
     }
 
     /**
@@ -293,12 +298,13 @@ class Image implements EntityInterface
      * @param string $rootPath
      * @param bool $tmp
      * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathSource(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    public function getPathSource(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_SOURCE, $tmp, $test, $full, $rootPath, $width);
+        return $this->getPath(self::PATH_TYPE_SOURCE, $tmp, $test, $full, $rootPath, $width, $calendarImage);
     }
 
     /**
@@ -308,12 +314,13 @@ class Image implements EntityInterface
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathSource400(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathSource400(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathSource($full, $test, $rootPath, $tmp, self::WIDTH_400);
+        return $this->getPathSource($full, $test, $rootPath, $tmp, self::WIDTH_400, $calendarImage);
     }
 
     /**
@@ -324,12 +331,13 @@ class Image implements EntityInterface
      * @param string $rootPath
      * @param bool $tmp
      * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathTarget(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    public function getPathTarget(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_TARGET, $tmp, $test, $full, $rootPath, $width);
+        return $this->getPath(self::PATH_TYPE_TARGET, $tmp, $test, $full, $rootPath, $width, $calendarImage);
     }
 
     /**
@@ -339,12 +347,13 @@ class Image implements EntityInterface
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathTarget400(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathTarget400(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathTarget($full, $test, $rootPath, $tmp, self::WIDTH_400);
+        return $this->getPathTarget($full, $test, $rootPath, $tmp, self::WIDTH_400, $calendarImage);
     }
 
     /**
@@ -355,12 +364,13 @@ class Image implements EntityInterface
      * @param string $rootPath
      * @param bool $tmp
      * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathExpected(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    public function getPathExpected(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_EXPECTED, $tmp, $test, $full, $rootPath, $width);
+        return $this->getPath(self::PATH_TYPE_EXPECTED, $tmp, $test, $full, $rootPath, $width, $calendarImage);
     }
 
     /**
@@ -371,12 +381,13 @@ class Image implements EntityInterface
      * @param string $rootPath
      * @param bool $tmp
      * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathCompare(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    public function getPathCompare(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_COMPARE, $tmp, $test, $full, $rootPath, $width);
+        return $this->getPath(self::PATH_TYPE_COMPARE, $tmp, $test, $full, $rootPath, $width, $calendarImage);
     }
 
     /**
@@ -385,12 +396,14 @@ class Image implements EntityInterface
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathSourceFull(bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathSourceFull(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathSource(true, $test, $rootPath, $tmp);
+        return $this->getPathSource(true, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**
@@ -399,12 +412,14 @@ class Image implements EntityInterface
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathTargetFull(bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathTargetFull(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathTarget(true, $test, $rootPath, $tmp);
+        return $this->getPathTarget(true, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**
@@ -413,12 +428,14 @@ class Image implements EntityInterface
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathExpectedFull(bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathExpectedFull(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathExpected(true, $test, $rootPath, $tmp);
+        return $this->getPathExpected(true, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**
@@ -427,12 +444,14 @@ class Image implements EntityInterface
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathCompareFull(bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathCompareFull(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathCompare(true, $test, $rootPath, $tmp);
+        return $this->getPathCompare(true, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**

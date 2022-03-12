@@ -79,7 +79,8 @@ class CreatePageCommand extends Command
             ->setDescription('Creates a calendar page')
             ->setDefinition([
                 new InputOption('email', null, InputOption::VALUE_REQUIRED, 'The email of the user.'),
-                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'The calendar name which will be used.'),
+                new InputOption('name', null, InputOption::VALUE_OPTIONAL, 'The calendar name which will be used.'),
+                new InputOption('id', null, InputOption::VALUE_OPTIONAL, 'The calendar id which will be used.'),
                 new InputOption('year', 'y', InputOption::VALUE_REQUIRED, 'The year with which the page will be created.'),
                 new InputOption('month', 'm', InputOption::VALUE_REQUIRED, 'The month with which the page will be created.'),
             ])
@@ -110,15 +111,26 @@ EOT
             '',
         ]);
 
-        /* Read parameter */
+        /* Read parameters */
         $email = strval($input->getOption('email'));
-        $calendarName = strval($input->getOption('name'));
+        switch (true) {
+            case $input->getOption('name') !== null:
+                $calendarNameOrId = strval($input->getOption('name'));
+                break;
+            case $input->getOption('id') !== null:
+                $calendarNameOrId = intval($input->getOption('id'));
+                break;
+            default:
+                $output->writeln('At least one option for calendar is missing: id or name.'."\n");
+                return Command::FAILURE;
+        }
+
         $year = intval($input->getOption('year'));
         $month = intval($input->getOption('month'));
         $holidayGroupName = 'Saxony';
 
-        /* Read db */
-        $calendarImage = $this->calendarLoaderService->loadCalendarImage($email, $calendarName, $year, $month);
+        /* Read calendar image and holiday group */
+        $calendarImage = $this->calendarLoaderService->loadCalendarImage($email, $calendarNameOrId, $year, $month);
         $holidayGroup = $this->holidayGroupLoaderService->loadHolidayGroup($holidayGroupName);
 
         /* Print details */
@@ -134,7 +146,7 @@ EOT
         /* Create calendar image */
         $timeStart = microtime(true);
         $calendarBuilderService = new CalendarBuilderService($this->appKernel);
-        $calendarBuilderService->init($calendarImage, $holidayGroup);
+        $calendarBuilderService->init($calendarImage, $holidayGroup, false, true);
         $file = $calendarBuilderService->build();
         $timeTaken = microtime(true) - $timeStart;
 

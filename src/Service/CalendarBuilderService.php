@@ -136,7 +136,9 @@ class CalendarBuilderService
 
     protected ?HolidayGroup $holidayGroup = null;
 
-    protected bool $test;
+    protected bool $test = false;
+
+    protected bool $useCalendarImagePath = false;
 
     /** @var array<array{name: string[]}> $eventsAndHolidaysRaw */
     protected array $eventsAndHolidaysRaw = [];
@@ -227,15 +229,19 @@ class CalendarBuilderService
      * @param CalendarImage $calendarImage
      * @param HolidayGroup|null $holidayGroup
      * @param bool $test
+     * @param bool $useCalendarImagePath
      * @throws Exception
      */
-    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false): void
+    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false, bool $useCalendarImagePath = false): void
     {
         /* Clear positions */
         $this->positionDays = [];
 
         /* Test mode */
         $this->test = $test;
+
+        /* Use CalendarImage path */
+        $this->useCalendarImagePath = $useCalendarImagePath;
 
         /* calendar instances */
         $this->calendarImage = $calendarImage;
@@ -682,7 +688,7 @@ class CalendarBuilderService
         }
 
         if (!file_exists($pathToCheck)) {
-            mkdir($pathToCheck);
+            mkdir($pathToCheck, 0775, true);
         }
 
         if (!file_exists($pathToCheck)) {
@@ -1242,8 +1248,13 @@ class CalendarBuilderService
     public function build(): array
     {
         /* Save given values */
-        $this->pathSource = $this->image->getPathFull(Image::PATH_TYPE_SOURCE, $this->test, $this->pathRoot);
-        $this->pathTarget = $this->image->getPathFull(Image::PATH_TYPE_TARGET, $this->test, $this->pathRoot);
+        $this->pathSource = $this->image->getPathFull(type: Image::PATH_TYPE_SOURCE, test: $this->test, rootPath: $this->pathRoot);
+        $this->pathTarget = $this->image->getPathFull(
+            type: Image::PATH_TYPE_TARGET,
+            test: $this->test,
+            rootPath: $this->pathRoot,
+            calendarImage: $this->useCalendarImagePath ? $this->calendarImage : null
+        );
 
         $this->textTitle = $this->calendarImage->getTitle() ?? '';
         $this->textPosition = $this->calendarImage->getPosition() ?? '';

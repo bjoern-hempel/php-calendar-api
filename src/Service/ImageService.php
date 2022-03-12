@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Entity\CalendarImage;
 use App\Entity\Image;
 use App\Service\Entity\UserLoaderService;
 use Exception;
@@ -200,6 +201,37 @@ class ImageService
     }
 
     /**
+     * Creates the directory from given file.
+     *
+     * @param string $path
+     * @return bool
+     * @throws Exception
+     */
+    protected function createDirectoryFromFile(string $path): bool
+    {
+        $directory = dirname($path);
+
+        /* Check existing $directory */
+        if (file_exists($directory)) {
+            if (is_dir($directory)) {
+                return true;
+            } else {
+                throw new Exception(sprintf('The given directory "%s" is not a directory (%s:%d)', $directory, __FILE__, __LINE__));
+            }
+        }
+
+        /* Create directory */
+        mkdir($directory, 0775, true);
+
+        /* Check directory */
+        if (!file_exists($directory)) {
+            throw new Exception(sprintf('Unable to create given directory "%s" (%s:%d).', $directory, __FILE__, __LINE__));
+        }
+
+        return true;
+    }
+
+    /**
      * Saves given gd image to path.
      *
      * @param GdImage $image
@@ -211,6 +243,9 @@ class ImageService
      */
     protected function saveImage(GdImage $image, string $path, int $imageType = IMAGETYPE_JPEG, string $mimeType = 'image/jpeg'): bool
     {
+        /* Create directory if it does not exist */
+        $this->createDirectoryFromFile($path);
+
         /* Create resized image. */
         $status = match ($imageType) {
             IMAGETYPE_GIF => imagegif($image, $path),
@@ -233,13 +268,14 @@ class ImageService
      * @param Image $image
      * @param int $widthResize
      * @param string $type
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    protected function resizeImageWidth(Image $image, int $widthResize, string $type = Image::PATH_TYPE_SOURCE): string
+    protected function resizeImageWidth(Image $image, int $widthResize, string $type = Image::PATH_TYPE_SOURCE, ?CalendarImage $calendarImage = null): string
     {
-        $pathFull = $image->getPath($type, false, false, true, $this->appKernel->getProjectDir());
-        $pathResizedFull = $image->getPath($type, false, false, true, $this->appKernel->getProjectDir(), $widthResize);
+        $pathFull = $image->getPath($type, false, false, true, $this->appKernel->getProjectDir(), null, $calendarImage);
+        $pathResizedFull = $image->getPath($type, false, false, true, $this->appKernel->getProjectDir(), $widthResize, $calendarImage);
 
         /* Get information about image. */
         $imageInfo = $this->getImageInfo($pathFull);
@@ -266,20 +302,21 @@ class ImageService
         $this->saveImage($imageResized, $pathResizedFull, $imageType, $mimeType);
 
         /* Return relative path */
-        return $image->getPath($type, false, false, false, $this->appKernel->getProjectDir(), $widthResize);
+        return $image->getPath($type, false, false, false, $this->appKernel->getProjectDir(), $widthResize, $calendarImage);
     }
 
     /**
      * Creates a temporary target image.
      *
      * @param Image $image
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    protected function createTmpTargetImage(Image $image): string
+    protected function createTmpTargetImage(Image $image, ?CalendarImage $calendarImage = null): string
     {
         $sourcePathFull = $image->getPathSource(true, false, $this->appKernel->getProjectDir());
-        $targetPathFullTmp = $image->getPathTarget(true, false, $this->appKernel->getProjectDir(), true);
+        $targetPathFullTmp = $image->getPathTarget(true, false, $this->appKernel->getProjectDir(), true, null, $calendarImage);
 
         /* Get information about image. */
         $imageInfo = $this->getImageInfo($sourcePathFull);
@@ -353,11 +390,12 @@ class ImageService
      * Checks target image.
      *
      * @param Image $image
+     * @param CalendarImage|null $calendarImage
      * @throws Exception
      */
-    public function checkTargetImage(Image $image): void
+    public function checkTargetImage(Image $image, ?CalendarImage $calendarImage = null): void
     {
-        $targetPathFull = $image->getPathSource(true, false, $this->appKernel->getProjectDir());
+        $targetPathFull = $image->getPathSource(true, false, $this->appKernel->getProjectDir(), false, null, $calendarImage);
 
         if (!file_exists($targetPathFull)) {
             throw new Exception(sprintf('Unable to load target image "%s" (%s:%d)', $targetPathFull, __FILE__, __LINE__));
@@ -380,18 +418,19 @@ class ImageService
      * Creates target image.
      *
      * @param Image $image
+     * @param CalendarImage|null $calendarImage
      * @throws Exception
      */
-    public function createTargetImage(Image $image): void
+    public function createTargetImage(Image $image, ?CalendarImage $calendarImage = null): void
     {
         $this->checkSourceImage($image);
 
-        $targetPathFull = $image->getPathTarget(true, false, $this->appKernel->getProjectDir());
+        $targetPathFull = $image->getPathTarget(true, false, $this->appKernel->getProjectDir(), false, null, $calendarImage);
 
         if (!file_exists($targetPathFull)) {
-            $targetPathTmp = $this->createTmpTargetImage($image);
+            $targetPathTmp = $this->createTmpTargetImage($image, $calendarImage);
 
-            $this->checkTargetImage($image);
+            $this->checkTargetImage($image, $calendarImage);
 
             $image->setPathTarget($targetPathTmp);
         }
@@ -420,16 +459,17 @@ class ImageService
      *
      * @param Image $image
      * @param int $width
+     * @param CalendarImage|null $calendarImage
      * @throws Exception
      */
-    public function createTargetImageWidth(Image $image, int $width): void
+    public function createTargetImageWidth(Image $image, int $width, ?CalendarImage $calendarImage = null): void
     {
-        $this->checkTargetImage($image);
+        $this->checkTargetImage($image, $calendarImage);
 
-        $targetPathFullWidth = $image->getPathTarget(true, false, $this->appKernel->getProjectDir(), false, $width);
+        $targetPathFullWidth = $image->getPathTarget(true, false, $this->appKernel->getProjectDir(), false, $width, $calendarImage);
 
         if (!file_exists($targetPathFullWidth)) {
-            $this->resizeImageWidth($image, $width, Image::PATH_TYPE_TARGET);
+            $this->resizeImageWidth($image, $width, Image::PATH_TYPE_TARGET, $calendarImage);
         }
     }
 

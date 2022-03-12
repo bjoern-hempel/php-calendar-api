@@ -15,12 +15,14 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\CalendarImage;
+use App\Entity\Image;
 use App\Service\Entity\CalendarLoaderService;
 use App\Service\Entity\ImageLoaderService;
 use App\Service\Entity\UserLoaderService;
 use App\Service\SecurityService;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use Exception;
 use JetBrains\PhpStorm\Pure;
@@ -111,6 +113,11 @@ class CalendarImageCrudController extends BaseCrudController
             'year', 'month' => IntegerField::new($fieldName)
                 ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                 ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
+            'pathSource', 'pathTarget', 'pathSource400', 'pathTarget400' => ImageField::new($fieldName)
+                    ->setBasePath(sprintf('%s/%s', Image::PATH_DATA, Image::PATH_IMAGES))
+                    ->setTemplatePath('admin/crud/field/image_preview.html.twig')
+                    ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                    ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
             default => parent::getField($fieldName),
         };
     }

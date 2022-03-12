@@ -102,15 +102,15 @@ class CalendarImage implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'calendar', 'image', 'pathSource', 'pathSource400', 'pathTarget', 'pathTarget400', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_INDEX = ['id', 'user', 'calendar', 'pathSource400', 'pathTarget400', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_NEW = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'calendar', 'pathSource', 'pathTarget', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_FILTER = ['user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'updatedAt', 'createdAt'];
 
@@ -171,6 +171,7 @@ class CalendarImage implements EntityInterface
      * @return string
      * @throws Exception
      */
+    #[Pure]
     public function __toString(): string
     {
         return $this->getTitleName();
@@ -182,9 +183,80 @@ class CalendarImage implements EntityInterface
      * @return string
      * @throws Exception
      */
+    #[Pure]
     public function getTitleName(): string
     {
         return sprintf('%s (%s/%s)', $this->getCalendar()?->getName(), $this->getYear(), $this->getMonth());
+    }
+
+    /**
+     * Gets the relative or absolute source path of the image.
+     *
+     * @param bool $full
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param int|null $width
+     * @return string
+     * @throws Exception
+     */
+    public function getPathSource(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    {
+        if ($this->getImage() === null) {
+            throw new Exception(sprintf('No Image was found (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $this->getImage()->getPath(Image::PATH_TYPE_SOURCE, $tmp, $test, $full, $rootPath, $width);
+    }
+
+    /**
+     * Gets the relative or absolute source path of the image with 400px width.
+     *
+     * @param bool $full
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @return string
+     * @throws Exception
+     */
+    public function getPathSource400(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    {
+        return $this->getPathSource($full, $test, $rootPath, $tmp, Image::WIDTH_400);
+    }
+
+    /**
+     * Gets the relative or absolute source path of the image.
+     *
+     * @param bool $full
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param int|null $width
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTarget(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    {
+        if ($this->getImage() === null) {
+            throw new Exception(sprintf('No Image was found (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $this->getImage()->getPath(Image::PATH_TYPE_TARGET, $tmp, $test, $full, $rootPath, $width, $this);
+    }
+
+    /**
+     * Gets the relative or absolute source path of the image with 400px width.
+     *
+     * @param bool $full
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTarget400(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    {
+        return $this->getPathTarget($full, $test, $rootPath, $tmp, Image::WIDTH_400);
     }
 
     /**

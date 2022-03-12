@@ -87,14 +87,21 @@ class FileNameConverter
      *
      * @param string $filename
      * @param string $type
+     * @param string|null $additionalPath
      * @return string
      * @throws Exception
      */
-    protected static function replacePathType(string $filename, string $type): string
+    protected static function replacePathType(string $filename, string $type, ?string $additionalPath = null): string
     {
-        $search = sprintf('~(^[a-z0-9]{40,40}/)%s(/)~', Image::PATH_TYPE_SOURCE);
+        $search = sprintf('~([a-z0-9]{40,40}/)(%s|%s|%s|%s)(/)~', Image::PATH_TYPE_SOURCE, Image::PATH_TYPE_TARGET, Image::PATH_TYPE_COMPARE, Image::PATH_TYPE_EXPECTED);
 
-        $replace = sprintf('$1%s$2', $type);
+        $path = $type;
+
+        if ($additionalPath !== null) {
+            $path = sprintf('%s/%s', $path, $additionalPath);
+        }
+
+        $replace = sprintf('$1%s$3', $path);
 
         $filename = preg_replace($search, $replace, $filename);
 
@@ -190,16 +197,17 @@ class FileNameConverter
      * @param bool $tmp
      * @param bool $test
      * @param string|null $outputMode
+     * @param string|null $additionalPath
      * @return string
      * @throws Exception
      */
-    public function getFilename(string $type = Image::PATH_TYPE_SOURCE, ?int $width = null, bool $tmp = false, ?bool $test = null, ?string $outputMode = null): string
+    public function getFilename(string $type = Image::PATH_TYPE_SOURCE, ?int $width = null, bool $tmp = false, ?bool $test = null, ?string $outputMode = null, string $additionalPath = null): string
     {
         $test = $test ?? $this->test;
         $outputMode = $outputMode ?? $this->outputMode;
 
         $filename = match ($type) {
-            Image::PATH_TYPE_TARGET, Image::PATH_TYPE_EXPECTED, Image::PATH_TYPE_COMPARE => self::replacePathType($this->filename, $type),
+            Image::PATH_TYPE_TARGET, Image::PATH_TYPE_EXPECTED, Image::PATH_TYPE_COMPARE => self::replacePathType($this->filename, $type, $additionalPath),
             default => $this->filename,
         };
 
@@ -230,12 +238,13 @@ class FileNameConverter
      * @param bool $tmp
      * @param bool|null $test
      * @param string|null $outputMode
+     * @param string|null $additionalPath
      * @return string
      * @throws Exception
      */
-    public function getFilenameSource(?int $width = null, bool $tmp = false, ?bool $test = null, ?string $outputMode = null): string
+    public function getFilenameSource(?int $width = null, bool $tmp = false, ?bool $test = null, ?string $outputMode = null, string $additionalPath = null): string
     {
-        return $this->getFilename(Image::PATH_TYPE_SOURCE, $width, $tmp, $test, $outputMode);
+        return $this->getFilename(Image::PATH_TYPE_SOURCE, $width, $tmp, $test, $outputMode, $additionalPath);
     }
 
     /**
@@ -245,12 +254,13 @@ class FileNameConverter
      * @param bool $tmp
      * @param bool|null $test
      * @param string|null $outputMode
+     * @param string|null $additionalPath
      * @return string
      * @throws Exception
      */
-    public function getFilenameTarget(?int $width = null, bool $tmp = false, ?bool $test = null, ?string $outputMode = null): string
+    public function getFilenameTarget(?int $width = null, bool $tmp = false, ?bool $test = null, ?string $outputMode = null, string $additionalPath = null): string
     {
-        return $this->getFilename(Image::PATH_TYPE_TARGET, $width, $tmp, $test, $outputMode);
+        return $this->getFilename(Image::PATH_TYPE_TARGET, $width, $tmp, $test, $outputMode, $additionalPath);
     }
 
     /**
@@ -260,12 +270,13 @@ class FileNameConverter
      * @param bool $tmp
      * @param bool|null $test
      * @param string|null $outputMode
+     * @param string|null $additionalPath
      * @return string
      * @throws Exception
      */
-    public function getFilenameExpected(?int $width = null, bool $tmp = false, ?bool $test = null, ?string $outputMode = null): string
+    public function getFilenameExpected(?int $width = null, bool $tmp = false, ?bool $test = null, ?string $outputMode = null, string $additionalPath = null): string
     {
-        return $this->getFilename(Image::PATH_TYPE_EXPECTED, $width, $tmp, $test, $outputMode);
+        return $this->getFilename(Image::PATH_TYPE_EXPECTED, $width, $tmp, $test, $outputMode, $additionalPath);
     }
 
     /**
@@ -275,12 +286,13 @@ class FileNameConverter
      * @param bool $tmp
      * @param bool|null $test
      * @param string|null $outputMode
+     * @param string|null $additionalPath
      * @return string
      * @throws Exception
      */
-    public function getFilenameCompare(?int $width = null, bool $tmp = false, ?bool $test = null, ?string $outputMode = null): string
+    public function getFilenameCompare(?int $width = null, bool $tmp = false, ?bool $test = null, ?string $outputMode = null, string $additionalPath = null): string
     {
-        return $this->getFilename(Image::PATH_TYPE_COMPARE, $width, $tmp, $test, $outputMode);
+        return $this->getFilename(Image::PATH_TYPE_COMPARE, $width, $tmp, $test, $outputMode, $additionalPath);
     }
 
     /**
@@ -290,12 +302,13 @@ class FileNameConverter
      * @param bool $tmp
      * @param bool|null $test
      * @param string|null $outputMode
+     * @param string|null $additionalPath
      * @return string
      * @throws Exception
      */
-    public function getFilenameWidth(int $width, bool $tmp = false, ?bool $test = null, ?string $outputMode = null): string
+    public function getFilenameWidth(int $width, bool $tmp = false, ?bool $test = null, ?string $outputMode = null, string $additionalPath = null): string
     {
-        return $this->getFilename(Image::PATH_TYPE_SOURCE, $width, $tmp, $test, $outputMode);
+        return $this->getFilename(Image::PATH_TYPE_SOURCE, $width, $tmp, $test, $outputMode, $additionalPath);
     }
 
     /**
@@ -303,12 +316,13 @@ class FileNameConverter
      *
      * @param bool|null $test
      * @param string|null $outputMode
+     * @param string|null $additionalPath
      * @return string
      * @throws Exception
      */
-    public function getFilenameTmp(?bool $test = null, ?string $outputMode = null): string
+    public function getFilenameTmp(?bool $test = null, ?string $outputMode = null, string $additionalPath = null): string
     {
-        return $this->getFilename(Image::PATH_TYPE_SOURCE, null, true, $test, $outputMode);
+        return $this->getFilename(Image::PATH_TYPE_SOURCE, null, true, $test, $outputMode, $additionalPath);
     }
 
     /**

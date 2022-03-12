@@ -113,7 +113,7 @@ EOT
         $email = strval($input->getOption('email'));
         $calendarName = strval($input->getOption('name'));
 
-        /* Read db */
+        /* Read calendar */
         $calendar = $this->calendarLoaderService->loadCalendar($email, $calendarName);
 
         /* Get application */

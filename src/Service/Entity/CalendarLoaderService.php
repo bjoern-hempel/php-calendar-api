@@ -173,16 +173,16 @@ class CalendarLoaderService extends BaseLoaderService
     }
 
     /**
-     * Loads and returns the calendar
+     * Loads and returns the calendar by given email and calendar name
      *
      * @param string $email
-     * @param string $calendarName
+     * @param string|int $calendarNameOrId
      * @param bool $clearObjects
      * @return Calendar
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function loadCalendar(string $email, string $calendarName, bool $clearObjects = true): Calendar
+    public function loadCalendar(string $email, string|int $calendarNameOrId, bool $clearObjects = true): Calendar
     {
         /* Clears all objects */
         if ($clearObjects) {
@@ -193,20 +193,25 @@ class CalendarLoaderService extends BaseLoaderService
         $this->loadUser($email, false);
 
         /* Load calendar */
-        $calendar = $this->getCalendarRepository()->findOneByName($this->getUser(), $calendarName);
+        $calendar = match (true) {
+            is_int($calendarNameOrId) => $this->getCalendarRepository()->findOneByUserAndId($this->getUser(), $calendarNameOrId),
+            is_string($calendarNameOrId) => $this->getCalendarRepository()->findOneByUserAndName($this->getUser(), $calendarNameOrId),
+        };
+
         if ($calendar === null) {
-            throw new Exception(sprintf('Unable to find calendar with name "%s".', $calendarName));
+            throw new Exception(sprintf('Unable to find calendar with name "%s".', $calendarNameOrId));
         }
+
         $this->calendar = $calendar;
 
         return $this->getCalendar();
     }
 
     /**
-     * Loads and returns calendar from user.
+     * Loads and returns calendar from user and given calendar name.
      *
      * @param string $email
-     * @param string $calendarName
+     * @param string|int $calendarNameOrId
      * @param int $year
      * @param int $month
      * @param bool $clearObjects
@@ -214,15 +219,15 @@ class CalendarLoaderService extends BaseLoaderService
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function loadCalendarImage(string $email, string $calendarName, int $year, int $month, bool $clearObjects = true): CalendarImage
+    public function loadCalendarImage(string $email, string|int $calendarNameOrId, int $year, int $month, bool $clearObjects = true): CalendarImage
     {
         /* Clears all objects */
         if ($clearObjects) {
             $this->clear();
         }
 
-        /* Load user */
-        $calendar = $this->loadCalendar($email, $calendarName, false);
+        /* Load calendar */
+        $calendar = $this->loadCalendar($email, $calendarNameOrId, false);
 
         /* Load calendar image */
         $calendarImage = $this->getCalendarImageRepository()->findOneByYearAndMonth($this->getUser(), $calendar, $year, $month);

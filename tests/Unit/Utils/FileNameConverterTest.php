@@ -30,6 +30,7 @@ namespace App\Tests\Unit\Utils;
 
 use App\Entity\Image;
 use App\Utils\FileNameConverter;
+use Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -57,10 +58,12 @@ final class FileNameConverterTest extends TestCase
      * @param mixed $param3
      * @param mixed $param4
      * @param mixed $param5
+     * @param mixed $param6
      * @param string $given
      * @param string $expected
+     * @throws Exception
      */
-    public function wrapper(int $number, string $method, mixed $param1, mixed $param2, mixed $param3, mixed $param4, mixed $param5, string $given, string $expected): void
+    public function wrapper(int $number, string $method, mixed $param1, mixed $param2, mixed $param3, mixed $param4, mixed $param5, mixed $param6, string $given, string $expected): void
     {
         /* Arrange */
 
@@ -73,6 +76,11 @@ final class FileNameConverterTest extends TestCase
         $this->assertIsCallable($callback);
 
         switch (true) {
+            case $param6 !== null:
+                /** @phpstan-ignore-next-line → PHPStan does not detect $callback as valid */
+                $this->assertSame($expected, call_user_func($callback, $param1, $param2, $param3, $param4, $param5, $param6));
+                break;
+
             case $param5 !== null:
                 /** @phpstan-ignore-next-line → PHPStan does not detect $callback as valid */
                 $this->assertSame($expected, call_user_func($callback, $param1, $param2, $param3, $param4, $param5));
@@ -126,6 +134,7 @@ final class FileNameConverterTest extends TestCase
                 null, /* tmp */
                 null, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'data.data', /* given */
                 'data.data', /* expected */
             ],
@@ -137,6 +146,7 @@ final class FileNameConverterTest extends TestCase
                 null, /* tmp */
                 null, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'data.data', /* given */
                 'data.800.data', /* expected */
             ],
@@ -148,6 +158,7 @@ final class FileNameConverterTest extends TestCase
                 true, /* tmp */
                 null, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'data.data', /* given */
                 'data.tmp.data', /* expected */
             ],
@@ -159,6 +170,7 @@ final class FileNameConverterTest extends TestCase
                 true, /* tmp */
                 null, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'data.data', /* given */
                 'data.800.tmp.data', /* expected */
             ],
@@ -170,6 +182,7 @@ final class FileNameConverterTest extends TestCase
                 null, /* test */
                 null, /* output mode */
                 null,
+                null,
                 'data.data', /* given */
                 'data.800.data', /* expected */
             ],
@@ -178,6 +191,7 @@ final class FileNameConverterTest extends TestCase
                 'getFilenameTmp', /* method */
                 null, /* test */
                 null, /* output mode */
+                null,
                 null,
                 null,
                 null,
@@ -196,6 +210,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 true, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'data.data', /* given */
                 'data.data', /* expected */
             ],
@@ -207,6 +222,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 true, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'data.data', /* given */
                 'data.800.data', /* expected */
             ],
@@ -218,6 +234,7 @@ final class FileNameConverterTest extends TestCase
                 true, /* tmp */
                 true, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'data.data', /* given */
                 'data.tmp.data', /* expected */
             ],
@@ -229,6 +246,7 @@ final class FileNameConverterTest extends TestCase
                 true, /* tmp */
                 true, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'data.data', /* given */
                 'data.800.tmp.data', /* expected */
             ],
@@ -240,6 +258,7 @@ final class FileNameConverterTest extends TestCase
                 true, /* test */
                 null, /* output mode */
                 null,
+                null,
                 'data.data', /* given */
                 'data.800.data', /* expected */
             ],
@@ -250,6 +269,7 @@ final class FileNameConverterTest extends TestCase
                 null, /* output mode */
                 null,
                 true,
+                null,
                 null,
                 'data.data', /* given */
                 'data.tmp.data', /* expected */
@@ -266,6 +286,7 @@ final class FileNameConverterTest extends TestCase
                 null, /* tmp */
                 null, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* expected */
             ],
@@ -277,8 +298,21 @@ final class FileNameConverterTest extends TestCase
                 null, /* tmp */
                 null, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/2ccfdd526f.beach.jpg', /* expected */
+            ],
+            [
+                ++$number,
+                'getFilename', /* method */
+                Image::PATH_TYPE_TARGET, /* type */
+                null, /* width */
+                false, /* tmp */
+                null, /* test */
+                null, /* output mode */
+                '1', /* additional path */
+                'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
+                'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/1/2ccfdd526f.beach.jpg', /* expected */
             ],
             [
                 ++$number,
@@ -288,6 +322,7 @@ final class FileNameConverterTest extends TestCase
                 null, /* tmp */
                 null, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/expected/2ccfdd526f.beach.jpg', /* expected */
             ],
@@ -299,6 +334,7 @@ final class FileNameConverterTest extends TestCase
                 null, /* tmp */
                 null, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/compare/2ccfdd526f.beach.jpg', /* expected */
             ],
@@ -310,8 +346,21 @@ final class FileNameConverterTest extends TestCase
                 null, /* tmp */
                 null, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/2ccfdd526f.beach.jpg', /* expected */
+            ],
+            [
+                ++$number,
+                'getFilenameTarget', /* method */
+                null, /* width */
+                false, /* tmp */
+                null, /* test */
+                null, /* output mode */
+                '1', /* additional path */
+                null,
+                'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
+                'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/1/2ccfdd526f.beach.jpg', /* expected */
             ],
             [
                 ++$number,
@@ -321,6 +370,7 @@ final class FileNameConverterTest extends TestCase
                 null, /* tmp */
                 null, /* test */
                 null, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.400.jpg', /* expected */
             ],
@@ -329,6 +379,7 @@ final class FileNameConverterTest extends TestCase
                 'getFilenameTmp', /* method */
                 null, /* test */
                 null, /* output mode */
+                null,
                 null,
                 null,
                 null,
@@ -347,6 +398,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_RELATIVE, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* expected */
             ],
@@ -358,8 +410,21 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_RELATIVE, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/2ccfdd526f.beach.jpg', /* expected */
+            ],
+            [
+                ++$number,
+                'getFilename', /* method */
+                Image::PATH_TYPE_TARGET, /* type */
+                null, /* width */
+                false, /* tmp */
+                false, /* test */
+                FileNameConverter::MODE_OUTPUT_RELATIVE, /* output mode */
+                '1', /* additional path */
+                'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
+                'data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/1/2ccfdd526f.beach.jpg', /* expected */
             ],
             [
                 ++$number,
@@ -369,6 +434,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_RELATIVE, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/expected/2ccfdd526f.beach.jpg', /* expected */
             ],
@@ -380,6 +446,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_RELATIVE, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/compare/2ccfdd526f.beach.jpg', /* expected */
             ],
@@ -391,8 +458,21 @@ final class FileNameConverterTest extends TestCase
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_RELATIVE, /* output mode */
                 null,
+                null,
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/2ccfdd526f.beach.jpg', /* expected */
+            ],
+            [
+                ++$number,
+                'getFilenameTarget', /* method */
+                null, /* width */
+                false, /* tmp */
+                false, /* test */
+                FileNameConverter::MODE_OUTPUT_RELATIVE, /* output mode */
+                '10', /* additional path */
+                null,
+                'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
+                'data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/10/2ccfdd526f.beach.jpg', /* expected */
             ],
             [
                 ++$number,
@@ -402,6 +482,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_RELATIVE, /* output mode */
                 null,
+                null,
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.400.jpg', /* expected */
             ],
@@ -410,6 +491,7 @@ final class FileNameConverterTest extends TestCase
                 'getFilenameTmp', /* method */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_RELATIVE, /* output mode */
+                null,
                 null,
                 null,
                 null,
@@ -428,6 +510,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* expected */
             ],
@@ -439,8 +522,21 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/2ccfdd526f.beach.jpg', /* expected */
+            ],
+            [
+                ++$number,
+                'getFilename', /* method */
+                Image::PATH_TYPE_TARGET, /* type */
+                null, /* width */
+                false, /* tmp */
+                false, /* test */
+                FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                'abc', /* additional path */
+                'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
+                '/path/to/root/data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/abc/2ccfdd526f.beach.jpg', /* expected */
             ],
             [
                 ++$number,
@@ -450,6 +546,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/expected/2ccfdd526f.beach.jpg', /* expected */
             ],
@@ -461,6 +558,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/compare/2ccfdd526f.beach.jpg', /* expected */
             ],
@@ -472,8 +570,21 @@ final class FileNameConverterTest extends TestCase
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
                 null,
+                null,
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/2ccfdd526f.beach.jpg', /* expected */
+            ],
+            [
+                ++$number,
+                'getFilenameTarget', /* method */
+                null, /* width */
+                false, /* tmp */
+                false, /* test */
+                FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                'calendar-image', /* additional path */
+                null,
+                'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
+                '/path/to/root/data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/calendar-image/2ccfdd526f.beach.jpg', /* expected */
             ],
             [
                 ++$number,
@@ -483,6 +594,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
                 null,
+                null,
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.400.jpg', /* expected */
             ],
@@ -491,6 +603,7 @@ final class FileNameConverterTest extends TestCase
                 'getFilenameTmp', /* method */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                null,
                 null,
                 null,
                 null,
@@ -509,6 +622,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 true, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/tests/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* expected */
             ],
@@ -520,8 +634,21 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 true, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/tests/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/2ccfdd526f.beach.jpg', /* expected */
+            ],
+            [
+                ++$number,
+                'getFilename', /* method */
+                Image::PATH_TYPE_TARGET, /* type */
+                null, /* width */
+                false, /* tmp */
+                true, /* test */
+                FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                '1', /* additional path */
+                'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
+                '/path/to/root/data/tests/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/1/2ccfdd526f.beach.jpg', /* expected */
             ],
             [
                 ++$number,
@@ -531,6 +658,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 true, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/tests/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/expected/2ccfdd526f.beach.jpg', /* expected */
             ],
@@ -542,6 +670,7 @@ final class FileNameConverterTest extends TestCase
                 false, /* tmp */
                 true, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                null, /* additional path */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/tests/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/compare/2ccfdd526f.beach.jpg', /* expected */
             ],
@@ -553,8 +682,21 @@ final class FileNameConverterTest extends TestCase
                 true, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
                 null,
+                null,
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/tests/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/2ccfdd526f.beach.jpg', /* expected */
+            ],
+            [
+                ++$number,
+                'getFilenameTarget', /* method */
+                null, /* width */
+                false, /* tmp */
+                true, /* test */
+                FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                '1', /* additional path */
+                null,
+                'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
+                '/path/to/root/data/tests/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/1/2ccfdd526f.beach.jpg', /* expected */
             ],
             [
                 ++$number,
@@ -564,6 +706,7 @@ final class FileNameConverterTest extends TestCase
                 true, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
                 null,
+                null,
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/tests/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.400.jpg', /* expected */
             ],
@@ -572,6 +715,7 @@ final class FileNameConverterTest extends TestCase
                 'getFilenameTmp', /* method */
                 true, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
+                null,
                 null,
                 null,
                 null,
