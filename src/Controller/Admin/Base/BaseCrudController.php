@@ -503,7 +503,8 @@ abstract class BaseCrudController extends AbstractCrudController
     {
         return $crud
             ->setEntityLabelInSingular(sprintf('admin.%s.singular', $this->getCrudName()))
-            ->setEntityLabelInPlural(sprintf('admin.%s.plural', $this->getCrudName()));
+            ->setEntityLabelInPlural(sprintf('admin.%s.plural', $this->getCrudName()))
+            ->overrideTemplate('crud/detail', 'admin/crud/detail.html.twig');
     }
 
     /**

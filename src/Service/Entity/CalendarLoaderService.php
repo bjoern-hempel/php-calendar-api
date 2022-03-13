@@ -149,13 +149,13 @@ class CalendarLoaderService extends BaseLoaderService
     /**
      * Loads and returns user
      *
-     * @param string $email
+     * @param string|int $userEmailOrId
      * @param bool $clearObjects
      * @return User
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function loadUser(string $email, bool $clearObjects = true): User
+    public function loadUser(string|int $userEmailOrId, bool $clearObjects = true): User
     {
         /* Clears all objects */
         if ($clearObjects) {
@@ -163,9 +163,12 @@ class CalendarLoaderService extends BaseLoaderService
         }
 
         /* Load user */
-        $user = $this->getUserRepository()->findOneByEmail($email);
+        $user = match (true) {
+            is_int($userEmailOrId) => $this->getUserRepository()->find($userEmailOrId),
+            is_string($userEmailOrId) => $this->getUserRepository()->findOneByEmail($userEmailOrId),
+        };
         if ($user === null) {
-            throw new Exception(sprintf('Unable to find user with email "%s".', $email));
+            throw new Exception(sprintf('Unable to find user with email "%s".', $userEmailOrId));
         }
         $this->user = $user;
 
@@ -175,14 +178,14 @@ class CalendarLoaderService extends BaseLoaderService
     /**
      * Loads and returns the calendar by given email and calendar name
      *
-     * @param string $email
+     * @param string|int $userEmailOrId
      * @param string|int $calendarNameOrId
      * @param bool $clearObjects
      * @return Calendar
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function loadCalendar(string $email, string|int $calendarNameOrId, bool $clearObjects = true): Calendar
+    public function loadCalendar(string|int $userEmailOrId, string|int $calendarNameOrId, bool $clearObjects = true): Calendar
     {
         /* Clears all objects */
         if ($clearObjects) {
@@ -190,7 +193,7 @@ class CalendarLoaderService extends BaseLoaderService
         }
 
         /* Load User */
-        $this->loadUser($email, false);
+        $this->loadUser($userEmailOrId, false);
 
         /* Load calendar */
         $calendar = match (true) {
@@ -210,7 +213,7 @@ class CalendarLoaderService extends BaseLoaderService
     /**
      * Loads and returns calendar from user and given calendar name.
      *
-     * @param string $email
+     * @param string|int $userEmailOrId
      * @param string|int $calendarNameOrId
      * @param int $year
      * @param int $month
@@ -219,7 +222,7 @@ class CalendarLoaderService extends BaseLoaderService
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function loadCalendarImage(string $email, string|int $calendarNameOrId, int $year, int $month, bool $clearObjects = true): CalendarImage
+    public function loadCalendarImage(string|int $userEmailOrId, string|int $calendarNameOrId, int $year, int $month, bool $clearObjects = true): CalendarImage
     {
         /* Clears all objects */
         if ($clearObjects) {
@@ -227,7 +230,7 @@ class CalendarLoaderService extends BaseLoaderService
         }
 
         /* Load calendar */
-        $calendar = $this->loadCalendar($email, $calendarNameOrId, false);
+        $calendar = $this->loadCalendar($userEmailOrId, $calendarNameOrId, false);
 
         /* Load calendar image */
         $calendarImage = $this->getCalendarImageRepository()->findOneByYearAndMonth($this->getUser(), $calendar, $year, $month);

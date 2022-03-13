@@ -54,6 +54,7 @@ class AppExtension extends AbstractExtension
             new TwigFilter('preg_replace', [$this, 'pregReplace']),
             new TwigFilter('path_orig', [$this, 'getPathOrig']),
             new TwigFilter('path_400', [$this, 'getPath400']),
+            new TwigFilter('add_hash', [$this, 'addHash']),
             new TwigFilter('check_path', [$this, 'checkPath']),
         ];
     }
@@ -106,6 +107,30 @@ class AppExtension extends AbstractExtension
     public function getPath400(string $path): string
     {
         return $this->checkPath($path);
+    }
+
+    /**
+     * Adds hash to the end of image path.
+     *
+     * @param string $path
+     * @return string
+     * @throws Exception
+     */
+    public function addHash(string $path): string
+    {
+        $fullPath = $this->getFullPath($path);
+
+        if (!file_exists($fullPath)) {
+            throw new Exception(sprintf('Image "%s" was not found (%s:%d).', $path, __FILE__, __LINE__));
+        }
+
+        $md5 = md5_file($fullPath);
+
+        if ($md5 === false) {
+            throw new Exception(sprintf('Unable to calculate md5 hash from file "%s" (%s:%d).', $path, __FILE__, __LINE__));
+        }
+
+        return sprintf('%s?%s', $path, $md5);
     }
 
     /**

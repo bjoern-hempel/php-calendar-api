@@ -161,7 +161,9 @@ class CalendarImage implements EntityInterface
     /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
     #[Groups('calendar_image_extended')]
-    private array $config = [];
+    private array $config = [
+        'valign' => 1,
+    ];
 
     private ArrayToObject $configObject;
 

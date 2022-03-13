@@ -16,16 +16,25 @@ namespace App\Controller\Admin;
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\CalendarImage;
 use App\Entity\Image;
+use App\Service\CalendarBuilderService;
 use App\Service\Entity\CalendarLoaderService;
+use App\Service\Entity\HolidayGroupLoaderService;
 use App\Service\Entity\ImageLoaderService;
 use App\Service\Entity\UserLoaderService;
 use App\Service\SecurityService;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use Exception;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -43,6 +52,10 @@ class CalendarImageCrudController extends BaseCrudController
 
     protected UserLoaderService $userLoaderService;
 
+    protected HolidayGroupLoaderService $holidayGroupLoaderService;
+
+    protected KernelInterface $appKernel;
+
     /**
      * CalendarImageCrudController constructor.
      *
@@ -51,15 +64,21 @@ class CalendarImageCrudController extends BaseCrudController
      * @param CalendarLoaderService $calendarLoaderService
      * @param ImageLoaderService $imageLoaderService
      * @param UserLoaderService $userLoaderService
+     * @param HolidayGroupLoaderService $holidayGroupLoaderService
+     * @param KernelInterface $appKernel
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarLoaderService $calendarLoaderService, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarLoaderService $calendarLoaderService, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, KernelInterface $appKernel)
     {
         $this->calendarLoaderService = $calendarLoaderService;
 
         $this->imageLoaderService = $imageLoaderService;
 
         $this->userLoaderService = $userLoaderService;
+
+        $this->holidayGroupLoaderService = $holidayGroupLoaderService;
+
+        $this->appKernel = $appKernel;
 
         parent::__construct($securityService, $translator);
     }
@@ -120,5 +139,89 @@ class CalendarImageCrudController extends BaseCrudController
                     ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
             default => parent::getField($fieldName),
         };
+    }
+
+    /**
+     * Configure actions.
+     *
+     * @param Actions $actions
+     * @return Actions
+     */
+    public function configureActions(Actions $actions): Actions
+    {
+        $actions = parent::configureActions($actions);
+
+        $buildCalendarSheet = Action::new('buildCalendarSheet', 'admin.calendarImage.fields.buildCalendarSheet.label', 'fa fa-calendar-alt')
+            ->linkToCrudAction('buildCalendarSheet')
+            ->setHtmlAttributes([
+                'data-bs-toggle' => 'modal',
+                'data-bs-target' => '#modal-calendar-sheet',
+                'id' => 'action-calendar-sheet'
+            ]);
+
+        $actions->add(Crud::PAGE_DETAIL, $buildCalendarSheet);
+
+        return $actions;
+    }
+
+    /**
+     * Build calendar sheet.
+     *
+     * @param AdminContext $context
+     * @return RedirectResponse
+     * @throws Exception
+     */
+    public function buildCalendarSheet(AdminContext $context): RedirectResponse
+    {
+        /** @var CalendarImage $calendarImage */
+        $calendarImage = $context->getEntity()->getInstance();
+
+        if (!$calendarImage instanceof CalendarImage) {
+            throw new Exception(sprintf('CalendarImage class of instance expected (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $calendar = $calendarImage->getCalendar();
+
+        if ($calendar === null) {
+            throw new Exception(sprintf('Calendar class not found (%s:%d).', __FILE__, __LINE__));
+        }
+
+        /* Read parameters */
+        $userId = $this->securityService->getUser()->getId();
+        $holidayGroupName = 'Saxony';
+
+        if ($userId === null) {
+            throw new Exception(sprintf('Unable to find user id (%s:%d).', __FILE__, __LINE__));
+        }
+
+        /* Read calendar image and holiday group */
+        $calendarImage = $this->calendarLoaderService->loadCalendarImage($userId, $calendar->getId(), $calendarImage->getYear(), $calendarImage->getMonth());
+        $holidayGroup = $this->holidayGroupLoaderService->loadHolidayGroup($holidayGroupName);
+
+        /* Create calendar image */
+        $timeStart = microtime(true);
+        $calendarBuilderService = new CalendarBuilderService($this->appKernel);
+        $calendarBuilderService->init($calendarImage, $holidayGroup, false, true);
+        $file = $calendarBuilderService->build();
+        $timeTaken = microtime(true) - $timeStart;
+
+        $this->addFlash('success', new TranslatableMessage('admin.actions.calendarSheet.success', [
+            '%month%' => $calendarImage->getMonth(),
+            '%year%' => $calendarImage->getYear(),
+            '%calendar%' => $calendar->getTitle(),
+            '%file%' => $file['pathRelativeTarget'],
+            '%width%' => $file['widthTarget'],
+            '%height%' => $file['heightTarget'],
+            '%size%' => $file['sizeHumanTarget'],
+            '%time%' => sprintf('%.2f', $timeTaken),
+        ]));
+
+        $referrer = $context->getReferrer();
+
+        if ($referrer === null) {
+            throw new Exception(sprintf('Unable to get referrer (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $this->redirect($referrer);
     }
 }

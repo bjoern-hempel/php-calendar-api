@@ -68,9 +68,15 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      */
     protected function checkMissingImages(Image $image, ?CalendarImage $calendarImage = null): void
     {
-        $this->imageService->createTargetImage($image, $calendarImage);
+        if ($calendarImage) {
+            $this->imageService->createTargetImage($image, $calendarImage);
+        }
+
         $this->imageService->createSourceImageWidth($image, Image::WIDTH_400);
-        $this->imageService->createTargetImageWidth($image, Image::WIDTH_400, $calendarImage);
+
+        if ($calendarImage) {
+            $this->imageService->createTargetImageWidth($image, Image::WIDTH_400, $calendarImage);
+        }
     }
 
     /**

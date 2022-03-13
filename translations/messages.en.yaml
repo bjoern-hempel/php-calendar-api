@@ -13,6 +13,14 @@ admin:
     labelLogout: 'Logout'
     insufficientRights: 'Insufficient rights available for access.'
 
+  # Actions
+  actions:
+    calendarSheet:
+      success: 'The calendar page "%month% / %year%" of the calendar "%calendar%" was successfully created: %file%, %width%x%height%px, %size%, %time%s.'
+      failure: 'The calendar page "%month% / %year%" of the calendar "%calendar%" could not be created successfully.'
+      title: 'Generate calendar sheet?'
+      question: 'This will regenerate the calendar sheet.'
+
   # Admin sections
   section:
     administration:
@@ -131,6 +139,9 @@ admin:
       createdAt:
         label: 'Created At'
         help: 'The date and time when this entry was created.'
+      buildCalendarSheet:
+        label: 'Build Calendar Sheet'
+        help: 'Build the Calendar Sheet'
 
   # CalendarStyle section
   calendarStyle:

@@ -59,9 +59,9 @@ class CalendarBuilderService
 
     protected string $pathData;
 
-    protected string $pathSource;
+    protected string $pathSourceAbsolute;
 
-    protected string $pathTarget;
+    protected string $pathTargetAbsolute;
 
     protected string $pathFont;
 
@@ -335,7 +335,7 @@ class CalendarBuilderService
     protected function writeImage(): void
     {
         /* Write image */
-        imagejpeg($this->imageTarget, $this->pathTarget, $this->qualityTarget);
+        imagejpeg($this->imageTarget, $this->pathTargetAbsolute, $this->qualityTarget);
     }
 
     /**
@@ -459,7 +459,7 @@ class CalendarBuilderService
     protected function createImages(): void
     {
         $this->imageTarget = $this->createImage($this->width, $this->height);
-        $this->imageSource = $this->createImageFromImage($this->pathSource);
+        $this->imageSource = $this->createImageFromImage($this->pathSourceAbsolute);
     }
 
     /**
@@ -512,7 +512,7 @@ class CalendarBuilderService
      */
     protected function calculateVariables(): void
     {
-        $propertiesSource = getimagesize($this->pathSource);
+        $propertiesSource = getimagesize($this->pathSourceAbsolute);
 
         if ($propertiesSource === false) {
             throw new Exception(sprintf('Unable to get image size (%s:%d)', __FILE__, __LINE__));
@@ -1045,37 +1045,39 @@ class CalendarBuilderService
     /**
      * Returns image properties from given image.
      *
-     * @param string $path
+     * @param string $pathAbsolute
+     * @param string $pathRelative
      * @param string $keyPostfix
      * @return array<string|int>
      * @throws Exception
      */
-    protected function getImageProperties(string $path, string $keyPostfix = 'Target'): array
+    protected function getImageProperties(string $pathAbsolute, string $pathRelative, string $keyPostfix = 'Target'): array
     {
         /* Check created image */
-        if (!file_exists($path)) {
-            throw new Exception(sprintf('Missing file "%s" (%s:%d).', $path, __FILE__, __LINE__));
+        if (!file_exists($pathAbsolute)) {
+            throw new Exception(sprintf('Missing file "%s" (%s:%d).', $pathAbsolute, __FILE__, __LINE__));
         }
 
         /* Get image properties */
-        $image = getimagesize($path);
+        $image = getimagesize($pathAbsolute);
 
         /* Check image properties */
         if ($image === false) {
-            throw new Exception(sprintf('Unable to get file information from "%s" (%s:%d).', $path, __FILE__, __LINE__));
+            throw new Exception(sprintf('Unable to get file information from "%s" (%s:%d).', $pathAbsolute, __FILE__, __LINE__));
         }
 
         /* Get file size */
-        $sizeByte = filesize($path);
+        $sizeByte = filesize($pathAbsolute);
 
         /* Check image properties */
         if ($sizeByte === false) {
-            throw new Exception(sprintf('Unable to get file size from "%s" (%s:%d).', $path, __FILE__, __LINE__));
+            throw new Exception(sprintf('Unable to get file size from "%s" (%s:%d).', $pathAbsolute, __FILE__, __LINE__));
         }
 
         /* Return the image properties */
         return [
-            sprintf('path%s', $keyPostfix) => $path,
+            sprintf('path%s', $keyPostfix) => $pathAbsolute,
+            sprintf('pathRelative%s', $keyPostfix) => $pathRelative,
             sprintf('width%s', $keyPostfix) => intval($image[0]),
             sprintf('height%s', $keyPostfix) => intval($image[1]),
             sprintf('mime%s', $keyPostfix) => strval($image['mime']),
@@ -1248,11 +1250,17 @@ class CalendarBuilderService
     public function build(): array
     {
         /* Save given values */
-        $this->pathSource = $this->image->getPathFull(type: Image::PATH_TYPE_SOURCE, test: $this->test, rootPath: $this->pathRoot);
-        $this->pathTarget = $this->image->getPathFull(
+        $this->pathSourceAbsolute = $this->image->getPathFull(type: Image::PATH_TYPE_SOURCE, test: $this->test, rootPath: $this->pathRoot);
+        $pathSourceRelative = $this->image->getPath(type: Image::PATH_TYPE_SOURCE, test: $this->test);
+        $this->pathTargetAbsolute = $this->image->getPathFull(
             type: Image::PATH_TYPE_TARGET,
             test: $this->test,
             rootPath: $this->pathRoot,
+            calendarImage: $this->useCalendarImagePath ? $this->calendarImage : null
+        );
+        $pathTargetRelative = $this->image->getPath(
+            type: Image::PATH_TYPE_TARGET,
+            test: $this->test,
             calendarImage: $this->useCalendarImagePath ? $this->calendarImage : null
         );
 
@@ -1264,7 +1272,7 @@ class CalendarBuilderService
         $this->url = $this->calendarImage->getUrl() ?? 'https://github.com/';
 
         /* Check target path */
-        $this->checkAndCreateDirectory($this->pathTarget, true);
+        $this->checkAndCreateDirectory($this->pathTargetAbsolute, true);
 
         /* Init */
         $this->prepare();
@@ -1297,8 +1305,8 @@ class CalendarBuilderService
         $this->destroy();
 
         return array_merge(
-            $this->getImageProperties($this->pathSource, 'Source'),
-            $this->getImageProperties($this->pathTarget),
+            $this->getImageProperties($this->pathSourceAbsolute, $pathSourceRelative, 'Source'),
+            $this->getImageProperties($this->pathTargetAbsolute, $pathTargetRelative),
         );
     }
 }

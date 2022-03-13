@@ -142,7 +142,9 @@ class Event implements EntityInterface
     /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
     #[Groups(['event', 'event_extended'])]
-    private array $config = [];
+    private array $config = [
+        'color' => '255,255,255,100',
+    ];
 
     private ArrayToObject $configObject;
 
