@@ -16,7 +16,9 @@ namespace App\Controller\Admin;
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\CalendarImage;
 use App\Entity\Image;
+use App\Entity\User;
 use App\Service\CalendarBuilderService;
+use App\Service\CalendarSheetCreateService;
 use App\Service\Entity\CalendarLoaderService;
 use App\Service\Entity\HolidayGroupLoaderService;
 use App\Service\Entity\ImageLoaderService;
@@ -54,7 +56,7 @@ class CalendarImageCrudController extends BaseCrudController
 
     protected HolidayGroupLoaderService $holidayGroupLoaderService;
 
-    protected KernelInterface $appKernel;
+    protected CalendarSheetCreateService $calendarSheetCreateService;
 
     /**
      * CalendarImageCrudController constructor.
@@ -65,10 +67,10 @@ class CalendarImageCrudController extends BaseCrudController
      * @param ImageLoaderService $imageLoaderService
      * @param UserLoaderService $userLoaderService
      * @param HolidayGroupLoaderService $holidayGroupLoaderService
-     * @param KernelInterface $appKernel
+     * @param CalendarSheetCreateService $calendarSheetCreateService
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarLoaderService $calendarLoaderService, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, KernelInterface $appKernel)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarLoaderService $calendarLoaderService, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, CalendarSheetCreateService $calendarSheetCreateService)
     {
         $this->calendarLoaderService = $calendarLoaderService;
 
@@ -78,7 +80,7 @@ class CalendarImageCrudController extends BaseCrudController
 
         $this->holidayGroupLoaderService = $holidayGroupLoaderService;
 
-        $this->appKernel = $appKernel;
+        $this->calendarSheetCreateService = $calendarSheetCreateService;
 
         parent::__construct($securityService, $translator);
     }
@@ -102,6 +104,41 @@ class CalendarImageCrudController extends BaseCrudController
     public function getEntity(): string
     {
         return self::getEntityFqcn();
+    }
+
+    /**
+     * Returns the year selection.
+     *
+     * @return int[]
+     */
+    protected function getYearSelection(): array
+    {
+        $years = range(intval(date('Y')) - 3, intval(date('Y') + 10));
+        return array_combine($years, $years);
+    }
+
+    /**
+     * Returns month selection.
+     *
+     * @return int[]
+     */
+    protected function getMonthSelection(): array
+    {
+        return [
+            'title' => 0,
+            'january' => 1,
+            'february' => 2,
+            'march' => 3,
+            'april' => 4,
+            'may' => 5,
+            'june' => 6,
+            'july' => 7,
+            'august' => 8,
+            'september' => 9,
+            'october' => 10,
+            'november' => 11,
+            'december' => 12,
+        ];
     }
 
     /**
@@ -129,9 +166,8 @@ class CalendarImageCrudController extends BaseCrudController
                 ->setRequired(true)
                 ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                 ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
-            'year', 'month' => IntegerField::new($fieldName)
-                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
-                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
+            'year' => $this->easyAdminField->getChoiceField($fieldName, $this->getYearSelection()),
+            'month' => $this->easyAdminField->getChoiceField($fieldName, $this->getMonthSelection()),
             'pathSource', 'pathTarget', 'pathSource400', 'pathTarget400' => ImageField::new($fieldName)
                     ->setBasePath(sprintf('%s/%s', Image::PATH_DATA, Image::PATH_IMAGES))
                     ->setTemplatePath('admin/crud/field/image_preview.html.twig')
@@ -165,6 +201,25 @@ class CalendarImageCrudController extends BaseCrudController
     }
 
     /**
+     * Configures crud.
+     *
+     * @param Crud $crud
+     * @return Crud
+     * @throws Exception
+     */
+    public function configureCrud(Crud $crud): Crud
+    {
+        $crud = parent::configureCrud($crud);
+
+        $crud->setDefaultSort([
+            'calendar' => 'ASC',
+            'month' => 'ASC'
+        ]);
+
+        return $crud;
+    }
+
+    /**
      * Build calendar sheet.
      *
      * @param AdminContext $context
@@ -187,23 +242,17 @@ class CalendarImageCrudController extends BaseCrudController
         }
 
         /* Read parameters */
-        $userId = $this->securityService->getUser()->getId();
         $holidayGroupName = 'Saxony';
-
-        if ($userId === null) {
-            throw new Exception(sprintf('Unable to find user id (%s:%d).', __FILE__, __LINE__));
-        }
-
-        /* Read calendar image and holiday group */
-        $calendarImage = $this->calendarLoaderService->loadCalendarImage($userId, $calendar->getId(), $calendarImage->getYear(), $calendarImage->getMonth());
         $holidayGroup = $this->holidayGroupLoaderService->loadHolidayGroup($holidayGroupName);
 
-        /* Create calendar image */
-        $timeStart = microtime(true);
-        $calendarBuilderService = new CalendarBuilderService($this->appKernel);
-        $calendarBuilderService->init($calendarImage, $holidayGroup, false, true);
-        $file = $calendarBuilderService->build();
-        $timeTaken = microtime(true) - $timeStart;
+        $data = $this->calendarSheetCreateService->create($calendarImage, $holidayGroup);
+
+        $file = $data['file'];
+        $time = floatval($data['time']);
+
+        if (!is_array($file)) {
+            throw new Exception(sprintf('Array expected (%s:%d).', __FILE__, __LINE__));
+        }
 
         $this->addFlash('success', new TranslatableMessage('admin.actions.calendarSheet.success', [
             '%month%' => $calendarImage->getMonth(),
@@ -213,7 +262,7 @@ class CalendarImageCrudController extends BaseCrudController
             '%width%' => $file['widthTarget'],
             '%height%' => $file['heightTarget'],
             '%size%' => $file['sizeHumanTarget'],
-            '%time%' => sprintf('%.2f', $timeTaken),
+            '%time%' => sprintf('%.2f', $time),
         ]));
 
         $referrer = $context->getReferrer();

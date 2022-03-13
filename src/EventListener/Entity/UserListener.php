@@ -152,7 +152,7 @@ class UserListener
             case $entity instanceof Event:
             case $entity instanceof Image:
                 if ($entity->getUser() !== $this->securityService->getUser()) {
-                    throw new AccessDeniedHttpException(sprintf('You do not have permissions to see that entity (%s:%d).', __FILE__, __LINE__));
+                    throw new AccessDeniedHttpException(sprintf('You do not have permissions to see that entity "%s" (%s:%d).', get_class($entity), __FILE__, __LINE__));
                 }
                 break;
         }

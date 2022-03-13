@@ -144,7 +144,7 @@ class CalendarImage implements EntityInterface
 
     #[ORM\Column(type: 'integer')]
     #[Groups(['calendar_image', 'calendar_image_extended'])]
-    private int $month;
+    private int $month = 0;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups('calendar_image_extended')]
@@ -166,6 +166,14 @@ class CalendarImage implements EntityInterface
     ];
 
     private ArrayToObject $configObject;
+
+    /**
+     * CalendarImage constructor.
+     */
+    public function __construct()
+    {
+        $this->year = intval(date('Y'));
+    }
 
     /**
      * __toString method.

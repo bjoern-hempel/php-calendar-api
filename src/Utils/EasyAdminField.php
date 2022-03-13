@@ -53,7 +53,7 @@ class EasyAdminField
      * Returns a choice field with label and help.
      *
      * @param string $fieldName
-     * @param string[] $choices
+     * @param string[]|int[] $choices
      * @return ChoiceField
      * @throws Exception
      */
