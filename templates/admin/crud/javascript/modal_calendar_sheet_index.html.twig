@@ -1,0 +1,41 @@
+<script>
+
+    let modalCalendarSheetTitle = '{{ 'admin.actions.calendarSheet.title'|trans|raw }}';
+    let modalCalendarSheetText = '{{ 'admin.actions.calendarSheet.questionIndex'|trans|raw }}';
+    let modalCalendarSheet = document.getElementById('modal-calendar-sheet');
+
+    modalCalendarSheet.addEventListener('show.bs.modal', function (event) {
+
+        /* Button that triggered the modal */
+        let button = event.relatedTarget;
+
+        /* Get Properties */
+        let tr = button.closest('tr');
+        let year = tr.querySelector('td[data-label="Year"], td[data-label="Jahr"]').textContent.trim();
+        let month = tr.querySelector('td[data-label="Month"], td[data-label="Monat"]').textContent.trim();
+        let calendar = tr.querySelector('td[data-label="Calendar"], td[data-label="Kalender"]').textContent.trim();
+        let title = tr.querySelector('td[data-label="Title"], td[data-label="Titel"]').textContent.trim();
+
+        /* Href */
+        let href = button.href;
+
+        /* Modal elements */
+        let modalButton = modalCalendarSheet.querySelector('#modal-calendar-sheet-button');
+        let modalTitle = modalCalendarSheet.querySelector('.modal-title');
+        let modalText = modalCalendarSheet.querySelector('.modal-text');
+
+        /* Change Text */
+        modalTitle.textContent = modalCalendarSheetTitle;
+        modalText.textContent = modalCalendarSheetText.
+        replace(/%calendar%/, calendar).
+        replace(/%title%/, title).
+        replace(/%year%/, year).
+        replace(/%month%/, month);
+
+        /* Set onclick */
+        modalButton.onclick = function() {
+            location.href = href;
+        };
+    })
+
+</script>

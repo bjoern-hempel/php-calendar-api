@@ -504,7 +504,8 @@ abstract class BaseCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular(sprintf('admin.%s.singular', $this->getCrudName()))
             ->setEntityLabelInPlural(sprintf('admin.%s.plural', $this->getCrudName()))
-            ->overrideTemplate('crud/detail', 'admin/crud/detail.html.twig');
+            ->overrideTemplate('crud/detail', 'admin/crud/detail.html.twig')
+            ->overrideTemplate('crud/index', 'admin/crud/index.html.twig');
     }
 
     /**
@@ -590,5 +591,19 @@ abstract class BaseCrudController extends AbstractCrudController
         }
 
         return $filters;
+    }
+
+    /**
+     * Set icon name.
+     *
+     * @param Actions $actions
+     * @param string $pageName
+     * @param string $actionName
+     * @param string $icon
+     * @return void
+     */
+    protected function setIcon(Actions $actions, string $pageName, string $actionName, string $icon): void
+    {
+        $actions->getAsDto($pageName)->getAction($pageName, $actionName)?->setIcon($icon);
     }
 }

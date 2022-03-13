@@ -58,6 +58,8 @@ class CalendarImageCrudController extends BaseCrudController
 
     protected CalendarSheetCreateService $calendarSheetCreateService;
 
+    public const ACTION_BUILD_CALENDAR_SHEET = 'buildCalendarSheet';
+
     /**
      * CalendarImageCrudController constructor.
      *
@@ -187,15 +189,21 @@ class CalendarImageCrudController extends BaseCrudController
     {
         $actions = parent::configureActions($actions);
 
-        $buildCalendarSheet = Action::new('buildCalendarSheet', 'admin.calendarImage.fields.buildCalendarSheet.label', 'fa fa-calendar-alt')
-            ->linkToCrudAction('buildCalendarSheet')
+        $buildCalendarSheet = Action::new(self::ACTION_BUILD_CALENDAR_SHEET, 'admin.calendarImage.fields.buildCalendarSheet.label', 'fa fa-calendar-alt')
+            ->linkToCrudAction(self::ACTION_BUILD_CALENDAR_SHEET)
             ->setHtmlAttributes([
                 'data-bs-toggle' => 'modal',
                 'data-bs-target' => '#modal-calendar-sheet',
-                'id' => 'action-calendar-sheet'
             ]);
 
-        $actions->add(Crud::PAGE_DETAIL, $buildCalendarSheet);
+        $actions
+            ->add(Crud::PAGE_DETAIL, $buildCalendarSheet)
+            ->add(Crud::PAGE_INDEX, $buildCalendarSheet)
+            ->reorder(Crud::PAGE_INDEX, [Action::DETAIL, Action::EDIT, self::ACTION_BUILD_CALENDAR_SHEET, Action::DELETE]);
+
+        $this->setIcon($actions, Crud::PAGE_INDEX, Action::DETAIL, 'fa fa-eye');
+        $this->setIcon($actions, Crud::PAGE_INDEX, Action::EDIT, 'fa fa-edit');
+        $this->setIcon($actions, Crud::PAGE_INDEX, Action::DELETE, 'fa fa-eraser');
 
         return $actions;
     }

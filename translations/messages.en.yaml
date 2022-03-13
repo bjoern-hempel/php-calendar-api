@@ -19,7 +19,8 @@ admin:
       success: 'The calendar page "%month% / %year%" of the calendar "%calendar%" was successfully created: %file%, %width%x%height%px, %size%, %time%s.'
       failure: 'The calendar page "%month% / %year%" of the calendar "%calendar%" could not be created successfully.'
       title: 'Generate calendar sheet?'
-      question: 'This will regenerate the calendar sheet.'
+      questionIndex: 'This will regenerate the calendar sheet "%title%" (%year%, %month%).'
+      questionDetail: 'This will regenerate the calendar sheet.'
 
   # Admin sections
   section:

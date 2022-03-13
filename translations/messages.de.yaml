@@ -19,7 +19,8 @@ admin:
       success: 'Das Kalenderblatt "%month% / %year%" vom Kalender "%calendar%" wurde erfolgreich erstellt: %file%, %width%x%height%px, %size%, %time%s.'
       failure: 'Das Kalenderblatt "%month% / %year%" vom Kalender "%calendar%" konnte nicht erfolgreich erstellt werden.'
       title: 'Kalenderblatt generieren?'
-      question: 'Hiermit wird das Kalenderblatt neu generiert.'
+      questionIndex: 'Hiermit wird das Kalenderblatt "%title%" (%year%, %month%) neu generiert.'
+      questionDetail: 'Hiermit wird das Kalenderblatt neu generiert.'
 
   # Admin sections
   section:
