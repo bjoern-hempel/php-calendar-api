@@ -122,7 +122,7 @@ class FileNameConverter
      */
     protected static function addFilenameWidth(string $filename, int $width): string
     {
-        $filename = preg_replace('~\.([a-z]+)$~', sprintf('.%d.$1', $width), $filename);
+        $filename = preg_replace('~\.([a-z]+)$~i', sprintf('.%d.$1', $width), $filename);
 
         if ($filename === null) {
             throw new Exception(sprintf('Unable to replace path (%s:%d).', __FILE__, __LINE__));
@@ -140,7 +140,7 @@ class FileNameConverter
      */
     protected static function addFilenameTmp(string $filename): string
     {
-        $filename = preg_replace('~\.([a-z]+)$~', '.tmp.$1', $filename);
+        $filename = preg_replace('~\.([a-z]+)$~i', '.tmp.$1', $filename);
 
         if ($filename === null) {
             throw new Exception(sprintf('Unable to replace path (%s:%d).', __FILE__, __LINE__));

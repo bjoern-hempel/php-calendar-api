@@ -88,7 +88,7 @@ class AppExtension extends AbstractExtension
      */
     public function getPathOrig(string $path): string
     {
-        $pathOrig = preg_replace('~\.[0-9]+\.([a-z]+)$~', '.$1', $path);
+        $pathOrig = preg_replace('~\.[0-9]+\.([a-z]+)$~i', '.$1', $path);
 
         if (!is_string($pathOrig)) {
             throw new Exception(sprintf('Unable to replace string (%s:%d).', __FILE__, __LINE__));
@@ -153,7 +153,7 @@ class AppExtension extends AbstractExtension
      */
     protected function addTmp(string $path): string
     {
-        $path = preg_replace('~(\.[0-9]+)?(\.[a-z]+)$~', '.tmp$1$2', $path);
+        $path = preg_replace('~(\.[0-9]+)?(\.[a-z]+)$~i', '.tmp$1$2', $path);
 
         if (!is_string($path)) {
             throw new Exception(sprintf('Unable to replace string (%s:%d).', __FILE__, __LINE__));

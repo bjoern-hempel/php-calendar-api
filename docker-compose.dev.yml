@@ -1,65 +1,19 @@
 # ===========================================
-# A recipe to deliver the app via Nginx, PHP 8.0.x and MySQL 5.7.35.
+# A development stack recipe to deliver the app via Nginx, PHP 8.0.x and MySQL 5.7.35.
 #
-# @author Björn Hempel <bjoern@hempel.li>
-# @version 1.0 (2021-12-29)
+# @author Björn Hempel <bjoern@hempel.de>
+# @version 1.0 (2022-03-14)
 # ===========================================
 
 # ===========================================
-# Preparation:
-# ------------
-# ❯ export UID=$(id -u)
-# ❯ export GID=$(id -g)
+# This file is used in combination with the docker-compose.yml file. For commands and usage see this file.
 #
 # Start app:
 # ----------
-# ❯ docker-compose up -d
-#
-# Show containers:
-# ----------------
-# ❯ docker container ls
-#
-# Build images:
-# -------------
-# ❯ docker-compose build
-#
-# Show logs:
-# ----------------
-# ❯ docker-compose logs -f
-#
-# Login into containers:
-# ----------------------
-# ❯ docker-compose exec nginx bash
-# ❯ docker-compose exec php bash
-# ❯ docker-compose exec composer bash
-# ❯ docker-compose exec db bash
-# ❯ docker-compose exec db-test bash
-#
-# Open app (local):
-# -----------------
-# - http://127.0.0.1
-#
-# Restart containers:
-# -------------------
-# ❯ docker-compose restart
-#
-# Shutdown containers:
-# --------------------
-# ❯ docker-compose down
-#
-# Installation:
-# -------------
-# ❯ git clone git@github.com:bjoern-hempel/calendarBuilder.git && cd calendarBuilder
-# ❯ ln -s docker-compose.dev.yml docker-compose.dev.yml
-# ❯ docker-compose up -d
-# ❯ docker-compose run composer install
-# ❯ docker-compose exec php yarn install
-# ❯ docker-compose exec php yarn encore production
-# ❯ docker-compose exec php composer migrate-prod
-# ❯ docker-compose exec php composer test
-#
+# ❯ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 # ===========================================
 
+# Use docker compose version 3.8
 version: "3.8"
 
 # configure services
@@ -67,145 +21,15 @@ services:
 
   # Nginx to serve the app.
   nginx:
-    # @see: https://hub.docker.com/_/nginx
-    image: "nginx:latest"
-    container_name: "${NAMESPACE_DEVELOPMENT}.nginx"
-    hostname: "${NAMESPACE_HOSTNAME_DEVELOPMENT}-nginx"
-    restart: always
     ports:
       - ${NGINX_EXPOSE_PORT}:80
-    volumes:
-      # Server static pages
-      - .:/var/www/web:cached
-      # Add nginx log path
-      - ./docker/nginx/log/:/var/log/nginx/
-      # Add nginx configuration
-      - ./docker/nginx/conf.d/site.conf:/etc/nginx/conf.d/default.conf
-    networks:
-      - network-internal
-    depends_on:
-      - php
-      - composer
-      - db
-      - db-test
-
-  # PHP FPM to serve dynamic php scripts
-  php:
-    # @see: https://hub.docker.com/_/php
-    build:
-      dockerfile: "${PHP_FPM_SERVER_DOCKERFILE}"
-      context: docker/.
-    image: "${APP_IMAGE_DEVELOPMENT}:${VERSION_APP}" # "${APP_IMAGE_DEVELOPMENT}:${VERSION_APP_LATEST}"
-    container_name: "${NAMESPACE_DEVELOPMENT}.php.${PHP_VERSION}"
-    hostname: "${NAMESPACE_HOSTNAME_DEVELOPMENT}-php-${PHP_VERSION_HOSTNAME}"
-    restart: always
-    #command: "cron -f"
-    volumes:
-      # Server static pages
-      - .:/var/www/web:delegated
-      # Exclude folder vendor
-      - php-data-vendor:/var/www/web/vendor
-      # Exclude folder var/cache
-      - php-data-var:/var/www/web/var
-    networks:
-      - network-internal
-    environment:
-      # app version
-      VERSION_APP: "${VERSION_APP}"
-      # db configuration
-      ENV_DB_HOST: "${NAMESPACE_HOSTNAME_DEVELOPMENT}-db-${MYSQL_VERSION_HOSTNAME}"
-      ENV_DB_USER: "${MYSQL_SERVER_USER_ROOT}"
-      ENV_DB_PASS: "${MYSQL_SERVER_PASSWORD_ROOT}"
-      ENV_DB_NAME: "${MYSQL_SERVER_DB}"
-      ENV_DB_PORT: "${MYSQL_SERVER_PORT}"
-      ENV_DB_VERSION: "${MYSQL_SERVER_VERSION}"
-      ENV_DB_DRIVER: "${MYSQL_SERVER_DRIVER}"
-      # db test configuration
-      ENV_DB_HOST_TEST: "${NAMESPACE_HOSTNAME_DEVELOPMENT}-db-${MYSQL_VERSION_HOSTNAME}-test"
-      ENV_DB_USER_TEST: "${MYSQL_SERVER_USER_ROOT}"
-      ENV_DB_PASS_TEST: "${MYSQL_SERVER_PASSWORD_ROOT}"
-      ENV_DB_NAME_TEST: "${MYSQL_SERVER_DB_TEST}"
-      ENV_DB_PORT_TEST: "${MYSQL_SERVER_PORT}"
-      ENV_DB_VERSION_TEST: "${MYSQL_SERVER_VERSION}"
-      ENV_DB_DRIVER_TEST: "${MYSQL_SERVER_DRIVER}"
-      # mail configuration
-      ENV_MAIL_SERVER_TRANSPORT: "${MAIL_SERVER_TRANSPORT}"
-      ENV_MAIL_SERVER_HOST: "${MAIL_SERVER_HOST}"
-      ENV_MAIL_SERVER_PORT: "${MAIL_SERVER_PORT}"
-      # system configuration
-      ENV_SYSTEM_CONTEXT: "${SYSTEM_CONTEXT}"
-      ENV_SYSTEM_PROXY_HOST: "${SYSTEM_PROXY_HOST}"
-    depends_on:
-      - db
-      - db-test
-
-  # Composer image
-  composer:
-      image: "composer:latest"
-      container_name: "${NAMESPACE_DEVELOPMENT}.composer"
-      hostname: "${NAMESPACE_HOSTNAME_DEVELOPMENT}-composer"
-      command: [ "composer", "install" ]
-      volumes:
-        - .:/app
-      user: "${UID}:${GID}"
-      networks:
-        - network-internal
-      depends_on:
-        - db
-        - db-test
 
   # MySQL server
   db:
-    image: "${MYSQL_IMAGE}"
-    container_name: "${NAMESPACE_DEVELOPMENT}.db.${MYSQL_VERSION}"
-    hostname: "${NAMESPACE_HOSTNAME_DEVELOPMENT}-db-${MYSQL_VERSION_HOSTNAME}"
-    restart: always
-    #command: --default-authentication-plugin=mysql_native_password
     ports:
       - ${MYSQL_EXPOSE_PORT}:${MYSQL_SERVER_PORT}
-    environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_SERVER_PASSWORD_ROOT}"
-      MYSQL_USER: "${MYSQL_SERVER_USER}"
-      MYSQL_PASSWORD: "${MYSQL_SERVER_PASSWORD}"
-      MYSQL_DATABASE: "${MYSQL_SERVER_DB}"
-    volumes:
-      # Add db data volume
-      - db-data:/var/lib/mysql:delegated
-      # Add db config file
-      - ./docker/mysql/conf.d/mysqld.cnf:/etc/mysql/conf.d/mysqld.cnf
-    networks:
-      - network-internal
 
   # MySQL server
   db-test:
-    image: "${MYSQL_IMAGE}"
-    container_name: "${NAMESPACE_DEVELOPMENT}.db.${MYSQL_VERSION}.test"
-    hostname: "${NAMESPACE_HOSTNAME_DEVELOPMENT}-db-${MYSQL_VERSION_HOSTNAME}-test"
-    restart: always
     ports:
       - ${MYSQL_EXPOSE_PORT_TEST}:${MYSQL_SERVER_PORT}
-    environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_SERVER_PASSWORD_ROOT}"
-      MYSQL_USER: "${MYSQL_SERVER_USER_TEST}"
-      MYSQL_PASSWORD: "${MYSQL_SERVER_PASSWORD_TEST}"
-      MYSQL_DATABASE: "${MYSQL_SERVER_DB_TEST}"
-    volumes:
-      # Add db config file
-      - ./docker/mysql/conf.d/mysqld.cnf:/etc/mysql/conf.d/mysqld.cnf
-    networks:
-      - network-internal
-
-# configure volumes
-volumes:
-  db-data:
-    name: "${NAMESPACE_DEVELOPMENT}.db.data"
-  php-data-vendor:
-    name: "${NAMESPACE_DEVELOPMENT}.php.data.vendor"
-  php-data-var:
-    name: "${NAMESPACE_DEVELOPMENT}.php.data.var"
-
-# configure networks
-networks:
-  network-internal:
-    external: false
-    name: "${NAMESPACE}.network.internal"
