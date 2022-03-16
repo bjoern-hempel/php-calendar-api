@@ -114,6 +114,8 @@ class CalendarImage implements EntityInterface
 
     public const CRUD_FIELDS_FILTER = ['user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'updatedAt', 'createdAt'];
 
+    public const QUALITY_TARGET = 50;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

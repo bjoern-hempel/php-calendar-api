@@ -21,6 +21,7 @@ use App\Service\Entity\HolidayGroupLoaderService;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Class CalendarSheetCreateService
@@ -35,27 +36,27 @@ class CalendarSheetCreateService
 
     protected HolidayGroupLoaderService $holidayGroupLoaderService;
 
-    protected CalendarBuilderService $calendarBuilderService;
-
     protected SecurityService $securityService;
+
+    protected KernelInterface $appKernel;
 
     /**
      * CalendarSheetCreateService constructor.
      *
      * @param CalendarLoaderService $calendarLoaderService
      * @param HolidayGroupLoaderService $holidayGroupLoaderService
-     * @param CalendarBuilderService $calendarBuilderService
      * @param SecurityService $securityService
+     * @param KernelInterface $appKernel
      */
-    public function __construct(CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, CalendarBuilderService $calendarBuilderService, SecurityService $securityService)
+    public function __construct(CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, SecurityService $securityService, KernelInterface $appKernel)
     {
         $this->calendarLoaderService = $calendarLoaderService;
 
         $this->holidayGroupLoaderService = $holidayGroupLoaderService;
 
-        $this->calendarBuilderService = $calendarBuilderService;
-
         $this->securityService = $securityService;
+
+        $this->appKernel = $appKernel;
     }
 
     /**
@@ -86,8 +87,9 @@ class CalendarSheetCreateService
 
         /* Create calendar image */
         $timeStart = microtime(true);
-        $this->calendarBuilderService->init($calendarImage, $holidayGroup, false, true);
-        $file = $this->calendarBuilderService->build();
+        $calendarBuilderService = new CalendarBuilderService($this->appKernel);
+        $calendarBuilderService->init($calendarImage, $holidayGroup, false, true, CalendarImage::QUALITY_TARGET);
+        $file = $calendarBuilderService->build();
         $timeTaken = microtime(true) - $timeStart;
 
         return [

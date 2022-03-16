@@ -106,7 +106,7 @@ class Calendar implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson'];
 
     public const CRUD_FIELDS_INDEX = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson'];
 
@@ -114,7 +114,7 @@ class Calendar implements EntityInterface
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson'];
 
     public const CRUD_FIELDS_FILTER = ['name', 'title', 'subtitle', 'user'];
 
@@ -164,7 +164,15 @@ class Calendar implements EntityInterface
     /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
     #[Groups(['calendar_extended', 'calendar'])]
-    private array $config = [];
+    private array $config = [
+        'backgroundColor' => '255,255,255,100',
+        'printCalendarWeek' => true,
+        'printWeekNumber' => true,
+        'printQrCodeMonth' => true,
+        'printQrCodeTitle' => true,
+        'aspectRatio' => 1.414,
+        'height' => 4000,
+    ];
 
     private ArrayToObject $configObject;
 

@@ -21,6 +21,12 @@ admin:
       title: 'Kalenderblatt generieren?'
       questionIndex: 'Hiermit wird das Kalenderblatt "%title%" (%year%, %month%) neu generiert.'
       questionDetail: 'Hiermit wird das Kalenderblatt neu generiert.'
+    calendarSheets:
+      success: '%number% Kalenderblätter "%name% wurden erfolgreich erstellt: %time%s; %sizes%.'
+      failure: 'Die Kalenderblätter "%name% konnten nicht erfolgreich erstellt werden.'
+      title: 'Kalenderblätter generieren?'
+      questionIndex: 'Hiermit werden die Kalenderblätter "%name%" neu generiert.'
+      questionDetail: 'Hiermit werden die Kalenderblätter neu generiert.'
 
   # Admin sections
   section:
@@ -80,12 +86,18 @@ admin:
       configJson:
         label: 'Konfiguration'
         help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      calendarImages:
+        label: 'Kalender Bilder'
+        help: 'Die Kalender Bilder dieses Eintrags.'
       updatedAt:
         label: 'Geändert am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
       createdAt:
         label: 'Angelegt am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+      buildCalendarSheets:
+        label: 'Kalenderblätter generieren'
+        help: 'Generiert die Kalenderblätter'
 
   # CalendarImage section
   calendarImage:

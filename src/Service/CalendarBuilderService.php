@@ -230,9 +230,10 @@ class CalendarBuilderService
      * @param HolidayGroup|null $holidayGroup
      * @param bool $test
      * @param bool $useCalendarImagePath
+     * @param int $qualityTarget
      * @throws Exception
      */
-    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false, bool $useCalendarImagePath = false): void
+    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false, bool $useCalendarImagePath = false, int $qualityTarget = 100): void
     {
         /* Clear positions */
         $this->positionDays = [];
@@ -242,6 +243,9 @@ class CalendarBuilderService
 
         /* Use CalendarImage path */
         $this->useCalendarImagePath = $useCalendarImagePath;
+
+        /* Set quality */
+        $this->qualityTarget = $qualityTarget;
 
         /* calendar instances */
         $this->calendarImage = $calendarImage;
@@ -1040,6 +1044,9 @@ class CalendarBuilderService
 
         /* Add dynamically generated qr image to main image */
         imagecopyresized($this->imageTarget, $imageQrCode, $this->padding, $this->height - $this->padding - $this->heightQrCode, 0, 0, $this->widthQrCode, $this->heightQrCode, $widthQrCode, $heightQrCode);
+
+        /* Destroy image. */
+        imagedestroy($imageQrCode);
     }
 
     /**

@@ -16,11 +16,17 @@ admin:
   # Actions
   actions:
     calendarSheet:
-      success: 'The calendar page "%month% / %year%" of the calendar "%calendar%" was successfully created: %file%, %width%x%height%px, %size%, %time%s.'
-      failure: 'The calendar page "%month% / %year%" of the calendar "%calendar%" could not be created successfully.'
+      success: 'The calendar sheet "%month% / %year%" of the calendar "%calendar%" was successfully created: %file%, %width%x%height%px, %size%, %time%s.'
+      failure: 'The calendar sheet "%month% / %year%" of the calendar "%calendar%" could not be created successfully.'
       title: 'Generate calendar sheet?'
       questionIndex: 'This will regenerate the calendar sheet "%title%" (%year%, %month%).'
       questionDetail: 'This will regenerate the calendar sheet.'
+    calendarSheets:
+      success: 'The calendar sheets "%name%" was successfully created: %number%, %time%s; %sizes%.'
+      failure: 'The calendar sheets "%name% could not be created successfully.'
+      title: 'Generate calendar sheets?'
+      questionIndex: 'This will regenerate all calendar sheet "%name%".'
+      questionDetail: 'This will regenerate all calendar sheets.'
 
   # Admin sections
   section:
@@ -80,12 +86,18 @@ admin:
       configJson:
         label: 'Config'
         help: 'The current configuration of this entry in JSON format.'
+      calendarImages:
+        label: 'Calendar images'
+        help: 'The calendar images of this entry.'
       updatedAt:
         label: 'Updated At'
         help: 'The date and time when this entry was last edited.'
       createdAt:
         label: 'Created At'
         help: 'The date and time when this entry was created.'
+      buildCalendarSheets:
+        label: 'Build Calendar Sheets'
+        help: 'Build the Calendar Sheets'
 
   # CalendarImage section
   calendarImage:

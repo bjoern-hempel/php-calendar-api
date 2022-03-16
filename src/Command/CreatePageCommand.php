@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Entity\CalendarImage;
 use App\Service\CalendarBuilderService;
 use App\Service\Entity\CalendarLoaderService;
 use App\Service\Entity\HolidayGroupLoaderService;
@@ -146,7 +147,7 @@ EOT
         /* Create calendar image */
         $timeStart = microtime(true);
         $calendarBuilderService = new CalendarBuilderService($this->appKernel);
-        $calendarBuilderService->init($calendarImage, $holidayGroup, false, true);
+        $calendarBuilderService->init($calendarImage, $holidayGroup, false, true, CalendarImage::QUALITY_TARGET);
         $file = $calendarBuilderService->build();
         $timeTaken = microtime(true) - $timeStart;
 
