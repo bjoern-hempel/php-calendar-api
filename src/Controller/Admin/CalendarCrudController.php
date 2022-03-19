@@ -14,12 +14,15 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\Admin\Base\BaseCrudController;
+use App\Controller\Base\BaseController;
+use App\Controller\CalendarController;
 use App\Entity\Calendar;
 use App\Entity\CalendarImage;
 use App\Entity\HolidayGroup;
 use App\Service\CalendarSheetCreateService;
 use App\Service\Entity\HolidayGroupLoaderService;
 use App\Service\SecurityService;
+use App\Service\UrlService;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -41,6 +44,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CalendarCrudController extends BaseCrudController
 {
     public const ACTION_BUILD_CALENDAR_SHEETS = 'buildCalendarSheets';
+
+    public const ACTION_VIEW_CALENDAR_SHEETS = 'viewCalendarSheets';
 
     protected HolidayGroupLoaderService $holidayGroupLoaderService;
 
@@ -95,23 +100,56 @@ class CalendarCrudController extends BaseCrudController
     {
         $actions = parent::configureActions($actions);
 
-        $buildCalendarSheet = Action::new(self::ACTION_BUILD_CALENDAR_SHEETS, 'admin.calendar.fields.buildCalendarSheets.label', 'fa fa-calendar-alt')
+        $buildCalendarSheets = Action::new(self::ACTION_BUILD_CALENDAR_SHEETS, 'admin.calendar.fields.buildCalendarSheets.label', 'fa fa-refresh')
             ->linkToCrudAction(self::ACTION_BUILD_CALENDAR_SHEETS)
             ->setHtmlAttributes([
                 'data-bs-toggle' => 'modal',
                 'data-bs-target' => '#modal-calendar-sheets',
             ]);
 
+        $viewCalendarSheets = Action::new(self::ACTION_VIEW_CALENDAR_SHEETS, 'admin.calendar.fields.viewCalendarSheets.label', 'fa fa-calendar')
+            ->linkToCrudAction(self::ACTION_VIEW_CALENDAR_SHEETS)
+            ->setHtmlAttributes([
+                'target' => '_blank',
+            ]);
+
         $actions
-            ->add(Crud::PAGE_DETAIL, $buildCalendarSheet)
-            ->add(Crud::PAGE_INDEX, $buildCalendarSheet)
-            ->reorder(Crud::PAGE_INDEX, [Action::DETAIL, Action::EDIT, self::ACTION_BUILD_CALENDAR_SHEETS, Action::DELETE]);
+            ->add(Crud::PAGE_DETAIL, $buildCalendarSheets)
+            ->add(Crud::PAGE_INDEX, $buildCalendarSheets)
+            ->add(Crud::PAGE_DETAIL, $viewCalendarSheets)
+            ->add(Crud::PAGE_INDEX, $viewCalendarSheets)
+            ->reorder(Crud::PAGE_INDEX, [
+                Action::DETAIL,
+                Action::EDIT,
+                Action::DELETE,
+                self::ACTION_VIEW_CALENDAR_SHEETS,
+                self::ACTION_BUILD_CALENDAR_SHEETS,
+            ]);
 
         $this->setIcon($actions, Crud::PAGE_INDEX, Action::DETAIL, 'fa fa-eye');
         $this->setIcon($actions, Crud::PAGE_INDEX, Action::EDIT, 'fa fa-edit');
         $this->setIcon($actions, Crud::PAGE_INDEX, Action::DELETE, 'fa fa-eraser');
 
         return $actions;
+    }
+
+    /**
+     * Gets the calendar from AdminContext.
+     *
+     * @param AdminContext $context
+     * @return Calendar
+     * @throws Exception
+     */
+    protected function getCalendar(AdminContext $context): Calendar
+    {
+        /** @var Calendar $calendar */
+        $calendar = $context->getEntity()->getInstance();
+
+        if (!$calendar instanceof Calendar) {
+            throw new Exception(sprintf('Calendar class of instance expected (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $calendar;
     }
 
     /**
@@ -135,6 +173,28 @@ class CalendarCrudController extends BaseCrudController
     }
 
     /**
+     * Views all calendar sheet.
+     *
+     * @param AdminContext $context
+     * @return RedirectResponse
+     * @throws Exception
+     */
+    public function viewCalendarSheets(AdminContext $context): RedirectResponse
+    {
+        $calendar = $this->getCalendar($context);
+
+        $encoded = UrlService::encode(BaseController::CONFIG_APP_CALENDAR_INDEX, [
+            'hash' => $calendar->getUser()->getIdHash(),
+            'userId' => intval($calendar->getUser()->getId()),
+            'calendarId' => $calendar->getId(),
+        ]);
+
+        return $this->redirectToRoute(BaseController::ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED, [
+            'encoded' => $encoded,
+        ]);
+    }
+
+    /**
      * Build calendar sheet.
      *
      * @param AdminContext $context
@@ -143,8 +203,7 @@ class CalendarCrudController extends BaseCrudController
      */
     public function buildCalendarSheets(AdminContext $context): RedirectResponse
     {
-        /** @var Calendar $calendar */
-        $calendar = $context->getEntity()->getInstance();
+        $calendar = $this->getCalendar($context);
 
         /* Some parameters */
         $holidayGroupName = 'Saxony';
@@ -152,10 +211,6 @@ class CalendarCrudController extends BaseCrudController
         $time = 0;
         $number = 0;
         $sizes = [];
-
-        if (!$calendar instanceof Calendar) {
-            throw new Exception(sprintf('Calendar class of instance expected (%s:%d).', __FILE__, __LINE__));
-        }
 
         foreach ($calendar->getCalendarImages() as $calendarImage) {
             $data = $this->buildCalendarSheet($calendarImage, $holidayGroup);

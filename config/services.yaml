@@ -41,6 +41,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
+    App\Field\Configurator\CollectionCalendarImageConfigurator:
+        tags:
+            - { name: 'ea.field_configurator', priority: -1 }
+
     App\Field\Configurator\ImageEmptyConfigurator:
         arguments: [ '%kernel.project_dir%' ]
 

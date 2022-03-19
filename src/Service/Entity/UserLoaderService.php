@@ -71,6 +71,24 @@ class UserLoaderService extends BaseLoaderService
     }
 
     /**
+     * Gets user entity by user id.
+     *
+     * @param int $userId
+     * @return User
+     * @throws Exception
+     */
+    protected function getUser(int $userId): User
+    {
+        $user = $this->getUserRepository()->find($userId);
+
+        if ($user === null) {
+            throw new Exception(sprintf('Unable to find user (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $user;
+    }
+
+    /**
      * Loads all users by permissions.
      *
      * @return User[]
@@ -83,5 +101,46 @@ class UserLoaderService extends BaseLoaderService
         }
 
         return $this->getUserRepository()->findBy(['id' => $this->securityService->getUser()->getId()]);
+    }
+
+    /**
+     * Load user by permissions.
+     *
+     * @param int $userId
+     * @return User
+     * @throws Exception
+     */
+    public function loadUser(int $userId): User
+    {
+        if ($this->securityService->isGrantedByAnAdmin()) {
+            return $this->getUser($userId);
+        }
+
+        if ($this->securityService->getUser()->getId() !== $userId) {
+            throw new Exception(sprintf('Not allowed to get user with id %d.', $userId));
+        }
+
+        return $this->getUser($userId);
+    }
+
+    /**
+     * Load user and check permission by given hash.
+     *
+     * @param int $userId
+     * @param string $hash
+     * @return User
+     * @throws Exception
+     */
+    public function loadUserCheckHash(int $userId, string $hash): User
+    {
+        $user = $this->getUser($userId);
+
+        $userHash = $user->getIdHash();
+
+        if ($userHash !== $hash) {
+            throw new Exception(sprintf('The hash does not match with given hash "%s" (%s:%d).', $hash, __FILE__, __LINE__));
+        }
+
+        return $user;
     }
 }

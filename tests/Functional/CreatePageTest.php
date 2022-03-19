@@ -163,7 +163,7 @@ final class CreatePageTest extends KernelTestCase
      */
     protected function getCalendarImage(string $email, string $calendarName, int $year, int $month): CalendarImage
     {
-        return $this->calendarLoaderService->loadCalendarImage($email, $calendarName, $year, $month);
+        return $this->calendarLoaderService->loadCalendarImageByCalendarNameYearAndMonth($email, $calendarName, $year, $month);
     }
 
     /**

@@ -98,6 +98,9 @@ admin:
       buildCalendarSheets:
         label: 'Build Calendar Sheets'
         help: 'Build the Calendar Sheets'
+      viewCalendarSheets:
+        label: 'View Calendar Sheets'
+        help: 'Show the Calendar Sheets'
 
   # CalendarImage section
   calendarImage:

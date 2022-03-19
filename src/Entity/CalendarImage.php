@@ -19,9 +19,11 @@ use App\EventListener\Entity\UserListener;
 use App\Repository\CalendarImageRepository;
 use App\Security\Voter\UserVoter;
 use App\Utils\ArrayToObject;
+use App\Utils\FileNameConverter;
 use App\Utils\Traits\JsonHelper;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
+use Hoa\File\File;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -204,7 +206,7 @@ class CalendarImage implements EntityInterface
     /**
      * Gets the relative or absolute source path of the image.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
@@ -212,34 +214,48 @@ class CalendarImage implements EntityInterface
      * @return string
      * @throws Exception
      */
-    public function getPathSource(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    public function getPathSource(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
     {
         if ($this->getImage() === null) {
             throw new Exception(sprintf('No Image was found (%s:%d).', __FILE__, __LINE__));
         }
 
-        return $this->getImage()->getPath(Image::PATH_TYPE_SOURCE, $tmp, $test, $full, $rootPath, $width);
+        return $this->getImage()->getPath(Image::PATH_TYPE_SOURCE, $tmp, $test, $outputMode, $rootPath, $width, $this);
     }
 
     /**
      * Gets the relative or absolute source path of the image with 400px width.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
      * @return string
      * @throws Exception
      */
-    public function getPathSource400(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathSource400(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false): string
     {
-        return $this->getPathSource($full, $test, $rootPath, $tmp, Image::WIDTH_400);
+        return $this->getPathSource($outputMode, $test, $rootPath, $tmp, Image::WIDTH_400);
+    }
+
+    /**
+     * Gets the relative source path of the image with 400px width.
+     *
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @return string
+     * @throws Exception
+     */
+    public function getPathSource400Relative(bool $test = false, string $rootPath = '', bool $tmp = false): string
+    {
+        return $this->getPathSource400(FileNameConverter::MODE_OUTPUT_RELATIVE, $test, $rootPath, $tmp);
     }
 
     /**
      * Gets the relative or absolute source path of the image.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
@@ -247,28 +263,61 @@ class CalendarImage implements EntityInterface
      * @return string
      * @throws Exception
      */
-    public function getPathTarget(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    public function getPathTarget(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
     {
         if ($this->getImage() === null) {
             throw new Exception(sprintf('No Image was found (%s:%d).', __FILE__, __LINE__));
         }
 
-        return $this->getImage()->getPath(Image::PATH_TYPE_TARGET, $tmp, $test, $full, $rootPath, $width, $this);
+        return $this->getImage()->getPath(Image::PATH_TYPE_TARGET, $tmp, $test, $outputMode, $rootPath, $width, $this);
     }
 
     /**
-     * Gets the relative or absolute source path of the image with 400px width.
+     * Gets the relative source path of the image.
      *
-     * @param bool $full
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param int|null $width
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTargetRelative(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    {
+        if ($this->getImage() === null) {
+            throw new Exception(sprintf('No Image was found (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $this->getImage()->getPath(Image::PATH_TYPE_TARGET, $tmp, $test, FileNameConverter::MODE_OUTPUT_RELATIVE, $rootPath, $width, $this);
+    }
+
+    /**
+     * Gets the file, relative or absolute source path of the image with 400px width.
+     *
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
      * @return string
      * @throws Exception
      */
-    public function getPathTarget400(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathTarget400(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false): string
     {
-        return $this->getPathTarget($full, $test, $rootPath, $tmp, Image::WIDTH_400);
+        return $this->getPathTarget($outputMode, $test, $rootPath, $tmp, Image::WIDTH_400);
+    }
+
+    /**
+     * Gets the relative source path of the image with 400px width.
+     *
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTarget400Relative(bool $test = false, string $rootPath = '', bool $tmp = false): string
+    {
+        return $this->getPathTarget400(FileNameConverter::MODE_OUTPUT_RELATIVE, $test, $rootPath, $tmp);
     }
 
     /**

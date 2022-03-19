@@ -158,6 +158,7 @@ class Calendar implements EntityInterface
     #[ORM\OneToMany(mappedBy: 'calendar', targetEntity: CalendarImage::class, orphanRemoval: true)]
     #[MaxDepth(1)]
     #[Groups('calendar_extended')]
+    #[ORM\OrderBy(value: ['month' => 'ASC'])]
     #[ApiSubresource]
     private Collection $calendarImages;
 

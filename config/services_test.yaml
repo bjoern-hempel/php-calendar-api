@@ -11,6 +11,7 @@ services:
             - '@kernel'
             - '@doctrine.orm.entity_manager'
             - '@App\Service\SecurityService'
+            - '@App\Service\Entity\UserLoaderService'
         public: true
 
     App\Service\Entity\HolidayGroupLoaderService:

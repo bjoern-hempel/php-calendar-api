@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ calendarImage.name }}{% endblock %}
+
+{% block body %}
+    {% apply spaceless %}
+        <div style="width: 1024px; margin: auto;">
+            <h1>{{ calendarImage.title }}</h1>
+            <p>
+                Jahr: {{ calendarImage.year }}<br />
+                Monat: {{ calendarImage.month }}
+            </p>
+            <p>
+                <img src="{{ calendarImage.pathTargetRelative|add_hash|url_absolute }}" style="width: 100%;" />
+            </p>
+            <p>
+                <a href="{{ path_encoded('app_calendar_index', {'hash': calendarImage.user.idHash, 'userId': calendarImage.user.id, 'calendarId': calendarImage.calendar.id}) }}">Übersicht</a>
+            </p>
+        </div>
+    {% endapply %}
+{% endblock %}

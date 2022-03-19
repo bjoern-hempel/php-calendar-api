@@ -98,6 +98,9 @@ admin:
       buildCalendarSheets:
         label: 'Kalenderblätter generieren'
         help: 'Generiert die Kalenderblätter'
+      viewCalendarSheets:
+        label: 'Kalenderblätter anzeigen'
+        help: 'Zeigt die Kalenderblätter an'
 
   # CalendarImage section
   calendarImage:

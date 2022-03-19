@@ -131,7 +131,7 @@ EOT
         $holidayGroupName = 'Saxony';
 
         /* Read calendar image and holiday group */
-        $calendarImage = $this->calendarLoaderService->loadCalendarImage($email, $calendarNameOrId, $year, $month);
+        $calendarImage = $this->calendarLoaderService->loadCalendarImageByCalendarNameYearAndMonth($email, $calendarNameOrId, $year, $month);
         $holidayGroup = $this->holidayGroupLoaderService->loadHolidayGroup($holidayGroupName);
 
         /* Print details */

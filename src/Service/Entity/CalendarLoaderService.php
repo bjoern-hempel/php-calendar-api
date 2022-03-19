@@ -15,7 +15,6 @@ namespace App\Service\Entity;
 
 use App\Entity\Calendar;
 use App\Entity\CalendarImage;
-use App\Entity\EntityInterface;
 use App\Entity\Image;
 use App\Entity\User;
 use App\Repository\CalendarImageRepository;
@@ -43,6 +42,8 @@ class CalendarLoaderService extends BaseLoaderService
 
     protected SecurityService $securityService;
 
+    protected UserLoaderService $userLoaderService;
+
     protected CalendarLoaderService $calendarLoaderService;
 
     protected User $user;
@@ -59,14 +60,17 @@ class CalendarLoaderService extends BaseLoaderService
      * @param KernelInterface $appKernel
      * @param EntityManagerInterface $manager
      * @param SecurityService $securityService
+     * @param UserLoaderService $userLoaderService
      */
-    public function __construct(KernelInterface $appKernel, EntityManagerInterface $manager, SecurityService $securityService)
+    public function __construct(KernelInterface $appKernel, EntityManagerInterface $manager, SecurityService $securityService, UserLoaderService $userLoaderService)
     {
         $this->appKernel = $appKernel;
 
         $this->manager = $manager;
 
         $this->securityService = $securityService;
+
+        $this->userLoaderService = $userLoaderService;
     }
 
     /**
@@ -222,7 +226,7 @@ class CalendarLoaderService extends BaseLoaderService
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function loadCalendarImage(string|int $userEmailOrId, string|int $calendarNameOrId, int $year, int $month, bool $clearObjects = true): CalendarImage
+    public function loadCalendarImageByCalendarNameYearAndMonth(string|int $userEmailOrId, string|int $calendarNameOrId, int $year, int $month, bool $clearObjects = true): CalendarImage
     {
         /* Clears all objects */
         if ($clearObjects) {
@@ -236,6 +240,54 @@ class CalendarLoaderService extends BaseLoaderService
         $calendarImage = $this->getCalendarImageRepository()->findOneByYearAndMonth($this->getUser(), $calendar, $year, $month);
         if ($calendarImage === null) {
             throw new Exception(sprintf('Unable to find calendar image with year "%d" and month "%d".', $year, $month));
+        }
+        $this->calendarImage = $calendarImage;
+
+        /* Load image */
+        $image = $this->calendarImage->getImage();
+        if ($image === null) {
+            throw new Exception(sprintf('Image not found (%s:%d).', __FILE__, __LINE__));
+        }
+        $this->image = $image;
+
+        /* Returns the calendar image */
+        return $this->getCalendarImage();
+    }
+
+    /**
+     * Loads and returns calendar from user and given user hash, user and calendar image id.
+     *
+     * @param string $hash
+     * @param int $userId
+     * @param int $calendarImageId
+     * @param bool $clearObjects
+     * @return CalendarImage
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function loadCalendarImageByUserHashAndCalendarImage(string $hash, int $userId, int $calendarImageId, bool $clearObjects = true): CalendarImage
+    {
+        /* Clears all objects */
+        if ($clearObjects) {
+            $this->clear();
+        }
+
+        /* Check that user id and user hash matches. */
+        $this->userLoaderService->loadUserCheckHash($userId, $hash);
+
+        /* Load user. */
+        $user = $this->getUserRepository()->find($userId);
+        if (!$user instanceof User) {
+            throw new Exception(sprintf('User not found (%s:%d).', __FILE__, __LINE__));
+        }
+
+        /* Load calendar image. */
+        $calendarImage = $this->getCalendarImageRepository()->findOneBy([
+            'user' => $user,
+            'id' => $calendarImageId,
+        ]);
+        if (!$calendarImage instanceof CalendarImage) {
+            throw new Exception(sprintf('CalendarImage not found (%s:%d).', __FILE__, __LINE__));
         }
         $this->calendarImage = $calendarImage;
 

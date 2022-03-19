@@ -158,9 +158,11 @@ class Image implements EntityInterface
 
     public const PATH_TYPE_COMPARE = 'compare';
 
+    public const PATH_DATA = 'data';
+
     public const PATH_IMAGES = 'images';
 
-    public const PATH_DATA = 'data';
+    public const PATH_DATA_IMAGES = 'data/images';
 
     public const WIDTH_400 = 400;
 
@@ -246,14 +248,14 @@ class Image implements EntityInterface
      * @param string $type
      * @param bool $tmp
      * @param bool $test
-     * @param bool $full
+     * @param string $outputMode
      * @param string $rootPath
      * @param int|null $width
      * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false, bool $test = false, bool $full = false, string $rootPath = '', ?int $width = null, ?CalendarImage $calendarImage = null): string
+    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false, bool $test = false, string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, string $rootPath = '', ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
         $path = match (true) {
             $type === self::PATH_TYPE_SOURCE && $this->pathSource !== null => $this->pathSource,
@@ -261,14 +263,14 @@ class Image implements EntityInterface
             default => $this->path,
         };
 
-        $fileNameConverter = new FileNameConverter($path, $rootPath, $full);
+        $fileNameConverter = new FileNameConverter($path, $rootPath, $test);
 
         return $fileNameConverter->getFilename(
             $type,
             $width,
             $tmp,
             $test,
-            $full ? FileNameConverter::MODE_OUTPUT_ABSOLUTE : FileNameConverter::MODE_OUTPUT_FILE,
+            $outputMode,
             $calendarImage ? strval($calendarImage->getId()) : null
         );
     }
@@ -287,13 +289,13 @@ class Image implements EntityInterface
      */
     public function getPathFull(string $type = self::PATH_TYPE_SOURCE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath($type, $tmp, $test, true, $rootPath, $width, $calendarImage);
+        return $this->getPath($type, $tmp, $test, FileNameConverter::MODE_OUTPUT_ABSOLUTE, $rootPath, $width, $calendarImage);
     }
 
     /**
      * Gets the relative or absolute source path of this image.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
@@ -302,15 +304,15 @@ class Image implements EntityInterface
      * @return string
      * @throws Exception
      */
-    public function getPathSource(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
+    public function getPathSource(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_SOURCE, $tmp, $test, $full, $rootPath, $width, $calendarImage);
+        return $this->getPath(self::PATH_TYPE_SOURCE, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
     }
 
     /**
      * Gets the relative or absolute source path of this image with 400px width.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
@@ -318,15 +320,15 @@ class Image implements EntityInterface
      * @return string
      * @throws Exception
      */
-    public function getPathSource400(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?CalendarImage $calendarImage = null): string
+    public function getPathSource400(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathSource($full, $test, $rootPath, $tmp, self::WIDTH_400, $calendarImage);
+        return $this->getPathSource($outputMode, $test, $rootPath, $tmp, self::WIDTH_400, $calendarImage);
     }
 
     /**
      * Gets the relative or absolute source path of this image.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
@@ -335,15 +337,15 @@ class Image implements EntityInterface
      * @return string
      * @throws Exception
      */
-    public function getPathTarget(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
+    public function getPathTarget(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_TARGET, $tmp, $test, $full, $rootPath, $width, $calendarImage);
+        return $this->getPath(self::PATH_TYPE_TARGET, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
     }
 
     /**
      * Gets the relative or absolute source path of this image with 400px width.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
@@ -351,15 +353,15 @@ class Image implements EntityInterface
      * @return string
      * @throws Exception
      */
-    public function getPathTarget400(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?CalendarImage $calendarImage = null): string
+    public function getPathTarget400(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathTarget($full, $test, $rootPath, $tmp, self::WIDTH_400, $calendarImage);
+        return $this->getPathTarget($outputMode, $test, $rootPath, $tmp, self::WIDTH_400, $calendarImage);
     }
 
     /**
      * Gets the relative or absolute source path of this image.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
@@ -368,15 +370,15 @@ class Image implements EntityInterface
      * @return string
      * @throws Exception
      */
-    public function getPathExpected(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
+    public function getPathExpected(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_EXPECTED, $tmp, $test, $full, $rootPath, $width, $calendarImage);
+        return $this->getPath(self::PATH_TYPE_EXPECTED, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
     }
 
     /**
      * Gets the relative or absolute source path of this image.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
@@ -385,9 +387,9 @@ class Image implements EntityInterface
      * @return string
      * @throws Exception
      */
-    public function getPathCompare(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
+    public function getPathCompare(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_COMPARE, $tmp, $test, $full, $rootPath, $width, $calendarImage);
+        return $this->getPath(self::PATH_TYPE_COMPARE, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
     }
 
     /**
@@ -403,7 +405,7 @@ class Image implements EntityInterface
      */
     public function getPathSourceFull(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathSource(true, $test, $rootPath, $tmp, $width, $calendarImage);
+        return $this->getPathSource(FileNameConverter::MODE_OUTPUT_ABSOLUTE, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**
@@ -419,7 +421,7 @@ class Image implements EntityInterface
      */
     public function getPathTargetFull(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathTarget(true, $test, $rootPath, $tmp, $width, $calendarImage);
+        return $this->getPathTarget(FileNameConverter::MODE_OUTPUT_ABSOLUTE, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**
@@ -435,7 +437,7 @@ class Image implements EntityInterface
      */
     public function getPathExpectedFull(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathExpected(true, $test, $rootPath, $tmp, $width, $calendarImage);
+        return $this->getPathExpected(FileNameConverter::MODE_OUTPUT_ABSOLUTE, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**
@@ -451,7 +453,7 @@ class Image implements EntityInterface
      */
     public function getPathCompareFull(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathCompare(true, $test, $rootPath, $tmp, $width, $calendarImage);
+        return $this->getPathCompare(FileNameConverter::MODE_OUTPUT_ABSOLUTE, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin\Base;
 
+use App\Controller\Admin\CalendarImageCrudController;
 use App\Entity\Calendar;
 use App\Entity\CalendarImage;
 use App\Entity\CalendarStyle;
@@ -21,6 +22,7 @@ use App\Entity\Holiday;
 use App\Entity\HolidayGroup;
 use App\Entity\Image;
 use App\Entity\User;
+use App\Field\CollectionCalendarImageField;
 use App\Field\PathImageField;
 use App\Service\SecurityService;
 use App\Utils\EasyAdminField;
@@ -40,7 +42,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -150,6 +151,12 @@ abstract class BaseCrudController extends AbstractCrudController
                     case 'calendarStyle':
                         return AssociationField::new($fieldName)
                             ->setRequired(true)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
+
+                    /* Collection fields */
+                    case 'calendarImages':
+                        return CollectionCalendarImageField::new($fieldName)
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                             ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
                 }
@@ -285,11 +292,6 @@ abstract class BaseCrudController extends AbstractCrudController
 
             /* DateTime fields. */
             'updatedAt', 'createdAt' => DateTimeField::new($fieldName)
-                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
-                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
-
-            /* Collection fields */
-            'calendarImages' => CollectionField::new($fieldName)
                 ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                 ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
 
