@@ -189,6 +189,12 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      */
     protected function getUrl(CalendarImage $calendarImage, string $defaultHost = 'calendar.ixno.de'): string
     {
+        $calendar = $calendarImage->getCalendar();
+
+        if (!$calendar instanceof Calendar) {
+            throw new Exception(sprintf('Unable to get calendar (%s:%d).', __FILE__, __LINE__));
+        }
+
         $currentRequest = $this->requestStack->getCurrentRequest();
 
         if ($currentRequest === null) {
@@ -199,9 +205,14 @@ class EasyAdminSubscriber implements EventSubscriberInterface
 
         $encoded = $this->getEncoded($calendarImage);
 
-        $path = $this->router->generate(BaseController::ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED, [
-            'encoded' => $encoded,
-        ]);
+        $path = match ($calendarImage->getMonth()) {
+            0 => $this->router->generate(BaseController::ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED, [
+                'encoded' => $encoded,
+            ]),
+            default => $this->router->generate(BaseController::ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED, [
+                'encoded' => $encoded,
+            ]),
+        };
 
         return sprintf('https://%s%s', $host, $path);
     }
