@@ -15,10 +15,12 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\User;
+use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class UserCrudController.
@@ -35,13 +37,15 @@ class UserCrudController extends BaseCrudController
      * UserCrudController constructor.
      *
      * @param UserPasswordHasherInterface $imageProperty
+     * @param SecurityService $securityService
+     * @param TranslatorInterface $translator
      * @throws Exception
      */
-    public function __construct(UserPasswordHasherInterface $imageProperty)
+    public function __construct(UserPasswordHasherInterface $imageProperty, SecurityService $securityService, TranslatorInterface $translator)
     {
         $this->userPasswordHasher = $imageProperty;
 
-        parent::__construct();
+        parent::__construct($securityService, $translator);
     }
 
     /**

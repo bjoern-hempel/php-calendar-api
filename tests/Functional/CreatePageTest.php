@@ -17,8 +17,8 @@ use App\DataFixtures\AppFixtures;
 use App\Entity\CalendarImage;
 use App\Entity\HolidayGroup;
 use App\Service\CalendarBuilderService;
-use App\Service\CalendarLoaderService;
-use App\Service\HolidayGroupLoaderService;
+use App\Service\Entity\CalendarLoaderService;
+use App\Service\Entity\HolidayGroupLoaderService;
 use App\Tests\Library\DbHelper;
 use App\Utils\ImageProperty;
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -163,7 +163,7 @@ final class CreatePageTest extends KernelTestCase
      */
     protected function getCalendarImage(string $email, string $calendarName, int $year, int $month): CalendarImage
     {
-        return $this->calendarLoaderService->loadCalendarImage($email, $calendarName, $year, $month);
+        return $this->calendarLoaderService->loadCalendarImageByCalendarNameYearAndMonth($email, $calendarName, $year, $month);
     }
 
     /**
@@ -228,13 +228,17 @@ final class CreatePageTest extends KernelTestCase
         $calendarName = 'Calendar 1';
         $year = 2022;
         $month = 1;
-        $holidayGroupName = 'Saxony';
+        $holidayGroupName = AppFixtures::NAME_HOLIDAY_GROUP_SAXONY;
 
         /* Arrange */
         $calendarImage = $this->getCalendarImage($email, $calendarName, $year, $month);
         $holidayGroup = $this->getHolidayGroup($holidayGroupName);
-        $height = $calendarImage->getCalendar()->getConfigObject()->getInt('height');
-        $width = $calendarImage->getCalendar()->getConfigObject()->getInt('width');
+        $calendar = $calendarImage->getCalendar();
+        if ($calendar === null) {
+            throw new Exception(sprintf('Calendar class is missing (%s:%d).', __FILE__, __LINE__));
+        }
+        $height = $calendar->getConfigObject()->getInt('height');
+        $width = $calendar->getConfigObject()->getInt('width');
 
         /* Act */
         $this->calendarBuilderService->init($calendarImage, $holidayGroup, true);

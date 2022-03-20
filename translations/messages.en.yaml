@@ -13,6 +13,21 @@ admin:
     labelLogout: 'Logout'
     insufficientRights: 'Insufficient rights available for access.'
 
+  # Actions
+  actions:
+    calendarSheet:
+      success: 'The calendar sheet "%month% / %year%" of the calendar "%calendar%" was successfully created: %file%, %width%x%height%px, %size%, %time%s.'
+      failure: 'The calendar sheet "%month% / %year%" of the calendar "%calendar%" could not be created successfully.'
+      title: 'Generate calendar sheet?'
+      questionIndex: 'This will regenerate the calendar sheet "%title%" (%year%, %month%).'
+      questionDetail: 'This will regenerate the calendar sheet.'
+    calendarSheets:
+      success: 'The calendar sheets "%name%" was successfully created: %number%, %time%s; %sizes%.'
+      failure: 'The calendar sheets "%name% could not be created successfully.'
+      title: 'Generate calendar sheets?'
+      questionIndex: 'This will regenerate all calendar sheet "%name%".'
+      questionDetail: 'This will regenerate all calendar sheets.'
+
   # Admin sections
   section:
     administration:
@@ -71,12 +86,24 @@ admin:
       configJson:
         label: 'Config'
         help: 'The current configuration of this entry in JSON format.'
+      published:
+        label: 'Published'
+        help: 'Specifies whether this entity should be published.'
+      calendarImages:
+        label: 'Calendar images'
+        help: 'The calendar images of this entry.'
       updatedAt:
         label: 'Updated At'
         help: 'The date and time when this entry was last edited.'
       createdAt:
         label: 'Created At'
         help: 'The date and time when this entry was created.'
+      buildCalendarSheets:
+        label: 'Build Calendar Sheets'
+        help: 'Build the Calendar Sheets'
+      viewCalendarSheets:
+        label: 'View Calendar Sheets'
+        help: 'Show the Calendar Sheets'
 
   # CalendarImage section
   calendarImage:
@@ -95,12 +122,62 @@ admin:
       image:
         label: 'Image'
         help: 'The image of this entry.'
+      pathSource:
+        label: 'Image'
+        help: 'The image path of this entry.'
+      pathSourcePreview:
+        label: 'Image'
+        help: 'The image of this entry.'
+      pathTarget:
+        label: 'Calendar Sheet'
+        help: 'The calendar sheet of this entry.'
+      pathTargetPreview:
+        label: 'Calendar Sheet'
+        help: 'The calendar sheet of this entry.'
       year:
         label: 'Year'
         help: 'The year of this entry.'
+        entries:
+          2010: 'Calendar year 2010'
+          2011: 'Calendar year 2011'
+          2012: 'Calendar year 2012'
+          2013: 'Calendar year 2013'
+          2014: 'Calendar year 2014'
+          2015: 'Calendar year 2015'
+          2016: 'Calendar year 2016'
+          2017: 'Calendar year 2017'
+          2018: 'Calendar year 2018'
+          2019: 'Calendar year 2019'
+          2020: 'Calendar year 2020'
+          2021: 'Calendar year 2021'
+          2022: 'Calendar year 2022'
+          2023: 'Calendar year 2023'
+          2024: 'Calendar year 2024'
+          2025: 'Calendar year 2025'
+          2026: 'Calendar year 2026'
+          2027: 'Calendar year 2027'
+          2028: 'Calendar year 2028'
+          2029: 'Calendar year 2029'
+          2030: 'Calendar year 2030'
+          2031: 'Calendar year 2031'
+          2032: 'Calendar year 2032'
       month:
         label: 'Month'
         help: 'The month of this entry.'
+        entries:
+          title: 'Title sheet'
+          january: 'January'
+          february: 'February'
+          march: 'March'
+          april: 'April'
+          may: 'May'
+          june: 'June'
+          july: 'July'
+          august: 'August'
+          september: 'September'
+          october: 'October'
+          november: 'November'
+          december: 'December'
       title:
         label: 'Title'
         help: 'The title of this entry.'
@@ -119,6 +196,9 @@ admin:
       createdAt:
         label: 'Created At'
         help: 'The date and time when this entry was created.'
+      buildCalendarSheet:
+        label: 'Build Calendar Sheet'
+        help: 'Build the Calendar Sheet'
 
   # CalendarStyle section
   calendarStyle:
@@ -158,6 +238,10 @@ admin:
       type:
         label: 'Type'
         help: 'The type of this entry.'
+        entries:
+          entry0: 'Birthday'
+          entry1: 'Event (one day)'
+          entry2: 'Event (several days)'
       date:
         label: 'Date'
         help: 'The date of this entry.'
@@ -228,13 +312,22 @@ admin:
       user:
         label: 'User'
         help: 'The user of this entry.'
+      name:
+        label: 'Name'
+        help: 'The name of this entry.'
       path:
         label: 'Path'
         help: 'The path of this entry.'
       pathSource:
         label: 'Source path'
         help: 'The source path of this entry.'
+      pathSourcePreview:
+        label: 'Path'
+        help: 'The path of this entry.'
       pathTarget:
+        label: 'Target path'
+        help: 'The source path of this entry.'
+      pathTargetPreview:
         label: 'Target path'
         help: 'The source path of this entry.'
       pathSourceFull:

@@ -13,6 +13,21 @@ admin:
     labelLogout: 'Ausloggen'
     insufficientRights: 'Unzureichende Rechte für den Zugang verfügbar.'
 
+  # Actions
+  actions:
+    calendarSheet:
+      success: 'Das Kalenderblatt "%month% / %year%" vom Kalender "%calendar%" wurde erfolgreich erstellt: %file%, %width%x%height%px, %size%, %time%s.'
+      failure: 'Das Kalenderblatt "%month% / %year%" vom Kalender "%calendar%" konnte nicht erfolgreich erstellt werden.'
+      title: 'Kalenderblatt generieren?'
+      questionIndex: 'Hiermit wird das Kalenderblatt "%title%" (%year%, %month%) neu generiert.'
+      questionDetail: 'Hiermit wird das Kalenderblatt neu generiert.'
+    calendarSheets:
+      success: '%number% Kalenderblätter "%name% wurden erfolgreich erstellt: %time%s; %sizes%.'
+      failure: 'Die Kalenderblätter "%name% konnten nicht erfolgreich erstellt werden.'
+      title: 'Kalenderblätter generieren?'
+      questionIndex: 'Hiermit werden die Kalenderblätter "%name%" neu generiert.'
+      questionDetail: 'Hiermit werden die Kalenderblätter neu generiert.'
+
   # Admin sections
   section:
     administration:
@@ -71,12 +86,24 @@ admin:
       configJson:
         label: 'Konfiguration'
         help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      published:
+        label: 'Veröffentlicht'
+        help: 'Gibt an, ob dieser Eintrag veröffentlicht werden soll.'
+      calendarImages:
+        label: 'Kalender Bilder'
+        help: 'Die Kalender Bilder dieses Eintrags.'
       updatedAt:
         label: 'Geändert am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
       createdAt:
         label: 'Angelegt am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+      buildCalendarSheets:
+        label: 'Kalenderblätter generieren'
+        help: 'Generiert die Kalenderblätter'
+      viewCalendarSheets:
+        label: 'Kalenderblätter anzeigen'
+        help: 'Zeigt die Kalenderblätter an'
 
   # CalendarImage section
   calendarImage:
@@ -95,12 +122,62 @@ admin:
       image:
         label: 'Bild'
         help: 'Das Bild dieses Eintrags.'
+      pathSource:
+        label: 'Bild'
+        help: 'Das Bild dieses Eintrags.'
+      pathSourcePreview:
+        label: 'Bild'
+        help: 'Der Bild dieses Eintrags.'
+      pathTarget:
+        label: 'Kalenderblatt'
+        help: 'Der Kalenderblatt dieses Eintrags.'
+      pathTargetPreview:
+        label: 'Kalenderblatt'
+        help: 'Der Kalenderblatt dieses Eintrags.'
       year:
         label: 'Jahr'
         help: 'Das Jahr dieses Eintrags.'
+        entries:
+          2010: 'Kalenderjahr 2010'
+          2011: 'Kalenderjahr 2011'
+          2012: 'Kalenderjahr 2012'
+          2013: 'Kalenderjahr 2013'
+          2014: 'Kalenderjahr 2014'
+          2015: 'Kalenderjahr 2015'
+          2016: 'Kalenderjahr 2016'
+          2017: 'Kalenderjahr 2017'
+          2018: 'Kalenderjahr 2018'
+          2019: 'Kalenderjahr 2019'
+          2020: 'Kalenderjahr 2020'
+          2021: 'Kalenderjahr 2021'
+          2022: 'Kalenderjahr 2022'
+          2023: 'Kalenderjahr 2023'
+          2024: 'Kalenderjahr 2024'
+          2025: 'Kalenderjahr 2025'
+          2026: 'Kalenderjahr 2026'
+          2027: 'Kalenderjahr 2027'
+          2028: 'Kalenderjahr 2028'
+          2029: 'Kalenderjahr 2029'
+          2030: 'Kalenderjahr 2030'
+          2031: 'Kalenderjahr 2031'
+          2032: 'Kalenderjahr 2032'
       month:
         label: 'Monat'
         help: 'Der Monat dieses Eintrags.'
+        entries:
+          title: 'Titelblatt'
+          january: 'Januar'
+          february: 'Februar'
+          march: 'März'
+          april: 'April'
+          may: 'Mai'
+          june: 'Juni'
+          july: 'Juli'
+          august: 'August'
+          september: 'September'
+          october: 'Oktober'
+          november: 'November'
+          december: 'Dezember'
       title:
         label: 'Titel'
         help: 'Der Titel dieses Eintrags.'
@@ -119,6 +196,9 @@ admin:
       createdAt:
         label: 'Angelegt am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+      buildCalendarSheet:
+        label: 'Kalenderblatt generieren'
+        help: 'Generiert das Kalenderblatt'
 
   # CalendarStyle section
   calendarStyle:
@@ -158,6 +238,10 @@ admin:
       type:
         label: 'Typ'
         help: 'Der Typ dieses Eintrags.'
+        entries:
+          entry0: 'Geburtstag'
+          entry1: 'Event (eintägig)'
+          entry2: 'Event (mehrtägig)'
       date:
         label: 'Datum'
         help: 'Das Datum dieses Eintrags.'
@@ -228,13 +312,22 @@ admin:
       user:
         label: 'User'
         help: 'Der User dieses Eintrags.'
+      name:
+        label: 'Name'
+        help: 'Der Name dieses Eintrags.'
       path:
         label: 'Pfad'
         help: 'Der Pfad dieses Eintrags.'
       pathSource:
         label: 'Quellpfad'
         help: 'Der Quellpfad dieses Eintrags.'
+      pathSourcePreview:
+        label: 'Quellpfad'
+        help: 'Der Quellpfad dieses Eintrags.'
       pathTarget:
+        label: 'Zielpfad'
+        help: 'Der Zielpfad dieses Eintrags.'
+      pathTargetPreview:
         label: 'Zielpfad'
         help: 'Der Zielpfad dieses Eintrags.'
       pathSourceFull:

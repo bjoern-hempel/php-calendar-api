@@ -13,47 +13,60 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\Entity\Image;
-use App\Entity\User;
-use App\Service\UserLoaderService;
-use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityBuiltEvent;
+use App\Controller\Base\BaseController;
+use App\Entity\Calendar;
+use App\Entity\CalendarImage;
+use App\Entity\HolidayGroup;
+use App\Service\CalendarSheetCreateService;
+use App\Service\ImageService;
+use App\Service\UrlService;
+use chillerlan\QRCode\QRCode;
+use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityPersistedEvent;
+use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityUpdatedEvent;
+use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
+use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Class EasyAdminSubscriber.
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-02-16)
+ * @version 1.0 (2022-02-26)
  * @package App\EventSubscriber
  */
 class EasyAdminSubscriber implements EventSubscriberInterface
 {
-    protected KernelInterface $appKernel;
+    protected ImageService $imageService;
 
-    protected UserLoaderService $userLoaderService;
+    protected CalendarSheetCreateService $calendarSheetCreateService;
 
     protected RequestStack $requestStack;
 
-    protected TranslatorInterface $translator;
+    protected UrlGeneratorInterface $router;
 
-    public const TEXT_NOT_GENERATED = 'admin.image.notGenerated';
-
-    public const PATH_FONT = 'data/font/OpenSansCondensed-Bold.ttf';
-
-    public function __construct(KernelInterface $appKernel, UserLoaderService $userLoaderService, RequestStack $requestStack, TranslatorInterface $translator)
+    /**
+     * EasyAdminSubscriber constructor.
+     *
+     * @param ImageService $imageService
+     * @param CalendarSheetCreateService $calendarSheetCreateService
+     * @param RequestStack $requestStack
+     * @param UrlGeneratorInterface $router
+     */
+    public function __construct(ImageService $imageService, CalendarSheetCreateService $calendarSheetCreateService, RequestStack $requestStack, UrlGeneratorInterface $router)
     {
-        $this->appKernel = $appKernel;
+        $this->imageService = $imageService;
 
-        $this->userLoaderService = $userLoaderService;
+        $this->calendarSheetCreateService = $calendarSheetCreateService;
 
         $this->requestStack = $requestStack;
 
-        $this->translator = $translator;
+        $this->router = $router;
     }
 
     /**
@@ -61,204 +74,212 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      *
      * @return string[][]
      */
-    #[ArrayShape([AfterEntityBuiltEvent::class => "string[]"])]
+    #[ArrayShape([BeforeEntityPersistedEvent::class => "string[]", BeforeEntityUpdatedEvent::class => "string[]", AfterEntityPersistedEvent::class => "string[]", AfterEntityUpdatedEvent::class => "string[]"])]
     public static function getSubscribedEvents(): array
     {
         return [
-            AfterEntityBuiltEvent::class => ['checkImageDir'],
+            BeforeEntityPersistedEvent::class => ['addLinkCalendarImagePersisted'],
+            BeforeEntityUpdatedEvent::class => ['addLinkCalendarImageUpdated'],
+            AfterEntityPersistedEvent::class => ['createCalendarImagePersisted'],
+            AfterEntityUpdatedEvent::class => ['createCalendarImageUpdated'],
         ];
     }
 
     /**
-     * Returns user id hash from request.
+     * Adds a flash message to the current session for type.
      *
-     * @return string|null
+     * @param string $type
+     * @param mixed $message
      * @throws Exception
      */
-    protected function getUserIdHashFromRequest(): ?string
+    protected function addFlash(string $type, mixed $message): void
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $session = $this->requestStack->getSession();
 
-        if ($request === null) {
-            return null;
+        /* @phpstan-ignore-next-line */
+        $flashBag = $session->getFlashBag();
+
+        if (!$flashBag instanceof FlashBag) {
+            throw new Exception(sprintf('Unable to get flash bag (%s:%d).', __FILE__, __LINE__));
         }
 
-        $image = $request->get('Image');
-
-        if (!is_array($image)) {
-            return null;
-        }
-
-        if (!array_key_exists('user', $image)) {
-            return null;
-        }
-
-        $user = $this->userLoaderService->getUserRepository()->find($image['user']);
-
-        if (!$user instanceof User) {
-            return null;
-        }
-
-        return $user->getIdHash();
+        $flashBag->add($type, $message);
     }
 
     /**
-     * Creates the source and target directory.
+     * Builds target image.
      *
-     * @param string $idHash
+     * @param CalendarImage $calendarImage
+     * @return bool
      * @throws Exception
      */
-    protected function createSourceAndTargetFromIdHash(string $idHash): void
+    protected function buildTargetImage(CalendarImage $calendarImage): bool
     {
-        $imageDirectory = sprintf('%s/%s/%s/%s', $this->appKernel->getProjectDir(), Image::PATH_DATA, Image::PATH_IMAGES, $idHash);
+        $calendar = $calendarImage->getCalendar();
 
-        $imageDirectorySource = sprintf('%s/%s', $imageDirectory, Image::PATH_TYPE_SOURCE);
-        $imageDirectoryTarget = sprintf('%s/%s', $imageDirectory, Image::PATH_TYPE_TARGET);
-
-        if (file_exists($imageDirectorySource) && !is_dir($imageDirectorySource)) {
-            throw new Exception(sprintf('Path "%s" does exists but is not a directory (%s:%d).', $imageDirectorySource, __FILE__, __LINE__));
+        if ($calendar === null) {
+            throw new Exception(sprintf('Calendar class not found (%s:%d).', __FILE__, __LINE__));
         }
 
-        if (file_exists($imageDirectoryTarget) && !is_dir($imageDirectoryTarget)) {
-            throw new Exception(sprintf('Path "%s" does exists but is not a directory (%s:%d).', $imageDirectorySource, __FILE__, __LINE__));
+        $holidayGroup = $calendar->getHolidayGroup();
+
+        if (!$holidayGroup instanceof HolidayGroup) {
+            throw new Exception(sprintf('Unable to get holiday group (%s:%d).', __FILE__, __LINE__));
         }
 
-        if (!file_exists($imageDirectorySource)) {
-            mkdir($imageDirectorySource, 0775, true);
+        $data = $this->calendarSheetCreateService->create($calendarImage, $holidayGroup, QRCode::VERSION_AUTO);
+
+        $file = $data['file'];
+        $time = floatval($data['time']);
+
+        if (!is_array($file)) {
+            throw new Exception(sprintf('Array expected (%s:%d).', __FILE__, __LINE__));
         }
 
-        if (!file_exists($imageDirectoryTarget)) {
-            mkdir($imageDirectoryTarget, 0775, true);
-        }
+        $this->addFlash('success', new TranslatableMessage('admin.actions.calendarSheet.success', [
+            '%month%' => $calendarImage->getMonth(),
+            '%year%' => $calendarImage->getYear(),
+            '%calendar%' => $calendar->getTitle(),
+            '%file%' => $file['pathRelativeTarget'],
+            '%width%' => $file['widthTarget'],
+            '%height%' => $file['heightTarget'],
+            '%size%' => $file['sizeHumanTarget'],
+            '%time%' => sprintf('%.2f', $time),
+        ]));
 
-        if (!file_exists($imageDirectorySource)) {
-            throw new Exception(sprintf('Unable to create directory "%s" (%s:%d).', $imageDirectorySource, __FILE__, __LINE__));
-        }
-
-        if (!file_exists($imageDirectoryTarget)) {
-            throw new Exception(sprintf('Unable to create directory "%s" (%s:%d).', $imageDirectoryTarget, __FILE__, __LINE__));
-        }
+        return true;
     }
 
     /**
-     * Create temporary picture.
+     * Gets encoded string from given calendar image.
      *
-     * @param Image $image
+     * @param CalendarImage $calendarImage
      * @return string
      * @throws Exception
      */
-    protected function createTmpPicture(Image $image): string
+    protected function getEncoded(CalendarImage $calendarImage): string
     {
-        $sourcePathFull = $image->getPathSource(true, false, $this->appKernel->getProjectDir());
+        $calendar = $calendarImage->getCalendar();
 
-        /* Get information about image. */
-        $imageInfo = getimagesize($sourcePathFull);
-
-        if ($imageInfo === false) {
-            throw new Exception(sprintf('Unable to get image information (%s:%d).', __FILE__, __LINE__));
+        if (!$calendar instanceof Calendar) {
+            throw new Exception(sprintf('Unable to get calendar (%s:%d).', __FILE__, __LINE__));
         }
 
-        /* Create image. */
-        $imageGp = match ($imageInfo[2]) {
-            IMAGETYPE_GIF => imagecreatefromgif($sourcePathFull),
-            IMAGETYPE_PNG => imagecreatefrompng($sourcePathFull),
-            IMAGETYPE_JPEG => imagecreatefromjpeg($sourcePathFull),
-            default => throw new Exception(sprintf('Unsupported image type %d - %s (%s:%d)', $imageInfo[2], $imageInfo['mime'], __FILE__, __LINE__)),
+        return match ($calendarImage->getMonth()) {
+            0 => UrlService::encode(BaseController::CONFIG_APP_CALENDAR_INDEX, [
+                'hash' => $calendar->getUser()->getIdHash(),
+                'userId' => intval($calendar->getUser()->getId()),
+                'calendarId' => $calendar->getId(),
+            ]),
+            default => UrlService::encode(BaseController::CONFIG_APP_CALENDAR_DETAIL, [
+                'hash' => $calendar->getUser()->getIdHash(),
+                'userId' => intval($calendar->getUser()->getId()),
+                'calendarImageId' => $calendarImage->getId(),
+            ]),
         };
-
-        if ($imageGp === false) {
-            throw new Exception(sprintf('Unable to load image (%s:%d).', __FILE__, __LINE__));
-        }
-
-        /* Image properties. */
-        $width = $imageInfo[0];
-        $height = $imageInfo[1];
-        $color = imagecolorallocate($imageGp, 255, 255, 0);
-        $font = sprintf('%s/%s', $this->appKernel->getProjectDir(), self::PATH_FONT);
-        $text = $this->translator->trans(self::TEXT_NOT_GENERATED);
-        $fontSize = intval($height / 20);
-        $angle = intval(atan($height / $width) / pi() * 2 * 90);
-
-        /* Calculate box. */
-        $box = imageftbbox($fontSize, $angle, $font, $text);
-
-        if ($box === false) {
-            throw new Exception(sprintf('Unable to get size (%s:%d).', __FILE__, __LINE__));
-        }
-
-        if ($color === false) {
-            throw new Exception(sprintf('Unable build color (%s:%d).', __FILE__, __LINE__));
-        }
-
-        /* Get box. */
-        list($left, $bottom, $right, , , $top) = $box;
-
-        /* Calculate center. */
-        $centerX = intval($width / 2);
-        $centerY = intval($height / 2);
-
-        /* Calculate offset. */
-        $left_offset = intval(($right - $left) / 2);
-        $top_offset = intval(($bottom - $top) / 2);
-
-        /* Calculate position. */
-        $x = $centerX - $left_offset;
-        $y = $centerY + $top_offset;
-
-        /* Add text. */
-        imagettftext($imageGp, $fontSize, $angle, $x, $y, $color, $font, $text);
-
-        /* Create image. */
-        $targetPathFullTmp = $image->getPathTarget(true, false, $this->appKernel->getProjectDir(), true);
-        $status = match ($imageInfo[2]) {
-            IMAGETYPE_GIF => imagegif($imageGp, $targetPathFullTmp),
-            IMAGETYPE_PNG => imagepng($imageGp, $targetPathFullTmp),
-            IMAGETYPE_JPEG => imagejpeg($imageGp, $targetPathFullTmp),
-            default => throw new Exception(sprintf('Unsupported image type %d - %s (%s:%d)', $imageInfo[2], $imageInfo['mime'], __FILE__, __LINE__)),
-        };
-
-        /* Check image */
-        if ($status === false || !file_exists($targetPathFullTmp)) {
-            throw new Exception(sprintf('Unable to generate picture (%s:%d).', __FILE__, __LINE__));
-        }
-
-        /* Return relative path */
-        return $image->getPathTarget(false, false, '', true);
     }
 
     /**
-     * Checks image directories.
+     * Returns the full and automatically generated URL from given calendar image.
      *
-     * @param AfterEntityBuiltEvent $event
+     * @param CalendarImage $calendarImage
+     * @param string $defaultHost
+     * @return string
      * @throws Exception
      */
-    public function checkImageDir(AfterEntityBuiltEvent $event): void
+    protected function getUrl(CalendarImage $calendarImage, string $defaultHost = 'calendar.ixno.de'): string
     {
-        $entity = $event->getEntity()->getInstance();
+        $currentRequest = $this->requestStack->getCurrentRequest();
 
-        $idHash = $this->getUserIdHashFromRequest();
-
-        if ($entity === null && $idHash !== null) {
-            $this->createSourceAndTargetFromIdHash($idHash);
+        if ($currentRequest === null) {
+            throw new Exception(sprintf('Unable to get current request (%s:%d).', __FILE__, __LINE__));
         }
 
-        if (!$entity instanceof Image) {
+        $host = in_array($currentRequest->getHost(), ['localhost', '127.0.0.1']) ? $defaultHost : $currentRequest->getHost();
+
+        $encoded = $this->getEncoded($calendarImage);
+
+        $path = $this->router->generate(BaseController::ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED, [
+            'encoded' => $encoded,
+        ]);
+
+        return sprintf('https://%s%s', $host, $path);
+    }
+
+    /**
+     * Adds url to calendar image if url is empty.
+     *
+     * @param CalendarImage $calendarImage
+     * @return bool
+     * @throws Exception
+     */
+    protected function addUrl(CalendarImage $calendarImage): bool
+    {
+        if (!empty($calendarImage->getUrl())) {
+            return true;
+        }
+
+        /* Set new url to calendar image. */
+        $calendarImage->setUrl($this->getUrl($calendarImage));
+
+        return true;
+    }
+
+    /**
+     * Create calendar sheet (create).
+     *
+     * @param AfterEntityPersistedEvent $entityInstance
+     * @return void
+     * @throws Exception
+     */
+    public function createCalendarImagePersisted(AfterEntityPersistedEvent $entityInstance): void
+    {
+        $entity = $entityInstance->getEntityInstance();
+
+        if (!$entity instanceof CalendarImage) {
             return;
         }
 
-        $image = $entity;
+        $this->buildTargetImage($entity);
+    }
 
-        $sourcePathFull = $image->getPathSource(true, false, $this->appKernel->getProjectDir());
-        $targetPathFull = $image->getPathTarget(true, false, $this->appKernel->getProjectDir());
+    /**
+     * Create calendar sheet (update).
+     *
+     * @param AfterEntityUpdatedEvent $entityInstance
+     * @return void
+     * @throws Exception
+     */
+    public function createCalendarImageUpdated(AfterEntityUpdatedEvent $entityInstance): void
+    {
+        $entity = $entityInstance->getEntityInstance();
 
-        if (!file_exists($sourcePathFull)) {
-            throw new Exception(sprintf('Unable to load source image "%s" (%s:%d)', $sourcePathFull, __FILE__, __LINE__));
+        if (!$entity instanceof CalendarImage) {
+            return;
         }
 
-        if (!file_exists($targetPathFull)) {
-            $targetPathTmp = $this->createTmpPicture($image);
+        $this->buildTargetImage($entity);
+    }
 
-            $image->setPathTarget($targetPathTmp);
+    public function addLinkCalendarImagePersisted(BeforeEntityPersistedEvent $entityInstance): void
+    {
+        $entity = $entityInstance->getEntityInstance();
+
+        if (!$entity instanceof CalendarImage) {
+            return;
         }
+
+        $this->addUrl($entity);
+    }
+
+    public function addLinkCalendarImageUpdated(BeforeEntityUpdatedEvent $entityInstance): void
+    {
+        $entity = $entityInstance->getEntityInstance();
+
+        if (!$entity instanceof CalendarImage) {
+            return;
+        }
+
+        $this->addUrl($entity);
     }
 }

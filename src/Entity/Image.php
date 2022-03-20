@@ -15,8 +15,10 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\UserListener;
 use App\Repository\ImageRepository;
 use App\Security\Voter\UserVoter;
+use App\Utils\FileNameConverter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -34,6 +36,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     # Security filter for collection operations at App\Doctrine\CurrentUserExtension
@@ -92,19 +95,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['image']],
     order: ['id' => 'ASC'],
 )]
-class Image
+class Image implements EntityInterface
 {
     use TimestampsTrait;
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'path', 'pathSource', 'pathTarget', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'user', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'name', 'path', 'pathSource', 'pathSourcePreview', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_INDEX = ['id', 'user', 'name', 'pathSourcePreview', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_NEW = ['id', 'user', 'path'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'pathTarget', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_FILTER = ['user', 'width', 'height', 'size'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -151,9 +158,15 @@ class Image
 
     public const PATH_TYPE_COMPARE = 'compare';
 
-    public const PATH_IMAGES = 'images';
+    public const PATH_TYPE_AUTO = 'auto';
 
     public const PATH_DATA = 'data';
+
+    public const PATH_IMAGES = 'images';
+
+    public const PATH_DATA_IMAGES = 'data/images';
+
+    public const WIDTH_400 = 400;
 
     /**
      * Image constructor.
@@ -171,7 +184,19 @@ class Image
      */
     public function __toString(): string
     {
-        return $this->path;
+        return $this->getName();
+    }
+
+    /**
+     * Gets the name of the image.
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        $array = explode('/', $this->path);
+
+        return end($array);
     }
 
     /**
@@ -224,10 +249,15 @@ class Image
      *
      * @param string $type
      * @param bool $tmp
+     * @param bool $test
+     * @param string $outputMode
+     * @param string $rootPath
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false): string
+    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false, bool $test = false, string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, string $rootPath = '', ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
         $path = match (true) {
             $type === self::PATH_TYPE_SOURCE && $this->pathSource !== null => $this->pathSource,
@@ -235,25 +265,16 @@ class Image
             default => $this->path,
         };
 
-        if ($tmp) {
-            $path = preg_replace('~\.([a-z]+)$~', '.tmp.$1', $path);
+        $fileNameConverter = new FileNameConverter($path, $rootPath, $test);
 
-            if ($path === null) {
-                throw new Exception(sprintf('Unable to replace path (%s:%d).', __FILE__, __LINE__));
-            }
-        }
-
-        if ($type === self::PATH_TYPE_SOURCE) {
-            return $path;
-        }
-
-        $replacedPath = preg_replace(sprintf('~(^[a-z0-9]{40,40}/)%s(/)~', self::PATH_TYPE_SOURCE), sprintf('$1%s$2', $type), $path);
-
-        if (!is_string($replacedPath)) {
-            throw new Exception(sprintf('Unexpected replaced path (%s:%d).', __FILE__, __LINE__));
-        }
-
-        return $replacedPath;
+        return $fileNameConverter->getFilename(
+            $type,
+            $width,
+            $tmp,
+            $test,
+            $outputMode,
+            $calendarImage ? strval($calendarImage->getId()) : null
+        );
     }
 
     /**
@@ -263,90 +284,148 @@ class Image
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathFull(string $type = self::PATH_TYPE_SOURCE, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathFull(string $type = self::PATH_TYPE_SOURCE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        $imagePath = sprintf($test ? '%s/tests/%s' : '%s/%s', self::PATH_DATA, self::PATH_IMAGES);
-
-        return sprintf('%s/%s/%s', $rootPath, $imagePath, $this->getPath($type, $tmp));
+        return $this->getPath($type, $tmp, $test, FileNameConverter::MODE_OUTPUT_ABSOLUTE, $rootPath, $width, $calendarImage);
     }
 
     /**
      * Gets the relative or absolute source path of this image.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathSource(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathSource(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        if ($full) {
-            return $this->getPathFull(self::PATH_TYPE_SOURCE, $test, $rootPath, $tmp);
-        }
+        return $this->getPath(self::PATH_TYPE_SOURCE, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+    }
 
-        return $this->getPath(self::PATH_TYPE_SOURCE, $tmp);
+    /**
+     * Gets the relative or absolute source path of this image (preview placeholder).
+     *
+     * @param string $outputMode
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
+     * @return string
+     * @throws Exception
+     */
+    public function getPathSourcePreview(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
+    {
+        return $this->getPathSource($outputMode, $test, $rootPath, $tmp, $width, $calendarImage);
+    }
+
+    /**
+     * Gets the relative or absolute source path of this image with 400px width.
+     *
+     * @param string $outputMode
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param CalendarImage|null $calendarImage
+     * @return string
+     * @throws Exception
+     */
+    public function getPathSource400(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?CalendarImage $calendarImage = null): string
+    {
+        return $this->getPathSource($outputMode, $test, $rootPath, $tmp, self::WIDTH_400, $calendarImage);
     }
 
     /**
      * Gets the relative or absolute source path of this image.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathTarget(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathTarget(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        if ($full) {
-            return $this->getPathFull(self::PATH_TYPE_TARGET, $test, $rootPath, $tmp);
-        }
+        return $this->getPath(self::PATH_TYPE_TARGET, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+    }
 
-        return $this->getPath(self::PATH_TYPE_TARGET, $tmp);
+    /**
+     * Gets the relative or absolute source path of this image (preview placeholder).
+     *
+     * @param string $outputMode
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTargetPreview(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
+    {
+        return $this->getPathTarget($outputMode, $test, $rootPath, $tmp, $width, $calendarImage);
+    }
+
+    /**
+     * Gets the relative or absolute source path of this image with 400px width.
+     *
+     * @param string $outputMode
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param CalendarImage|null $calendarImage
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTarget400(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?CalendarImage $calendarImage = null): string
+    {
+        return $this->getPathTarget($outputMode, $test, $rootPath, $tmp, self::WIDTH_400, $calendarImage);
     }
 
     /**
      * Gets the relative or absolute source path of this image.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathExpected(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathExpected(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        if ($full) {
-            return $this->getPathFull(self::PATH_TYPE_EXPECTED, $test, $rootPath, $tmp);
-        }
-
-        return $this->getPath(self::PATH_TYPE_EXPECTED, $tmp);
+        return $this->getPath(self::PATH_TYPE_EXPECTED, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
     }
 
     /**
      * Gets the relative or absolute source path of this image.
      *
-     * @param bool $full
+     * @param string $outputMode
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathCompare(bool $full = false, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathCompare(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        if ($full) {
-            return $this->getPathFull(self::PATH_TYPE_COMPARE, $test, $rootPath, $tmp);
-        }
-
-        return $this->getPath(self::PATH_TYPE_COMPARE, $tmp);
+        return $this->getPath(self::PATH_TYPE_COMPARE, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
     }
 
     /**
@@ -355,12 +434,14 @@ class Image
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathSourceFull(bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathSourceFull(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathSource(true, $test, $rootPath, $tmp);
+        return $this->getPathSource(FileNameConverter::MODE_OUTPUT_ABSOLUTE, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**
@@ -369,12 +450,14 @@ class Image
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathTargetFull(bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathTargetFull(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathTarget(true, $test, $rootPath, $tmp);
+        return $this->getPathTarget(FileNameConverter::MODE_OUTPUT_ABSOLUTE, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**
@@ -383,12 +466,14 @@ class Image
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathExpectedFull(bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathExpectedFull(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathExpected(true, $test, $rootPath, $tmp);
+        return $this->getPathExpected(FileNameConverter::MODE_OUTPUT_ABSOLUTE, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**
@@ -397,12 +482,14 @@ class Image
      * @param bool $test
      * @param string $rootPath
      * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
      * @return string
      * @throws Exception
      */
-    public function getPathCompareFull(bool $test = false, string $rootPath = '', bool $tmp = false): string
+    public function getPathCompareFull(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPathCompare(true, $test, $rootPath, $tmp);
+        return $this->getPathCompare(FileNameConverter::MODE_OUTPUT_ABSOLUTE, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**

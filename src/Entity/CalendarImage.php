@@ -15,12 +15,15 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\UserListener;
 use App\Repository\CalendarImageRepository;
 use App\Security\Voter\UserVoter;
 use App\Utils\ArrayToObject;
+use App\Utils\FileNameConverter;
 use App\Utils\Traits\JsonHelper;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
+use Hoa\File\File;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -34,6 +37,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: CalendarImageRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     # Security filter for collection operations at App\Doctrine\CurrentUserExtension
@@ -92,21 +96,27 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar_image']],
     order: ['id' => 'ASC'],
 )]
-class CalendarImage
+class CalendarImage implements EntityInterface
 {
     use TimestampsTrait;
 
     use JsonHelper;
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'calendar', 'image', 'pathSource', 'pathSourcePreview', 'pathTarget', 'pathTargetPreview', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_INDEX = ['id', 'user', 'calendar', 'pathSourcePreview', 'pathTargetPreview', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_NEW = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'calendar', 'pathSource', 'pathTarget', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_FILTER = ['user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'updatedAt', 'createdAt'];
+
+    public const QUALITY_TARGET = 50;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -138,7 +148,7 @@ class CalendarImage
 
     #[ORM\Column(type: 'integer')]
     #[Groups(['calendar_image', 'calendar_image_extended'])]
-    private int $month;
+    private int $month = 0;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups('calendar_image_extended')]
@@ -155,9 +165,192 @@ class CalendarImage
     /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
     #[Groups('calendar_image_extended')]
-    private array $config = [];
+    private array $config = [
+        'valign' => 1,
+    ];
 
     private ArrayToObject $configObject;
+
+    /**
+     * CalendarImage constructor.
+     */
+    public function __construct()
+    {
+        $this->year = intval(date('Y'));
+    }
+
+    /**
+     * __toString method.
+     *
+     * @return string
+     * @throws Exception
+     */
+    #[Pure]
+    public function __toString(): string
+    {
+        return $this->getTitleName();
+    }
+
+    /**
+     * Returns the name of this calendar image.
+     *
+     * @return string
+     * @throws Exception
+     */
+    #[Pure]
+    public function getTitleName(): string
+    {
+        return sprintf('%s (%s/%s)', $this->getCalendar()?->getName(), $this->getYear(), $this->getMonth());
+    }
+
+    /**
+     * Gets the relative or absolute source path of the image.
+     *
+     * @param string $outputMode
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param int|null $width
+     * @return string
+     * @throws Exception
+     */
+    public function getPathSource(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    {
+        if ($this->getImage() === null) {
+            throw new Exception(sprintf('No Image was found (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $this->getImage()->getPath(Image::PATH_TYPE_SOURCE, $tmp, $test, $outputMode, $rootPath, $width, $this);
+    }
+
+    /**
+     * Gets the relative or absolute source path of the image (preview placeholder).
+     *
+     * @param string $outputMode
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param int|null $width
+     * @return string
+     * @throws Exception
+     */
+    public function getPathSourcePreview(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    {
+        return $this->getPathSource($outputMode, $test, $rootPath, $tmp, $width);
+    }
+
+    /**
+     * Gets the relative or absolute source path of the image with 400px width.
+     *
+     * @param string $outputMode
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @return string
+     * @throws Exception
+     */
+    public function getPathSource400(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    {
+        return $this->getPathSource($outputMode, $test, $rootPath, $tmp, Image::WIDTH_400);
+    }
+
+    /**
+     * Gets the relative source path of the image with 400px width.
+     *
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @return string
+     * @throws Exception
+     */
+    public function getPathSource400Relative(bool $test = false, string $rootPath = '', bool $tmp = false): string
+    {
+        return $this->getPathSource400(FileNameConverter::MODE_OUTPUT_RELATIVE, $test, $rootPath, $tmp);
+    }
+
+    /**
+     * Gets the relative or absolute source path of the image.
+     *
+     * @param string $outputMode
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param int|null $width
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTarget(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    {
+        if ($this->getImage() === null) {
+            throw new Exception(sprintf('No Image was found (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $this->getImage()->getPath(Image::PATH_TYPE_TARGET, $tmp, $test, $outputMode, $rootPath, $width, $this);
+    }
+
+    /**
+     * Gets the relative or absolute source path of the image (preview placeholder).
+     *
+     * @param string $outputMode
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param int|null $width
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTargetPreview(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    {
+        return $this->getPathTarget($outputMode, $test, $rootPath, $tmp, $width);
+    }
+
+    /**
+     * Gets the relative source path of the image.
+     *
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param int|null $width
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTargetRelative(bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null): string
+    {
+        if ($this->getImage() === null) {
+            throw new Exception(sprintf('No Image was found (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $this->getImage()->getPath(Image::PATH_TYPE_TARGET, $tmp, $test, FileNameConverter::MODE_OUTPUT_RELATIVE, $rootPath, $width, $this);
+    }
+
+    /**
+     * Gets the file, relative or absolute source path of the image with 400px width.
+     *
+     * @param string $outputMode
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTarget400(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false): string
+    {
+        return $this->getPathTarget($outputMode, $test, $rootPath, $tmp, Image::WIDTH_400);
+    }
+
+    /**
+     * Gets the relative source path of the image with 400px width.
+     *
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTarget400Relative(bool $test = false, string $rootPath = '', bool $tmp = false): string
+    {
+        return $this->getPathTarget400(FileNameConverter::MODE_OUTPUT_RELATIVE, $test, $rootPath, $tmp);
+    }
 
     /**
      * Gets the id of this calendar image.
@@ -212,28 +405,25 @@ class CalendarImage
     /**
      * Gets the calendar of this calendar image.
      *
-     * @return Calendar
+     * @return Calendar|null
      * @throws Exception
      */
-    public function getCalendar(): Calendar
+    public function getCalendar(): ?Calendar
     {
-        if (!isset($this->calendar)) {
-            throw new Exception(sprintf('No calendar was configured (%s:%d)', __FILE__, __LINE__));
-        }
-
         return $this->calendar;
     }
 
     /**
      * Gets the calendar id of this calendar image.
      *
-     * @return int
+     * @return int|null
      * @throws Exception
      */
+    #[Pure]
     #[Groups(['calendar_image', 'calendar_image_extended'])]
-    public function getCalendarId(): int
+    public function getCalendarId(): ?int
     {
-        return $this->getCalendar()->getId();
+        return $this->getCalendar()?->getId();
     }
 
     /**
@@ -252,28 +442,24 @@ class CalendarImage
     /**
      * Gets the image of this calendar image.
      *
-     * @return Image
+     * @return Image|null
      * @throws Exception
      */
-    public function getImage(): Image
+    public function getImage(): ?Image
     {
-        if (!isset($this->image)) {
-            throw new Exception(sprintf('No image was configured (%s:%d)', __FILE__, __LINE__));
-        }
-
         return $this->image;
     }
 
     /**
      * Gets the image id of this calendar image.
      *
-     * @return int
+     * @return int|null
      * @throws Exception
      */
     #[Groups(['calendar_image', 'calendar_image_extended'])]
-    public function getImageId(): int
+    public function getImageId(): ?int
     {
-        return $this->getImage()->getId();
+        return $this->getImage()?->getId();
     }
 
     /**

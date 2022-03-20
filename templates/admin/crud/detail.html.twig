@@ -1,0 +1,53 @@
+{% extends '@!EasyAdmin/crud/detail.html.twig' %}
+
+{% block main %}
+    {{ parent() }}
+
+    <div id="modal-calendar-sheet" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4>{{ 'admin.actions.calendarSheet.title'|trans }}</h4>
+                    <p>{{ 'admin.actions.calendarSheet.questionDetail'|trans }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">
+                        <span class="btn-label">{{ 'action.cancel'|trans([], 'EasyAdminBundle') }}</span>
+                    </button>
+
+                    {# \App\Controller\Admin\CalendarImageCrudController::configureActions (#action-calendar-sheet) #}
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-info" id="modal-calendar-sheet-button" onclick="location.href = document.getElementById('action-calendar-sheet').href;">
+                        <span class="btn-label">{{ 'action.generate'|trans([], 'actions') }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-calendar-sheets" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4>{{ 'admin.actions.calendarSheets.title'|trans }}</h4>
+                    <p>{{ 'admin.actions.calendarSheets.questionDetail'|trans }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">
+                        <span class="btn-label">{{ 'action.cancel'|trans([], 'EasyAdminBundle') }}</span>
+                    </button>
+
+                    {# \App\Controller\Admin\CalendarCrudController::configureActions (#action-calendar-sheets) #}
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-info" id="modal-calendar-sheets-button" onclick="location.href = document.getElementById('action-calendar-sheets').href;">
+                        <span class="btn-label">{{ 'action.generate'|trans([], 'actions') }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    {{ include('admin/crud/javascript/modal_calendar_sheet_detail.html.twig') }}
+    {{ include('admin/crud/javascript/modal_calendar_sheets_detail.html.twig') }}
+{% endblock body_javascript %}

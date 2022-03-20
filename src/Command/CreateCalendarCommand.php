@@ -15,8 +15,8 @@ namespace App\Command;
 
 use App\Entity\CalendarImage;
 use App\Service\CalendarBuilderService;
-use App\Service\CalendarLoaderService;
-use App\Service\HolidayGroupLoaderService;
+use App\Service\Entity\CalendarLoaderService;
+use App\Service\Entity\HolidayGroupLoaderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Command\Command;
@@ -113,7 +113,7 @@ EOT
         $email = strval($input->getOption('email'));
         $calendarName = strval($input->getOption('name'));
 
-        /* Read db */
+        /* Read calendar */
         $calendar = $this->calendarLoaderService->loadCalendar($email, $calendarName);
 
         /* Get application */

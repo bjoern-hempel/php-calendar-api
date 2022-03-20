@@ -11,10 +11,13 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace App\Service;
+namespace App\Service\Entity;
 
+use App\Entity\EntityInterface;
 use App\Entity\Image;
 use App\Repository\ImageRepository;
+use App\Service\Entity\Base\BaseLoaderService;
+use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -26,23 +29,28 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * @version 1.0 (2022-02-15)
  * @package App\Command
  */
-class ImageLoaderService
+class ImageLoaderService extends BaseLoaderService
 {
     protected KernelInterface $appKernel;
 
     protected EntityManagerInterface $manager;
+
+    protected SecurityService $securityService;
 
     /**
      * Calendar constructor
      *
      * @param KernelInterface $appKernel
      * @param EntityManagerInterface $manager
+     * @param SecurityService $securityService
      */
-    public function __construct(KernelInterface $appKernel, EntityManagerInterface $manager)
+    public function __construct(KernelInterface $appKernel, EntityManagerInterface $manager, SecurityService $securityService)
     {
         $this->appKernel = $appKernel;
 
         $this->manager = $manager;
+
+        $this->securityService = $securityService;
     }
 
     /**
@@ -60,5 +68,20 @@ class ImageLoaderService
         }
 
         return $repository;
+    }
+
+    /**
+     * Loads all images by permissions.
+     *
+     * @return Image[]
+     * @throws Exception
+     */
+    public function loadImages(): array
+    {
+        if ($this->securityService->isGrantedByAnAdmin()) {
+            return $this->getImageRepository()->findAll();
+        }
+
+        return $this->getImageRepository()->findBy(['user' => $this->securityService->getUser()]);
     }
 }

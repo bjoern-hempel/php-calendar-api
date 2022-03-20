@@ -70,6 +70,11 @@ class VersionController
         return trim($version);
     }
 
+    /**
+     * Returns the PHP version.
+     *
+     * @return string
+     */
     protected function getPhpVersion(): string
     {
         return phpversion();

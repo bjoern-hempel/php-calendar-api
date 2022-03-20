@@ -54,13 +54,43 @@ class CalendarRepository extends ServiceEntityRepository
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function findOneByName(User $user, string $name): ?Calendar
+    public function findOneByUserAndName(User $user, string $name): ?Calendar
     {
         $result = $this->createQueryBuilder('c')
             ->where('c.user = :user')
             ->andWhere('c.name = :name')
             ->setParameter('user', $user)
             ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($result instanceof Calendar) {
+            return $result;
+        }
+
+        if ($result !== null) {
+            throw new Exception(sprintf('Unsupported type (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return null;
+    }
+
+    /**
+     * Find one by id field.
+     *
+     * @param User $user
+     * @param int $id
+     * @return Calendar|null
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function findOneByUserAndId(User $user, int $id): ?Calendar
+    {
+        $result = $this->createQueryBuilder('c')
+            ->where('c.user = :user')
+            ->andWhere('c.id = :id')
+            ->setParameter('user', $user)
+            ->setParameter('id', $id)
             ->getQuery()
             ->getOneOrNullResult();
 

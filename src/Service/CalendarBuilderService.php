@@ -59,9 +59,9 @@ class CalendarBuilderService
 
     protected string $pathData;
 
-    protected string $pathSource;
+    protected string $pathSourceAbsolute;
 
-    protected string $pathTarget;
+    protected string $pathTargetAbsolute;
 
     protected string $pathFont;
 
@@ -136,7 +136,9 @@ class CalendarBuilderService
 
     protected ?HolidayGroup $holidayGroup = null;
 
-    protected bool $test;
+    protected bool $test = false;
+
+    protected bool $useCalendarImagePath = false;
 
     /** @var array<array{name: string[]}> $eventsAndHolidaysRaw */
     protected array $eventsAndHolidaysRaw = [];
@@ -146,6 +148,8 @@ class CalendarBuilderService
 
     /** @var array<bool> $holidays */
     protected array $holidays = [];
+
+    protected int $qrCodeVersion = 5;
 
     public const BIRTHDAY_YEAR_NOT_GIVEN = 2100;
 
@@ -175,6 +179,8 @@ class CalendarBuilderService
 
     public const EVENT_TYPE_EVENT_GROUP = 2;
 
+    public const DEFAULT_QR_CODE_VERSION = 5;
+
     /**
      * Calendar constructor
      *
@@ -186,14 +192,53 @@ class CalendarBuilderService
     }
 
     /**
+     * Gets calendar from given calendar image.
+     *
+     * @param CalendarImage $calendarImage
+     * @return Calendar
+     * @throws Exception
+     */
+    protected function getCalendar(CalendarImage $calendarImage): Calendar
+    {
+        $calendar = $calendarImage->getCalendar();
+
+        if ($calendar === null) {
+            throw new Exception(sprintf('Calendar is missing (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $calendar;
+    }
+
+    /**
+     * Gets image from given calendar image.
+     *
+     * @param CalendarImage $calendarImage
+     * @return Image
+     * @throws Exception
+     */
+    protected function getImage(CalendarImage $calendarImage): Image
+    {
+        $image = $calendarImage->getImage();
+
+        if ($image === null) {
+            throw new Exception(sprintf('Calendar is missing (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $image;
+    }
+
+    /**
      * Init function.
      *
      * @param CalendarImage $calendarImage
      * @param HolidayGroup|null $holidayGroup
      * @param bool $test
+     * @param bool $useCalendarImagePath
+     * @param int $qualityTarget
+     * @param int $qrCodeVersion
      * @throws Exception
      */
-    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false): void
+    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false, bool $useCalendarImagePath = false, int $qualityTarget = 100, int $qrCodeVersion = self::DEFAULT_QR_CODE_VERSION): void
     {
         /* Clear positions */
         $this->positionDays = [];
@@ -201,15 +246,24 @@ class CalendarBuilderService
         /* Test mode */
         $this->test = $test;
 
+        /* Use CalendarImage path */
+        $this->useCalendarImagePath = $useCalendarImagePath;
+
+        /* Set quality */
+        $this->qualityTarget = $qualityTarget;
+
+        /* Set qr code version */
+        $this->qrCodeVersion = $qrCodeVersion;
+
         /* calendar instances */
         $this->calendarImage = $calendarImage;
         $this->holidayGroup = $holidayGroup;
-        $this->calendar = $this->calendarImage->getCalendar();
-        $this->image = $this->calendarImage->getImage();
+        $this->calendar = $this->getCalendar($this->calendarImage);
+        $this->image = $this->getImage($this->calendarImage);
 
         /* sizes */
-        $this->aspectRatio = $this->calendarImage->getCalendar()->getConfigObject()->getAspectRatio() ?? 3 / 2;
-        $this->height = $this->calendarImage->getCalendar()->getConfigObject()->getHeight() ?? 4000;
+        $this->aspectRatio = $this->calendar->getConfigObject()->getAspectRatio() ?? 3 / 2;
+        $this->height = $this->calendar->getConfigObject()->getHeight() ?? 4000;
         $this->width = intval(floor($this->height * $this->aspectRatio));
 
         /* Root path */
@@ -293,7 +347,7 @@ class CalendarBuilderService
     protected function writeImage(): void
     {
         /* Write image */
-        imagejpeg($this->imageTarget, $this->pathTarget, $this->qualityTarget);
+        imagejpeg($this->imageTarget, $this->pathTargetAbsolute, $this->qualityTarget);
     }
 
     /**
@@ -417,7 +471,7 @@ class CalendarBuilderService
     protected function createImages(): void
     {
         $this->imageTarget = $this->createImage($this->width, $this->height);
-        $this->imageSource = $this->createImageFromImage($this->pathSource);
+        $this->imageSource = $this->createImageFromImage($this->pathSourceAbsolute);
     }
 
     /**
@@ -470,7 +524,7 @@ class CalendarBuilderService
      */
     protected function calculateVariables(): void
     {
-        $propertiesSource = getimagesize($this->pathSource);
+        $propertiesSource = getimagesize($this->pathSourceAbsolute);
 
         if ($propertiesSource === false) {
             throw new Exception(sprintf('Unable to get image size (%s:%d)', __FILE__, __LINE__));
@@ -646,7 +700,7 @@ class CalendarBuilderService
         }
 
         if (!file_exists($pathToCheck)) {
-            mkdir($pathToCheck);
+            mkdir($pathToCheck, 0775, true);
         }
 
         if (!file_exists($pathToCheck)) {
@@ -968,7 +1022,7 @@ class CalendarBuilderService
         $options = [
             'eccLevel' => QRCode::ECC_H,
             'outputType' => QRCode::OUTPUT_IMAGICK,
-            'version' => 5,
+            'version' => $this->qrCodeVersion,
             'addQuietzone' => false,
             'scale' => $scale,
             'markupDark' => '#fff',
@@ -998,42 +1052,47 @@ class CalendarBuilderService
 
         /* Add dynamically generated qr image to main image */
         imagecopyresized($this->imageTarget, $imageQrCode, $this->padding, $this->height - $this->padding - $this->heightQrCode, 0, 0, $this->widthQrCode, $this->heightQrCode, $widthQrCode, $heightQrCode);
+
+        /* Destroy image. */
+        imagedestroy($imageQrCode);
     }
 
     /**
      * Returns image properties from given image.
      *
-     * @param string $path
+     * @param string $pathAbsolute
+     * @param string $pathRelative
      * @param string $keyPostfix
      * @return array<string|int>
      * @throws Exception
      */
-    protected function getImageProperties(string $path, string $keyPostfix = 'Target'): array
+    protected function getImageProperties(string $pathAbsolute, string $pathRelative, string $keyPostfix = 'Target'): array
     {
         /* Check created image */
-        if (!file_exists($path)) {
-            throw new Exception(sprintf('Missing file "%s" (%s:%d).', $path, __FILE__, __LINE__));
+        if (!file_exists($pathAbsolute)) {
+            throw new Exception(sprintf('Missing file "%s" (%s:%d).', $pathAbsolute, __FILE__, __LINE__));
         }
 
         /* Get image properties */
-        $image = getimagesize($path);
+        $image = getimagesize($pathAbsolute);
 
         /* Check image properties */
         if ($image === false) {
-            throw new Exception(sprintf('Unable to get file information from "%s" (%s:%d).', $path, __FILE__, __LINE__));
+            throw new Exception(sprintf('Unable to get file information from "%s" (%s:%d).', $pathAbsolute, __FILE__, __LINE__));
         }
 
         /* Get file size */
-        $sizeByte = filesize($path);
+        $sizeByte = filesize($pathAbsolute);
 
         /* Check image properties */
         if ($sizeByte === false) {
-            throw new Exception(sprintf('Unable to get file size from "%s" (%s:%d).', $path, __FILE__, __LINE__));
+            throw new Exception(sprintf('Unable to get file size from "%s" (%s:%d).', $pathAbsolute, __FILE__, __LINE__));
         }
 
         /* Return the image properties */
         return [
-            sprintf('path%s', $keyPostfix) => $path,
+            sprintf('path%s', $keyPostfix) => $pathAbsolute,
+            sprintf('pathRelative%s', $keyPostfix) => $pathRelative,
             sprintf('width%s', $keyPostfix) => intval($image[0]),
             sprintf('height%s', $keyPostfix) => intval($image[1]),
             sprintf('mime%s', $keyPostfix) => strval($image['mime']),
@@ -1198,6 +1257,17 @@ class CalendarBuilderService
     }
 
     /**
+     * Sets the QR Code version.
+     *
+     * @param int $qrCodeVersion
+     * @return void
+     */
+    public function setQrCodeVersion(int $qrCodeVersion)
+    {
+        $this->qrCodeVersion = $qrCodeVersion;
+    }
+
+    /**
      * Builds the given source image to a calendar page.
      *
      * @return array<string|int>
@@ -1206,8 +1276,19 @@ class CalendarBuilderService
     public function build(): array
     {
         /* Save given values */
-        $this->pathSource = $this->image->getPathFull(Image::PATH_TYPE_SOURCE, $this->test, $this->pathRoot);
-        $this->pathTarget = $this->image->getPathFull(Image::PATH_TYPE_TARGET, $this->test, $this->pathRoot);
+        $this->pathSourceAbsolute = $this->image->getPathFull(type: Image::PATH_TYPE_SOURCE, test: $this->test, rootPath: $this->pathRoot);
+        $pathSourceRelative = $this->image->getPath(type: Image::PATH_TYPE_SOURCE, test: $this->test);
+        $this->pathTargetAbsolute = $this->image->getPathFull(
+            type: Image::PATH_TYPE_TARGET,
+            test: $this->test,
+            rootPath: $this->pathRoot,
+            calendarImage: $this->useCalendarImagePath ? $this->calendarImage : null
+        );
+        $pathTargetRelative = $this->image->getPath(
+            type: Image::PATH_TYPE_TARGET,
+            test: $this->test,
+            calendarImage: $this->useCalendarImagePath ? $this->calendarImage : null
+        );
 
         $this->textTitle = $this->calendarImage->getTitle() ?? '';
         $this->textPosition = $this->calendarImage->getPosition() ?? '';
@@ -1217,7 +1298,7 @@ class CalendarBuilderService
         $this->url = $this->calendarImage->getUrl() ?? 'https://github.com/';
 
         /* Check target path */
-        $this->checkAndCreateDirectory($this->pathTarget, true);
+        $this->checkAndCreateDirectory($this->pathTargetAbsolute, true);
 
         /* Init */
         $this->prepare();
@@ -1250,8 +1331,8 @@ class CalendarBuilderService
         $this->destroy();
 
         return array_merge(
-            $this->getImageProperties($this->pathSource, 'Source'),
-            $this->getImageProperties($this->pathTarget),
+            $this->getImageProperties($this->pathSourceAbsolute, $pathSourceRelative, 'Source'),
+            $this->getImageProperties($this->pathTargetAbsolute, $pathTargetRelative),
         );
     }
 }

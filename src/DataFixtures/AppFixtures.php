@@ -53,17 +53,29 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
 
     public const FIXTURE_TEMPLATE_EMAIL = 'user%d@domain.tld';
 
+    public const FIXTURE_TEMPLATE_EMAIL_ADMIN = 'admin%d@domain.tld';
+
     public const FIXTURE_TEMPLATE_USERNAME = 'user%d';
+
+    public const FIXTURE_TEMPLATE_USERNAME_ADMIN = 'admin%d';
 
     public const FIXTURE_TEMPLATE_PASSWORD = 'password%d';
 
+    public const FIXTURE_TEMPLATE_PASSWORD_ADMIN = 'password%d';
+
     public const FIXTURE_TEMPLATE_FIRSTNAME = 'Firstname %d';
 
+    public const FIXTURE_TEMPLATE_FIRSTNAME_ADMIN = 'Admin %d';
+
     public const FIXTURE_TEMPLATE_LASTNAME = 'Lastname %d';
+
+    public const FIXTURE_TEMPLATE_LASTNAME_ADMIN = 'Admin %d';
 
     private const ENVIRONMENT_NAME_DEV = 'dev';
 
     private const ENVIRONMENT_NAME_TEST = 'test';
+
+    public const NAME_HOLIDAY_GROUP_SAXONY = 'Sachsen';
 
     /** @var string[][]|int[][] $calendars  */
     protected array $calendars = [
@@ -224,19 +236,173 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         ],
     ];
 
-    /** @var string[][] $holidayDatas  */
+    /** @var array<string, string[][]> $holidayDatas  */
     protected array $holidayDatas = [
-        ['Neujahr', '2022-01-01T12:00:00Z'],
-        ['Karfreitag', '2022-04-15T12:00:00Z'],
-        ['Ostern', '2022-04-18T12:00:00Z'],
-        ['1. Mai', '2022-05-01T12:00:00Z'],
-        ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
-        ['Pfingsten ', '2022-06-06T12:00:00Z'],
-        ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
-        ['Reformationstag', '2022-10-31T12:00:00Z'],
-        ['Buß- und Bettag', '2022-11-16T12:00:00Z'],
-        ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
-        ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        'Bayern' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Heilige Drei Könige', '2022-01-06T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Fronleichnam ', '2022-06-16T12:00:00Z'],
+            ['Augsburger Friedensfest ', '2022-08-08T12:00:00Z'],
+            ['Mariä Himmelfahrt ', '2022-08-15T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Allerheiligen', '2022-11-01T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Berlin' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Internationaler Frauentag', '2022-03-08T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Brandenburg' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Bremen' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Hamburg' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Hessen' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Fronleichnam', '2022-06-16T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Mecklenburg-Vorpommern' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Niedersachsen' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Nordrhein-Westfalen' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Fronleichnam', '2022-06-16T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Allerheiligen', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Rheinland-Pfalz' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Fronleichnam', '2022-06-16T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Allerheiligen', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Saarland ' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Fronleichnam', '2022-06-16T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Allerheiligen', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Sachsen-Anhalt' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Heilige Drei Könige', '2022-01-06T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        self::NAME_HOLIDAY_GROUP_SAXONY => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['Buß- und Bettag', '2022-11-16T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ]
     ];
 
     /** @var string[][]|int[][] $eventDatas  */
@@ -293,15 +459,18 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
      * Get hash from given (user) id.
      *
      * @param int $i
+     * @param bool $admin
      * @return string
      */
-    public function getHash(int $i): string
+    public function getHash(int $i, bool $admin = false): string
     {
         $salt = 'S4Lt';
 
-        return match ($i) {
-            1 => 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290',
-            2 => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
+        return match (true) {
+            !$admin && $i === 1 => 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290',
+            !$admin && $i === 2 => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
+            $admin && $i === 1 => '9cc28538cd413685762993a2376412393be29ccf',
+            $admin && $i === 2 => '8768be4811c6bc1df185440b82b41aeca048f319',
             default => sha1(sprintf('%s-%s', $salt, $i)),
         };
     }
@@ -310,74 +479,91 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
      * Returns a fixture email.
      *
      * @param int $i
+     * @param bool $admin
      * @return string
      */
-    public static function getEmail(int $i): string
+    public static function getEmail(int $i, bool $admin = false): string
     {
-        return sprintf(self::FIXTURE_TEMPLATE_EMAIL, $i);
+        return sprintf($admin ? self::FIXTURE_TEMPLATE_EMAIL_ADMIN : self::FIXTURE_TEMPLATE_EMAIL, $i);
     }
 
     /**
      * Returns a fixture username.
      *
      * @param int $i
+     * @param bool $admin
      * @return string
      */
-    public static function getUsername(int $i): string
+    public static function getUsername(int $i, bool $admin = false): string
     {
-        return sprintf(self::FIXTURE_TEMPLATE_USERNAME, $i);
+        return sprintf($admin ? self::FIXTURE_TEMPLATE_USERNAME_ADMIN : self::FIXTURE_TEMPLATE_USERNAME, $i);
     }
 
     /**
      * Returns a fixture password.
      *
      * @param int $i
+     * @param bool $admin
      * @return string
      */
-    public static function getPassword(int $i): string
+    public static function getPassword(int $i, bool $admin = false): string
     {
-        return sprintf(self::FIXTURE_TEMPLATE_PASSWORD, $i);
+        return sprintf($admin ? self::FIXTURE_TEMPLATE_PASSWORD_ADMIN : self::FIXTURE_TEMPLATE_PASSWORD, $i);
     }
 
     /**
      * Returns a fixture firstname.
      *
      * @param int $i
+     * @param bool $admin
      * @return string
      */
-    public static function getFirstname(int $i): string
+    public static function getFirstname(int $i, bool $admin = false): string
     {
-        return sprintf(self::FIXTURE_TEMPLATE_FIRSTNAME, $i);
+        return sprintf($admin ? self::FIXTURE_TEMPLATE_FIRSTNAME_ADMIN : self::FIXTURE_TEMPLATE_FIRSTNAME, $i);
     }
 
     /**
      * Returns a fixture lastname.
      *
      * @param int $i
+     * @param bool $admin
      * @return string
      */
-    public static function getLastname(int $i): string
+    public static function getLastname(int $i, bool $admin = false): string
     {
-        return sprintf(self::FIXTURE_TEMPLATE_LASTNAME, $i);
+        return sprintf($admin ? self::FIXTURE_TEMPLATE_LASTNAME_ADMIN : self::FIXTURE_TEMPLATE_LASTNAME, $i);
+    }
+
+    /**
+     * Returns user roles.
+     *
+     * @param bool $admin
+     * @return string[]
+     */
+    public static function getRoles(bool $admin = false): array
+    {
+        return $admin ? [User::ROLE_USER, User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN] : [User::ROLE_USER];
     }
 
     /**
      * Returns a user as JSON.
      *
      * @param int $i
+     * @param bool $admin
      * @return array{id: int, email: string, username: string, firstname: string, lastname: string, roles: string[]}
      */
     #[ArrayShape(['id' => "int", 'email' => "string", 'username' => "string", 'firstname' => "string", 'lastname' => "string", 'roles' => "array"])]
     #[Pure]
-    public static function getUserAsJson(int $i): array
+    public static function getUserAsJson(int $i, bool $admin = false): array
     {
         return [
-            'id' => $i,
-            'email' => AppFixtures::getEmail($i),
-            'username' => AppFixtures::getUsername($i),
-            'firstname' => AppFixtures::getFirstname($i),
-            'lastname' => AppFixtures::getLastname($i),
-            'roles' => [User::ROLE_USER],
+            'id' => $admin ? $i + 2 : $i,
+            'email' => AppFixtures::getEmail($i, $admin),
+            'username' => AppFixtures::getUsername($i, $admin),
+            'firstname' => AppFixtures::getFirstname($i, $admin),
+            'lastname' => AppFixtures::getLastname($i, $admin),
+            'roles' => AppFixtures::getRoles($admin),
         ];
     }
 
@@ -407,32 +593,39 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
     /**
      * Returns a HolidayGroup resource with its Holiday events.
      *
-     * @return HolidayGroup
+     * @return array<string, HolidayGroup>
      * @throws Exception
      */
-    public function getHolidayGroup(): HolidayGroup
+    public function getHolidayGroups(): array
     {
-        /* Get persisted public holiday group */
-        $holidayGroup = $this->setHolidayGroup();
+        $holidayGroups = [];
 
-        /* Add holidays */
-        foreach ($this->holidayDatas as $holidayData) {
-            $this->setHoliday($holidayGroup, $holidayData[0], $holidayData[1]);
+        foreach ($this->holidayDatas as $name => $holidayDatas) {
+
+            /* Get persisted public holiday group */
+            $holidayGroup = $this->setHolidayGroup($name);
+
+            /* Add holidays */
+            foreach ($holidayDatas as $holidayData) {
+                $this->setHoliday($holidayGroup, $holidayData[0], $holidayData[1]);
+            }
+
+            $holidayGroups[$name] = $holidayGroup;
         }
 
-        return $holidayGroup;
+        return $holidayGroups;
     }
 
     /**
      * Sets a HolidayGroup resource.
      *
+     * @param string $name
      * @return HolidayGroup
-     * @throws Exception
      */
-    protected function setHolidayGroup(): HolidayGroup
+    protected function setHolidayGroup(string $name): HolidayGroup
     {
         $holidayGroup = new HolidayGroup();
-        $holidayGroup->setName('Saxony');
+        $holidayGroup->setName($name);
         $this->manager?->persist($holidayGroup);
 
         return $holidayGroup;
@@ -483,12 +676,13 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
      * @param CalendarStyle $calendarStyle
      * @param HolidayGroup $holidayGroup
      * @param int $i
+     * @param bool $admin
      * @return User
      * @throws Exception
      */
-    public function getUser(CalendarStyle $calendarStyle, HolidayGroup $holidayGroup, int $i = 1): User
+    public function getUser(CalendarStyle $calendarStyle, HolidayGroup $holidayGroup, int $i = 1, bool $admin = false): User
     {
-        $user = $this->setUser($i);
+        $user = $this->setUser($i, $admin);
 
         /* Add events to user */
         foreach ($this->eventDatas as $eventData) {
@@ -523,23 +717,25 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
      * Sets a User resource.
      *
      * @param int $i
+     * @param bool $admin
      * @return User
      */
-    protected function setUser(int $i = 1): User
+    protected function setUser(int $i = 1, bool $admin = false): User
     {
         /* Create credentials. */
-        $email = self::getEmail($i);
-        $username = self::getUsername($i);
-        $password = self::getPassword($i);
+        $email = self::getEmail($i, $admin);
+        $username = self::getUsername($i, $admin);
+        $password = self::getPassword($i, $admin);
 
         /* Create a new user. */
         $user = new User();
         $user->setEmail($email);
         $user->setUsername($username);
         $user->setPassword($this->userPasswordHasher->hashPassword($user, $password));
-        $user->setFirstname(self::getFirstname($i));
-        $user->setLastname(self::getLastname($i));
-        $user->setIdHash($this->getHash($i));
+        $user->setFirstname(self::getFirstname($i, $admin));
+        $user->setLastname(self::getLastname($i, $admin));
+        $user->setIdHash($this->getHash($i, $admin));
+        $user->setRoles(self::getRoles($admin));
         $this->manager?->persist($user);
 
         /* Return the user */
@@ -672,15 +868,20 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         /* Set ObjectManager */
         $this->setManager($manager);
 
-        /* Get and create HolidayGroup resource. */
-        $holidayGroup = $this->getHolidayGroup();
+        /* Get and create HolidayGroup resources. */
+        $holidayGroups = $this->getHolidayGroups();
 
         /* Get and create CalendarStyle resource. */
         $calendarStyle = $this->getCalendarStyle();
 
         /* Create User resources. */
         for ($i = 1; $i <= 2; $i++) {
-            $this->getUser($calendarStyle, $holidayGroup, $i);
+            $this->getUser($calendarStyle, $holidayGroups[self::NAME_HOLIDAY_GROUP_SAXONY], $i);
+        }
+
+        /* Create User resources. */
+        for ($i = 1; $i <= 2; $i++) {
+            $this->getUser($calendarStyle, $holidayGroups[self::NAME_HOLIDAY_GROUP_SAXONY], $i, true);
         }
 
         /* Save all resources to db. */

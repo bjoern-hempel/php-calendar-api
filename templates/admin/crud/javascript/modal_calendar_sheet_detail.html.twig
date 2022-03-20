@@ -1,0 +1,24 @@
+<script>
+
+    let modalCalendarSheetTitle = '{{ 'admin.actions.calendarSheet.title'|trans|raw }}';
+    let modalCalendarSheetText = '{{ 'admin.actions.calendarSheet.questionIndex'|trans|raw }}';
+    let modalCalendarSheet = document.getElementById('modal-calendar-sheet');
+
+    modalCalendarSheet.addEventListener('show.bs.modal', function (event) {
+
+        /* Button that triggered the modal */
+        let button = event.relatedTarget;
+
+        /* Href */
+        let href = button.href;
+
+        /* Modal elements */
+        let modalButton = modalCalendarSheet.querySelector('#modal-calendar-sheet-button');
+
+        /* Set onclick */
+        modalButton.onclick = function() {
+            location.href = href;
+        };
+    })
+
+</script>

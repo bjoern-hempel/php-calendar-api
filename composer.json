@@ -40,6 +40,7 @@
         "symfony/serializer": "6.0.*",
         "symfony/twig-bundle": "6.0.*",
         "symfony/validator": "6.0.*",
+        "symfony/webpack-encore-bundle": "^1.14",
         "symfony/yaml": "6.0.*"
     },
     "require-dev": {
@@ -104,6 +105,11 @@
         "phpunit-api": "phpunit tests/Api",
         "phpunit-functional": "phpunit tests/Functional",
         "phpunit-unit": "phpunit tests/Unit",
+        "phpunit": [
+            "@phpunit-api",
+            "@phpunit-functional",
+            "@phpunit-unit"
+        ],
         "sca": "phpstan analyse --level max --memory-limit 256M src tests",
         "phpcs-src": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 fix src 2>/dev/null",
         "phpcs-tests": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 fix tests 2>/dev/null",

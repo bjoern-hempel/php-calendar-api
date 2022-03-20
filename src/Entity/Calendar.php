@@ -16,6 +16,7 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\UserListener;
 use App\Repository\CalendarRepository;
 use App\Security\Voter\UserVoter;
 use App\Utils\ArrayToObject;
@@ -38,6 +39,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: CalendarRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     # Security filter for collection operations at App\Doctrine\CurrentUserExtension
@@ -96,21 +98,25 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar']],
     order: ['id' => 'ASC'],
 )]
-class Calendar
+class Calendar implements EntityInterface
 {
     use TimestampsTrait;
 
     use JsonHelper;
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'configJson'];
+    public const CRUD_FIELDS_INDEX = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson', 'published'];
+
+    public const CRUD_FIELDS_NEW = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'configJson', 'published'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
+
+    public const CRUD_FIELDS_FILTER = ['name', 'title', 'subtitle', 'user', 'published'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -152,13 +158,26 @@ class Calendar
     #[ORM\OneToMany(mappedBy: 'calendar', targetEntity: CalendarImage::class, orphanRemoval: true)]
     #[MaxDepth(1)]
     #[Groups('calendar_extended')]
+    #[ORM\OrderBy(value: ['month' => 'ASC'])]
     #[ApiSubresource]
     private Collection $calendarImages;
 
     /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
     #[Groups(['calendar_extended', 'calendar'])]
-    private array $config = [];
+    private array $config = [
+        'backgroundColor' => '255,255,255,100',
+        'printCalendarWeek' => true,
+        'printWeekNumber' => true,
+        'printQrCodeMonth' => true,
+        'printQrCodeTitle' => true,
+        'aspectRatio' => 1.414,
+        'height' => 4000,
+    ];
+
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['calendar_extended', 'calendar'])]
+    private bool $published = false;
 
     private ArrayToObject $configObject;
 
@@ -176,9 +195,10 @@ class Calendar
      *
      * @return string
      */
+    #[Pure]
     public function __toString(): string
     {
-        return $this->name;
+        return sprintf('%s (%s)', $this->getName(), $this->getTitle());
     }
 
     /**
@@ -500,5 +520,28 @@ class Calendar
     public function setConfigJsonRaw(string $json): self
     {
         return $this->setConfigJson($json);
+    }
+
+    /**
+     * Gets the published status.
+     *
+     * @return bool|null
+     */
+    public function getPublished(): ?bool
+    {
+        return $this->published;
+    }
+
+    /**
+     * Sets the published status.
+     *
+     * @param bool $published
+     * @return $this
+     */
+    public function setPublished(bool $published): self
+    {
+        $this->published = $published;
+
+        return $this;
     }
 }

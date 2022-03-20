@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2022-02-22)
- * @package App\Command
+ * @package App\Service
  */
 class ConfigService
 {

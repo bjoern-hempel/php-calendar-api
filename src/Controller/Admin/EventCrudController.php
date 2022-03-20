@@ -15,7 +15,10 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\Event;
+use App\Service\SecurityService;
+use Exception;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class EventCrudController.
@@ -26,6 +29,18 @@ use JetBrains\PhpStorm\Pure;
  */
 class EventCrudController extends BaseCrudController
 {
+    /**
+     * EventCrudController constructor.
+     *
+     * @param SecurityService $securityService
+     * @param TranslatorInterface $translator
+     * @throws Exception
+     */
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator)
+    {
+        parent::__construct($securityService, $translator);
+    }
+
     /**
      * Return fqcn of this class.
      *

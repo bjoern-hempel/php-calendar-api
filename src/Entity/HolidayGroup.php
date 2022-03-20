@@ -15,6 +15,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\UserListener;
 use App\Repository\HolidayGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -30,6 +31,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: HolidayGroupRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     collectionOperations: [
@@ -75,9 +77,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['holiday_group']],
     order: ['id' => 'ASC'],
 )]
-class HolidayGroup
+class HolidayGroup implements EntityInterface
 {
     use TimestampsTrait;
+
+    public const CRUD_FIELDS_ADMIN = [];
 
     public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'updatedAt', 'createdAt'];
 
@@ -88,6 +92,8 @@ class HolidayGroup
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
     public const CRUD_FIELDS_DETAIL = ['id', 'name', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_FILTER = ['name'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
