@@ -64,12 +64,13 @@ class CalendarSheetCreateService
      *
      * @param CalendarImage $calendarImage
      * @param HolidayGroup $holidayGroup
+     * @param int $qrCodeVersion
      * @return float[]|array<string|int>[]
      * @throws NonUniqueResultException
      * @throws Exception
      */
     #[ArrayShape(['file' => "mixed", 'time' => "float"])]
-    public function create(CalendarImage $calendarImage, HolidayGroup $holidayGroup): array
+    public function create(CalendarImage $calendarImage, HolidayGroup $holidayGroup, int $qrCodeVersion = 5): array
     {
         /** @var ?Calendar $calendar */
         $calendar = $calendarImage->getCalendar();
@@ -88,7 +89,7 @@ class CalendarSheetCreateService
         /* Create calendar image */
         $timeStart = microtime(true);
         $calendarBuilderService = new CalendarBuilderService($this->appKernel);
-        $calendarBuilderService->init($calendarImage, $holidayGroup, false, true, CalendarImage::QUALITY_TARGET);
+        $calendarBuilderService->init($calendarImage, $holidayGroup, false, true, CalendarImage::QUALITY_TARGET, $qrCodeVersion);
         $file = $calendarBuilderService->build();
         $timeTaken = microtime(true) - $timeStart;
 

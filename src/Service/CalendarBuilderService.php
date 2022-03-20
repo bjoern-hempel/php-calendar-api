@@ -149,6 +149,8 @@ class CalendarBuilderService
     /** @var array<bool> $holidays */
     protected array $holidays = [];
 
+    protected int $qrCodeVersion = 5;
+
     public const BIRTHDAY_YEAR_NOT_GIVEN = 2100;
 
     public const ALIGN_LEFT = 1;
@@ -176,6 +178,8 @@ class CalendarBuilderService
     public const EVENT_TYPE_EVENT = 1;
 
     public const EVENT_TYPE_EVENT_GROUP = 2;
+
+    public const DEFAULT_QR_CODE_VERSION = 5;
 
     /**
      * Calendar constructor
@@ -231,9 +235,10 @@ class CalendarBuilderService
      * @param bool $test
      * @param bool $useCalendarImagePath
      * @param int $qualityTarget
+     * @param int $qrCodeVersion
      * @throws Exception
      */
-    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false, bool $useCalendarImagePath = false, int $qualityTarget = 100): void
+    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false, bool $useCalendarImagePath = false, int $qualityTarget = 100, int $qrCodeVersion = self::DEFAULT_QR_CODE_VERSION): void
     {
         /* Clear positions */
         $this->positionDays = [];
@@ -246,6 +251,9 @@ class CalendarBuilderService
 
         /* Set quality */
         $this->qualityTarget = $qualityTarget;
+
+        /* Set qr code version */
+        $this->qrCodeVersion = $qrCodeVersion;
 
         /* calendar instances */
         $this->calendarImage = $calendarImage;
@@ -1014,7 +1022,7 @@ class CalendarBuilderService
         $options = [
             'eccLevel' => QRCode::ECC_H,
             'outputType' => QRCode::OUTPUT_IMAGICK,
-            'version' => 5,
+            'version' => $this->qrCodeVersion,
             'addQuietzone' => false,
             'scale' => $scale,
             'markupDark' => '#fff',
@@ -1246,6 +1254,17 @@ class CalendarBuilderService
 
         /* Combine events and holidays */
         $this->eventsAndHolidays = $this->combineEventsAndHolidays();
+    }
+
+    /**
+     * Sets the QR Code version.
+     *
+     * @param int $qrCodeVersion
+     * @return void
+     */
+    public function setQrCodeVersion(int $qrCodeVersion)
+    {
+        $this->qrCodeVersion = $qrCodeVersion;
     }
 
     /**
