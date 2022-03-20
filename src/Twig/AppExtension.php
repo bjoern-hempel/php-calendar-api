@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace App\Twig;
 
 use App\Controller\Base\BaseController;
+use App\Entity\Image;
+use App\Service\ImageService;
 use App\Service\UrlService;
 use App\Utils\FileNameConverter;
-use Doctrine\ORM\Query\Expr\Base;
 use Exception;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -37,17 +38,22 @@ class AppExtension extends AbstractExtension
 
     protected UrlGeneratorInterface $generator;
 
+    protected ImageService $imageService;
+
     /**
      * AppExtension constructor.
      *
      * @param KernelInterface $kernel
      * @param UrlGeneratorInterface $generator
+     * @param ImageService $imageService
      */
-    public function __construct(KernelInterface $kernel, UrlGeneratorInterface $generator)
+    public function __construct(KernelInterface $kernel, UrlGeneratorInterface $generator, ImageService $imageService)
     {
         $this->kernel = $kernel;
 
         $this->generator = $generator;
+
+        $this->imageService = $imageService;
     }
 
     /**
@@ -60,7 +66,7 @@ class AppExtension extends AbstractExtension
         return [
             new TwigFilter('preg_replace', [$this, 'pregReplace']),
             new TwigFilter('path_orig', [$this, 'getPathOrig']),
-            new TwigFilter('path_400', [$this, 'getPath400']),
+            new TwigFilter('path_preview', [$this, 'getPathPreview']),
             new TwigFilter('add_hash', [$this, 'addHash']),
             new TwigFilter('check_path', [$this, 'checkPath']),
             new TwigFilter('url_absolute', [$this, 'urlAbsolute']),
@@ -103,30 +109,46 @@ class AppExtension extends AbstractExtension
      * TwigFilter: Returns the orig path of given path.
      *
      * @param string $path
+     * @param string $outputMode
      * @return string
      * @throws Exception
      */
-    public function getPathOrig(string $path): string
+    public function getPathOrig(string $path, string $outputMode = FileNameConverter::MODE_OUTPUT_RELATIVE): string
     {
-        $pathOrig = preg_replace('~\.[0-9]+\.([a-z]+)$~i', '.$1', $path);
+        $fileNameConverter = new FileNameConverter($path, $this->kernel->getProjectDir(), false, $outputMode);
 
-        if (!is_string($pathOrig)) {
-            throw new Exception(sprintf('Unable to replace string (%s:%d).', __FILE__, __LINE__));
-        }
+        $type = $fileNameConverter->getType($path);
+
+        $pathOrig = $fileNameConverter->getFilename($type);
 
         return $this->checkPath($pathOrig);
     }
 
     /**
-     * TwigFilter: Returns the 400 path of given path.
+     * TwigFilter: Returns the preview path of given path.
      *
      * @param string $path
+     * @param int $width
+     * @param string $outputMode
      * @return string
      * @throws Exception
      */
-    public function getPath400(string $path): string
+    public function getPathPreview(string $path, int $width = 400, string $outputMode = FileNameConverter::MODE_OUTPUT_RELATIVE): string
     {
-        return $this->checkPath($path);
+        $fileNameConverter = new FileNameConverter($path, $this->kernel->getProjectDir(), false, $outputMode);
+
+        $type = $fileNameConverter->getType($path);
+
+        $pathFull = $fileNameConverter->getFilename($type, null, false, null, FileNameConverter::MODE_OUTPUT_ABSOLUTE);
+        $pathPreview = $fileNameConverter->getFilename($type, $width);
+        $pathPreviewFull = $fileNameConverter->getFilename($type, $width, false, null, FileNameConverter::MODE_OUTPUT_ABSOLUTE);
+
+        /* Resize image if image does not exist. */
+        if (!file_exists($pathPreviewFull)) {
+            $this->imageService->resizeImage($pathFull, $pathPreviewFull, $width);
+        }
+
+        return $this->checkPath($pathPreview);
     }
 
     /**
@@ -162,13 +184,6 @@ class AppExtension extends AbstractExtension
      */
     public function checkPath(string $path): string
     {
-        $fullPath = $this->getFullPath($path);
-
-        if (file_exists($fullPath)) {
-            return $path;
-        }
-
-        $path = $this->addTmp($path);
         $fullPath = $this->getFullPath($path);
 
         if (file_exists($fullPath)) {

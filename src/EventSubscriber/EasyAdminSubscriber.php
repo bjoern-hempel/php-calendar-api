@@ -14,14 +14,17 @@ declare(strict_types=1);
 namespace App\EventSubscriber;
 
 use App\Entity\CalendarImage;
-use App\Entity\Image;
+use App\Entity\HolidayGroup;
+use App\Service\CalendarSheetCreateService;
 use App\Service\ImageService;
-use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
-use EasyCorp\Bundle\EasyAdminBundle\Event\AfterCrudActionEvent;
-use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityBuiltEvent;
+use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityPersistedEvent;
+use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityUpdatedEvent;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Class EasyAdminSubscriber.
@@ -34,14 +37,24 @@ class EasyAdminSubscriber implements EventSubscriberInterface
 {
     protected ImageService $imageService;
 
+    protected CalendarSheetCreateService $calendarSheetCreateService;
+
+    protected RequestStack $requestStack;
+
     /**
      * EasyAdminSubscriber constructor.
      *
      * @param ImageService $imageService
+     * @param CalendarSheetCreateService $calendarSheetCreateService
+     * @param RequestStack $requestStack
      */
-    public function __construct(ImageService $imageService)
+    public function __construct(ImageService $imageService, CalendarSheetCreateService $calendarSheetCreateService, RequestStack $requestStack)
     {
         $this->imageService = $imageService;
+
+        $this->calendarSheetCreateService = $calendarSheetCreateService;
+
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -49,89 +62,113 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      *
      * @return string[][]
      */
-    #[ArrayShape([AfterEntityBuiltEvent::class => "string[]"])]
+    #[ArrayShape([AfterEntityPersistedEvent::class => "string[]", AfterEntityUpdatedEvent::class => "string[]"])]
     public static function getSubscribedEvents(): array
     {
         return [
-            AfterEntityBuiltEvent::class => ['checkMissingImagesDetail'],
-            AfterCrudActionEvent::class => ['checkMissingImagesList']
+            AfterEntityPersistedEvent::class => ['createCalendarImagePersisted'],
+            AfterEntityUpdatedEvent::class => ['createCalendarImageUpdated'],
         ];
     }
 
     /**
-     * Checks missing image on single Image instance.
+     * Adds a flash message to the current session for type.
      *
-     * @param Image $image
-     * @param CalendarImage|null $calendarImage
-     * @return void
+     * @param string $type
+     * @param mixed $message
      * @throws Exception
      */
-    protected function checkMissingImages(Image $image, ?CalendarImage $calendarImage = null): void
+    protected function addFlash(string $type, mixed $message): void
     {
-        if ($calendarImage) {
-            $this->imageService->createTargetImage($image, $calendarImage);
+        $session = $this->requestStack->getSession();
+
+        /* @phpstan-ignore-next-line */
+        $flashBag = $session->getFlashBag();
+
+        if (!$flashBag instanceof FlashBag) {
+            throw new Exception(sprintf('Unable to get flash bag (%s:%d).', __FILE__, __LINE__));
         }
 
-        $this->imageService->createSourceImageWidth($image, Image::WIDTH_400);
-
-        if ($calendarImage) {
-            $this->imageService->createTargetImageWidth($image, Image::WIDTH_400, $calendarImage);
-        }
+        $flashBag->add($type, $message);
     }
 
     /**
-     * Checks target image (on image detail and edit page).
+     * Builds target image.
      *
-     * @param AfterEntityBuiltEvent $event
-     * @return void
+     * @param CalendarImage $calendarImage
+     * @return bool
      * @throws Exception
      */
-    public function checkMissingImagesDetail(AfterEntityBuiltEvent $event): void
+    protected function buildTargetImage(CalendarImage $calendarImage): bool
     {
-        $instance = $event->getEntity()->getInstance();
+        $calendar = $calendarImage->getCalendar();
 
-        /* Checks if we are on image detail or detail page. */
-        if (!$instance instanceof Image) {
-            return;
+        if ($calendar === null) {
+            throw new Exception(sprintf('Calendar class not found (%s:%d).', __FILE__, __LINE__));
         }
 
-        $this->checkMissingImages($instance);
+        $holidayGroup = $calendar->getHolidayGroup();
+
+        if (!$holidayGroup instanceof HolidayGroup) {
+            throw new Exception(sprintf('Unable to get holiday group (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $data = $this->calendarSheetCreateService->create($calendarImage, $holidayGroup);
+
+        $file = $data['file'];
+        $time = floatval($data['time']);
+
+        if (!is_array($file)) {
+            throw new Exception(sprintf('Array expected (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $this->addFlash('success', new TranslatableMessage('admin.actions.calendarSheet.success', [
+            '%month%' => $calendarImage->getMonth(),
+            '%year%' => $calendarImage->getYear(),
+            '%calendar%' => $calendar->getTitle(),
+            '%file%' => $file['pathRelativeTarget'],
+            '%width%' => $file['widthTarget'],
+            '%height%' => $file['heightTarget'],
+            '%size%' => $file['sizeHumanTarget'],
+            '%time%' => sprintf('%.2f', $time),
+        ]));
+
+        return true;
     }
 
     /**
-     * Checks 400px width images (on image index page).
+     * Create calendar sheet (create).
      *
-     * @param AfterCrudActionEvent $event
+     * @param AfterEntityPersistedEvent $entityInstance
      * @return void
      * @throws Exception
      */
-    public function checkMissingImagesList(AfterCrudActionEvent $event): void
+    public function createCalendarImagePersisted(AfterEntityPersistedEvent $entityInstance): void
     {
-        if (!$event->getResponseParameters()->has('entities')) {
+        $entity = $entityInstance->getEntityInstance();
+
+        if (!$entity instanceof CalendarImage) {
             return;
         }
 
-        /** @var EntityDto $entity */
-        foreach ($event->getResponseParameters()->get('entities') as $entity) {
-            $instance = $entity->getInstance();
+        $this->buildTargetImage($entity);
+    }
 
-            $image = match (true) {
-                $instance instanceof Image => $instance,
-                $instance instanceof CalendarImage => $instance->getImage(),
-                default => null,
-            };
+    /**
+     * Create calendar sheet (update).
+     *
+     * @param AfterEntityUpdatedEvent $entityInstance
+     * @return void
+     * @throws Exception
+     */
+    public function createCalendarImageUpdated(AfterEntityUpdatedEvent $entityInstance): void
+    {
+        $entity = $entityInstance->getEntityInstance();
 
-            $calendarImage = match (true) {
-                $instance instanceof CalendarImage => $instance,
-                default => null,
-            };
-
-            /* Checks if list element is an image element. */
-            if ($image === null) {
-                return;
-            }
-
-            $this->checkMissingImages($image, $calendarImage);
+        if (!$entity instanceof CalendarImage) {
+            return;
         }
+
+        $this->buildTargetImage($entity);
     }
 }

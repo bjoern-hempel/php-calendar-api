@@ -264,6 +264,44 @@ class ImageService
     }
 
     /**
+     * Resizes image.
+     *
+     * @param string $pathSourceFull
+     * @param string $pathTargetFull
+     * @param int $widthResize
+     * @return bool
+     * @throws Exception
+     */
+    public function resizeImage(string $pathSourceFull, string $pathTargetFull, int $widthResize): bool
+    {
+        /* Get information about image. */
+        $imageInfo = $this->getImageInfo($pathSourceFull);
+
+        /* Create image. */
+        $imageSource = $this->createGdImageFromGivenPath($pathSourceFull);
+
+        /* Get width and height */
+        $width = intval($imageInfo[0]);
+        $height = intval($imageInfo[1]);
+        $imageType = intval($imageInfo[2]);
+        $mimeType = strval($imageInfo['mime']);
+
+        /* Calculate resized image. */
+        $heightResize = intval(round($widthResize * $height / $width));
+
+        /* Create resized image. */
+        $imageResized = $this->createEmptyGdImage($widthResize, $heightResize);
+
+        /* Copy resized image. */
+        imagecopyresampled($imageResized, $imageSource, 0, 0, 0, 0, $widthResize, $heightResize, $width, $height);
+
+        /* Create resized image. */
+        $this->saveImage($imageResized, $pathTargetFull, $imageType, $mimeType);
+
+        return true;
+    }
+
+    /**
      * Resizes the given image with given width.
      *
      * @param Image $image

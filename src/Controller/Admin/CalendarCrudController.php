@@ -15,12 +15,10 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Controller\Base\BaseController;
-use App\Controller\CalendarController;
 use App\Entity\Calendar;
 use App\Entity\CalendarImage;
 use App\Entity\HolidayGroup;
 use App\Service\CalendarSheetCreateService;
-use App\Service\Entity\HolidayGroupLoaderService;
 use App\Service\SecurityService;
 use App\Service\UrlService;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -47,8 +45,6 @@ class CalendarCrudController extends BaseCrudController
 
     public const ACTION_VIEW_CALENDAR_SHEETS = 'viewCalendarSheets';
 
-    protected HolidayGroupLoaderService $holidayGroupLoaderService;
-
     protected CalendarSheetCreateService $calendarSheetCreateService;
 
     /**
@@ -56,14 +52,11 @@ class CalendarCrudController extends BaseCrudController
      *
      * @param SecurityService $securityService
      * @param TranslatorInterface $translator
-     * @param HolidayGroupLoaderService $holidayGroupLoaderService
      * @param CalendarSheetCreateService $calendarSheetCreateService
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator, HolidayGroupLoaderService $holidayGroupLoaderService, CalendarSheetCreateService $calendarSheetCreateService)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarSheetCreateService $calendarSheetCreateService)
     {
-        $this->holidayGroupLoaderService = $holidayGroupLoaderService;
-
         $this->calendarSheetCreateService = $calendarSheetCreateService;
 
         parent::__construct($securityService, $translator);
@@ -206,11 +199,15 @@ class CalendarCrudController extends BaseCrudController
         $calendar = $this->getCalendar($context);
 
         /* Some parameters */
-        $holidayGroupName = 'Saxony';
-        $holidayGroup = $this->holidayGroupLoaderService->loadHolidayGroup($holidayGroupName);
         $time = 0;
         $number = 0;
         $sizes = [];
+
+        $holidayGroup = $calendar->getHolidayGroup();
+
+        if (!$holidayGroup instanceof HolidayGroup) {
+            throw new Exception(sprintf('Unable to get holiday group (%s:%d).', __FILE__, __LINE__));
+        }
 
         foreach ($calendar->getCalendarImages() as $calendarImage) {
             $data = $this->buildCalendarSheet($calendarImage, $holidayGroup);

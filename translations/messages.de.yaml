@@ -122,13 +122,13 @@ admin:
       pathSource:
         label: 'Bild'
         help: 'Das Bild dieses Eintrags.'
-      pathSource400:
+      pathSourcePreview:
         label: 'Bild'
         help: 'Der Bild dieses Eintrags.'
       pathTarget:
         label: 'Kalenderblatt'
         help: 'Der Kalenderblatt dieses Eintrags.'
-      pathTarget400:
+      pathTargetPreview:
         label: 'Kalenderblatt'
         help: 'Der Kalenderblatt dieses Eintrags.'
       year:
@@ -318,13 +318,13 @@ admin:
       pathSource:
         label: 'Quellpfad'
         help: 'Der Quellpfad dieses Eintrags.'
-      pathSource400:
+      pathSourcePreview:
         label: 'Quellpfad'
         help: 'Der Quellpfad dieses Eintrags.'
       pathTarget:
         label: 'Zielpfad'
         help: 'Der Zielpfad dieses Eintrags.'
-      pathTarget400:
+      pathTargetPreview:
         label: 'Zielpfad'
         help: 'Der Zielpfad dieses Eintrags.'
       pathSourceFull:

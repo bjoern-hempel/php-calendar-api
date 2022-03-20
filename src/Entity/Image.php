@@ -101,9 +101,9 @@ class Image implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'name', 'path', 'pathSource', 'pathSource400', 'pathTarget', 'pathTarget400', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'name', 'path', 'pathSource', 'pathSourcePreview', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'user', 'name', 'pathSource400', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_INDEX = ['id', 'user', 'name', 'pathSourcePreview', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_NEW = ['id', 'user', 'path'];
 
@@ -157,6 +157,8 @@ class Image implements EntityInterface
     public const PATH_TYPE_EXPECTED = 'expected';
 
     public const PATH_TYPE_COMPARE = 'compare';
+
+    public const PATH_TYPE_AUTO = 'auto';
 
     public const PATH_DATA = 'data';
 
@@ -310,6 +312,23 @@ class Image implements EntityInterface
     }
 
     /**
+     * Gets the relative or absolute source path of this image (preview placeholder).
+     *
+     * @param string $outputMode
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
+     * @return string
+     * @throws Exception
+     */
+    public function getPathSourcePreview(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
+    {
+        return $this->getPathSource($outputMode, $test, $rootPath, $tmp, $width, $calendarImage);
+    }
+
+    /**
      * Gets the relative or absolute source path of this image with 400px width.
      *
      * @param string $outputMode
@@ -340,6 +359,23 @@ class Image implements EntityInterface
     public function getPathTarget(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
         return $this->getPath(self::PATH_TYPE_TARGET, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+    }
+
+    /**
+     * Gets the relative or absolute source path of this image (preview placeholder).
+     *
+     * @param string $outputMode
+     * @param bool $test
+     * @param string $rootPath
+     * @param bool $tmp
+     * @param int|null $width
+     * @param CalendarImage|null $calendarImage
+     * @return string
+     * @throws Exception
+     */
+    public function getPathTargetPreview(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
+    {
+        return $this->getPathTarget($outputMode, $test, $rootPath, $tmp, $width, $calendarImage);
     }
 
     /**

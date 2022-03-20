@@ -254,11 +254,11 @@ final class FileNameConverterTest extends TestCase
                 ++$number,
                 'getFilenameWidth', /* method */
                 800, /* width */
+                Image::PATH_TYPE_SOURCE, /* type */
                 false, /* tmp */
                 true, /* test */
                 null, /* output mode */
-                null,
-                null,
+                null, /* additionalPath */
                 'data.data', /* given */
                 'data.800.data', /* expected */
             ],
@@ -449,8 +449,8 @@ final class FileNameConverterTest extends TestCase
             [
                 ++$number,
                 'getFilenameWidth', /* method */
-                400, /* type */
-                null, /* width */
+                400, /* width */
+                Image::PATH_TYPE_SOURCE, /* type */
                 null, /* tmp */
                 null, /* test */
                 null, /* output mode */
@@ -461,8 +461,8 @@ final class FileNameConverterTest extends TestCase
             [
                 ++$number,
                 'getFilenameWidth', /* method */
-                400, /* type */
-                null, /* width */
+                400, /* width */
+                Image::PATH_TYPE_SOURCE, /* type */
                 null, /* tmp */
                 null, /* test */
                 null, /* output mode */
@@ -473,8 +473,8 @@ final class FileNameConverterTest extends TestCase
             [
                 ++$number,
                 'getFilenameWidth', /* method */
-                400, /* type */
-                null, /* width */
+                400, /* width */
+                Image::PATH_TYPE_SOURCE, /* type */
                 null, /* tmp */
                 null, /* test */
                 null, /* output mode */
@@ -694,11 +694,11 @@ final class FileNameConverterTest extends TestCase
                 ++$number,
                 'getFilenameWidth', /* method */
                 400, /* width */
+                Image::PATH_TYPE_SOURCE, /* type */
                 false, /* tmp */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_RELATIVE, /* output mode */
-                null,
-                null,
+                null, /* additionalPath */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 'data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.400.jpg', /* expected */
             ],
@@ -706,11 +706,11 @@ final class FileNameConverterTest extends TestCase
                 ++$number,
                 'getFilenameWidth', /* method */
                 400, /* width */
+                Image::PATH_TYPE_SOURCE, /* type */
                 false, /* tmp */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_RELATIVE, /* output mode */
-                null,
-                null,
+                null, /* additionalPath */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.JPG', /* given */
                 'data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.400.JPG', /* expected */
             ],
@@ -830,11 +830,11 @@ final class FileNameConverterTest extends TestCase
                 ++$number,
                 'getFilenameWidth', /* method */
                 400, /* width */
+                Image::PATH_TYPE_SOURCE, /* type */
                 false, /* tmp */
                 false, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
-                null,
-                null,
+                null, /* additionalPath */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.400.jpg', /* expected */
             ],
@@ -942,11 +942,11 @@ final class FileNameConverterTest extends TestCase
                 ++$number,
                 'getFilenameWidth', /* method */
                 400, /* width */
+                Image::PATH_TYPE_SOURCE, /* type */
                 false, /* tmp */
                 true, /* test */
                 FileNameConverter::MODE_OUTPUT_ABSOLUTE, /* output mode */
-                null,
-                null,
+                null, /* additionalPath */
                 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.jpg', /* given */
                 '/path/to/root/data/tests/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/source/2ccfdd526f.beach.400.jpg', /* expected */
             ],

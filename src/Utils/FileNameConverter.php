@@ -299,6 +299,7 @@ class FileNameConverter
      * Returns with filename.
      *
      * @param int $width
+     * @param string $type
      * @param bool $tmp
      * @param bool|null $test
      * @param string|null $outputMode
@@ -306,9 +307,9 @@ class FileNameConverter
      * @return string
      * @throws Exception
      */
-    public function getFilenameWidth(int $width, bool $tmp = false, ?bool $test = null, ?string $outputMode = null, string $additionalPath = null): string
+    public function getFilenameWidth(int $width, string $type = Image::PATH_TYPE_SOURCE, bool $tmp = false, ?bool $test = null, ?string $outputMode = null, string $additionalPath = null): string
     {
-        return $this->getFilename(Image::PATH_TYPE_SOURCE, $width, $tmp, $test, $outputMode, $additionalPath);
+        return $this->getFilename($type, $width, $tmp, $test, $outputMode, $additionalPath);
     }
 
     /**
@@ -403,5 +404,23 @@ class FileNameConverter
         $this->outputMode = $outputMode;
 
         return $this;
+    }
+
+    /**
+     * Gets type from path.
+     *
+     * @param string $path
+     * @return string
+     * @throws Exception
+     */
+    public function getType(string $path): string
+    {
+        return match (true) {
+            str_contains($path, sprintf('/%s/', Image::PATH_TYPE_SOURCE)) => Image::PATH_TYPE_SOURCE,
+            str_contains($path, sprintf('/%s/', Image::PATH_TYPE_TARGET)) => Image::PATH_TYPE_TARGET,
+            str_contains($path, sprintf('/%s/', Image::PATH_TYPE_EXPECTED)) => Image::PATH_TYPE_EXPECTED,
+            str_contains($path, sprintf('/%s/', Image::PATH_TYPE_COMPARE)) => Image::PATH_TYPE_COMPARE,
+            default => throw new Exception(sprintf('Unable to detect type from path "%s" (%s:%d).', $path, __FILE__, __LINE__)),
+        };
     }
 }

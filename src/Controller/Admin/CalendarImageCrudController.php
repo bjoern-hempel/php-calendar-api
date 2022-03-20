@@ -15,10 +15,10 @@ namespace App\Controller\Admin;
 
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\CalendarImage;
+use App\Entity\HolidayGroup;
 use App\Entity\Image;
 use App\Service\CalendarSheetCreateService;
 use App\Service\Entity\CalendarLoaderService;
-use App\Service\Entity\HolidayGroupLoaderService;
 use App\Service\Entity\ImageLoaderService;
 use App\Service\Entity\UserLoaderService;
 use App\Service\SecurityService;
@@ -50,8 +50,6 @@ class CalendarImageCrudController extends BaseCrudController
 
     protected UserLoaderService $userLoaderService;
 
-    protected HolidayGroupLoaderService $holidayGroupLoaderService;
-
     protected CalendarSheetCreateService $calendarSheetCreateService;
 
     public const ACTION_BUILD_CALENDAR_SHEET = 'buildCalendarSheet';
@@ -64,19 +62,16 @@ class CalendarImageCrudController extends BaseCrudController
      * @param CalendarLoaderService $calendarLoaderService
      * @param ImageLoaderService $imageLoaderService
      * @param UserLoaderService $userLoaderService
-     * @param HolidayGroupLoaderService $holidayGroupLoaderService
      * @param CalendarSheetCreateService $calendarSheetCreateService
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarLoaderService $calendarLoaderService, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, CalendarSheetCreateService $calendarSheetCreateService)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarLoaderService $calendarLoaderService, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, CalendarSheetCreateService $calendarSheetCreateService)
     {
         $this->calendarLoaderService = $calendarLoaderService;
 
         $this->imageLoaderService = $imageLoaderService;
 
         $this->userLoaderService = $userLoaderService;
-
-        $this->holidayGroupLoaderService = $holidayGroupLoaderService;
 
         $this->calendarSheetCreateService = $calendarSheetCreateService;
 
@@ -166,8 +161,12 @@ class CalendarImageCrudController extends BaseCrudController
                 ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
             'year' => $this->easyAdminField->getChoiceField($fieldName, $this->getYearSelection()),
             'month' => $this->easyAdminField->getChoiceField($fieldName, $this->getMonthSelection()),
-            'pathSource', 'pathTarget', 'pathSource400', 'pathTarget400' => ImageField::new($fieldName)
+            'pathSource', 'pathTarget' => ImageField::new($fieldName)
                     ->setBasePath(sprintf('%s/%s', Image::PATH_DATA, Image::PATH_IMAGES))
+                    ->setTemplatePath('admin/crud/field/image_preview.html.twig')
+                    ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                    ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
+            'pathSourcePreview', 'pathTargetPreview' => ImageField::new($fieldName)
                     ->setTemplatePath('admin/crud/field/image_preview.html.twig')
                     ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                     ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
@@ -245,9 +244,11 @@ class CalendarImageCrudController extends BaseCrudController
             throw new Exception(sprintf('Calendar class not found (%s:%d).', __FILE__, __LINE__));
         }
 
-        /* Read parameters */
-        $holidayGroupName = 'Saxony';
-        $holidayGroup = $this->holidayGroupLoaderService->loadHolidayGroup($holidayGroupName);
+        $holidayGroup = $calendar->getHolidayGroup();
+
+        if (!$holidayGroup instanceof HolidayGroup) {
+            throw new Exception(sprintf('Unable to get holiday group (%s:%d).', __FILE__, __LINE__));
+        }
 
         $data = $this->calendarSheetCreateService->create($calendarImage, $holidayGroup);
 

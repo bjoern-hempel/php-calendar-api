@@ -136,10 +136,9 @@ class ImageCrudController extends BaseCrudController
                     ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                     ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
 
-            case 'pathSource400':
-            case 'pathTarget400':
+            case 'pathSourcePreview':
+            case 'pathTargetPreview':
                 return ImageField::new($fieldName)
-                    ->setBasePath(sprintf('%s/%s', Image::PATH_DATA, Image::PATH_IMAGES))
                     ->setTemplatePath('admin/crud/field/image_preview.html.twig')
                     ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                     ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));

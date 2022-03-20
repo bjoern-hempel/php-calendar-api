@@ -122,13 +122,13 @@ admin:
       pathSource:
         label: 'Image'
         help: 'The image path of this entry.'
-      pathSource400:
+      pathSourcePreview:
         label: 'Image'
         help: 'The image of this entry.'
       pathTarget:
         label: 'Calendar Sheet'
         help: 'The calendar sheet of this entry.'
-      pathTarget400:
+      pathTargetPreview:
         label: 'Calendar Sheet'
         help: 'The calendar sheet of this entry.'
       year:
@@ -318,13 +318,13 @@ admin:
       pathSource:
         label: 'Source path'
         help: 'The source path of this entry.'
-      pathSource400:
+      pathSourcePreview:
         label: 'Path'
         help: 'The path of this entry.'
       pathTarget:
         label: 'Target path'
         help: 'The source path of this entry.'
-      pathTarget400:
+      pathTargetPreview:
         label: 'Target path'
         help: 'The source path of this entry.'
       pathSourceFull:
