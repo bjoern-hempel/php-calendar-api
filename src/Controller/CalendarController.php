@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Controller\Base\BaseController;
+use App\Entity\Calendar;
 use App\Repository\CalendarImageRepository;
 use App\Service\Entity\CalendarLoaderService;
 use App\Service\Entity\UserLoaderService;
+use App\Service\SecurityService;
 use App\Service\UrlService;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,20 +39,43 @@ class CalendarController extends BaseController
 
     protected CalendarImageRepository $calendarImageRepository;
 
+    protected SecurityService $securityService;
+
     /**
      * CalendarController constructor.
      *
      * @param UserLoaderService $userLoaderService
      * @param CalendarLoaderService $calendarLoaderService
      * @param CalendarImageRepository $calendarImageRepository
+     * @param SecurityService $securityService
      */
-    public function __construct(UserLoaderService $userLoaderService, CalendarLoaderService $calendarLoaderService, CalendarImageRepository $calendarImageRepository)
+    public function __construct(UserLoaderService $userLoaderService, CalendarLoaderService $calendarLoaderService, CalendarImageRepository $calendarImageRepository, SecurityService $securityService)
     {
         $this->userLoaderService = $userLoaderService;
 
         $this->calendarLoaderService = $calendarLoaderService;
 
         $this->calendarImageRepository = $calendarImageRepository;
+
+        $this->securityService = $securityService;
+    }
+
+    /**
+     * This method checks, whether the user is allowed to see that given calendar.
+     *
+     * @param Calendar $calendar
+     * @return bool
+     * @throws Exception
+     */
+    protected function allowedToSeeCalendar(Calendar $calendar): bool
+    {
+        $published = $calendar->getPublished();
+
+        $own = $this->securityService->isUserLoggedIn() && $this->securityService->getUser() === $calendar->getUser();
+
+        $admin = $this->securityService->isGrantedByAnAdmin();
+
+        return $published || $own || $admin;
     }
 
     /**
@@ -69,9 +94,13 @@ class CalendarController extends BaseController
 
         $calendar = $this->calendarLoaderService->loadCalendar($userId, $calendarId);
 
-        return $this->render('calendar/index.html.twig', [
-            'calendar' => $calendar
-        ]);
+        if ($this->allowedToSeeCalendar($calendar)) {
+            return $this->render('calendar/index.html.twig', [
+                'calendar' => $calendar
+            ]);
+        }
+
+        throw $this->createNotFoundException();
     }
 
     /**
@@ -109,9 +138,19 @@ class CalendarController extends BaseController
 
         $calendarImage = $this->calendarLoaderService->loadCalendarImageByUserHashAndCalendarImage($hash, $userId, $calendarImageId);
 
-        return $this->render('calendar/detail.html.twig', [
-            'calendarImage' => $calendarImage
-        ]);
+        $calendar = $calendarImage->getCalendar();
+
+        if (!$calendar instanceof Calendar) {
+            throw new Exception(sprintf('Unable to get calendar (%s:%d).', __FILE__, __LINE__));
+        }
+
+        if ($this->allowedToSeeCalendar($calendar)) {
+            return $this->render('calendar/detail.html.twig', [
+                'calendarImage' => $calendarImage
+            ]);
+        }
+
+        throw $this->createNotFoundException();
     }
 
     /**

@@ -86,6 +86,9 @@ admin:
       configJson:
         label: 'Konfiguration'
         help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      published:
+        label: 'Veröffentlicht'
+        help: 'Gibt an, ob dieser Eintrag veröffentlicht werden soll.'
       calendarImages:
         label: 'Kalender Bilder'
         help: 'Die Kalender Bilder dieses Eintrags.'

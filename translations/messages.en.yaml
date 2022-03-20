@@ -86,6 +86,9 @@ admin:
       configJson:
         label: 'Config'
         help: 'The current configuration of this entry in JSON format.'
+      published:
+        label: 'Published'
+        help: 'Specifies whether this entity should be published.'
       calendarImages:
         label: 'Calendar images'
         help: 'The calendar images of this entry.'

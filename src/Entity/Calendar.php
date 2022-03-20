@@ -106,17 +106,17 @@ class Calendar implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_INDEX = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson', 'published'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'configJson'];
+    public const CRUD_FIELDS_NEW = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'configJson', 'published'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
 
-    public const CRUD_FIELDS_FILTER = ['name', 'title', 'subtitle', 'user'];
+    public const CRUD_FIELDS_FILTER = ['name', 'title', 'subtitle', 'user', 'published'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -174,6 +174,10 @@ class Calendar implements EntityInterface
         'aspectRatio' => 1.414,
         'height' => 4000,
     ];
+
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['calendar_extended', 'calendar'])]
+    private bool $published = false;
 
     private ArrayToObject $configObject;
 
@@ -516,5 +520,28 @@ class Calendar implements EntityInterface
     public function setConfigJsonRaw(string $json): self
     {
         return $this->setConfigJson($json);
+    }
+
+    /**
+     * Gets the published status.
+     *
+     * @return bool|null
+     */
+    public function getPublished(): ?bool
+    {
+        return $this->published;
+    }
+
+    /**
+     * Sets the published status.
+     *
+     * @param bool $published
+     * @return $this
+     */
+    public function setPublished(bool $published): self
+    {
+        $this->published = $published;
+
+        return $this;
     }
 }
