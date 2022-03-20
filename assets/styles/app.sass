@@ -1,11 +1,11 @@
+/* Variables */
+$breakpoint-mobile: 540px
+$breakpoint-tablet: 1024px
+
 html, body
     margin: 0px
     padding: 0px
     width: 100%
-    height: 100%
-
-.images
-    height: 100%
 
 .images
     a
@@ -19,3 +19,44 @@ html, body
             .image
                 width: 50%
                 height: 37.5vw
+
+.content
+    width: $breakpoint-tablet
+    margin: auto
+
+    p
+        img
+            width: 100%
+
+
+/* For Mobile */
+@media (max-width: $breakpoint-mobile)
+    .images
+        a
+            .image
+                width: 100%
+                height: 75vw
+
+            &:first-child
+                .image
+                    width: 100%
+                    height: 75vw
+
+    .content
+        width: 100%
+
+/* For Tablets */
+@media screen and (min-width: $breakpoint-mobile) and (max-width: $breakpoint-tablet)
+    .images
+        a
+            .image
+                width: 100%
+                height: 75vw
+
+            &:first-child
+                .image
+                    width: 100%
+                    height: 75vw
+
+    .content
+        width: 100%
