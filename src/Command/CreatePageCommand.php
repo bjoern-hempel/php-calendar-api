@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\DataFixtures\AppFixtures;
 use App\Entity\CalendarImage;
 use App\Service\CalendarBuilderService;
 use App\Service\Entity\CalendarLoaderService;
@@ -128,7 +129,7 @@ EOT
 
         $year = intval($input->getOption('year'));
         $month = intval($input->getOption('month'));
-        $holidayGroupName = 'Saxony';
+        $holidayGroupName = AppFixtures::NAME_HOLIDAY_GROUP_SAXONY;
 
         /* Read calendar image and holiday group */
         $calendarImage = $this->calendarLoaderService->loadCalendarImageByCalendarNameYearAndMonth($email, $calendarNameOrId, $year, $month);

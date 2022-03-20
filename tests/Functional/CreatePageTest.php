@@ -228,7 +228,7 @@ final class CreatePageTest extends KernelTestCase
         $calendarName = 'Calendar 1';
         $year = 2022;
         $month = 1;
-        $holidayGroupName = 'Saxony';
+        $holidayGroupName = AppFixtures::NAME_HOLIDAY_GROUP_SAXONY;
 
         /* Arrange */
         $calendarImage = $this->getCalendarImage($email, $calendarName, $year, $month);

@@ -75,6 +75,8 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
 
     private const ENVIRONMENT_NAME_TEST = 'test';
 
+    public const NAME_HOLIDAY_GROUP_SAXONY = 'Sachsen';
+
     /** @var string[][]|int[][] $calendars  */
     protected array $calendars = [
         /* Titel page */
@@ -234,19 +236,173 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         ],
     ];
 
-    /** @var string[][] $holidayDatas  */
+    /** @var array<string, string[][]> $holidayDatas  */
     protected array $holidayDatas = [
-        ['Neujahr', '2022-01-01T12:00:00Z'],
-        ['Karfreitag', '2022-04-15T12:00:00Z'],
-        ['Ostern', '2022-04-18T12:00:00Z'],
-        ['1. Mai', '2022-05-01T12:00:00Z'],
-        ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
-        ['Pfingsten ', '2022-06-06T12:00:00Z'],
-        ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
-        ['Reformationstag', '2022-10-31T12:00:00Z'],
-        ['Buß- und Bettag', '2022-11-16T12:00:00Z'],
-        ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
-        ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        'Bayern' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Heilige Drei Könige', '2022-01-06T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Fronleichnam ', '2022-06-16T12:00:00Z'],
+            ['Augsburger Friedensfest ', '2022-08-08T12:00:00Z'],
+            ['Mariä Himmelfahrt ', '2022-08-15T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Allerheiligen', '2022-11-01T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Berlin' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Internationaler Frauentag', '2022-03-08T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Brandenburg' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Bremen' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Hamburg' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Hessen' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Fronleichnam', '2022-06-16T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Mecklenburg-Vorpommern' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Niedersachsen' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Nordrhein-Westfalen' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Fronleichnam', '2022-06-16T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Allerheiligen', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Rheinland-Pfalz' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Fronleichnam', '2022-06-16T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Allerheiligen', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Saarland ' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Fronleichnam', '2022-06-16T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Allerheiligen', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        'Sachsen-Anhalt' => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Heilige Drei Könige', '2022-01-06T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ],
+        self::NAME_HOLIDAY_GROUP_SAXONY => [
+            ['Neujahr', '2022-01-01T12:00:00Z'],
+            ['Karfreitag', '2022-04-15T12:00:00Z'],
+            ['Ostermontag', '2022-04-18T12:00:00Z'],
+            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
+            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
+            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
+            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['Buß- und Bettag', '2022-11-16T12:00:00Z'],
+            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
+            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
+        ]
     ];
 
     /** @var string[][]|int[][] $eventDatas  */
@@ -437,32 +593,39 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
     /**
      * Returns a HolidayGroup resource with its Holiday events.
      *
-     * @return HolidayGroup
+     * @return array<string, HolidayGroup>
      * @throws Exception
      */
-    public function getHolidayGroup(): HolidayGroup
+    public function getHolidayGroups(): array
     {
-        /* Get persisted public holiday group */
-        $holidayGroup = $this->setHolidayGroup();
+        $holidayGroups = [];
 
-        /* Add holidays */
-        foreach ($this->holidayDatas as $holidayData) {
-            $this->setHoliday($holidayGroup, $holidayData[0], $holidayData[1]);
+        foreach ($this->holidayDatas as $name => $holidayDatas) {
+
+            /* Get persisted public holiday group */
+            $holidayGroup = $this->setHolidayGroup($name);
+
+            /* Add holidays */
+            foreach ($holidayDatas as $holidayData) {
+                $this->setHoliday($holidayGroup, $holidayData[0], $holidayData[1]);
+            }
+
+            $holidayGroups[$name] = $holidayGroup;
         }
 
-        return $holidayGroup;
+        return $holidayGroups;
     }
 
     /**
      * Sets a HolidayGroup resource.
      *
+     * @param string $name
      * @return HolidayGroup
-     * @throws Exception
      */
-    protected function setHolidayGroup(): HolidayGroup
+    protected function setHolidayGroup(string $name): HolidayGroup
     {
         $holidayGroup = new HolidayGroup();
-        $holidayGroup->setName('Saxony');
+        $holidayGroup->setName($name);
         $this->manager?->persist($holidayGroup);
 
         return $holidayGroup;
@@ -705,20 +868,20 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         /* Set ObjectManager */
         $this->setManager($manager);
 
-        /* Get and create HolidayGroup resource. */
-        $holidayGroup = $this->getHolidayGroup();
+        /* Get and create HolidayGroup resources. */
+        $holidayGroups = $this->getHolidayGroups();
 
         /* Get and create CalendarStyle resource. */
         $calendarStyle = $this->getCalendarStyle();
 
         /* Create User resources. */
         for ($i = 1; $i <= 2; $i++) {
-            $this->getUser($calendarStyle, $holidayGroup, $i);
+            $this->getUser($calendarStyle, $holidayGroups[self::NAME_HOLIDAY_GROUP_SAXONY], $i);
         }
 
         /* Create User resources. */
         for ($i = 1; $i <= 2; $i++) {
-            $this->getUser($calendarStyle, $holidayGroup, $i, true);
+            $this->getUser($calendarStyle, $holidayGroups[self::NAME_HOLIDAY_GROUP_SAXONY], $i, true);
         }
 
         /* Save all resources to db. */
