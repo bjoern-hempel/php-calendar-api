@@ -2,6 +2,8 @@
 
 {% block title %}{{ calendarImage.name }}{% endblock %}
 
+{% block body_class %}calendar-detail{% endblock %}
+
 {% block body %}
     {% apply spaceless %}
         <div class="content">
@@ -11,7 +13,7 @@
                 Monat: {{ calendarImage.month }}
             </p>
             <p>
-                <img src="{{ calendarImage.pathTargetRelative|add_hash|url_absolute }}" />
+                <img src="{{ calendarImage.pathTarget|path_preview(1024)|add_hash|url_absolute }}" />
             </p>
             <p>
                 <a href="{{ path_encoded('app_calendar_index', {'hash': calendarImage.user.idHash, 'userId': calendarImage.user.id, 'calendarId': calendarImage.calendar.id}) }}">Übersicht</a>

@@ -2,12 +2,14 @@
 
 {% block title %}{{ calendar.name }}{% endblock %}
 
+{% block body_class %}calendar-index{% endblock %}
+
 {% block body %}
     {% apply spaceless %}
         <div class="images">
-            {% for calendarImage in calendar.calendarImages %}
+            {% for key, calendarImage in calendar.calendarImages %}
                 <a href="{{ path_encoded('app_calendar_detail', {'hash': calendarImage.user.idHash, 'userId': calendarImage.user.id, 'calendarImageId': calendarImage.id}) }}">
-                    <div class="image" style="background-image:url({{ calendarImage.pathTargetRelative|add_hash|url_absolute }});"></div>
+                    <div class="image" style="background-image:url({{ calendarImage.pathTarget|path_preview(key is same as(0) ? 2048 : 1024)|add_hash|url_absolute }});"></div>
                 </a>
             {% endfor %}
         </div>
