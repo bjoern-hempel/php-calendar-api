@@ -1,62 +1,64 @@
-/* Variables */
-$breakpoint-mobile: 540px
-$breakpoint-tablet: 1024px
+/**
+ * Import bootstrap
+ */
+@import "~bootstrap/scss/bootstrap"
 
+/**
+ * Calendar index page
+ */
 html, body
     margin: 0px
     padding: 0px
     width: 100%
 
-.images
-    a
-        .image
-            width: 25%
-            height: 18.75vw
-            background-size: 100% 100%
-            float: left
+/**
+ * Calendar index page
+ */
+body.calendar-index
+    background-color: #fff
 
-        &:first-child
-            .image
-                width: 50%
-                height: 37.5vw
+    /* Decrease padding left and right from used px-5 on mobile devices */
+    @include media-breakpoint-between(xs, md)
+        header
+            .container-fluid.px-5
+                padding-left: .75rem!important
+                padding-right: .75rem!important
+        footer
+            .container-fluid.px-5
+                padding-left: .75rem!important
+                padding-right: .75rem!important
 
-.content
-    width: $breakpoint-tablet
-    margin: auto
-
-    p
-        img
-            width: 100%
-
-
-/* For Mobile */
-@media (max-width: $breakpoint-mobile)
-    .images
-        a
-            .image
+    /* Show the calendar among each other */
+    .container-images
+        a.container-image-link
+            .container-image
                 width: 100%
                 height: 75vw
+                background-size: 100% 100%
+                float: left
 
-            &:first-child
-                .image
-                    width: 100%
-                    height: 75vw
+    /* Show tablet style */
+    @include media-breakpoint-up(md)
+        .container-images
+            a.container-image-link
+                .container-image
+                    width: 50%
+                    height: 37.5vw
 
-    .content
-        width: 100%
+    /* Show nice calendar style on larger devices */
+    @include media-breakpoint-up(lg)
+        .container-images
+            a.container-image-link
+                .container-image
+                    width: 25%
+                    height: 18.75vw
+                &:first-child
+                    .container-image
+                        width: 50%
+                        height: 37.5vw
 
-/* For Tablets */
-@media screen and (min-width: $breakpoint-mobile) and (max-width: $breakpoint-tablet)
-    .images
-        a
-            .image
-                width: 100%
-                height: 75vw
-
-            &:first-child
-                .image
-                    width: 100%
-                    height: 75vw
-
-    .content
-        width: 100%
+/**
+ * Calendar detail page
+ */
+body.calendar-detail
+    background-color: #fff

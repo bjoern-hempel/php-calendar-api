@@ -30,8 +30,11 @@ abstract class BaseController extends AbstractController
 
     public const ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED = 'app_calendar_index_encoded';
 
+    public const ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED_SHORT = 'app_calendar_index_encoded_short';
+
     public const CONFIG_APP_CALENDAR_INDEX = [
         'path' => 'calendar',
+        'pathShort' => 'c',
         'parameter' => [
             'hash' => 'string',
             'userId' => 'integer',
@@ -46,8 +49,11 @@ abstract class BaseController extends AbstractController
 
     public const ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED = 'app_calendar_detail_encoded';
 
+    public const ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED_SHORT = 'app_calendar_detail_encoded_short';
+
     public const CONFIG_APP_CALENDAR_DETAIL = [
         'path' => 'calendar/detail',
+        'pathShort' => 'd',
         'parameter' => [
             'hash' => 'string',
             'userId' => 'integer',

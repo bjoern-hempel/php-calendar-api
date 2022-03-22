@@ -39,14 +39,15 @@ class UrlService
      * @param array<string, string|array<string, string>> $config
      * @param array<string, string|int> $values
      * @param bool $withPath
+     * @param bool $short
      * @param bool $encode
      * @return string
      * @throws Exception
      */
-    public static function build(array $config, array $values, bool $withPath = false, bool $encode = false): string
+    public static function build(array $config, array $values, bool $withPath = false, bool $short = false, bool $encode = false): string
     {
         $configParameter = $config['parameter'];
-        $configPath = strval($config['path']);
+        $configPath = strval($config[$short ? 'pathShort' : 'path']);
 
         if (!is_array($configParameter)) {
             throw new Exception(sprintf('Unexpected data format (%s:%d).', __FILE__, __LINE__));
@@ -94,12 +95,13 @@ class UrlService
      * @param array<string, string|array<string, string>> $config
      * @param array<string, string|int> $values
      * @param bool $withPath
+     * @param bool $short
      * @return string
      * @throws Exception
      */
-    public static function encode(array $config, array $values, bool $withPath = false): string
+    public static function encode(array $config, array $values, bool $withPath = false, bool $short = false): string
     {
-        return self::build($config, $values, $withPath, true);
+        return self::build($config, $values, $withPath, $short, true);
     }
 
     /**
@@ -113,8 +115,10 @@ class UrlService
      */
     public static function parse(array $config, string $path, bool $decode = false): array
     {
+        $short = !str_contains($path, strval($config['path']));
+
         $configParameter = $config['parameter'];
-        $configPath = strval($config['path']);
+        $configPath = strval($config[$short ? 'pathShort' : 'path']);
 
         if (!is_array($configParameter)) {
             throw new Exception(sprintf('Unexpected data format (%s:%d).', __FILE__, __LINE__));

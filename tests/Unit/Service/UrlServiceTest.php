@@ -53,9 +53,10 @@ final class UrlServiceTest extends TestCase
      * @param array<string, string> $config
      * @param array<int, string|int> $given
      * @param bool $withPath
+     * @param bool $short
      * @param string $expected
      */
-    public function wrapperEncode(int $number, string $method, array $config, array $given, bool $withPath, string $expected): void
+    public function wrapperEncode(int $number, string $method, array $config, array $given, bool $withPath, bool $short, string $expected): void
     {
         /* Arrange */
 
@@ -66,7 +67,7 @@ final class UrlServiceTest extends TestCase
         $this->assertContains($method, get_class_methods(UrlService::class));
         $this->assertIsCallable($callback);
         /** @phpstan-ignore-next-line → PHPStan does not detect $callback as valid */
-        $this->assertSame($expected, call_user_func($callback, $config, $given, $withPath));
+        $this->assertSame($expected, call_user_func($callback, $config, $given, $withPath, $short));
     }
 
     /**
@@ -108,60 +109,116 @@ final class UrlServiceTest extends TestCase
         return [
 
             /**
-             * build (without path)
+             * build (without path, standard)
              */
             [++$number, 'build', BaseController::CONFIG_APP_CALENDAR_INDEX, [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
                 'userId' => 2,
                 'calendarId' => 5,
-            ], false, 'da4b9237bacccdf19c0760cab7aec4a8359010b0/2/5'],
+            ], false, false, 'da4b9237bacccdf19c0760cab7aec4a8359010b0/2/5'],
             [++$number, 'build', BaseController::CONFIG_APP_CALENDAR_DETAIL, [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
                 'userId' => 2,
                 'calendarImageId' => 52,
-            ], false, 'da4b9237bacccdf19c0760cab7aec4a8359010b0/2/52'],
+            ], false, false, 'da4b9237bacccdf19c0760cab7aec4a8359010b0/2/52'],
 
             /**
-             * build (with path)
+             * build (without path, short)
+             */
+            [++$number, 'build', BaseController::CONFIG_APP_CALENDAR_INDEX, [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarId' => 5,
+            ], false, true, 'da4b9237/2/5'],
+            [++$number, 'build', BaseController::CONFIG_APP_CALENDAR_DETAIL, [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarImageId' => 52,
+            ], false, true, 'da4b9237/2/52'],
+
+            /**
+             * build (with path, standard)
              */
             [++$number, 'build', BaseController::CONFIG_APP_CALENDAR_INDEX, [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
                 'userId' => 2,
                 'calendarId' => 5,
-            ], true, 'calendar/da4b9237bacccdf19c0760cab7aec4a8359010b0/2/5'],
+            ], true, false, 'calendar/da4b9237bacccdf19c0760cab7aec4a8359010b0/2/5'],
             [++$number, 'build', BaseController::CONFIG_APP_CALENDAR_DETAIL, [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
                 'userId' => 2,
                 'calendarImageId' => 52,
-            ], true, 'calendar/detail/da4b9237bacccdf19c0760cab7aec4a8359010b0/2/52'],
+            ], true, false, 'calendar/detail/da4b9237bacccdf19c0760cab7aec4a8359010b0/2/52'],
 
             /**
-             * encode (without path)
+             * build (with path, short)
+             */
+            [++$number, 'build', BaseController::CONFIG_APP_CALENDAR_INDEX, [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarId' => 5,
+            ], true, true, 'c/da4b9237/2/5'],
+            [++$number, 'build', BaseController::CONFIG_APP_CALENDAR_DETAIL, [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarImageId' => 52,
+            ], true, true, 'd/da4b9237/2/52'],
+
+            /**
+             * encode (without path, standard)
              */
             [++$number, 'encode', BaseController::CONFIG_APP_CALENDAR_INDEX, [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
                 'userId' => 2,
                 'calendarId' => 5,
-            ], false, 'ZGE0YjkyMzdiYWNjY2RmMTljMDc2MGNhYjdhZWM0YTgzNTkwMTBiMC8yLzU-'],
+            ], false, false, 'ZGE0YjkyMzdiYWNjY2RmMTljMDc2MGNhYjdhZWM0YTgzNTkwMTBiMC8yLzU-'],
             [++$number, 'encode', BaseController::CONFIG_APP_CALENDAR_DETAIL, [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
                 'userId' => 2,
                 'calendarImageId' => 52,
-            ], false, 'ZGE0YjkyMzdiYWNjY2RmMTljMDc2MGNhYjdhZWM0YTgzNTkwMTBiMC8yLzUy'],
+            ], false, false, 'ZGE0YjkyMzdiYWNjY2RmMTljMDc2MGNhYjdhZWM0YTgzNTkwMTBiMC8yLzUy'],
 
             /**
-             * encode (with path)
+             * encode (without path, short)
+             */
+            [++$number, 'encode', BaseController::CONFIG_APP_CALENDAR_INDEX, [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarId' => 5,
+            ], false, true, 'ZGE0YjkyMzcvMi81'],
+            [++$number, 'encode', BaseController::CONFIG_APP_CALENDAR_DETAIL, [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarImageId' => 52,
+            ], false, true, 'ZGE0YjkyMzcvMi81Mg--'],
+
+            /**
+             * encode (with path, standard)
              */
             [++$number, 'encode', BaseController::CONFIG_APP_CALENDAR_INDEX, [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
                 'userId' => 2,
                 'calendarId' => 5,
-            ], true, 'calendar/ZGE0YjkyMzdiYWNjY2RmMTljMDc2MGNhYjdhZWM0YTgzNTkwMTBiMC8yLzU-'],
+            ], true, false, 'calendar/ZGE0YjkyMzdiYWNjY2RmMTljMDc2MGNhYjdhZWM0YTgzNTkwMTBiMC8yLzU-'],
             [++$number, 'encode', BaseController::CONFIG_APP_CALENDAR_DETAIL, [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
                 'userId' => 2,
                 'calendarImageId' => 52,
-            ], true, 'calendar/detail/ZGE0YjkyMzdiYWNjY2RmMTljMDc2MGNhYjdhZWM0YTgzNTkwMTBiMC8yLzUy'],
+            ], true, false, 'calendar/detail/ZGE0YjkyMzdiYWNjY2RmMTljMDc2MGNhYjdhZWM0YTgzNTkwMTBiMC8yLzUy'],
+
+            /**
+             * encode (with path, short)
+             */
+            [++$number, 'encode', BaseController::CONFIG_APP_CALENDAR_INDEX, [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarId' => 5,
+            ], true, true, 'c/ZGE0YjkyMzcvMi81'],
+            [++$number, 'encode', BaseController::CONFIG_APP_CALENDAR_DETAIL, [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarImageId' => 52,
+            ], true, true, 'd/ZGE0YjkyMzcvMi81Mg--'],
         ];
     }
 
@@ -177,7 +234,7 @@ final class UrlServiceTest extends TestCase
         return [
 
             /**
-             * parse (without path)
+             * parse (without path, standard)
              */
             [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_INDEX, 'da4b9237bacccdf19c0760cab7aec4a8359010b0/2/5', [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
@@ -191,7 +248,21 @@ final class UrlServiceTest extends TestCase
             ]],
 
             /**
-             * decode (without path)
+             * parse (without path, short)
+             */
+            [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_INDEX, 'da4b9237/2/5', [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarId' => 5,
+            ]],
+            [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_DETAIL, 'da4b9237/2/52', [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarImageId' => 52,
+            ]],
+
+            /**
+             * decode (without path, standard)
              */
             [++$number, 'decode', BaseController::CONFIG_APP_CALENDAR_INDEX, 'ZGE0YjkyMzdiYWNjY2RmMTljMDc2MGNhYjdhZWM0YTgzNTkwMTBiMC8yLzU-', [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
@@ -205,7 +276,21 @@ final class UrlServiceTest extends TestCase
             ]],
 
             /**
-             * parse (with path)
+             * decode (without path, short)
+             */
+            [++$number, 'decode', BaseController::CONFIG_APP_CALENDAR_INDEX, 'ZGE0YjkyMzcvMi81', [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarId' => 5,
+            ]],
+            [++$number, 'decode', BaseController::CONFIG_APP_CALENDAR_DETAIL, 'ZGE0YjkyMzcvMi81Mg--', [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarImageId' => 52,
+            ]],
+
+            /**
+             * parse (with path, standard)
              */
             [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_INDEX, 'calendar/da4b9237bacccdf19c0760cab7aec4a8359010b0/2/5', [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
@@ -219,7 +304,21 @@ final class UrlServiceTest extends TestCase
             ]],
 
             /**
-             * decode (with path)
+             * parse (with path, short)
+             */
+            [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_INDEX, 'calendar/da4b9237/2/5', [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarId' => 5,
+            ]],
+            [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_DETAIL, 'calendar/detail/da4b9237/2/52', [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarImageId' => 52,
+            ]],
+
+            /**
+             * decode (with path, standard)
              */
             [++$number, 'decode', BaseController::CONFIG_APP_CALENDAR_INDEX, 'calendar/ZGE0YjkyMzdiYWNjY2RmMTljMDc2MGNhYjdhZWM0YTgzNTkwMTBiMC8yLzU-', [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
@@ -233,7 +332,21 @@ final class UrlServiceTest extends TestCase
             ]],
 
             /**
-             * parse (with path and beginning /)
+             * decode (with path, short)
+             */
+            [++$number, 'decode', BaseController::CONFIG_APP_CALENDAR_INDEX, 'c/ZGE0YjkyMzcvMi81', [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarId' => 5,
+            ]],
+            [++$number, 'decode', BaseController::CONFIG_APP_CALENDAR_DETAIL, 'd/ZGE0YjkyMzcvMi81Mg--', [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarImageId' => 52,
+            ]],
+
+            /**
+             * parse (with path and beginning /, standard)
              */
             [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_INDEX, '/calendar/da4b9237bacccdf19c0760cab7aec4a8359010b0/2/5', [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
@@ -247,15 +360,43 @@ final class UrlServiceTest extends TestCase
             ]],
 
             /**
-             * parse (full url)
+             * parse (with path and beginning /, short)
              */
-            [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_INDEX, 'https://calendar.ixno.de/calendar/da4b9237bacccdf19c0760cab7aec4a8359010b0/2/5', [
+            [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_INDEX, '/c/da4b9237bacccdf19c0760cab7aec4a8359010b0/2/5', [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
                 'userId' => 2,
                 'calendarId' => 5,
             ]],
-            [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_DETAIL, 'https://calendar.ixno.de/calendar/detail/da4b9237bacccdf19c0760cab7aec4a8359010b0/2/52', [
+            [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_DETAIL, '/d/da4b9237bacccdf19c0760cab7aec4a8359010b0/2/52', [
                 'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
+                'userId' => 2,
+                'calendarImageId' => 52,
+            ]],
+
+            /**
+             * parse (full url, parse, standard)
+             */
+            [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_INDEX, 'https://twelvepics.com/c/da4b9237bacccdf19c0760cab7aec4a8359010b0/2/5', [
+                'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
+                'userId' => 2,
+                'calendarId' => 5,
+            ]],
+            [++$number, 'parse', BaseController::CONFIG_APP_CALENDAR_DETAIL, 'https://twelvepics.com/d/da4b9237bacccdf19c0760cab7aec4a8359010b0/2/52', [
+                'hash' => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
+                'userId' => 2,
+                'calendarImageId' => 52,
+            ]],
+
+            /**
+             * parse (full url, decode standard)
+             */
+            [++$number, 'decode', BaseController::CONFIG_APP_CALENDAR_INDEX, 'https://twelvepics.com/c/ZGE0YjkyMzcvMi81', [
+                'hash' => 'da4b9237',
+                'userId' => 2,
+                'calendarId' => 5,
+            ]],
+            [++$number, 'decode', BaseController::CONFIG_APP_CALENDAR_DETAIL, 'https://twelvepics.com/d/ZGE0YjkyMzcvMi81Mg--', [
+                'hash' => 'da4b9237',
                 'userId' => 2,
                 'calendarImageId' => 52,
             ]],

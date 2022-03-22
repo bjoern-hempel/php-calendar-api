@@ -70,6 +70,7 @@ class AppExtension extends AbstractExtension
             new TwigFilter('add_hash', [$this, 'addHash']),
             new TwigFilter('check_path', [$this, 'checkPath']),
             new TwigFilter('url_absolute', [$this, 'urlAbsolute']),
+            new TwigFilter('month_translation', [$this, 'getMonthTranslationKey'])
         ];
     }
 
@@ -246,6 +247,35 @@ class AppExtension extends AbstractExtension
         ];
 
         return $this->generator->generate($nameEncoded, $parametersEncoded, $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH);
+    }
+
+    /**
+     * Get month translation key.
+     *
+     * @param int $month
+     * @return string
+     * @throws Exception
+     */
+    public function getMonthTranslationKey(int $month): string
+    {
+        $name = match ($month) {
+            0 => 'title',
+            1 => 'january',
+            2 => 'february',
+            3 => 'march',
+            4 => 'april',
+            5 => 'may',
+            6 => 'june',
+            7 => 'july',
+            8 => 'august',
+            9 => 'september',
+            10 => 'october',
+            11 => 'november',
+            12 => 'december',
+            default => throw new Exception(sprintf('Unknown month (%s:%d).', __FILE__, __LINE__)),
+        };
+
+        return sprintf('admin.calendarImage.fields.month.entries.%s', $name);
     }
 
     /**

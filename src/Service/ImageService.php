@@ -41,6 +41,8 @@ class ImageService
 
     protected TranslatorInterface $translator;
 
+    protected int $jpegQuality = 75;
+
     public const TEXT_NOT_GENERATED = 'admin.image.notGenerated';
 
     public const PATH_FONT = 'data/font/OpenSansCondensed-Bold.ttf';
@@ -58,6 +60,17 @@ class ImageService
         $this->requestStack = $requestStack;
 
         $this->translator = $translator;
+    }
+
+    /**
+     * Sets JPEG quality.
+     *
+     * @param int $jpegQuality
+     * @return void
+     */
+    public function setJpegQuality(int $jpegQuality): void
+    {
+        $this->jpegQuality = $jpegQuality;
     }
 
     /**
@@ -251,7 +264,7 @@ class ImageService
         $status = match ($imageType) {
             IMAGETYPE_GIF => imagegif($image, $path),
             IMAGETYPE_PNG => imagepng($image, $path),
-            IMAGETYPE_JPEG => imagejpeg($image, $path),
+            IMAGETYPE_JPEG => imagejpeg($image, $path, $this->jpegQuality),
             default => throw new Exception(sprintf('Unsupported image type %d - %s (%s:%d)', $imageType, $mimeType, __FILE__, __LINE__)),
         };
 
