@@ -154,10 +154,11 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      * Gets encoded string from given calendar image.
      *
      * @param CalendarImage $calendarImage
+     * @param bool $short
      * @return string
      * @throws Exception
      */
-    protected function getEncoded(CalendarImage $calendarImage): string
+    protected function getEncoded(CalendarImage $calendarImage, bool $short = false): string
     {
         $calendar = $calendarImage->getCalendar();
 
@@ -167,15 +168,15 @@ class EasyAdminSubscriber implements EventSubscriberInterface
 
         return match ($calendarImage->getMonth()) {
             0 => UrlService::encode(BaseController::CONFIG_APP_CALENDAR_INDEX, [
-                'hash' => $calendar->getUser()->getIdHash(),
+                'hash' => $short ? $calendar->getUser()->getIdHashShort() : $calendar->getUser()->getIdHash(),
                 'userId' => intval($calendar->getUser()->getId()),
                 'calendarId' => $calendar->getId(),
-            ]),
+            ], false, true),
             default => UrlService::encode(BaseController::CONFIG_APP_CALENDAR_DETAIL, [
-                'hash' => $calendar->getUser()->getIdHash(),
+                'hash' => $short ? $calendar->getUser()->getIdHashShort() : $calendar->getUser()->getIdHash(),
                 'userId' => intval($calendar->getUser()->getId()),
                 'calendarImageId' => $calendarImage->getId(),
-            ]),
+            ], false, true),
         };
     }
 
@@ -187,7 +188,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      * @return string
      * @throws Exception
      */
-    protected function getUrl(CalendarImage $calendarImage, string $defaultHost = 'calendar.ixno.de'): string
+    protected function getUrl(CalendarImage $calendarImage, string $defaultHost = 'twelvepics.com'): string
     {
         $calendar = $calendarImage->getCalendar();
 
@@ -203,13 +204,13 @@ class EasyAdminSubscriber implements EventSubscriberInterface
 
         $host = in_array($currentRequest->getHost(), ['localhost', '127.0.0.1']) ? $defaultHost : $currentRequest->getHost();
 
-        $encoded = $this->getEncoded($calendarImage);
+        $encoded = $this->getEncoded($calendarImage, true);
 
         $path = match ($calendarImage->getMonth()) {
-            0 => $this->router->generate(BaseController::ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED, [
+            0 => $this->router->generate(BaseController::ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED_SHORT, [
                 'encoded' => $encoded,
             ]),
-            default => $this->router->generate(BaseController::ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED, [
+            default => $this->router->generate(BaseController::ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED_SHORT, [
                 'encoded' => $encoded,
             ]),
         };

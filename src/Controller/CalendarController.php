@@ -104,7 +104,7 @@ class CalendarController extends BaseController
     }
 
     /**
-     * Encoded index route.
+     * Encoded index route (standard).
      *
      * @param string $encoded
      * @return Response
@@ -120,6 +120,38 @@ class CalendarController extends BaseController
         $calendarId = intval($parameters['calendarId']);
 
         return $this->index($hash, $userId, $calendarId);
+    }
+
+    /**
+     * Encoded index route (short).
+     *
+     * @param string $encoded
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/c/{encoded}', name: BaseController::ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED_SHORT)]
+    public function indexEncodedShort(string $encoded): Response
+    {
+        $parameters = UrlService::decode(BaseController::CONFIG_APP_CALENDAR_INDEX, $encoded);
+
+        $hash = strval($parameters['hash']);
+        $userId = intval($parameters['userId']);
+        $calendarId = intval($parameters['calendarId']);
+
+        /* Loads user and gets the full hash. */
+        $user = $this->userLoaderService->loadUserCheckHash($userId, $hash, true);
+
+        /* Get encoded string. */
+        $encoded = UrlService::encode(BaseController::CONFIG_APP_CALENDAR_INDEX, [
+            'hash' => $user->getIdHash(),
+            'userId' => $userId,
+            'calendarId' => $calendarId,
+        ]);
+
+        /* Redirect to standard URL. */
+        return $this->redirectToRoute(BaseController::ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED, [
+            'encoded' => $encoded
+        ], Response::HTTP_TEMPORARY_REDIRECT);
     }
 
     /**
@@ -154,7 +186,7 @@ class CalendarController extends BaseController
     }
 
     /**
-     * Encoded detail route.
+     * Encoded detail route (standard).
      *
      * @param string $encoded
      * @return Response
@@ -170,5 +202,37 @@ class CalendarController extends BaseController
         $calendarImageId = intval($parameters['calendarImageId']);
 
         return $this->detail($hash, $userId, $calendarImageId);
+    }
+
+    /**
+     * Encoded detail route (short).
+     *
+     * @param string $encoded
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/d/{encoded}', name: BaseController::ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED_SHORT)]
+    public function detailEncodedShort(string $encoded): Response
+    {
+        $parameters = UrlService::decode(BaseController::CONFIG_APP_CALENDAR_DETAIL, $encoded);
+
+        $hash = strval($parameters['hash']);
+        $userId = intval($parameters['userId']);
+        $calendarImageId = intval($parameters['calendarImageId']);
+
+        /* Loads user and gets the full hash. */
+        $user = $this->userLoaderService->loadUserCheckHash($userId, $hash, true);
+
+        /* Get encoded string. */
+        $encoded = UrlService::encode(BaseController::CONFIG_APP_CALENDAR_DETAIL, [
+            'hash' => $user->getIdHash(),
+            'userId' => $userId,
+            'calendarImageId' => $calendarImageId,
+        ]);
+
+        /* Redirect to standard URL. */
+        return $this->redirectToRoute(BaseController::ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED, [
+            'encoded' => $encoded
+        ], Response::HTTP_TEMPORARY_REDIRECT);
     }
 }

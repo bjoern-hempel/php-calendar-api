@@ -128,14 +128,15 @@ class UserLoaderService extends BaseLoaderService
      *
      * @param int $userId
      * @param string $hash
+     * @param bool $short
      * @return User
      * @throws Exception
      */
-    public function loadUserCheckHash(int $userId, string $hash): User
+    public function loadUserCheckHash(int $userId, string $hash, bool $short = false): User
     {
         $user = $this->getUser($userId);
 
-        $userHash = $user->getIdHash();
+        $userHash = $short ? substr($user->getIdHash(), 0, 8) : $user->getIdHash();
 
         if ($userHash !== $hash) {
             throw new Exception(sprintf('The hash does not match with given hash "%s" (%s:%d).', $hash, __FILE__, __LINE__));

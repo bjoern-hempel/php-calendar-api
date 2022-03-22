@@ -1,23 +1,40 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ calendarImage.name }}{% endblock %}
+{% block title %}{{ calendarImage.title }}, {{ calendarImage.year }}, {{ calendarImage.month|month_translation|trans }}{% endblock %}
 
 {% block body_class %}calendar-detail{% endblock %}
 
 {% block body %}
     {% apply spaceless %}
-        <div class="content">
-            <h1>{{ calendarImage.title }}</h1>
-            <p>
-                Jahr: {{ calendarImage.year }}<br />
-                Monat: {{ calendarImage.month }}
-            </p>
-            <p>
-                <img src="{{ calendarImage.pathTarget|path_preview(1024)|add_hash|url_absolute }}" />
-            </p>
-            <p>
-                <a href="{{ path_encoded('app_calendar_index', {'hash': calendarImage.user.idHash, 'userId': calendarImage.user.id, 'calendarId': calendarImage.calendar.id}) }}">Übersicht</a>
-            </p>
-        </div>
+        {% include 'calendar/header.html.twig' with {
+            'title': calendarImage.title
+        } %}
+
+        <main>
+            <section class="py-5 text-center container">
+                <div class="row py-lg-5">
+                    <div class="col-lg-6 col-md-8 mx-auto">
+                        <h1 class="fw-light">{{ calendarImage.title }}</h1>
+                        <p class="lead text-muted">{{ calendarImage.year }}, {{ calendarImage.month|month_translation|trans }}, {{ calendarImage.position }}</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="album py-5 bg-light">
+                <div class="container">
+                    <p>
+                        <picture>
+                            <source srcset="{{ calendarImage.pathTarget|path_preview(2048)|add_hash|url_absolute }}" type="image/jpeg">
+                            <img src="{{ calendarImage.pathTarget|path_preview(2048)|add_hash|url_absolute }}" class="img-fluid img-thumbnail" alt="{{ calendarImage }}">
+                        </picture>
+                    </p>
+                    <p>
+                        <a class="btn btn-primary btn-dark" href="{{ path_encoded('app_calendar_index', {'hash': calendarImage.user.idHash, 'userId': calendarImage.user.id, 'calendarId': calendarImage.calendar.id}) }}" role="button">Übersicht</a>
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        {% include 'calendar/footer.html.twig' %}
     {% endapply %}
 {% endblock %}

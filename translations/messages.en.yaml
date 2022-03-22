@@ -394,3 +394,18 @@ admin:
       createdAt:
         label: 'Created At'
         help: 'The date and time when this entry was created.'
+
+# Pages
+page:
+  general:
+    about: 'About'
+    backToTop: 'Back to top'
+    contact: 'Contact'
+    domain: 'twelvepics.com'
+    domainFull: 'https://www.twelvepics.com'
+    email: 'contact@twelvepics.com'
+    emailMe: 'Contact'
+    impress: 'Impress'
+    info: >
+      This service is provided by <a href="https://www.twelvepics.com" class="%class%">twelvepics.com</a>.
+    name: 'TwelvePics'

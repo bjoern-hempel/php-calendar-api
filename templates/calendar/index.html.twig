@@ -6,12 +6,23 @@
 
 {% block body %}
     {% apply spaceless %}
-        <div class="images">
+        {% include 'calendar/header.html.twig' with {
+            'title': calendar.title,
+            'containerClass': 'container-fluid',
+            'containerMargin': 'px-5'
+        } %}
+
+        <div class="container-fluid container-images px-0">
             {% for key, calendarImage in calendar.calendarImages %}
-                <a href="{{ path_encoded('app_calendar_detail', {'hash': calendarImage.user.idHash, 'userId': calendarImage.user.id, 'calendarImageId': calendarImage.id}) }}">
-                    <div class="image" style="background-image:url({{ calendarImage.pathTarget|path_preview(key is same as(0) ? 2048 : 1024)|add_hash|url_absolute }});"></div>
+                <a class="container-image-link" href="{{ path_encoded('app_calendar_detail', {'hash': calendarImage.user.idHash, 'userId': calendarImage.user.id, 'calendarImageId': calendarImage.id}) }}">
+                    <div class="container-image" style="background-image:url({{ calendarImage.pathTarget|path_preview(key is same as(0) ? 2048 : 1024)|add_hash|url_absolute }});"></div>
                 </a>
             {% endfor %}
         </div>
+
+        {% include 'calendar/footer.html.twig' with {
+            'containerClass': 'container-fluid',
+            'containerMargin': 'px-5'
+        } %}
     {% endapply %}
 {% endblock %}

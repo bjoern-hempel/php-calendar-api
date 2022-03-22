@@ -112,6 +112,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityI
 
     public const PASSWORD_UNCHANGED = '**********';
 
+    public const SHORT_HASH_LENGTH = 8;
+
     public const CRUD_FIELDS_ADMIN = ['id'];
 
     public const CRUD_FIELDS_REGISTERED = ['id', 'idHash', 'email', 'username', 'password', 'plainPassword', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
@@ -262,6 +264,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityI
     public function getIdHash(): string
     {
         return $this->idHash ?? $this->getIdHashNew();
+    }
+
+    /**
+     * Gets the hash id of this user.
+     *
+     * @return string
+     */
+    public function getIdHashShort(): string
+    {
+        return substr($this->getIdHash(), 0, self::SHORT_HASH_LENGTH);
     }
 
     /**

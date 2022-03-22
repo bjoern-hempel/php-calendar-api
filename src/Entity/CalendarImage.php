@@ -160,7 +160,7 @@ class CalendarImage implements EntityInterface
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups('calendar_image_extended')]
-    private ?string $url;
+    private ?string $url = null;
 
     /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
