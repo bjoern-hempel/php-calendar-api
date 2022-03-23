@@ -29,7 +29,7 @@ admin:
       questionDetail: 'This will regenerate all calendar sheets.'
     calendarUrls:
       success: 'The calendar URLs "%name%" was successfully created: %number%.'
-      failure: 'The calendar URLs "%name% could not be created successfully.'
+      failure: 'The calendar URLs "%name%" could not be created successfully.'
       title: 'Generate calendar URLs?'
       questionIndex: 'This will regenerate all (!) calendar URLs "%name%". Attention: The calendar sheets will not be changed. This must be done additionally (Build Calendar Sheets).'
       questionDetail: 'This will regenerate all (!) calendar URLs. Attention: The calendar sheets will not be changed. This must be done additionally (Build Calendar Sheets).'
