@@ -48,7 +48,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
 
     protected RequestStack $requestStack;
 
-    protected UrlGeneratorInterface $router;
+    protected UrlService $urlService;
 
     /**
      * EasyAdminSubscriber constructor.
@@ -56,9 +56,9 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      * @param ImageService $imageService
      * @param CalendarSheetCreateService $calendarSheetCreateService
      * @param RequestStack $requestStack
-     * @param UrlGeneratorInterface $router
+     * @param UrlService $urlService
      */
-    public function __construct(ImageService $imageService, CalendarSheetCreateService $calendarSheetCreateService, RequestStack $requestStack, UrlGeneratorInterface $router)
+    public function __construct(ImageService $imageService, CalendarSheetCreateService $calendarSheetCreateService, RequestStack $requestStack, UrlService $urlService)
     {
         $this->imageService = $imageService;
 
@@ -66,7 +66,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
 
         $this->requestStack = $requestStack;
 
-        $this->router = $router;
+        $this->urlService = $urlService;
     }
 
     /**
@@ -151,74 +151,6 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Gets encoded string from given calendar image.
-     *
-     * @param CalendarImage $calendarImage
-     * @param bool $short
-     * @return string
-     * @throws Exception
-     */
-    protected function getEncoded(CalendarImage $calendarImage, bool $short = false): string
-    {
-        $calendar = $calendarImage->getCalendar();
-
-        if (!$calendar instanceof Calendar) {
-            throw new Exception(sprintf('Unable to get calendar (%s:%d).', __FILE__, __LINE__));
-        }
-
-        return match ($calendarImage->getMonth()) {
-            0 => UrlService::encode(BaseController::CONFIG_APP_CALENDAR_INDEX, [
-                'hash' => $short ? $calendar->getUser()->getIdHashShort() : $calendar->getUser()->getIdHash(),
-                'userId' => intval($calendar->getUser()->getId()),
-                'calendarId' => $calendar->getId(),
-            ], false, true),
-            default => UrlService::encode(BaseController::CONFIG_APP_CALENDAR_DETAIL, [
-                'hash' => $short ? $calendar->getUser()->getIdHashShort() : $calendar->getUser()->getIdHash(),
-                'userId' => intval($calendar->getUser()->getId()),
-                'calendarImageId' => $calendarImage->getId(),
-            ], false, true),
-        };
-    }
-
-    /**
-     * Returns the full and automatically generated URL from given calendar image.
-     *
-     * @param CalendarImage $calendarImage
-     * @param string $defaultHost
-     * @return string
-     * @throws Exception
-     */
-    protected function getUrl(CalendarImage $calendarImage, string $defaultHost = 'twelvepics.com'): string
-    {
-        $calendar = $calendarImage->getCalendar();
-
-        if (!$calendar instanceof Calendar) {
-            throw new Exception(sprintf('Unable to get calendar (%s:%d).', __FILE__, __LINE__));
-        }
-
-        $currentRequest = $this->requestStack->getCurrentRequest();
-
-        if ($currentRequest === null) {
-            throw new Exception(sprintf('Unable to get current request (%s:%d).', __FILE__, __LINE__));
-        }
-
-        $host = in_array($currentRequest->getHost(), ['localhost', '127.0.0.1']) ? $defaultHost : $currentRequest->getHost();
-
-        $encoded = $this->getEncoded($calendarImage, true);
-
-        $path = match ($calendarImage->getMonth()) {
-            0 => $this->router->generate(BaseController::ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED_SHORT, [
-                'encoded' => $encoded,
-            ]),
-            default => $this->router->generate(BaseController::ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED_SHORT, [
-                'encoded' => $encoded,
-            ]),
-        };
-
-        return sprintf('https://%s%s', $host, $path);
-    }
-
-    /**
      * Adds url to calendar image if url is empty.
      *
      * @param CalendarImage $calendarImage
@@ -232,7 +164,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         }
 
         /* Set new url to calendar image. */
-        $calendarImage->setUrl($this->getUrl($calendarImage));
+        $calendarImage->setUrl($this->urlService->getUrl($calendarImage));
 
         return true;
     }

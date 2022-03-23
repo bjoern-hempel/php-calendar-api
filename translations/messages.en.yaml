@@ -24,9 +24,15 @@ admin:
     calendarSheets:
       success: 'The calendar sheets "%name%" was successfully created: %number%, %time%s; %sizes%.'
       failure: 'The calendar sheets "%name% could not be created successfully.'
-      title: 'Generate calendar sheets?'
-      questionIndex: 'This will regenerate all calendar sheet "%name%".'
+      title: 'Regenerate calendar sheets?'
+      questionIndex: 'This will regenerate all calendar sheets "%name%".'
       questionDetail: 'This will regenerate all calendar sheets.'
+    calendarUrls:
+      success: 'The calendar URLs "%name%" was successfully created: %number%.'
+      failure: 'The calendar URLs "%name% could not be created successfully.'
+      title: 'Generate calendar URLs?'
+      questionIndex: 'This will regenerate all (!) calendar URLs "%name%". Attention: The calendar sheets will not be changed. This must be done additionally (Build Calendar Sheets).'
+      questionDetail: 'This will regenerate all (!) calendar URLs. Attention: The calendar sheets will not be changed. This must be done additionally (Build Calendar Sheets).'
 
   # Admin sections
   section:
@@ -101,6 +107,9 @@ admin:
       buildCalendarSheets:
         label: 'Build Calendar Sheets'
         help: 'Build the Calendar Sheets'
+      buildCalendarUrls:
+        label: 'Build Calendar URLs'
+        help: 'Build the Calendar URLs'
       viewCalendarSheets:
         label: 'View Calendar Sheets'
         help: 'Show the Calendar Sheets'
