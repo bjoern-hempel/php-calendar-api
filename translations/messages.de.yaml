@@ -28,8 +28,8 @@ admin:
       questionIndex: 'Hiermit werden die Kalenderblätter "%name%" neu generiert.'
       questionDetail: 'Hiermit werden die Kalenderblätter neu generiert.'
     calendarUrls:
-      success: '%number% Kalender URLs "%name% wurden erfolgreich erstellt.'
-      failure: 'Die Kalender URLs "%name% konnten nicht erfolgreich erstellt werden.'
+      success: '%number% Kalender URLs "%name%" wurden erfolgreich erstellt.'
+      failure: 'Die Kalender URLs "%name%" konnten nicht erfolgreich erstellt werden.'
       title: 'Kalender URLs generieren?'
       questionIndex: 'Hiermit werden alle (!) Kalender URLs "%name%" neu generiert. Achtung: Die Kalenderblätter werden dabei nicht geändert. Dies muss zusätzlich ausgeführt werden (Kalenderblätter generieren).'
       questionDetail: 'Hiermit werden alle (!) Kalender URLs neu generiert. Achtung: Die Kalenderblätter werden dabei nicht geändert. Dies muss zusätzlich ausgeführt werden (Kalenderblätter generieren).'
