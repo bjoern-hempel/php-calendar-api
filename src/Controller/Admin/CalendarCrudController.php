@@ -21,6 +21,7 @@ use App\Entity\HolidayGroup;
 use App\Service\CalendarSheetCreateService;
 use App\Service\SecurityService;
 use App\Service\UrlService;
+use chillerlan\QRCode\QRCode;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -185,7 +186,7 @@ class CalendarCrudController extends BaseCrudController
             throw new Exception(sprintf('Calendar class not found (%s:%d).', __FILE__, __LINE__));
         }
 
-        return $this->calendarSheetCreateService->create($calendarImage, $holidayGroup);
+        return $this->calendarSheetCreateService->create($calendarImage, $holidayGroup, QRCode::VERSION_AUTO);
     }
 
     /**
