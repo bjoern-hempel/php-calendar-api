@@ -13,7 +13,12 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Controller\Base\BaseController;
+use App\Entity\Calendar;
+use App\Entity\CalendarImage;
 use Exception;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class UrlService
@@ -27,11 +32,96 @@ use Exception;
  */
 class UrlService
 {
+    protected RequestStack $requestStack;
+
+    protected UrlGeneratorInterface $router;
+
     public const SEPARATOR = '/';
 
     public const REPLACE_ENCODE = '+/=';
 
     public const REPLACE_DECODE = '._-';
+
+    /**
+     * UrlService constructor.
+     *
+     * @param RequestStack $requestStack
+     * @param UrlGeneratorInterface $router
+     */
+    public function __construct(RequestStack $requestStack, UrlGeneratorInterface $router)
+    {
+        $this->requestStack = $requestStack;
+
+        $this->router = $router;
+    }
+
+    /**
+     * Returns the full and automatically generated URL from given calendar image.
+     *
+     * @param CalendarImage $calendarImage
+     * @param string $defaultHost
+     * @return string
+     * @throws Exception
+     */
+    public function getUrl(CalendarImage $calendarImage, string $defaultHost = 'twelvepics.com'): string
+    {
+        $calendar = $calendarImage->getCalendar();
+
+        if (!$calendar instanceof Calendar) {
+            throw new Exception(sprintf('Unable to get calendar (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $currentRequest = $this->requestStack->getCurrentRequest();
+
+        if ($currentRequest === null) {
+            throw new Exception(sprintf('Unable to get current request (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $host = in_array($currentRequest->getHost(), ['localhost', '127.0.0.1']) ? $defaultHost : $currentRequest->getHost();
+
+        $encoded = $this->getEncoded($calendarImage, true);
+
+        $path = match ($calendarImage->getMonth()) {
+            0 => $this->router->generate(BaseController::ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED_SHORT, [
+                'encoded' => $encoded,
+            ]),
+            default => $this->router->generate(BaseController::ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED_SHORT, [
+                'encoded' => $encoded,
+            ]),
+        };
+
+        return sprintf('https://%s%s', $host, $path);
+    }
+
+    /**
+     * Gets encoded string from given calendar image.
+     *
+     * @param CalendarImage $calendarImage
+     * @param bool $short
+     * @return string
+     * @throws Exception
+     */
+    protected function getEncoded(CalendarImage $calendarImage, bool $short = false): string
+    {
+        $calendar = $calendarImage->getCalendar();
+
+        if (!$calendar instanceof Calendar) {
+            throw new Exception(sprintf('Unable to get calendar (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return match ($calendarImage->getMonth()) {
+            0 => UrlService::encode(BaseController::CONFIG_APP_CALENDAR_INDEX, [
+                'hash' => $short ? $calendar->getUser()->getIdHashShort() : $calendar->getUser()->getIdHash(),
+                'userId' => intval($calendar->getUser()->getId()),
+                'calendarId' => $calendar->getId(),
+            ], false, true),
+            default => UrlService::encode(BaseController::CONFIG_APP_CALENDAR_DETAIL, [
+                'hash' => $short ? $calendar->getUser()->getIdHashShort() : $calendar->getUser()->getIdHash(),
+                'userId' => intval($calendar->getUser()->getId()),
+                'calendarImageId' => $calendarImage->getId(),
+            ], false, true),
+        };
+    }
 
     /**
      * Builds url from given values.

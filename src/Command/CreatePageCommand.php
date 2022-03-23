@@ -18,7 +18,6 @@ use App\Entity\CalendarImage;
 use App\Service\CalendarBuilderService;
 use App\Service\Entity\CalendarLoaderService;
 use App\Service\Entity\HolidayGroupLoaderService;
-use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -44,25 +43,20 @@ class CreatePageCommand extends Command
 
     protected HolidayGroupLoaderService $holidayGroupLoaderService;
 
-    protected EntityManagerInterface $manager;
-
     /**
      * CreatePageCommand constructor
      *
      * @param KernelInterface $appKernel
      * @param CalendarLoaderService $calendarLoaderService
      * @param HolidayGroupLoaderService $holidayGroupLoaderService
-     * @param EntityManagerInterface $manager
      */
-    public function __construct(KernelInterface $appKernel, CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, EntityManagerInterface $manager)
+    public function __construct(KernelInterface $appKernel, CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService)
     {
         $this->appKernel = $appKernel;
 
         $this->calendarLoaderService = $calendarLoaderService;
 
         $this->holidayGroupLoaderService = $holidayGroupLoaderService;
-
-        $this->manager = $manager;
 
         parent::__construct();
     }

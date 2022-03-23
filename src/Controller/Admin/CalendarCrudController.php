@@ -21,6 +21,7 @@ use App\Entity\HolidayGroup;
 use App\Service\CalendarSheetCreateService;
 use App\Service\SecurityService;
 use App\Service\UrlService;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -43,9 +44,15 @@ class CalendarCrudController extends BaseCrudController
 {
     public const ACTION_BUILD_CALENDAR_SHEETS = 'buildCalendarSheets';
 
+    public const ACTION_BUILD_CALENDAR_URLS = 'buildCalendarUrls';
+
     public const ACTION_VIEW_CALENDAR_SHEETS = 'viewCalendarSheets';
 
     protected CalendarSheetCreateService $calendarSheetCreateService;
+
+    protected UrlService $urlService;
+
+    protected EntityManagerInterface $manager;
 
     /**
      * CalendarCrudController constructor.
@@ -53,11 +60,17 @@ class CalendarCrudController extends BaseCrudController
      * @param SecurityService $securityService
      * @param TranslatorInterface $translator
      * @param CalendarSheetCreateService $calendarSheetCreateService
+     * @param UrlService $urlService
+     * @param EntityManagerInterface $manager
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarSheetCreateService $calendarSheetCreateService)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarSheetCreateService $calendarSheetCreateService, UrlService $urlService, EntityManagerInterface $manager)
     {
         $this->calendarSheetCreateService = $calendarSheetCreateService;
+
+        $this->urlService = $urlService;
+
+        $this->manager = $manager;
 
         parent::__construct($securityService, $translator);
     }
@@ -93,6 +106,12 @@ class CalendarCrudController extends BaseCrudController
     {
         $actions = parent::configureActions($actions);
 
+        $viewCalendarSheets = Action::new(self::ACTION_VIEW_CALENDAR_SHEETS, 'admin.calendar.fields.viewCalendarSheets.label', 'fa fa-calendar')
+            ->linkToCrudAction(self::ACTION_VIEW_CALENDAR_SHEETS)
+            ->setHtmlAttributes([
+                'target' => '_blank',
+            ]);
+
         $buildCalendarSheets = Action::new(self::ACTION_BUILD_CALENDAR_SHEETS, 'admin.calendar.fields.buildCalendarSheets.label', 'fa fa-refresh')
             ->linkToCrudAction(self::ACTION_BUILD_CALENDAR_SHEETS)
             ->setHtmlAttributes([
@@ -100,23 +119,27 @@ class CalendarCrudController extends BaseCrudController
                 'data-bs-target' => '#modal-calendar-sheets',
             ]);
 
-        $viewCalendarSheets = Action::new(self::ACTION_VIEW_CALENDAR_SHEETS, 'admin.calendar.fields.viewCalendarSheets.label', 'fa fa-calendar')
-            ->linkToCrudAction(self::ACTION_VIEW_CALENDAR_SHEETS)
+        $buildCalendarUrls = Action::new(self::ACTION_BUILD_CALENDAR_URLS, 'admin.calendar.fields.buildCalendarUrls.label', 'fa fa-link')
+            ->linkToCrudAction(self::ACTION_BUILD_CALENDAR_URLS)
             ->setHtmlAttributes([
-                'target' => '_blank',
+                'data-bs-toggle' => 'modal',
+                'data-bs-target' => '#modal-calendar-urls',
             ]);
 
         $actions
-            ->add(Crud::PAGE_DETAIL, $buildCalendarSheets)
-            ->add(Crud::PAGE_INDEX, $buildCalendarSheets)
-            ->add(Crud::PAGE_DETAIL, $viewCalendarSheets)
             ->add(Crud::PAGE_INDEX, $viewCalendarSheets)
+            ->add(Crud::PAGE_DETAIL, $viewCalendarSheets)
+            ->add(Crud::PAGE_INDEX, $buildCalendarSheets)
+            ->add(Crud::PAGE_DETAIL, $buildCalendarSheets)
+            ->add(Crud::PAGE_INDEX, $buildCalendarUrls)
+            ->add(Crud::PAGE_DETAIL, $buildCalendarUrls)
             ->reorder(Crud::PAGE_INDEX, [
                 Action::DETAIL,
                 Action::EDIT,
                 Action::DELETE,
                 self::ACTION_VIEW_CALENDAR_SHEETS,
                 self::ACTION_BUILD_CALENDAR_SHEETS,
+                self::ACTION_BUILD_CALENDAR_URLS
             ]);
 
         $this->setIcon($actions, Crud::PAGE_INDEX, Action::DETAIL, 'fa fa-eye');
@@ -188,7 +211,7 @@ class CalendarCrudController extends BaseCrudController
     }
 
     /**
-     * Build calendar sheet.
+     * Build calendar sheets.
      *
      * @param AdminContext $context
      * @return RedirectResponse
@@ -228,6 +251,55 @@ class CalendarCrudController extends BaseCrudController
             '%number%' => $number,
             '%time%' => sprintf('%.2f', $time),
             '%sizes%' => implode(', ', $sizes),
+        ]));
+
+        $referrer = $context->getReferrer();
+
+        if ($referrer === null) {
+            throw new Exception(sprintf('Unable to get referrer (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $this->redirect($referrer);
+    }
+
+    /**
+     * Build calendar urls.
+     *
+     * @param AdminContext $context
+     * @return RedirectResponse
+     * @throws Exception
+     */
+    public function buildCalendarUrls(AdminContext $context): RedirectResponse
+    {
+        $calendar = $this->getCalendar($context);
+
+        $number = 0;
+
+        $holidayGroup = $calendar->getHolidayGroup();
+
+        if (!$holidayGroup instanceof HolidayGroup) {
+            throw new Exception(sprintf('Unable to get holiday group (%s:%d).', __FILE__, __LINE__));
+        }
+
+        foreach ($calendar->getCalendarImages() as $calendarImage) {
+            $number++;
+
+            /* Build url */
+            $url = $this->urlService->getUrl($calendarImage);
+
+            /* Set url */
+            $calendarImage->setUrl($url);
+
+            /* Persist url. */
+            $this->manager->persist($calendarImage);
+        }
+
+        /* Persists all urls */
+        $this->manager->flush();
+
+        $this->addFlash('success', new TranslatableMessage('admin.actions.calendarUrls.success', [
+            '%name%' => $calendar->getName(),
+            '%number%' => $number,
         ]));
 
         $referrer = $context->getReferrer();
