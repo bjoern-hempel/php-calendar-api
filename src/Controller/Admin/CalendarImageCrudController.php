@@ -22,6 +22,7 @@ use App\Service\Entity\CalendarLoaderService;
 use App\Service\Entity\ImageLoaderService;
 use App\Service\Entity\UserLoaderService;
 use App\Service\SecurityService;
+use chillerlan\QRCode\QRCode;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -250,7 +251,7 @@ class CalendarImageCrudController extends BaseCrudController
             throw new Exception(sprintf('Unable to get holiday group (%s:%d).', __FILE__, __LINE__));
         }
 
-        $data = $this->calendarSheetCreateService->create($calendarImage, $holidayGroup);
+        $data = $this->calendarSheetCreateService->create($calendarImage, $holidayGroup, QRCode::VERSION_AUTO);
 
         $file = $data['file'];
         $time = floatval($data['time']);
