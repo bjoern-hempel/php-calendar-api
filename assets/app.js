@@ -11,5 +11,31 @@ import './styles/app.sass';
 const $ = require('jquery');
 require('bootstrap');
 
+/**
+ * Function: Add classes depending on page position.
+ */
+let navbarChanger = () => {
+    let y = $(window).scrollTop();
+
+    if (y > 20) {
+        $('header')
+            .addClass('--not-top')
+            .find('.navbar')
+            .removeClass('navbar-dark')
+            .addClass('navbar-light');
+    } else {
+        $('header')
+            .removeClass('--not-top')
+            .find('.navbar')
+            .removeClass('navbar-light')
+            .addClass('navbar-dark');
+    }
+}
+
+if ($('body').hasClass('content-index')) {
+    $(window).scroll(navbarChanger);
+    navbarChanger();
+}
+
 // start the Stimulus application
 import './bootstrap';

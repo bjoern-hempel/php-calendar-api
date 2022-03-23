@@ -15,7 +15,7 @@
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
     </head>
-    <body class="{% block body_class %}base{% endblock %} d-flex flex-column h-100">
+    <body class="{% block body_class %}base{% endblock %} d-flex flex-column min-vh-100">
         {% block body %}{% endblock %}
     </body>
 </html>

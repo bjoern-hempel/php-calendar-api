@@ -416,5 +416,5 @@ page:
     emailMe: 'Contact'
     impress: 'Impress'
     info: >
-      This service is provided by <a href="https://www.twelvepics.com" class="%class%">twelvepics.com</a>.
+      This service is provided by <a href="https://www.twelvepics.com" class="%class%">twelvepics.com</a>
     name: 'TwelvePics'

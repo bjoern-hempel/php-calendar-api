@@ -26,6 +26,10 @@ abstract class BaseController extends AbstractController
 {
     public const KEY_NAME_ENCODED = 'encoded';
 
+    public const ROUTE_NAME_APP_INDEX = 'app_index';
+
+    public const ROUTE_NAME_APP_IMPRESS = 'app_impress';
+
     public const ROUTE_NAME_APP_CALENDAR_INDEX = 'app_calendar_index';
 
     public const ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED = 'app_calendar_index_encoded';

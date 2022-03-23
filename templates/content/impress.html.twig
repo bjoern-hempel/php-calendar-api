@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TwelvePics / Impressum{% endblock %}
+
+{% block body_class %}content content-impress bg-light{% endblock %}
+
+{% block body %}
+    {% apply spaceless %}
+
+        {% include 'content/header.html.twig' with {
+            'title': 'Impressum',
+        } %}
+
+        <main class="bg-light">
+            <div class="bg-transparent">
+                <div class="container">
+                    <div class="bg-white rounded shadow-sm p-5 mb-5">
+                        <h1>Impressum</h1>
+                        <address>
+                            <strong>Björn Hempel</strong><br>
+                            Königstr. 3<br>
+                            Dresden 01097<br>
+                            <abbr title="Phone">Telefon:</abbr>  +49 (1517) 00 70 70 6
+                        </address>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        {% include 'content/footer.html.twig' with {
+
+        } %}
+    {% endapply %}
+{% endblock %}

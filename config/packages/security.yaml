@@ -84,13 +84,14 @@ security:
         - { path: ^/calendar/, roles: PUBLIC_ACCESS } # Allows to see the calendar list and detail pages (standard)
         - { path: ^/c/, roles: PUBLIC_ACCESS } # Allows to see the calendar list pages (short)
         - { path: ^/d/, roles: PUBLIC_ACCESS } # Allows to see the calendar detail pages (short)
+        - { path: ^/impress, roles: PUBLIC_ACCESS } # Allow impress page
         - { path: ^/admin/login$, roles: PUBLIC_ACCESS } # Allows /admin/login into backend
         - { path: ^/admin, roles: IS_AUTHENTICATED_FULLY  } # Easy admin backend
         - { path: ^/api/v1/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/api/v1/token/refresh, roles: PUBLIC_ACCESS } # Allows getting new tokens
         - { path: ^/api/v1/token/get, roles: PUBLIC_ACCESS } # Allows getting token with login
         - { path: ^/api/v1/version, roles: PUBLIC_ACCESS } # Allows getting the version
-        - { path: ^/, roles: '%env(resolve:JWT_ROLE)%' } # Protect all others pages
+        - { path: ^/api, roles: '%env(resolve:JWT_ROLE)%' } # Protect all others pages
 
 when@test:
     security:

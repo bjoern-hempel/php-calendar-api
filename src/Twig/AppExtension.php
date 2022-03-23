@@ -18,7 +18,10 @@ use App\Entity\Image;
 use App\Service\ImageService;
 use App\Service\UrlService;
 use App\Utils\FileNameConverter;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Exception;
+use GdImage;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Extension\AbstractExtension;
@@ -70,7 +73,8 @@ class AppExtension extends AbstractExtension
             new TwigFilter('add_hash', [$this, 'addHash']),
             new TwigFilter('check_path', [$this, 'checkPath']),
             new TwigFilter('url_absolute', [$this, 'urlAbsolute']),
-            new TwigFilter('month_translation', [$this, 'getMonthTranslationKey'])
+            new TwigFilter('month_translation', [$this, 'getMonthTranslationKey']),
+            new TwigFilter('qr_code', [$this, 'getQrCode'])
         ];
     }
 
@@ -276,6 +280,68 @@ class AppExtension extends AbstractExtension
         };
 
         return sprintf('admin.calendarImage.fields.month.entries.%s', $name);
+    }
+
+    /**
+     * Get QrCode value.
+     *
+     * @param string $url
+     * @param int $qrCodeVersion
+     * @return string
+     * @throws Exception
+     */
+    public function getQrCode(string $url, int $qrCodeVersion = QRCode::VERSION_AUTO): string
+    {
+        /* Set background color */
+        $backgroundColor = [255, 0, 0];
+
+        /* Matrix length of qrCode */
+        $matrixLength = 37;
+
+        /* Wanted width (and height) of qrCode */
+        $width = 800;
+
+        /* Calculate scale of qrCode */
+        $scale = intval(ceil($width / $matrixLength));
+
+        /* Set options for qrCode */
+        $options = [
+            'eccLevel' => QRCode::ECC_H,
+            'outputType' => QRCode::OUTPUT_IMAGICK,
+            'version' => $qrCodeVersion,
+            'addQuietzone' => false,
+            'scale' => $scale,
+            'markupDark' => '#000',
+            'markupLight' => '#f00', // $backgroundColor = [255, 0, 0];
+        ];
+
+        /* Get blob from qrCode image */
+        $qrCodeBlob = (new QRCode(new QROptions($options)))->render($url);
+
+        /* Create GDImage from blob */
+        $imageQrCode = imagecreatefromstring(strval($qrCodeBlob));
+
+        if (!$imageQrCode instanceof GdImage) {
+            throw new Exception(sprintf('Unable to create image QRCode (%s:%d).', __FILE__, __LINE__));
+        }
+
+        /* Create transparent color */
+        $transparentColor = imagecolorexact($imageQrCode, $backgroundColor[0], $backgroundColor[1], $backgroundColor[2]);
+
+        /* Set background color to transparent */
+        imagecolortransparent($imageQrCode, $transparentColor);
+
+        /* Get QrCode */
+        ob_start();
+        imagepng($imageQrCode);
+        $png = ob_get_clean();
+
+        if (!is_string($png)) {
+            throw new Exception(sprintf('Unable to get image QRCode (%s:%d).', __FILE__, __LINE__));
+        }
+
+        /* Return QrCode for: <img src="{{ 'https://www.link.de'|qr_code }}" style="width: 200px;"> */
+        return sprintf("data:image/png;base64,%s", base64_encode($png));
     }
 
     /**

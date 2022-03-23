@@ -186,7 +186,7 @@ class CalendarCrudController extends BaseCrudController
             throw new Exception(sprintf('Calendar class not found (%s:%d).', __FILE__, __LINE__));
         }
 
-        return $this->calendarSheetCreateService->create($calendarImage, $holidayGroup, QRCode::VERSION_AUTO);
+        return $this->calendarSheetCreateService->create($calendarImage, $holidayGroup, QRCode::VERSION_AUTO, true);
     }
 
     /**
