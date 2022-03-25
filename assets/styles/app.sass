@@ -48,14 +48,57 @@ body.content
             /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
             background: linear-gradient(to right, rgba(102, 126, 234, 0.5), rgba(118, 75, 162, 0.5))
 
-body.content
-    main
-        div:first-child
-            margin-top: 100px
-    &.content-index
-        main
-        div:first-child
-            margin-top: 0
+    .main-content
+        @extend .p-5
+        @extend .bg-white
+        @extend .rounded
+        @extend .shadow-sm
+        @extend .mt-n5
+        @extend .mb-5
+
+    hr
+        margin-top: 3rem!important
+
+    h2
+        @extend .text-center
+        @extend .fw-light
+        margin-top: 3rem!important
+
+    h3
+        @extend .text-center
+        padding-top: 1.5rem!important
+
+    h4
+        @extend .text-center
+        padding-top: 1rem!important
+
+    .row
+        @extend .mt-5
+        margin-top: 1.5rem!important
+
+    @include media-breakpoint-up(md)
+        .main-content
+            padding-left: 8rem!important
+            padding-right: 8rem!important
+
+        hr
+            margin-top: 6rem!important
+
+        h2
+            margin-top: 6rem!important
+
+        h3
+            padding-top: 3rem!important
+
+        h4
+            padding-top: 2rem!important
+
+        .row
+            margin-top: 3rem!important
+
+    img.rounded-4
+        border-radius: 1rem!important
+
 
 /**
  * Calendar index page

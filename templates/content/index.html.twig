@@ -12,54 +12,97 @@
             'showStage': true,
         } %}
 
-        <main class="bg-light">
-            <div class="bg-transparent">
-                <div class="container">
-                    <div class="bg-white rounded shadow-sm p-5 mt-n5 mb-5">
-                        <h2>Title</h2>
-                        <p>
-                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                            ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
-                            dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor
-                            sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
-                            invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et
-                            justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum
-                            dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
-                            tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
-                            et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem
-                            ipsum dolor sit amet.
-                        </p>
-                        <p>
-                            <img class="w-100" src="/data/images/cf6b37d2b5f805a0f76ef2b3610eff7a705a2290/target/1/00.2048.jpg?8626f634fc32d4025ee380edbd99d5e1">
-                        </p>
-                        <p>
-                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                            ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
-                            dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor
-                            sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
-                            invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et
-                            justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum
-                            dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
-                            tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
-                            et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem
-                            ipsum dolor sit amet.
-                        </p>
-                        <p>
-                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                            ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
-                            dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor
-                            sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
-                            invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et
-                            justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum
-                            dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
-                            tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
-                            et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem
-                            ipsum dolor sit amet.
-                        </p>
+        {% embed 'main_layout_with_header.html.twig' %}
+            {% block main_content %}
+                <div>
+                    <h2>Schritt für Schritt zum eigenen Kalender</h2>
+
+                    <div class="row text-center">
+                        <div class="col-12 col-lg-3">
+                            <h4>Schritt 1</h4>
+                            <p>Kalender anlegen<br />&nbsp;</p>
+                            <img class="w-100" src="{{ asset('build/images/steps/admin.notebook.800.jpg') }}" />
+                        </div>
+                        <div class="col-12 col-lg-3">
+                            <h4>Schritt 2</h4>
+                            <p>Kalender erstellen<br />&nbsp;</p>
+                            <img class="w-100" src="{{ asset('build/images/steps/overview.notebook.800.jpg') }}" />
+                        </div>
+                        <div class="col-12 col-lg-3">
+                            <h4>Schritt 3</h4>
+                            <p>Kalender bestellen<br />&nbsp;</p>
+                            <img class="w-100" src="{{ asset('build/images/steps/order.notebook.800.jpg') }}" />
+                        </div>
+                        <div class="col-12 col-lg-3">
+                            <h4>Schritt 4</h4>
+                            <p>Zu Hause in Empfang nehmen</p>
+                            <img class="w-100" src="{{ asset('build/images/steps/home.notebook.800.jpg') }}" />
+                        </div>
+                    </div>
+
+                    <hr class="w-50 mx-auto">
+
+                    <h2 class="text-center mt-5">Warum TwelvePics?</h2>
+
+                    <div class="row text-center">
+                        <div class="col-12 col-lg-4">
+                            <h4>Print-Kalender</h4>
+                            <p>
+                                Du bestellst dir einen Kalender für zu Hause. Als Wandkalender.
+                                Für den Schreibtisch. Wo du ihn am liebsten magst. Mit deinen
+                                Lieblingsbildern und schönsten Erinnerungen.
+                            </p>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <h4>Online-Kalender</h4>
+                            <p>
+                                Mit dem aufgedruckten QRCode kannst du den Kalender online teilen.
+                                Jederzeit. Teile deine Erinnerungen und schönsten Erlebnisse. Mit jedem,
+                                den du es erlaubst.
+                            </p>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <h4>Interaktion</h4>
+                            <p>
+                                Bekomme Feedback zu deinen Bildern und Erinnerungen. Kommentare. Likes.
+                                Interagiere mit deiner Familie und Freunden. Und wenn sie mögen, können
+                                auch sie sich deinen Kalender zu sich nach Hause liefern lassen.
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr class="w-50 mx-auto">
+
+                    <h2 class="text-center mt-5">Beispiel-Kalender</h2>
+
+                    <div class="row">
+                        <div class="col-6 mx-0 px-0">
+                            <img class="w-100" src="{{ asset('build/images/calendar/00.800.jpg') }}">
+                        </div>
+                        <div class="col-6 mx-0 px-0">
+                            <img class="w-50" src="{{ asset('build/images/calendar/01.800.jpg') }}">
+                            <img class="w-50" src="{{ asset('build/images/calendar/02.800.jpg') }}">
+                            <img class="w-50" src="{{ asset('build/images/calendar/03.800.jpg') }}">
+                            <img class="w-50" src="{{ asset('build/images/calendar/04.800.jpg') }}">
+                        </div>
+                        {% for i in 5..12 %}
+                            <div class="col-3 mx-0 px-0">
+                                <img class="w-100" src="{{ asset('build/images/calendar/%02d.800.jpg'|format(i)) }}">
+                            </div>
+                        {% endfor %}
+
+                    </div>
+
+                    <hr class="w-50 mx-auto">
+
+                    <h2 class="text-center mt-5">Registriere dich noch heute</h2>
+
+                    <div class="row">
+                        <p>In Arbeit.. Coming soon.</p>
                     </div>
                 </div>
-            </div>
-        </main>
+            {% endblock %}
+        {% endembed %}
 
         {% include 'content/footer.html.twig' with {
 
