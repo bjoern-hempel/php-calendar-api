@@ -48,6 +48,20 @@ body.content
             /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
             background: linear-gradient(to right, rgba(102, 126, 234, 0.5), rgba(118, 75, 162, 0.5))
 
+        .container
+            @extend .px-3
+
+    main
+        @extend .px-3
+
+        .container
+            @extend .px-0
+
+        @include media-breakpoint-up(md)
+            .container
+                padding-left: 1rem!important
+                padding-right: 1rem!important
+
     .main-content
         @extend .p-5
         @extend .bg-white
