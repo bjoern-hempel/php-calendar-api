@@ -11,21 +11,19 @@
             'title': 'Impressum',
         } %}
 
-        <main class="bg-light">
-            <div class="bg-transparent">
-                <div class="container">
-                    <div class="bg-white rounded shadow-sm p-5 mb-5">
-                        <h1>Impressum</h1>
-                        <address>
-                            <strong>Björn Hempel</strong><br>
-                            Königstr. 3<br>
-                            Dresden 01097<br>
-                            <abbr title="Phone">Telefon:</abbr>  +49 (1517) 00 70 70 6
-                        </address>
-                    </div>
+        {% embed 'main_layout_without_header.html.twig' %}
+            {% block main_content %}
+                <div id="content-impress">
+                    <h1>Impressum</h1>
+                    <address>
+                        <strong>Björn Hempel</strong><br>
+                        Königstr. 3<br>
+                        Dresden 01097<br>
+                        <abbr title="Phone">Telefon:</abbr>  +49 (1517) 00 70 70 6
+                    </address>
                 </div>
-            </div>
-        </main>
+            {% endblock %}
+        {% endembed %}
 
         {% include 'content/footer.html.twig' with {
 

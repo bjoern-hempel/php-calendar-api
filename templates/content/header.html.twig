@@ -48,7 +48,9 @@
                         </p>
                     </div>
                     <div class="col-lg-4">
-                        <img class="w-100 rounded-4" src="{{ asset('build/images/calendar/04.800.jpg') }}">
+                        <a href="{{ asset('build/images/calendar/04.2048.jpg') }}" class="lightbox-own" data-gallery="header">
+                            <img class="w-100 rounded-4"{{ 'build/images/calendar/04.2048.jpg'|image_dimensions|raw }} src="{{ asset('build/images/calendar/04.800.jpg') }}">
+                        </a>
                     </div>
                 </div>
             </section>

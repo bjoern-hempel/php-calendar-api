@@ -70,6 +70,7 @@ class AppExtension extends AbstractExtension
             new TwigFilter('preg_replace', [$this, 'pregReplace']),
             new TwigFilter('path_orig', [$this, 'getPathOrig']),
             new TwigFilter('path_preview', [$this, 'getPathPreview']),
+            new TwigFilter('image_dimensions', [$this, 'getImageDimensions']),
             new TwigFilter('add_hash', [$this, 'addHash']),
             new TwigFilter('check_path', [$this, 'checkPath']),
             new TwigFilter('url_absolute', [$this, 'urlAbsolute']),
@@ -154,6 +155,26 @@ class AppExtension extends AbstractExtension
         }
 
         return $this->checkPath($pathPreview);
+    }
+
+    /**
+     * TwigFilter: Returns the image dimensions.
+     *
+     * @param string $path
+     * @return string
+     * @throws Exception
+     */
+    public function getImageDimensions(string $path): string
+    {
+        $pathFull = sprintf('%s/public/%s', $this->kernel->getProjectDir(), $path);
+
+        $size = getimagesize($pathFull);
+
+        if ($size === false) {
+            throw new Exception(sprintf('Unable to get image size (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return str_replace(array('width=', 'height='), array('data-width=', 'data-height='), $size[3]);
     }
 
     /**

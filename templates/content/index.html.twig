@@ -14,34 +14,45 @@
 
         {% embed 'main_layout_with_header.html.twig' %}
             {% block main_content %}
-                <div>
+                <div id="content-steps">
                     <h2>Schritt für Schritt zum eigenen Kalender</h2>
 
                     <div class="row text-center">
-                        <div class="col-12 col-lg-3">
+                        <div class="col-12 col-sm-6 col-lg-3"><div>
                             <h4>Schritt 1</h4>
-                            <p>Kalender anlegen</p>
-                            <img class="w-100" src="{{ asset('build/images/steps/admin.notebook.800.jpg') }}" />
-                        </div>
-                        <div class="col-12 col-lg-3">
+                            <p class="h-auto mb-3 mb-lg-0">Kalender anlegen</p>
+                            <a href="{{ asset('build/images/steps/admin.2048.jpg') }}" class="lightbox-own" data-caption="Kalender anlegen" data-gallery="steps" data-add-class="button-dark">
+                                <img class="w-100" data-add-class="step-1-image"{{ 'build/images/steps/admin.2048.jpg'|image_dimensions|raw }} src="{{ asset('build/images/steps/admin.notebook.800.jpg') }}">
+                            </a>
+                        </div></div>
+                        <div class="col-12 col-sm-6 col-lg-3"><div>
                             <h4>Schritt 2</h4>
-                            <p>Kalender erstellen</p>
-                            <img class="w-100" src="{{ asset('build/images/steps/overview.notebook.800.jpg') }}" />
-                        </div>
-                        <div class="col-12 col-lg-3">
+                            <p class="h-auto mb-3 mb-lg-0">Kalender erstellen</p>
+
+                            <a href="{{ asset('build/images/steps/overview.2048.jpg') }}" class="lightbox-own" data-caption="Kalender erstellen" data-gallery="steps">
+                                <img class="w-100" data-add-class="step-2-image"{{ 'build/images/steps/overview.2048.jpg'|image_dimensions|raw }} src="{{ asset('build/images/steps/overview.notebook.800.jpg') }}" />
+                            </a>
+                        </div></div>
+                        <div class="col-12 col-sm-6 col-lg-3"><div>
                             <h4>Schritt 3</h4>
-                            <p>Kalender bestellen</p>
-                            <img class="w-100" src="{{ asset('build/images/steps/order.notebook.800.jpg') }}" />
-                        </div>
-                        <div class="col-12 col-lg-3">
+                            <p class="h-auto mb-3 mb-lg-0">Kalender bestellen</p>
+                            <a href="{{ asset('build/images/steps/order.2048.jpg') }}" class="lightbox-own" data-gallery="steps" data-add-class="button-dark">
+                                <img class="w-100" data-add-class="step-3-image"{{ 'build/images/steps/order.2048.jpg'|image_dimensions|raw }} src="{{ asset('build/images/steps/order.notebook.800.jpg') }}" />
+                            </a>
+                        </div></div>
+                        <div class="col-12 col-sm-6 col-lg-3"><div>
                             <h4>Schritt 4</h4>
-                            <p>Zu Hause in Empfang nehmen</p>
-                            <img class="w-100" src="{{ asset('build/images/steps/home.notebook.800.jpg') }}" />
-                        </div>
+                            <p class="h-auto mb-3 mb-lg-0">Zu Hause in Empfang nehmen</p>
+                            <a href="{{ asset('build/images/steps/home.2048.jpg') }}" class="lightbox-own" data-gallery="steps">
+                                <img class="w-100" data-add-class="step-4-image"{{ 'build/images/steps/home.2048.jpg'|image_dimensions|raw }} src="{{ asset('build/images/steps/home.notebook.800.jpg') }}" />
+                            </a>
+                        </div></div>
                     </div>
+                </div>
 
-                    <hr class="w-50 mx-auto">
+                <hr class="w-50 mx-auto">
 
+                <div id="content-why">
                     <h2 class="text-center mt-5">Warum TwelvePics?</h2>
 
                     <div class="row text-center">
@@ -56,9 +67,9 @@
                         <div class="col-12 col-lg-4">
                             <h4>Online-Kalender</h4>
                             <p>
-                                Mit dem aufgedruckten QRCode kannst du den Kalender online teilen.
-                                Jederzeit. Teile deine Erinnerungen und schönsten Erlebnisse. Mit jedem,
-                                den du es erlaubst.
+                                Mit dem aufgedruckten QRCode und dem damit erstellten Bereich kannst du den Kalender
+                                online einfach teilen. Jederzeit. Teile deine Erinnerungen und schönsten Erlebnisse.
+                                Mit jedem, den du es erlaubst.
                             </p>
                         </div>
                         <div class="col-12 col-lg-4">
@@ -70,35 +81,118 @@
                             </p>
                         </div>
                     </div>
+                </div>
 
-                    <hr class="w-50 mx-auto">
+                <hr class="w-50 mx-auto">
 
+                <div id="content-example-calendar">
                     <h2 class="text-center mt-5">Beispiel-Kalender</h2>
 
-                    <div class="row">
-                        <div class="col-6 mx-0 px-0">
-                            <img class="w-100" src="{{ asset('build/images/calendar/00.800.jpg') }}">
+                    <div class="calendar-overview row">
+                        <div class="calendar-row-1 col-12 col-md-6 mx-0 px-0">
+                            <a href="{{ asset('build/images/calendar/00.2048.jpg') }}" class="lightbox-own" data-gallery="calendar" data-add-class="">
+                                <img class="w-100"{{ 'build/images/calendar/00.2048.jpg'|image_dimensions|raw }} src="{{ asset('build/images/calendar/00.800.jpg') }}">
+                            </a>
                         </div>
-                        <div class="col-6 mx-0 px-0">
-                            <img class="w-50" src="{{ asset('build/images/calendar/01.800.jpg') }}">
-                            <img class="w-50" src="{{ asset('build/images/calendar/02.800.jpg') }}">
-                            <img class="w-50" src="{{ asset('build/images/calendar/03.800.jpg') }}">
-                            <img class="w-50" src="{{ asset('build/images/calendar/04.800.jpg') }}">
+                        <div class="calendar-row-2 col-12 col-md-6 mx-0 px-0">
+                            {% for i in 1..4 %}
+                                <a href="{{ asset('build/images/calendar/%02d.2048.jpg'|format(i)) }}" class="lightbox-own" data-gallery="calendar" data-add-class="">
+                                    <img class="w-100"{{ 'build/images/calendar/%02d.2048.jpg'|format(i)|image_dimensions|raw }} src="{{ asset('build/images/calendar/%02d.800.jpg'|format(i)) }}">
+                                </a>
+                            {% endfor %}
                         </div>
                         {% for i in 5..12 %}
-                            <div class="col-3 mx-0 px-0">
-                                <img class="w-100" src="{{ asset('build/images/calendar/%02d.800.jpg'|format(i)) }}">
+                            <div class="calendar-row-3 col-12 col-sm-6 col-md-3 mx-0 px-0">
+                                <a href="{{ asset('build/images/calendar/%02d.2048.jpg'|format(i)) }}" class="lightbox-own" data-gallery="calendar" data-add-class="">
+                                    <img class="w-100"{{ 'build/images/calendar/%02d.2048.jpg'|format(i)|image_dimensions|raw }} src="{{ asset('build/images/calendar/%02d.800.jpg'|format(i)) }}">
+                                </a>
                             </div>
                         {% endfor %}
+                    </div>
+                </div>
 
+                <hr class="w-50 mx-auto">
+
+                <div id="content-register">
+                    <h2 class="text-center mt-5">Vorteile einer Registrierung</h2>
+
+                    <div class="row text-center">
+                        <div class="col-12 col-lg-4">
+                            <h4>Kostenlos</h4>
+                            <p>
+                                Die Registrierung ist kostenlos. Du hast damit die Möglichkeit deine eigenen Kalender
+                                interaktiv zu gestalten und zu teilen. Deine erstellten Kalender kannst du an Freunde
+                                und Familie weitergeben. Mit dem aufgedruckten QRCode ist dies einfach möglich.
+                            </p>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <h4>Freier Speicherplatz</h4>
+                            <p>
+                                Du hast die Möglichkeit eigene Bilder hochzuladen. Die Beschränkung auf schon erstellte
+                                und einsehbare Kalender entfällt. Du erhältst freien Speicherplatz bis zu 30 Bilder.
+                                Das entspricht zwei Kalendern à 13 Bilder - max. 5 MB - plus Titelblatt.
+                            </p>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <h4>Interaktion</h4>
+                            <p>
+                                Bekomme Feedback zu deinen erstellten Kalendern, Bildern und Erinnerungen. Kommentare. Likes.
+                                Interagiere mit deiner Familie und Freunden. Und wenn sie mögen, können
+                                auch sie sich deinen Kalender zu sich nach Hause bestellen.
+                            </p>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <h4>Online Cloud Storage Dienste</h4>
+                            <p>
+                                Du kannst eigene Cloud-Storage Dienste wie Dropbox, Strato HiDrive oder Google
+                                Drive hinterlegen, um deinen Speicherplatz zu erhöhen. Die erstellten Kalender werden
+                                automatisch in deine Cloud hochgeladen.
+                            </p>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <h4>Wichtige Events & Geburtstage</h4>
+                            <p>
+                                Du kannst eigene Geburtstage und wichtige Termine erstellen, die in deinem Kalender
+                                integriert und angezeigt werden. Diese können von deiner Familie und Freunden
+                                eingesehen werden.
+                            </p>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <h4>Zugang zum Kalender Builder</h4>
+                            <p>
+                                Du bekommst Zugang zum Kalender-Builder, mit dem du aus verschiedenen Vorlagen für deinen
+                                Kalender wählen kannst.
+                            </p>
+                        </div>
                     </div>
 
-                    <hr class="w-50 mx-auto">
+                    <h3>Ohne Registrierung</h3>
 
-                    <h2 class="text-center mt-5">Registriere dich noch heute</h2>
-
-                    <div class="row">
-                        <p>In Arbeit.. Coming soon.</p>
+                    <div class="row text-center">
+                        <div class="col-12 col-lg-4">
+                            <h4>Kalender von Freunden und Familie</h4>
+                            <p>
+                                Du kannst die Kalender deiner Freunde und Familie einsehen, sofern sie diese für
+                                dich freigeschaltet haben. Mit dem QRCode auf dem Kalender ist dies einfach z.B.
+                                mit deinem Handy möglich.
+                            </p>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <h4>Kommentieren</h4>
+                            <p>
+                                Kommentiere die Kalender, Bilder und Erinnerungen deiner Freunde oder Famile. Ein QRCode
+                                oder ein Link gibt dir die Einsicht frei.
+                            </p>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <h4>Bestellen</h4>
+                            <p>
+                                Gefällt dir ein Kalender? Und du möchtest ihn auch bei dir zu Hause haben? Bestelle
+                                einfach und direkt einen Kalender deiner Freunde oder Familie. Einfach QRCode
+                                scannen. Ein Paypal Konto genügt.
+                            </p>
+                        </div>
                     </div>
                 </div>
             {% endblock %}

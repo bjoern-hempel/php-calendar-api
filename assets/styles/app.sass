@@ -20,6 +20,10 @@ html, body
  * Content page
  */
 body.content
+
+    /**
+     * <header> defaults.
+     */
     header
         .navbar.navbar-light
             box-shadow: 0 12px 10px rgba(0, 0, 0, 0.1)
@@ -51,18 +55,29 @@ body.content
         .container
             @extend .px-3
 
+        img.rounded-4
+            border-radius: 1rem!important
+
+    /**
+     * <main> defaults.
+     */
     main
         @extend .px-3
 
         .container
             @extend .px-0
+            &.container-without-header
+                margin-top: 150px
 
         @include media-breakpoint-up(md)
             .container
                 padding-left: 1rem!important
                 padding-right: 1rem!important
 
-    .main-content
+    /**
+     * Main content defaults
+     */
+    .content-main
         @extend .p-5
         @extend .bg-white
         @extend .rounded
@@ -80,18 +95,23 @@ body.content
 
         h3
             @extend .text-center
-            padding-top: 1.5rem!important
+            @extend .fw-light
+            margin-top: 1.5rem!important
 
         h4
             @extend .text-center
-            padding-top: 1rem!important
+            margin-top: 1rem!important
 
         .row
             @extend .mt-5
             margin-top: 1.5rem!important
 
+        @include media-breakpoint-up(sm)
+            p.h-auto
+                height: 3.5rem!important
+
     @include media-breakpoint-up(md)
-        .main-content
+        .content-main
             padding-left: 8rem!important
             padding-right: 8rem!important
 
@@ -110,8 +130,225 @@ body.content
             .row
                 margin-top: 3rem!important
 
-    img.rounded-4
-        border-radius: 1rem!important
+    /**
+     * Calendar example defaults.
+     */
+    #content-example-calendar
+        @include media-breakpoint-up(sm)
+            .calendar-overview
+                .calendar-row-2
+                    img.w-100
+                        width: 50% !important
+
+    /**
+     * Lightbox content
+     */
+    .modal
+        .modal-dialog
+            max-width: calc(100% - 2rem)
+            max-height: calc(100% - 2rem)
+            margin: 1rem auto
+            @include media-breakpoint-up(sm)
+                max-width: calc(100% - 5rem)
+                max-height: calc(100% - 5rem)
+                margin: 2.5rem auto
+            @include media-breakpoint-up(md)
+                max-width: calc(100% - 10rem)
+                max-height: calc(100% - 10rem)
+                margin: 5rem auto
+            .carousel-control.h-75
+                height: 100% !important
+
+        button
+            background-color: transparent!important
+            &.carousel-control-next
+                justify-content: right
+                margin-right: 1rem!important
+            &.carousel-control-prev
+                justify-content: left
+                margin-left: 1rem!important
+        &.button-dark
+            button
+                .carousel-control-next-icon
+                    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3E%3Cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E")
+                .carousel-control-prev-icon
+                    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3E%3Cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3E%3C/svg%3E")
+                &.btn-close
+                    svg
+                        fill: black
+
+        //&.button-dark
+        //    button
+        //        &.btn-close
+        //            background-color: black!important
+        //        span.carousel-control-next-icon, span.carousel-control-prev-icon
+        //            background-color: black!important
+        //
+        //.modal-content
+        //    &:hover
+        //        button
+        //            background-color: rgba(102,126,234,0.25)!important
+        //
+        //&.button-dark
+        //    .modal-content
+        //        &:hover
+        //            button.btn-close
+        //                background-color: black!important
+        //            button.carousel-control-next, button.carousel-control-prev
+        //                background-color: rgba(127,127,127,0.25)!important
+
+
+    //        min-height: 0!important
+    //        overflow: hidden
+    //        position: absolute
+    //        top: 0!important
+    //        left: 0!important
+    //        right: 0!important
+    //        bottom: 0!important
+    //        .modal-content
+    //            background-color: #f00
+    //            position: absolute
+    //            top: 0!important
+    //            left: 0!important
+    //            right: 0!important
+    //            bottom: 0!important
+    //            .modal-body
+    //                position: absolute
+    //                top: 0!important
+    //                left: 0!important
+    //                right: 0!important
+    //                bottom: 0!important
+    //                .lightbox-carousel
+    //                    position: absolute
+    //                    top: 0!important
+    //                    left: 0!important
+    //                    right: 0!important
+    //                    bottom: 0!important
+    //                    .carousel-inner
+    //                        position: absolute
+    //                        top: 0!important
+    //                        left: 0!important
+    //                        right: 0!important
+    //                        bottom: 0!important
+    //                        .carousel-item
+    //                            position: absolute
+    //                            top: 0!important
+    //                            left: 0!important
+    //                            right: 0!important
+    //                            bottom: 0!important
+    //                            .ratio
+    //                                position: absolute
+    //                                top: 0!important
+    //                                left: 0!important
+    //                                right: 0!important
+    //                                bottom: 0!important
+    //                                img
+    //                                    position: absolute
+    //                                    top: 0!important
+    //                                    left: 0!important
+    //                                    right: 0!important
+    //                                    bottom: 0!important
+    //
+    //        button
+    //            background-color: transparent!important
+    //            &:hover
+    //                background-color: rgba(102,126,234,0.25)!important
+    //        &.button-grey
+    //            button
+    //                background-color: rgba(127,127,127,0.25)!important
+    //                &:hover
+    //                    background-color: rgba(102,126,234,0.25)!important
+    //        .carousel-inner
+    //            .ratio
+    //                background-color: #fff!important
+    //                img
+    //                    padding: 0
+    //                    position: relative
+    //                    object-fit: contain!important
+    //                &:before
+    //                    display: none
+    //.modal
+    //    .modal-dialog
+    //        max-width: calc(100% - 2rem)
+    //        max-height: calc(100% - 2rem)
+    //        min-height: 0!important
+    //        margin: 1rem auto
+    //        overflow: hidden
+    //        position: absolute
+    //        top: 0!important
+    //        left: 0!important
+    //        right: 0!important
+    //        bottom: 0!important
+    //        @include media-breakpoint-up(sm)
+    //            max-width: calc(100% - 5rem)
+    //            max-height: calc(100% - 5rem)
+    //            margin: 2.5rem auto
+    //        @include media-breakpoint-up(md)
+    //            max-width: calc(100% - 10rem)
+    //            max-height: calc(100% - 10rem)
+    //            margin: 5rem auto
+    //        .modal-content
+    //            background-color: #f00
+    //            position: absolute
+    //            top: 0!important
+    //            left: 0!important
+    //            right: 0!important
+    //            bottom: 0!important
+    //            .modal-body
+    //                position: absolute
+    //                top: 0!important
+    //                left: 0!important
+    //                right: 0!important
+    //                bottom: 0!important
+    //                .lightbox-carousel
+    //                    position: absolute
+    //                    top: 0!important
+    //                    left: 0!important
+    //                    right: 0!important
+    //                    bottom: 0!important
+    //                    .carousel-inner
+    //                        position: absolute
+    //                        top: 0!important
+    //                        left: 0!important
+    //                        right: 0!important
+    //                        bottom: 0!important
+    //                        .carousel-item
+    //                            position: absolute
+    //                            top: 0!important
+    //                            left: 0!important
+    //                            right: 0!important
+    //                            bottom: 0!important
+    //                            .ratio
+    //                                position: absolute
+    //                                top: 0!important
+    //                                left: 0!important
+    //                                right: 0!important
+    //                                bottom: 0!important
+    //                                img
+    //                                    position: absolute
+    //                                    top: 0!important
+    //                                    left: 0!important
+    //                                    right: 0!important
+    //                                    bottom: 0!important
+    //
+    //        button
+    //            background-color: transparent!important
+    //            &:hover
+    //                background-color: rgba(102,126,234,0.25)!important
+    //        &.button-grey
+    //            button
+    //                background-color: rgba(127,127,127,0.25)!important
+    //                &:hover
+    //                    background-color: rgba(102,126,234,0.25)!important
+    //        .carousel-inner
+    //            .ratio
+    //                background-color: #fff!important
+    //                img
+    //                    padding: 0
+    //                    position: relative
+    //                    object-fit: contain!important
+    //                &:before
+    //                    display: none
 
 
 /**
