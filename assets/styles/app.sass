@@ -148,17 +148,22 @@ body.content
             max-width: calc(100% - 2rem)
             max-height: calc(100% - 2rem)
             margin: 1rem auto
-            @include media-breakpoint-up(sm)
+            @include media-breakpoint-up(lg)
                 max-width: calc(100% - 5rem)
-                max-height: calc(100% - 5rem)
-                margin: 2.5rem auto
-            @include media-breakpoint-up(md)
+            @include media-breakpoint-up(xl)
                 max-width: calc(100% - 10rem)
-                max-height: calc(100% - 10rem)
-                margin: 5rem auto
+            @include media-breakpoint-up(xxl)
+                max-width: 1400px
+
+    .modal
+        .modal-dialog
             .carousel-control.h-75
                 height: 100% !important
+            .carousel-item
+                p
+                    display: none
 
+    .modal
         button
             background-color: transparent!important
             &.carousel-control-next
