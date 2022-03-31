@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.22.1] - 2022-04-01
+
+* [#72](https://github.com/bjoern-hempel/php-calendar-api/issues/72) - Add root page, impress, etc.
+
 ### [0.22.0] - 2022-03-23
 
 * [#67](https://github.com/bjoern-hempel/php-calendar-api/issues/67) - Add auto url batch to calendar
