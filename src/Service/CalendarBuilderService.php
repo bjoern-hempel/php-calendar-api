@@ -151,6 +151,8 @@ class CalendarBuilderService
 
     protected int $qrCodeVersion = 5;
 
+    protected bool $deleteTargetImages = false;
+
     public const BIRTHDAY_YEAR_NOT_GIVEN = 2100;
 
     public const ALIGN_LEFT = 1;
@@ -236,9 +238,10 @@ class CalendarBuilderService
      * @param bool $useCalendarImagePath
      * @param int $qualityTarget
      * @param int $qrCodeVersion
+     * @param bool $deleteTargetImages
      * @throws Exception
      */
-    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false, bool $useCalendarImagePath = false, int $qualityTarget = 100, int $qrCodeVersion = self::DEFAULT_QR_CODE_VERSION): void
+    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false, bool $useCalendarImagePath = false, int $qualityTarget = 100, int $qrCodeVersion = self::DEFAULT_QR_CODE_VERSION, bool $deleteTargetImages = false): void
     {
         /* Clear positions */
         $this->positionDays = [];
@@ -254,6 +257,9 @@ class CalendarBuilderService
 
         /* Set qr code version */
         $this->qrCodeVersion = $qrCodeVersion;
+
+        /* Set delete target images */
+        $this->deleteTargetImages = $deleteTargetImages;
 
         /* calendar instances */
         $this->calendarImage = $calendarImage;
@@ -1268,6 +1274,60 @@ class CalendarBuilderService
     }
 
     /**
+     * Gets all target paths.
+     *
+     * @param string $pathTargetAbsolute
+     * @return string[]
+     * @throws Exception
+     */
+    protected function getAllTargetImages(string $pathTargetAbsolute): array
+    {
+        $pathTargetAbsolutePattern = preg_replace('~\.([a-z][a-z0-9]+)$~i', '.*.$1', $pathTargetAbsolute);
+
+        if (!is_string($pathTargetAbsolutePattern)) {
+            throw new Exception(sprintf('Unable to replace string (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $imageFiles = glob($pathTargetAbsolutePattern);
+
+        if ($imageFiles === false) {
+            throw new Exception(sprintf('Unable to get files via glob (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $imageFiles[] = $pathTargetAbsolute;
+
+        return $imageFiles;
+    }
+
+    /**
+     * Removes target images.
+     *
+     * @param string $pathTargetAbsolute
+     * @return bool
+     * @throws Exception
+     */
+    protected function removeTargetImages(string $pathTargetAbsolute): bool
+    {
+        $imageFiles = $this->getAllTargetImages($pathTargetAbsolute);
+
+        foreach ($imageFiles as $imageFile) {
+
+            /* To avoid accidental deletion. */
+            if (!preg_match('~/[a-f0-9]{40}/target/[0-9]+/[^\.]+(\.[0-9]+)?\.([a-z][a-z0-9]+)$~', $imageFile)) {
+                throw new Exception(sprintf('Unexpected image path given: "%s" (%s:%d).', $imageFile, __FILE__, __LINE__));
+            }
+
+            if (!file_exists($imageFile)) {
+                throw new Exception(sprintf('Given file "%s" does not exists (%s:%d).', $imageFile, __FILE__, __LINE__));
+            }
+
+            unlink($imageFile);
+        }
+
+        return true;
+    }
+
+    /**
      * Builds the given source image to a calendar page.
      *
      * @return array<string|int>
@@ -1289,6 +1349,10 @@ class CalendarBuilderService
             test: $this->test,
             calendarImage: $this->useCalendarImagePath ? $this->calendarImage : null
         );
+
+        if ($this->deleteTargetImages) {
+            $this->removeTargetImages($this->pathTargetAbsolute);
+        }
 
         $this->textTitle = $this->calendarImage->getTitle() ?? '';
         $this->textPosition = $this->calendarImage->getPosition() ?? '';

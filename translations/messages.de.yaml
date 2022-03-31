@@ -411,10 +411,10 @@ page:
     backToTop: 'Zurück zum Anfang'
     contact: 'Kontakt'
     domain: 'twelvepics.com'
-    domainFull: 'https://www.twelvepics.com'
+    domainFull: 'https://twelvepics.com'
     email: 'contact@twelvepics.com'
     emailMe: 'Kontakt'
     impress: 'Impressum'
     info: >
-      Dieser Service wird bereitgestellt von <a href="https://www.twelvepics.com" class="%class%">twelvepics.com</a>.
+      Dieser Service wird bereitgestellt von <a href="https://twelvepics.com" class="%class%">twelvepics.com</a>
     name: 'TwelvePics'

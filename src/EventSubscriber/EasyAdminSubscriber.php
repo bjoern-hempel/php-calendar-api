@@ -127,7 +127,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             throw new Exception(sprintf('Unable to get holiday group (%s:%d).', __FILE__, __LINE__));
         }
 
-        $data = $this->calendarSheetCreateService->create($calendarImage, $holidayGroup, QRCode::VERSION_AUTO);
+        $data = $this->calendarSheetCreateService->create($calendarImage, $holidayGroup, QRCode::VERSION_AUTO, true);
 
         $file = $data['file'];
         $time = floatval($data['time']);
