@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\FosUser\EventListener;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\HolidayListener;
 use App\EventListener\Entity\UserListener;
 use App\Repository\HolidayRepository;
 use App\Utils\ArrayToObject;
@@ -32,7 +34,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: HolidayRepository::class)]
-#[ORM\EntityListeners([UserListener::class])]
+#[ORM\EntityListeners([UserListener::class, HolidayListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     collectionOperations: [
@@ -86,17 +88,17 @@ class Holiday implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = [];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'holidayGroup', 'name', 'date', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'holidayGroup', 'name', 'date', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_INDEX = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'holidayGroup', 'name', 'date', 'configJson'];
+    public const CRUD_FIELDS_NEW = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'configJson'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'holidayGroup', 'name', 'date', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_FILTER = ['holidayGroup', 'name', 'date'];
+    public const CRUD_FIELDS_FILTER = ['holidayGroup', 'name', 'date', 'yearly'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -120,6 +122,10 @@ class Holiday implements EntityInterface
     #[ORM\Column(type: 'json')]
     #[Groups(['holiday', 'holiday_extended'])]
     private array $config = [];
+
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['holiday', 'holiday_extended'])]
+    private bool $yearly = false;
 
     private ArrayToObject $configObject;
 
@@ -300,5 +306,28 @@ class Holiday implements EntityInterface
     public function setConfigJsonRaw(string $json): self
     {
         return $this->setConfigJson($json);
+    }
+
+    /**
+     * Gets the yearly status of this holiday.
+     *
+     * @return bool|null
+     */
+    public function getYearly(): ?bool
+    {
+        return $this->yearly;
+    }
+
+    /**
+     * Sets the yearly status from this holiday.
+     *
+     * @param bool $yearly
+     * @return $this
+     */
+    public function setYearly(bool $yearly): self
+    {
+        $this->yearly = $yearly;
+
+        return $this;
     }
 }

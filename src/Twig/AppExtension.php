@@ -14,16 +14,17 @@ declare(strict_types=1);
 namespace App\Twig;
 
 use App\Controller\Base\BaseController;
-use App\Entity\Image;
 use App\Service\ImageService;
 use App\Service\UrlService;
 use App\Utils\FileNameConverter;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use DateTime;
 use Exception;
 use GdImage;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -43,20 +44,25 @@ class AppExtension extends AbstractExtension
 
     protected ImageService $imageService;
 
+    protected TranslatorInterface $translator;
+
     /**
      * AppExtension constructor.
      *
      * @param KernelInterface $kernel
      * @param UrlGeneratorInterface $generator
      * @param ImageService $imageService
+     * @param TranslatorInterface $translator
      */
-    public function __construct(KernelInterface $kernel, UrlGeneratorInterface $generator, ImageService $imageService)
+    public function __construct(KernelInterface $kernel, UrlGeneratorInterface $generator, ImageService $imageService, TranslatorInterface $translator)
     {
         $this->kernel = $kernel;
 
         $this->generator = $generator;
 
         $this->imageService = $imageService;
+
+        $this->translator = $translator;
     }
 
     /**
@@ -75,7 +81,8 @@ class AppExtension extends AbstractExtension
             new TwigFilter('check_path', [$this, 'checkPath']),
             new TwigFilter('url_absolute', [$this, 'urlAbsolute']),
             new TwigFilter('month_translation', [$this, 'getMonthTranslationKey']),
-            new TwigFilter('qr_code', [$this, 'getQrCode'])
+            new TwigFilter('qr_code', [$this, 'getQrCode']),
+            new TwigFilter('date_event', [$this, 'getDateEvent'])
         ];
     }
 
@@ -363,6 +370,34 @@ class AppExtension extends AbstractExtension
 
         /* Return QrCode for: <img src="{{ 'https://www.link.de'|qr_code }}" style="width: 200px;"> */
         return sprintf("data:image/png;base64,%s", base64_encode($png));
+    }
+
+    /**
+     * Gets formatted event date.
+     *
+     * @param string $dateString
+     * @return string
+     * @throws Exception
+     */
+    public function getDateEvent(string $dateString): string
+    {
+        $date = DateTime::createFromFormat('Y-m-d', $dateString);
+
+        if (!$date instanceof DateTime) {
+            throw new Exception(sprintf('Unable to parse given date (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $day = $date->format('j');
+        $month = intval($date->format('n'));
+        $year = intval($date->format('Y'));
+
+        $monthString = $this->translator->trans($this->getMonthTranslationKey($month));
+
+        return match ($year) {
+            2100 => sprintf('%s. %s (%s)', $day, $monthString, $this->translator->trans('words.yearUnknown')),
+            1970 => sprintf('%s. %s', $day, $monthString),
+            default => sprintf('%s. %s %s', $day, $monthString, $year),
+        };
     }
 
     /**

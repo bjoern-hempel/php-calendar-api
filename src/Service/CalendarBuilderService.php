@@ -1111,12 +1111,13 @@ class CalendarBuilderService
     /**
      * Returns the year month key.
      *
+     * @param int $year
      * @param int $month
      * @return string
      */
-    protected function getYearMonthKey(int $month): string
+    protected function getYearMonthKey(int $year, int $month): string
     {
-        return sprintf('%04d-%02d', $this->year, $month);
+        return sprintf('%04d-%02d', $year, $month);
     }
 
     /**
@@ -1146,7 +1147,7 @@ class CalendarBuilderService
     protected function addEvents(): void
     {
         /* Build current year and month */
-        $yearMonthPage = $this->getYearMonthKey($this->month);
+        $yearMonthPage = $this->getYearMonthKey($this->year, $this->month);
 
         /** @var Event $event */
         foreach ($this->calendarImage->getUser()->getEvents() as $event) {
@@ -1161,7 +1162,7 @@ class CalendarBuilderService
             $age = $this->calendarImage->getYear() - $year;
 
             /* This event does not fit the month → Skip */
-            if ($yearMonthPage !== $this->getYearMonthKey(intval($event->getDate()->format('n')))) {
+            if ($yearMonthPage !== $this->getYearMonthKey($this->year, intval($event->getDate()->format('n')))) {
                 continue;
             }
 
@@ -1200,17 +1201,23 @@ class CalendarBuilderService
             return;
         }
 
-        /* Build current year and month */
-        $yearMonthPage = $this->getYearMonthKey($this->month);
-
         /** @var Holiday $holiday */
         foreach ($this->holidayGroup->getHolidays() as $holiday) {
 
             /* Get event key */
             $holidayKey = $this->getDayKey(intval($holiday->getDate()->format('j')));
 
-            /* This event does not fit the month → Skip */
-            if ($yearMonthPage !== $this->getYearMonthKey(intval($holiday->getDate()->format('n')))) {
+            /* Get year and month */
+            $year = intval($holiday->getDate()->format('Y'));
+            $month = intval($holiday->getDate()->format('n'));
+
+            /* Check holiday (month) → Skip if not equal */
+            if ($this->month !== $month) {
+                continue;
+            }
+
+            /* Check holiday (year) → Skip if not equal */
+            if (!$holiday->getYearly() && $this->year !== $year) {
                 continue;
             }
 
@@ -1317,11 +1324,9 @@ class CalendarBuilderService
                 throw new Exception(sprintf('Unexpected image path given: "%s" (%s:%d).', $imageFile, __FILE__, __LINE__));
             }
 
-            if (!file_exists($imageFile)) {
-                throw new Exception(sprintf('Given file "%s" does not exists (%s:%d).', $imageFile, __FILE__, __LINE__));
+            if (file_exists($imageFile)) {
+                unlink($imageFile);
             }
-
-            unlink($imageFile);
         }
 
         return true;

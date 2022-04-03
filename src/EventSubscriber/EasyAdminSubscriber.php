@@ -170,7 +170,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Create calendar sheet (create).
+     * Creates calendar sheet (create).
      *
      * @param AfterEntityPersistedEvent $entityInstance
      * @return void
@@ -188,7 +188,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Create calendar sheet (update).
+     * Creates calendar sheet (update).
      *
      * @param AfterEntityUpdatedEvent $entityInstance
      * @return void
@@ -205,6 +205,13 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         $this->buildTargetImage($entity);
     }
 
+    /**
+     * Adds calendar sheet (create).
+     *
+     * @param BeforeEntityPersistedEvent $entityInstance
+     * @return void
+     * @throws Exception
+     */
     public function addLinkCalendarImagePersisted(BeforeEntityPersistedEvent $entityInstance): void
     {
         $entity = $entityInstance->getEntityInstance();
@@ -216,6 +223,13 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         $this->addUrl($entity);
     }
 
+    /**
+     * Adds calendar sheet (update).
+     *
+     * @param BeforeEntityUpdatedEvent $entityInstance
+     * @return void
+     * @throws Exception
+     */
     public function addLinkCalendarImageUpdated(BeforeEntityUpdatedEvent $entityInstance): void
     {
         $entity = $entityInstance->getEntityInstance();

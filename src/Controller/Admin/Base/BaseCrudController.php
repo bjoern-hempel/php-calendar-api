@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin\Base;
 
-use App\Controller\Admin\CalendarImageCrudController;
 use App\Entity\Calendar;
 use App\Entity\CalendarImage;
 use App\Entity\CalendarStyle;
@@ -288,6 +287,8 @@ abstract class BaseCrudController extends AbstractCrudController
 
             /* DateTime fields. */
             'date' => DateField::new($fieldName)
+                ->setFormat('yyyy-MM-dd')
+                ->setTemplatePath('admin/crud/field/date_event.html.twig')
                 ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                 ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
 
@@ -297,7 +298,7 @@ abstract class BaseCrudController extends AbstractCrudController
                 ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
 
             /* Boolean fields. */
-            'published' => BooleanField::new($fieldName)
+            'published', 'yearly' => BooleanField::new($fieldName)
                 ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                 ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
 
