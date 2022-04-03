@@ -103,17 +103,17 @@ class Event implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'type', 'user', 'date', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'name', 'type', 'user', 'date', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_INDEX = ['id', 'name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name', 'type', 'user', 'date', 'configJson'];
+    public const CRUD_FIELDS_NEW = ['id', 'name', 'type', 'user', 'date', 'yearly', 'configJson'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'type', 'user', 'date', 'updatedAt', 'createdAt', 'configJson'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const CRUD_FIELDS_FILTER = ['name', 'type', 'user', 'date', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_FILTER = ['name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -145,6 +145,10 @@ class Event implements EntityInterface
     private array $config = [
         'color' => '255,255,255,100',
     ];
+
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['event', 'event_extended'])]
+    private bool $yearly = false;
 
     private ArrayToObject $configObject;
 
@@ -360,5 +364,28 @@ class Event implements EntityInterface
     public function setConfigJsonRaw(string $json): self
     {
         return $this->setConfigJson($json);
+    }
+
+    /**
+     * Gets the yearly status of this holiday.
+     *
+     * @return bool|null
+     */
+    public function getYearly(): ?bool
+    {
+        return $this->yearly;
+    }
+
+    /**
+     * Sets the yearly status from this holiday.
+     *
+     * @param bool $yearly
+     * @return $this
+     */
+    public function setYearly(bool $yearly): self
+    {
+        $this->yearly = $yearly;
+
+        return $this;
     }
 }

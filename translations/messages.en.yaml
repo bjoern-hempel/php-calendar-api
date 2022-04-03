@@ -254,6 +254,9 @@ admin:
       date:
         label: 'Date'
         help: 'The date of this entry.'
+      yearly:
+        label: 'Yearly'
+        help: 'The yearly state of this entry.'
       configJson:
         label: 'Config'
         help: 'The current configuration of this entry in JSON format.'
@@ -281,6 +284,9 @@ admin:
       date:
         label: 'Date'
         help: 'The date of this entry.'
+      yearly:
+        label: 'Yearly'
+        help: 'The yearly state of this entry.'
       configJson:
         label: 'Config'
         help: 'The current configuration of this entry in JSON format.'
@@ -403,6 +409,10 @@ admin:
       createdAt:
         label: 'Created At'
         help: 'The date and time when this entry was created.'
+
+# Words
+words:
+  yearUnknown: 'Year unknown'
 
 # Pages
 page:
