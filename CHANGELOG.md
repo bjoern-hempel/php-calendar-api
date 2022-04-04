@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.24.0] - 2022-04-04
+
+* [#82](https://github.com/bjoern-hempel/php-calendar-api/issues/82) - EasyAdmin: Fix ajax issue on live
+
 ### [0.23.0] - 2022-04-03
 
 * [#75](https://github.com/bjoern-hempel/php-calendar-api/issues/75) - Add yearly option to events and holidays
