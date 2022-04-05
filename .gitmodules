@@ -1,3 +1,5 @@
 [submodule "submodules/bash-version-manager"]
 	path = submodules/bash-version-manager
 	url = git@github.com:ixnode/bash-version-manager.git
+        branch = main
+
