@@ -31,7 +31,8 @@ services:
       - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.tls.certresolver=letsencryptresolver"
       - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.service=lb-php-8-0-12-apache-calendar-ixno-de"
       # load balancer
-      - "traefik.http.services.lb-php-8-0-12-apache-calendar-ixno-de.loadbalancer.server.port=80"
+      - "traefik.http.services.lb-php-8-0-12-apache-calendar-ixno-de.loadbalancer.server.port=443"
+      - "traefik.http.services.lb-php-8-0-12-apache-calendar-ixno-de.loadbalancer.server.scheme=https"
       # network
       - "traefik.docker.network=traefik-public"
     networks:

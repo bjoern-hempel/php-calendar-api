@@ -72,7 +72,10 @@ services:
   # Nginx to serve the app.
   nginx:
     # @see: https://hub.docker.com/_/nginx
-    image: "nginx:latest"
+    build:
+      dockerfile: "nginx.dockerfile"
+      context: "docker/nginx"
+    image: "ixnode/nginx"
     container_name: "${NAMESPACE_DEVELOPMENT}.nginx"
     hostname: "${NAMESPACE_HOSTNAME_DEVELOPMENT}-nginx"
     restart: always
