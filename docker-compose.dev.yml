@@ -22,7 +22,8 @@ services:
   # Nginx to serve the app.
   nginx:
     ports:
-      - ${NGINX_EXPOSE_PORT}:80
+      - ${NGINX_EXPOSE_PORT_HTTP}:80
+      - ${NGINX_EXPOSE_PORT_HTTPS}:443
 
   # MySQL server
   db:
