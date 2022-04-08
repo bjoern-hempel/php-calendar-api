@@ -68,4 +68,30 @@ class HolidayGroupRepository extends ServiceEntityRepository
 
         return null;
     }
+
+    /**
+     * Find one by short name field.
+     *
+     * @param string $shortName
+     * @return HolidayGroup|null
+     * @throws Exception
+     */
+    public function findOneByShortName(string $shortName): ?HolidayGroup
+    {
+        $result = $this->createQueryBuilder('hg')
+            ->andWhere('hg.nameShort = :val')
+            ->setParameter('val', $shortName)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($result instanceof HolidayGroup) {
+            return $result;
+        }
+
+        if ($result !== null) {
+            throw new Exception(sprintf('Unsupported type (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return null;
+    }
 }

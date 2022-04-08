@@ -308,6 +308,9 @@ admin:
       name:
         label: 'Name'
         help: 'The name of this entry.'
+      nameShort:
+        label: 'Short name'
+        help: 'The short name of this entry.'
       updatedAt:
         label: 'Updated At'
         help: 'The date and time when this entry was last edited.'
@@ -316,7 +319,7 @@ admin:
         help: 'The date and time when this entry was created.'
 
   # Image section
-  iamge:
+  image:
     singular: Image
     plural: Images
     notGenerated: 'This image has not been generated yet.'

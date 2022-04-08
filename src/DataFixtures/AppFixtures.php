@@ -236,9 +236,12 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         ],
     ];
 
-    /** @var array<string, string[][]> $holidayDatas  */
+    /** @var array<int, array<string, array<int, array<int, string>>|string>> $holidayDatas  */
     protected array $holidayDatas = [
-        'Bayern' => [
+        ['name' => 'Baden-Württemberg', 'name_short' => 'BW', 'holidays' => [
+
+        ]],
+        ['name' => 'Bayern', 'name_short' => 'BY', 'holidays' => [
             ['Neujahr', '2022-01-01T12:00:00Z'],
             ['Heilige Drei Könige', '2022-01-06T12:00:00Z'],
             ['Karfreitag', '2022-04-15T12:00:00Z'],
@@ -253,8 +256,8 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
             ['Allerheiligen', '2022-11-01T12:00:00Z'],
             ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ],
-        'Berlin' => [
+        ]],
+        ['name' => 'Berlin', 'name_short' => 'BE', 'holidays' => [
             ['Neujahr', '2022-01-01T12:00:00Z'],
             ['Internationaler Frauentag', '2022-03-08T12:00:00Z'],
             ['Karfreitag', '2022-04-15T12:00:00Z'],
@@ -265,8 +268,8 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
             ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
             ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ],
-        'Brandenburg' => [
+        ]],
+        ['name' => 'Brandenburg', 'name_short' => 'BB', 'holidays' => [
             ['Neujahr', '2022-01-01T12:00:00Z'],
             ['Karfreitag', '2022-04-15T12:00:00Z'],
             ['Ostermontag', '2022-04-18T12:00:00Z'],
@@ -277,8 +280,8 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
             ['Reformationstag', '2022-10-31T12:00:00Z'],
             ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ],
-        'Bremen' => [
+        ]],
+        ['name' => 'Bremen', 'name_short' => 'HB', 'holidays' => [
             ['Neujahr', '2022-01-01T12:00:00Z'],
             ['Karfreitag', '2022-04-15T12:00:00Z'],
             ['Ostermontag', '2022-04-18T12:00:00Z'],
@@ -289,8 +292,8 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
             ['Reformationstag', '2022-10-31T12:00:00Z'],
             ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ],
-        'Hamburg' => [
+        ]],
+        ['name' => 'Hamburg', 'name_short' => 'HH', 'holidays' => [
             ['Neujahr', '2022-01-01T12:00:00Z'],
             ['Karfreitag', '2022-04-15T12:00:00Z'],
             ['Ostermontag', '2022-04-18T12:00:00Z'],
@@ -301,8 +304,8 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
             ['Reformationstag', '2022-10-31T12:00:00Z'],
             ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ],
-        'Hessen' => [
+        ]],
+        ['name' => 'Hessen', 'name_short' => 'HE', 'holidays' => [
             ['Neujahr', '2022-01-01T12:00:00Z'],
             ['Karfreitag', '2022-04-15T12:00:00Z'],
             ['Ostermontag', '2022-04-18T12:00:00Z'],
@@ -313,8 +316,8 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
             ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
             ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ],
-        'Mecklenburg-Vorpommern' => [
+        ]],
+        ['name' => 'Mecklenburg-Vorpommern', 'name_short' => 'MV', 'holidays' => [
             ['Neujahr', '2022-01-01T12:00:00Z'],
             ['Karfreitag', '2022-04-15T12:00:00Z'],
             ['Ostermontag', '2022-04-18T12:00:00Z'],
@@ -325,8 +328,8 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
             ['Reformationstag', '2022-10-31T12:00:00Z'],
             ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ],
-        'Niedersachsen' => [
+        ]],
+        ['name' => 'Niedersachsen', 'name_short' => 'NI', 'holidays' => [
             ['Neujahr', '2022-01-01T12:00:00Z'],
             ['Karfreitag', '2022-04-15T12:00:00Z'],
             ['Ostermontag', '2022-04-18T12:00:00Z'],
@@ -337,21 +340,8 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
             ['Reformationstag', '2022-10-31T12:00:00Z'],
             ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ],
-        'Nordrhein-Westfalen' => [
-            ['Neujahr', '2022-01-01T12:00:00Z'],
-            ['Karfreitag', '2022-04-15T12:00:00Z'],
-            ['Ostermontag', '2022-04-18T12:00:00Z'],
-            ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
-            ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
-            ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
-            ['Fronleichnam', '2022-06-16T12:00:00Z'],
-            ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
-            ['Allerheiligen', '2022-10-31T12:00:00Z'],
-            ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
-            ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ],
-        'Rheinland-Pfalz' => [
+        ]],
+        ['name' => 'Nordrhein-Westfalen', 'name_short' => 'NW', 'holidays' => [
             ['Neujahr', '2022-01-01T12:00:00Z'],
             ['Karfreitag', '2022-04-15T12:00:00Z'],
             ['Ostermontag', '2022-04-18T12:00:00Z'],
@@ -363,8 +353,8 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
             ['Allerheiligen', '2022-10-31T12:00:00Z'],
             ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ],
-        'Saarland ' => [
+        ]],
+        ['name' => 'Rheinland-Pfalz', 'name_short' => 'RP', 'holidays' => [
             ['Neujahr', '2022-01-01T12:00:00Z'],
             ['Karfreitag', '2022-04-15T12:00:00Z'],
             ['Ostermontag', '2022-04-18T12:00:00Z'],
@@ -376,21 +366,21 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
             ['Allerheiligen', '2022-10-31T12:00:00Z'],
             ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ],
-        'Sachsen-Anhalt' => [
+        ]],
+        ['name' => 'Saarland', 'name_short' => 'SL', 'holidays' => [
             ['Neujahr', '2022-01-01T12:00:00Z'],
-            ['Heilige Drei Könige', '2022-01-06T12:00:00Z'],
             ['Karfreitag', '2022-04-15T12:00:00Z'],
             ['Ostermontag', '2022-04-18T12:00:00Z'],
             ['Tag der Arbeit', '2022-05-01T12:00:00Z'],
             ['Christi Himmelfahrt', '2022-05-26T12:00:00Z'],
             ['Pfingstmontag ', '2022-06-06T12:00:00Z'],
+            ['Fronleichnam', '2022-06-16T12:00:00Z'],
             ['Tag der Deutschen Einheit', '2022-10-03T12:00:00Z'],
-            ['Reformationstag', '2022-10-31T12:00:00Z'],
+            ['Allerheiligen', '2022-10-31T12:00:00Z'],
             ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ],
-        self::NAME_HOLIDAY_GROUP_SAXONY => [
+        ]],
+        ['name' => 'Sachsen', 'name_short' => 'SN', 'holidays' => [
             ['Neujahr', '2022-01-01T12:00:00Z'],
             ['Karfreitag', '2022-04-15T12:00:00Z'],
             ['Ostermontag', '2022-04-18T12:00:00Z'],
@@ -402,7 +392,16 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
             ['Buß- und Bettag', '2022-11-16T12:00:00Z'],
             ['1. Weihnachtsfeiertag', '2022-12-25T12:00:00Z'],
             ['2. Weihnachtsfeiertag', '2022-12-26T12:00:00Z'],
-        ]
+        ]],
+        ['name' => 'Sachsen-Anhalt', 'name_short' => 'ST', 'holidays' => [
+
+        ]],
+        ['name' => 'Schleswig-Holstein', 'name_short' => 'SH', 'holidays' => [
+
+        ]],
+        ['name' => 'Thüringen', 'name_short' => 'TH', 'holidays' => [
+
+        ]],
     ];
 
     /** @var string[][]|int[][] $eventDatas  */
@@ -582,6 +581,7 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         $holiday->setHolidayGroup($holidayGroup);
         $holiday->setName($name);
         $holiday->setDate(new DateTime($date));
+        $holiday->setType(0);
         $holiday->setConfig([
             'color' => '255,255,255,100',
         ]);
@@ -593,24 +593,29 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
     /**
      * Returns a HolidayGroup resource with its Holiday events.
      *
-     * @return array<string, HolidayGroup>
+     * @return array<int|string, HolidayGroup>
      * @throws Exception
      */
     public function getHolidayGroups(): array
     {
         $holidayGroups = [];
 
-        foreach ($this->holidayDatas as $name => $holidayDatas) {
+        foreach ($this->holidayDatas as $holidayDatas) {
 
             /* Get persisted public holiday group */
-            $holidayGroup = $this->setHolidayGroup($name);
+            $holidayGroup = $this->setHolidayGroup(strval($holidayDatas['name']), strval($holidayDatas['name_short']));
 
-            /* Add holidays */
-            foreach ($holidayDatas as $holidayData) {
-                $this->setHoliday($holidayGroup, $holidayData[0], $holidayData[1]);
+            if ($this->getEnvironment() === self::ENVIRONMENT_NAME_TEST && array_key_exists('holidays', $holidayDatas)) {
+                if (!is_array($holidayDatas['holidays'])) {
+                    throw new Exception(sprintf('Array expected (%s:%d).', __FILE__, __LINE__));
+                }
+
+                foreach ($holidayDatas['holidays'] as $holiday) {
+                    $this->setHoliday($holidayGroup, $holiday[0], $holiday[1]);
+                }
             }
 
-            $holidayGroups[$name] = $holidayGroup;
+            $holidayGroups[strval($holidayDatas['name'])] = $holidayGroup;
         }
 
         return $holidayGroups;
@@ -620,12 +625,14 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
      * Sets a HolidayGroup resource.
      *
      * @param string $name
+     * @param string $nameShort
      * @return HolidayGroup
      */
-    protected function setHolidayGroup(string $name): HolidayGroup
+    protected function setHolidayGroup(string $name, string $nameShort): HolidayGroup
     {
         $holidayGroup = new HolidayGroup();
         $holidayGroup->setName($name);
+        $holidayGroup->setNameShort($nameShort);
         $this->manager?->persist($holidayGroup);
 
         return $holidayGroup;

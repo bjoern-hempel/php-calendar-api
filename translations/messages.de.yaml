@@ -308,6 +308,9 @@ admin:
       name:
         label: 'Name'
         help: 'Der Name dieses Eintrags.'
+      nameShort:
+        label: 'Kürzel'
+        help: 'Der Kürzel dieses Eintrags.'
       updatedAt:
         label: 'Geändert am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'

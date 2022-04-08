@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Command\CreateHolidayCommand;
 use App\Entity\Holiday;
+use App\Entity\HolidayGroup;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,5 +43,23 @@ class HolidayRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Holiday::class);
+    }
+
+    /**
+     * Find holiday by holiday group and date.
+     *
+     * @param HolidayGroup $holidayGroup
+     * @param DateTime $date
+     * @return Holiday[]
+     */
+    public function findHolidaysByHolidayGroupAndDate(HolidayGroup $holidayGroup, DateTime $date): array
+    {
+        return $this->createQueryBuilder('h')
+            ->andWhere('h.holidayGroup = :hg')
+            ->andWhere('h.date = :date')
+            ->setParameter('hg', $holidayGroup)
+            ->setParameter('date', $date->format(CreateHolidayCommand::API_DATE_FORMAT))
+            ->getQuery()
+            ->getResult();
     }
 }
