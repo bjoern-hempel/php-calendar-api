@@ -438,3 +438,7 @@ page:
     info: >
       Dieser Service wird bereitgestellt von <a href="https://twelvepics.com" class="%class%">twelvepics.com</a>
     name: 'TwelvePics'
+
+# Easyadmin
+page_title:
+  new: '%entity_label_singular% erstellen'

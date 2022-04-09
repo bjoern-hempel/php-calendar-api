@@ -7,15 +7,20 @@
 {% endif %}
 
 {% for year, holidays in holidayGroup %}
-    <h4 style="margin-bottom: 15px;">{{ year }}</h4>
-    <ol>
-        {% for holiday in holidays %}
-            {% set editUrl = ea_url()
-                .setController('App\\Controller\\Admin\\HolidayCrudController')
-                .setAction('edit')
-                .setEntityId(holiday.id) %}
+    {% if ea.crud.currentAction == 'detail' %}
+        <h4 style="margin-bottom: 15px;">{{ year }}</h4>
+        <ol>
+            {% for holiday in holidays %}
+                {% set editUrl = ea_url().setController('App\\Controller\\Admin\\HolidayCrudController').setAction('edit').setEntityId(holiday.id) %}
+                <li><a href="{{ editUrl }}"><b>{{ holiday.name }}</b></a> - {{ holiday.date|date_event }}{% if holiday.yearly %} &nbsp; <i class="action-icon fa fa-fw fa-repeat" style="font-size: x-small;"></i>{% endif %}</li>
+            {% endfor %}
+        </ol>
 
-            <li><a href="{{ editUrl }}"><b>{{ holiday.name }}</b></a> - {{ holiday.date|date_event }}{% if holiday.yearly %} &nbsp; <i class="action-icon fa fa-fw fa-repeat" style="font-size: x-small;"></i>{% endif %}</li>
-        {% endfor %}
-    </ol>
+        <p>
+            {% set createUrl = ea_url().setController('App\\Controller\\Admin\\HolidayCrudController').setAction('new') %}
+            <a class="action-new btn btn-primary" href="{{ createUrl }}" data-action-name="new"><span class="action-label">{{ 'page_title.new'|trans({'%entity_label_singular%': 'admin.holiday.singular'|trans}) }}</span></a>
+        </p>
+    {% else %}
+        {{ year }} ({{ holidays|length }}){% if not loop.last %},{% endif %}
+    {% endif %}
 {% endfor %}

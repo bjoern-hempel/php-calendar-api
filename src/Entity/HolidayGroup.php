@@ -90,7 +90,7 @@ class HolidayGroup implements EntityInterface
 
     public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'nameShort', 'holidays', 'holidaysGrouped', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'name', 'nameShort', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_INDEX = ['id', 'name', 'nameShort', 'holidaysGrouped', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_NEW = ['id', 'name', 'nameShort'];
 
