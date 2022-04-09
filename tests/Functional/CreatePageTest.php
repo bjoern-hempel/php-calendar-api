@@ -248,6 +248,6 @@ final class CreatePageTest extends KernelTestCase
         /* Assert */
         $this->assertSame($file['widthTarget'], $width);
         $this->assertSame($file['heightTarget'], $height);
-        $this->assertLessThan(0.05, $differenceValue, sprintf('The difference is more than 0.05%% (%.2f%%).', $differenceValue));
+        $this->assertLessThan(0.02, $differenceValue, sprintf('The difference is more than 0.02%% (%.2f%%).', $differenceValue));
     }
 }

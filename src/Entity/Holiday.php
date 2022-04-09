@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\FosUser\EventListener;
 use App\Entity\Trait\TimestampsTrait;
 use App\EventListener\Entity\HolidayListener;
 use App\EventListener\Entity\UserListener;
@@ -128,6 +127,9 @@ class Holiday implements EntityInterface
     private bool $yearly = false;
 
     private ArrayToObject $configObject;
+
+    #[ORM\Column(type: 'integer')]
+    private int $type;
 
     /**
      * Gets the id of this holiday.
@@ -327,6 +329,18 @@ class Holiday implements EntityInterface
     public function setYearly(bool $yearly): self
     {
         $this->yearly = $yearly;
+
+        return $this;
+    }
+
+    public function getType(): ?int
+    {
+        return $this->type;
+    }
+
+    public function setType(int $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }

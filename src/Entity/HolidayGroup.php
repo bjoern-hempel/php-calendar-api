@@ -83,15 +83,15 @@ class HolidayGroup implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = [];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'nameShort', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'name', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_INDEX = ['id', 'name', 'nameShort', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name'];
+    public const CRUD_FIELDS_NEW = ['id', 'name', 'nameShort'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'nameShort', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_FILTER = ['name'];
 
@@ -109,6 +109,10 @@ class HolidayGroup implements EntityInterface
     #[ORM\OneToMany(mappedBy: 'holidayGroup', targetEntity: Holiday::class)]
     #[Groups(['holiday_group', 'holiday_group_extended'])]
     private Collection $holidays;
+
+    #[ORM\Column(name: 'name_short', type: 'string', length: 10)]
+    #[Groups(['holiday_group', 'holiday_group_extended'])]
+    private string $nameShort;
 
     /**
      * HolidayGroup constructor.
@@ -158,6 +162,29 @@ class HolidayGroup implements EntityInterface
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Gets the short name of this holiday group.
+     *
+     * @return string
+     */
+    public function getNameShort(): string
+    {
+        return $this->nameShort;
+    }
+
+    /**
+     * Sets the short name of this holiday group.
+     *
+     * @param string $nameShort
+     * @return $this
+     */
+    public function setNameShort(string $nameShort): self
+    {
+        $this->nameShort = $nameShort;
 
         return $this;
     }
