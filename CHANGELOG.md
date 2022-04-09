@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.26.0] - 2022-04-09
+
+* [#86](https://github.com/bjoern-hempel/php-calendar-api/issues/86) - Holiday Import from an API
+
 ### [0.25.1] - 2022-04-06
 
 * Add new version of submodule submodules/bash-version-manager
