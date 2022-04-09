@@ -21,6 +21,6 @@
             <a class="action-new btn btn-primary" href="{{ createUrl }}" data-action-name="new"><span class="action-label">{{ 'page_title.new'|trans({'%entity_label_singular%': 'admin.holiday.singular'|trans}) }}</span></a>
         </p>
     {% else %}
-        {{ year }} ({{ holidays|length }}){% if not loop.last %},{% endif %}
+        <b>{{ year }}</b> ({{ holidays|length }}){% if not loop.last %},{% endif %}
     {% endif %}
 {% endfor %}
