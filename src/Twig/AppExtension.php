@@ -375,16 +375,18 @@ class AppExtension extends AbstractExtension
     /**
      * Gets formatted event date.
      *
-     * @param string $dateString
+     * @param DateTime|string $date
      * @return string
      * @throws Exception
      */
-    public function getDateEvent(string $dateString): string
+    public function getDateEvent(DateTime|string $date): string
     {
-        $date = DateTime::createFromFormat('Y-m-d', $dateString);
-
         if (!$date instanceof DateTime) {
-            throw new Exception(sprintf('Unable to parse given date (%s:%d).', __FILE__, __LINE__));
+            $date = DateTime::createFromFormat('Y-m-d', $date);
+
+            if (!$date instanceof DateTime) {
+                throw new Exception(sprintf('Unable to parse given date (%s:%d).', __FILE__, __LINE__));
+            }
         }
 
         $day = $date->format('j');

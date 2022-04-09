@@ -1,0 +1,16 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+{% set holidayGroup = field.formattedValue %}
+{% if holidayGroup is not iterable %}
+    {% set holidayGroup = [holidayGroup] %}
+{% endif %}
+
+{% for year, holidays in holidayGroup %}
+    <h4 style="margin-bottom: 15px;">{{ year }}</h4>
+    {% for holiday in holidays %}
+        <ul>
+            <li><b>{{ holiday.name }}</b> - {{ holiday.date|date_event }}{% if holiday.yearly %} &nbsp; <i class="action-icon fa fa-fw fa-repeat" style="font-size: x-small;"></i>{% endif %}</li>
+        </ul>
+    {% endfor %}
+{% endfor %}

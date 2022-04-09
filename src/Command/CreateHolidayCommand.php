@@ -53,7 +53,7 @@ class CreateHolidayCommand extends Command
 
     public const API_DATE_FORMAT = 'Y-m-d';
 
-    protected const YEARLY_YEAR = 1970;
+    public const YEARLY_YEAR = 1970;
 
     protected const YEARLY_DATES = [
         '01-01', // New Year (Neujahr)

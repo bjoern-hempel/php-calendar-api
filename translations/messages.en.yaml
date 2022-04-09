@@ -311,6 +311,12 @@ admin:
       nameShort:
         label: 'Short name'
         help: 'The short name of this entry.'
+      holidays:
+        label: 'Holidays'
+        help: 'The holidays of this entry.'
+      holidaysGrouped:
+        label: 'Holidays'
+        help: 'The holidays of this entry.'
       updatedAt:
         label: 'Updated At'
         help: 'The date and time when this entry was last edited.'
@@ -416,6 +422,7 @@ admin:
 # Words
 words:
   yearUnknown: 'Year unknown'
+  yearly: 'annual'
 
 # Pages
 page:

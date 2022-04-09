@@ -14,14 +14,19 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Command\CreateHolidayCommand;
 use App\Entity\Trait\TimestampsTrait;
 use App\EventListener\Entity\UserListener;
 use App\Repository\HolidayGroupRepository;
+use App\Utils\HolidayCollection;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Entity class HolidayGroup
@@ -83,7 +88,7 @@ class HolidayGroup implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = [];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'nameShort', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'nameShort', 'holidays', 'holidaysGrouped', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_INDEX = ['id', 'name', 'nameShort', 'updatedAt', 'createdAt'];
 
@@ -91,7 +96,7 @@ class HolidayGroup implements EntityInterface
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'nameShort', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'nameShort', 'holidaysGrouped', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_FILTER = ['name'];
 
@@ -108,6 +113,7 @@ class HolidayGroup implements EntityInterface
     /** @var Collection<int, Holiday> $holidays */
     #[ORM\OneToMany(mappedBy: 'holidayGroup', targetEntity: Holiday::class)]
     #[Groups(['holiday_group', 'holiday_group_extended'])]
+    #[ORM\OrderBy(value: ['date' => 'ASC'])]
     private Collection $holidays;
 
     #[ORM\Column(name: 'name_short', type: 'string', length: 10)]
@@ -197,6 +203,17 @@ class HolidayGroup implements EntityInterface
     public function getHolidays(): Collection
     {
         return $this->holidays;
+    }
+
+    /**
+     * Gets all related holidays grouped.
+     *
+     * @return Array<int, Collection<int, Holiday>>
+     * @throws Exception
+     */
+    public function getHolidaysGrouped(): array
+    {
+        return HolidayCollection::getHolidaysGrouped($this->getHolidays());
     }
 
     /**

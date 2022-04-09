@@ -311,6 +311,12 @@ admin:
       nameShort:
         label: 'Kürzel'
         help: 'Der Kürzel dieses Eintrags.'
+      holidays:
+        label: 'Feiertage'
+        help: 'Die Feiertage dieses Eintrags.'
+      holidaysGrouped:
+        label: 'Feiertage'
+        help: 'Die Feiertage dieses Eintrags.'
       updatedAt:
         label: 'Geändert am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
@@ -416,6 +422,7 @@ admin:
 # Words
 words:
   yearUnknown: 'Jahr unbekannt'
+  yearly: 'jährlich stattfindend'
 
 # Pages
 page:

@@ -23,6 +23,7 @@ use App\Utils\Traits\JsonHelper;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
+use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -130,6 +131,16 @@ class Holiday implements EntityInterface
 
     #[ORM\Column(type: 'integer')]
     private int $type;
+
+    /**
+     * __toString method.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return sprintf('%s (%s)', $this->getName(), $this->getDate()->format('d.n.Y'));
+    }
 
     /**
      * Gets the id of this holiday.
