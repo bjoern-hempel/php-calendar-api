@@ -88,12 +88,20 @@ class FileNameConverter
      * @param string $filename
      * @param string $type
      * @param string|null $additionalPath
+     * @param bool $removeAdditionalPath
      * @return string
      * @throws Exception
      */
-    protected static function replacePathType(string $filename, string $type, ?string $additionalPath = null): string
+    public static function replacePathType(string $filename, string $type, ?string $additionalPath = null, bool $removeAdditionalPath = false): string
     {
-        $search = sprintf('~([a-z0-9]{40,40}/)(%s|%s|%s|%s)(/)~', Image::PATH_TYPE_SOURCE, Image::PATH_TYPE_TARGET, Image::PATH_TYPE_COMPARE, Image::PATH_TYPE_EXPECTED);
+        $search = sprintf(
+            '~([a-z0-9]{40,40}/)(%s|%s|%s|%s)(/)%s~',
+            Image::PATH_TYPE_SOURCE,
+            Image::PATH_TYPE_TARGET,
+            Image::PATH_TYPE_COMPARE,
+            Image::PATH_TYPE_EXPECTED,
+            $removeAdditionalPath ? '([0-9]+/)' : ''
+        );
 
         $path = $type;
 
