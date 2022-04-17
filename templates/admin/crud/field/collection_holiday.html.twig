@@ -17,7 +17,8 @@
         </ol>
 
         <p>
-            {% set createUrl = ea_url().setController('App\\Controller\\Admin\\HolidayCrudController').setAction('new') %}
+            {# https://stackoverflow.com/questions/67334635/easyadmin3-symfony-twig-url-generator-with-route-name-and-params-in-twig-t #}
+            {% set createUrl = ea_url().setController('App\\Controller\\Admin\\HolidayCrudController').setAction('new').set('Holiday[holidayGroup]', 13) %}
             <a class="action-new btn btn-primary" href="{{ createUrl }}" data-action-name="new"><span class="action-label">{{ 'page_title.new'|trans({'%entity_label_singular%': 'admin.holiday.singular'|trans}) }}</span></a>
         </p>
     {% else %}
