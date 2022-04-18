@@ -311,12 +311,21 @@ admin:
       nameShort:
         label: 'Kürzel'
         help: 'Der Kürzel dieses Eintrags.'
+      holidays:
+        label: 'Feiertage'
+        help: 'Die Feiertage dieses Eintrags.'
+      holidaysGrouped:
+        label: 'Feiertage'
+        help: 'Die Feiertage dieses Eintrags.'
       updatedAt:
         label: 'Geändert am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
       createdAt:
         label: 'Angelegt am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+      newHoliday:
+        label: 'Feiertag anlegen'
+        help: 'Legt einen neuen Feiertag an.'
 
   # Image section
   image:
@@ -416,6 +425,7 @@ admin:
 # Words
 words:
   yearUnknown: 'Jahr unbekannt'
+  yearly: 'jährlich stattfindend'
 
 # Pages
 page:
@@ -431,3 +441,7 @@ page:
     info: >
       Dieser Service wird bereitgestellt von <a href="https://twelvepics.com" class="%class%">twelvepics.com</a>
     name: 'TwelvePics'
+
+# Easyadmin
+page_title:
+  new: '%entity_label_singular% erstellen'

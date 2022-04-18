@@ -16,8 +16,14 @@ namespace App\Controller\Admin;
 use App\Controller\Admin\Base\BaseCrudController;
 use App\Entity\HolidayGroup;
 use App\Service\SecurityService;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Exception;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -29,16 +35,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class HolidayGroupCrudController extends BaseCrudController
 {
+    protected AdminUrlGenerator $adminUrlGenerator;
+
+    public const ACTION_NEW_HOLIDAY = 'newHoliday';
+
     /**
      * HolidayGroupCrudController constructor.
      *
      * @param SecurityService $securityService
      * @param TranslatorInterface $translator
+     * @param AdminUrlGenerator $adminUrlGenerator
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, AdminUrlGenerator $adminUrlGenerator)
     {
         parent::__construct($securityService, $translator);
+
+        $this->adminUrlGenerator = $adminUrlGenerator;
     }
 
     /**
@@ -60,5 +73,44 @@ class HolidayGroupCrudController extends BaseCrudController
     public function getEntity(): string
     {
         return self::getEntityFqcn();
+    }
+
+    /**
+     * Configure actions.
+     *
+     * @param Actions $actions
+     * @return Actions
+     */
+    public function configureActions(Actions $actions): Actions
+    {
+        $actions = parent::configureActions($actions);
+
+        $newHoliday = Action::new(self::ACTION_NEW_HOLIDAY, 'admin.holidayGroup.fields.newHoliday.label', 'fa fa-plus-square-o')
+            ->linkToCrudAction(self::ACTION_NEW_HOLIDAY);
+
+        $actions
+            ->add(Crud::PAGE_DETAIL, $newHoliday);
+
+        return $actions;
+    }
+
+    /**
+     * New holiday.
+     *
+     * @param AdminContext $context
+     * @return RedirectResponse
+     */
+    public function newHoliday(AdminContext $context): RedirectResponse
+    {
+        /** @var HolidayGroup $holidayGroup */
+        $holidayGroup = $context->getEntity()->getInstance();
+
+        $url = $this->adminUrlGenerator
+            ->setController(HolidayCrudController::class)
+            ->setAction(Action::NEW)
+            ->set(HolidayCrudController::PARAMETER_HOLIDAY_GROUP, $holidayGroup->getId())
+            ->generateUrl();
+
+        return $this->redirect($url);
     }
 }

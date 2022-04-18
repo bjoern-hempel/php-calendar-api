@@ -311,12 +311,21 @@ admin:
       nameShort:
         label: 'Short name'
         help: 'The short name of this entry.'
+      holidays:
+        label: 'Holidays'
+        help: 'The holidays of this entry.'
+      holidaysGrouped:
+        label: 'Holidays'
+        help: 'The holidays of this entry.'
       updatedAt:
         label: 'Updated At'
         help: 'The date and time when this entry was last edited.'
       createdAt:
         label: 'Created At'
         help: 'The date and time when this entry was created.'
+      newHoliday:
+        label: 'Create new holiday'
+        help: 'Creates a new holiday.'
 
   # Image section
   image:
@@ -416,6 +425,7 @@ admin:
 # Words
 words:
   yearUnknown: 'Year unknown'
+  yearly: 'annual'
 
 # Pages
 page:
@@ -431,3 +441,7 @@ page:
     info: >
       This service is provided by <a href="https://twelvepics.com" class="%class%">twelvepics.com</a>
     name: 'TwelvePics'
+
+# Easyadmin
+page_title:
+  new: 'Create %entity_label_singular%'

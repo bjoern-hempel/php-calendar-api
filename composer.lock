@@ -169,16 +169,16 @@
         },
         {
             "name": "chillerlan/php-qrcode",
-            "version": "4.3.2",
+            "version": "4.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/chillerlan/php-qrcode.git",
-                "reference": "b625396e0752d79747a55205ae7e191eeb459dcd"
+                "reference": "6356b246948ac1025882b3f55e7c68ebd4515ae3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chillerlan/php-qrcode/zipball/b625396e0752d79747a55205ae7e191eeb459dcd",
-                "reference": "b625396e0752d79747a55205ae7e191eeb459dcd",
+                "url": "https://api.github.com/repos/chillerlan/php-qrcode/zipball/6356b246948ac1025882b3f55e7c68ebd4515ae3",
+                "reference": "6356b246948ac1025882b3f55e7c68ebd4515ae3",
                 "shasum": ""
             },
             "require": {
@@ -231,7 +231,7 @@
             ],
             "support": {
                 "issues": "https://github.com/chillerlan/php-qrcode/issues",
-                "source": "https://github.com/chillerlan/php-qrcode/tree/4.3.2"
+                "source": "https://github.com/chillerlan/php-qrcode/tree/4.3.3"
             },
             "funding": [
                 {
@@ -243,7 +243,7 @@
                     "type": "ko_fi"
                 }
             ],
-            "time": "2021-11-18T08:46:03+00:00"
+            "time": "2021-11-25T22:38:09+00:00"
         },
         {
             "name": "chillerlan/php-settings-container",
@@ -11315,5 +11315,5 @@
         "ext-iconv": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }

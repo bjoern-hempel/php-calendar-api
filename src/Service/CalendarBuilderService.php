@@ -194,6 +194,70 @@ class CalendarBuilderService
     }
 
     /**
+     * This is a replacement for imageftbbox within test mode to avoid different dimensions within different versions of gd libs.
+     * These settings are valid for GD GD Version 2.2.5. Some other versions could return other values for that.
+     *
+     * @param string $text
+     * @param int $fontSize
+     * @param int $angle
+     * @return array<int, int>
+     * @throws Exception
+     */
+    public function getTestImageftbbox(string $text, int $fontSize, int $angle = 0): array
+    {
+        $data = [
+            "28°08’53.9\"N 15°25’53.0\"W - 6 - 90" => [1, 1, 1, -75, -7, -75, -7, 1, ],
+            "01 - 44 - 0" => [0, 2, 48, 2, 48, -44, 0, -44, ],
+            "2022 - 20 - 0" => [0, 1, 43, 1, 43, -20, 0, -20, ],
+            "16 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "15 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "14 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "13 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "12 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "11 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "10 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "09 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "08 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "07 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "06 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "05 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "04 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "03 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "02 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "01 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "17 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "18 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "19 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "20 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "21 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "22 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "23 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "24 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "25 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "26 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "27 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "28 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "29 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "30 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "31 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "KW 02 > - 6 - 0" => [-1, 1, 22, 1, 22, -7, -1, -7, ],
+            "KW 01 > - 6 - 0" => [-1, 1, 22, 1, 22, -7, -1, -7, ],
+            "KW 03 > - 6 - 0" => [-1, 1, 22, 1, 22, -7, -1, -7, ],
+            "KW 04 > - 6 - 0" => [-1, 1, 22, 1, 22, -7, -1, -7, ],
+            "KW 05 > - 6 - 0" => [-1, 1, 22, 1, 22, -7, -1, -7, ],
+            "Neujahr - 8 - 80" => [3, 1, 9, -28, -4, -30, -9, 0, ],
+        ];
+
+        $key = sprintf('%s - %s - %s', $text, $fontSize, $angle);
+
+        if (!array_key_exists($key, $data)) {
+            throw new Exception(sprintf('Data settings missing for key "%s" (%s:%d).', $key, __FILE__, __LINE__));
+        }
+
+        return $data[$key];
+    }
+
+    /**
      * Gets calendar from given calendar image.
      *
      * @param CalendarImage $calendarImage
@@ -320,17 +384,17 @@ class CalendarBuilderService
     #[ArrayShape(['width' => "int", 'height' => "int"])]
     protected function getDimension(string $text, int $fontSize, int $angle = 0): array
     {
-        $boundingBox = imageftbbox($fontSize, $angle, $this->pathFont, $text);
+        $boundingBox = $this->test ? $this->getTestImageftbbox($text, $fontSize, $angle) : imageftbbox($fontSize, $angle, $this->pathFont, $text);
 
         if ($boundingBox === false) {
             throw new Exception(sprintf('Unable to get bounding box (%s:%d', __FILE__, __LINE__));
         }
 
-        list($left, $bottom, $right, , , $top) = $boundingBox;
+        list($leftBottomX, $leftBottomY, $rightBottomX, $rightBottomY, $rightTopX, $rightTopY, $leftTopX, $leftTopY) = $boundingBox;
 
         return [
-            'width' => $right - $left,
-            'height' => $bottom - $top,
+            'width' => $rightBottomX - $leftBottomX,
+            'height' => $leftBottomY - $rightTopY,
         ];
     }
 

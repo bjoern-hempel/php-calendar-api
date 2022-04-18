@@ -22,6 +22,7 @@ use App\Entity\HolidayGroup;
 use App\Entity\Image;
 use App\Entity\User;
 use App\Field\CollectionCalendarImageField;
+use App\Field\CollectionHolidayField;
 use App\Field\PathImageField;
 use App\Service\SecurityService;
 use App\Utils\EasyAdminField;
@@ -42,6 +43,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -192,6 +194,18 @@ abstract class BaseCrudController extends AbstractCrudController
                     case 'holidayGroup':
                         return AssociationField::new($fieldName)
                             ->setRequired(true)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
+                }
+                break;
+
+            case $this->getCrudName(HolidayGroup::class):
+                switch ($fieldName) {
+
+                    /* Collection fields */
+                    case 'holidays':
+                    case 'holidaysGrouped':
+                        return CollectionHolidayField::new($fieldName)
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                             ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
                 }

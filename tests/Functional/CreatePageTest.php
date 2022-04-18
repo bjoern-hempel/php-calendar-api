@@ -209,7 +209,7 @@ final class CreatePageTest extends KernelTestCase
         $imageExpected->readImage($pathExpected);
 
         /* Compare the images using METRIC=1 (Absolute Error). */
-        $result = $imageExpected->compareImages($imageTarget, 1);
+        $result = $imageExpected->compareImages($imageTarget, Imagick::METRIC_ABSOLUTEERRORMETRIC);
 
         /* Return the image comparison. */
         return floatval($result[1] / $width / $height * 100);
@@ -243,11 +243,13 @@ final class CreatePageTest extends KernelTestCase
         /* Act */
         $this->calendarBuilderService->init($calendarImage, $holidayGroup, true);
         $file = $this->calendarBuilderService->build();
-        $differenceValue = $this->compareImages($calendarImage, intval($file['widthTarget']), intval($file['heightTarget']));
+        $widthBuild = intval($file['widthTarget']);
+        $heightBuild = intval($file['heightTarget']);
+        $differenceValue = $this->compareImages($calendarImage, $widthBuild, $heightBuild);
 
         /* Assert */
-        $this->assertSame($file['widthTarget'], $width);
-        $this->assertSame($file['heightTarget'], $height);
+        $this->assertSame($widthBuild, $width);
+        $this->assertSame($heightBuild, $height);
         $this->assertLessThan(0.02, $differenceValue, sprintf('The difference is more than 0.02%% (%.2f%%).', $differenceValue));
     }
 }

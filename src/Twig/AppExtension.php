@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Twig;
 
 use App\Controller\Base\BaseController;
+use App\Entity\Image;
 use App\Service\ImageService;
 use App\Service\UrlService;
 use App\Utils\FileNameConverter;
@@ -134,6 +135,13 @@ class AppExtension extends AbstractExtension
 
         $pathOrig = $fileNameConverter->getFilename($type);
 
+        $pathOrigFull = $fileNameConverter->getFilename($type, null, false, null, FileNameConverter::MODE_OUTPUT_ABSOLUTE);
+
+        /* The target image does not exists -> use the source image. */
+        if (!file_exists($pathOrigFull) && $type === Image::PATH_TYPE_TARGET) {
+            $pathOrig = FileNameConverter::replacePathType($pathOrig, Image::PATH_TYPE_SOURCE, null, true);
+        }
+
         return $this->checkPath($pathOrig);
     }
 
@@ -153,6 +161,12 @@ class AppExtension extends AbstractExtension
         $type = $fileNameConverter->getType($path);
 
         $pathFull = $fileNameConverter->getFilename($type, null, false, null, FileNameConverter::MODE_OUTPUT_ABSOLUTE);
+
+        /* The target image does not exists -> use the source image. */
+        if (!file_exists($pathFull) && $type === Image::PATH_TYPE_TARGET) {
+            $pathFull = FileNameConverter::replacePathType($pathFull, Image::PATH_TYPE_SOURCE, null, true);
+        }
+
         $pathPreview = $fileNameConverter->getFilename($type, $width);
         $pathPreviewFull = $fileNameConverter->getFilename($type, $width, false, null, FileNameConverter::MODE_OUTPUT_ABSOLUTE);
 
@@ -375,16 +389,18 @@ class AppExtension extends AbstractExtension
     /**
      * Gets formatted event date.
      *
-     * @param string $dateString
+     * @param DateTime|string $date
      * @return string
      * @throws Exception
      */
-    public function getDateEvent(string $dateString): string
+    public function getDateEvent(DateTime|string $date): string
     {
-        $date = DateTime::createFromFormat('Y-m-d', $dateString);
-
         if (!$date instanceof DateTime) {
-            throw new Exception(sprintf('Unable to parse given date (%s:%d).', __FILE__, __LINE__));
+            $date = DateTime::createFromFormat('Y-m-d', $date);
+
+            if (!$date instanceof DateTime) {
+                throw new Exception(sprintf('Unable to parse given date (%s:%d).', __FILE__, __LINE__));
+            }
         }
 
         $day = $date->format('j');

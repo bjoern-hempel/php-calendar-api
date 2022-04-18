@@ -99,7 +99,7 @@ services:
     # @see: https://hub.docker.com/_/php
     build:
       dockerfile: "${PHP_FPM_SERVER_DOCKERFILE}"
-      context: docker/.
+      context: "docker/php"
     image: "${APP_IMAGE_DEVELOPMENT}:${VERSION_APP}" # "${APP_IMAGE_DEVELOPMENT}:${VERSION_APP_LATEST}"
     container_name: "${NAMESPACE_DEVELOPMENT}.php.${PHP_VERSION}"
     hostname: "${NAMESPACE_HOSTNAME_DEVELOPMENT}-php-${PHP_VERSION_HOSTNAME}"

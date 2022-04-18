@@ -1,0 +1,22 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+{% set holidayGroup = field.formattedValue.holidayGroup %}
+{% set holidayGroups = field.formattedValue.holidays %}
+{% if holidayGroups is not iterable %}
+    {% set holidayGroups = [holidayGroups] %}
+{% endif %}
+
+{% for year, holidays in holidayGroups %}
+    {% if ea.crud.currentAction == 'detail' %}
+        <h4 style="margin-bottom: 15px;">{{ year }}</h4>
+        <ol>
+            {% for holiday in holidays %}
+                {% set editUrl = ea_url().setController('App\\Controller\\Admin\\HolidayCrudController').setAction('edit').setEntityId(holiday.id) %}
+                <li><a href="{{ editUrl }}"><b>{{ holiday.name }}</b></a> - {{ holiday.date|date_event }}{% if holiday.yearly %} &nbsp; <i class="action-icon fa fa-fw fa-repeat" style="font-size: x-small;"></i>{% endif %}</li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <b>{{ year }}</b> ({{ holidays|length }}){% if not loop.last %},{% endif %}
+    {% endif %}
+{% endfor %}
