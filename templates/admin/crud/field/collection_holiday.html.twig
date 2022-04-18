@@ -13,7 +13,7 @@
         <ol>
             {% for holiday in holidays %}
                 {% set editUrl = ea_url().setController('App\\Controller\\Admin\\HolidayCrudController').setAction('edit').setEntityId(holiday.id) %}
-                <li><a href="{{ editUrl }}"><b>{{ holiday.name }}</b></a> - {{ holiday.date|date_event }}{% if holiday.yearly %} &nbsp; <i class="action-icon fa fa-fw fa-repeat" style="font-size: x-small;"></i>{% endif %}</li>
+                <li><a href="{{ editUrl }}"><b>{{ holiday.name }}</b></a>{% if holiday.type is same as(1) %} ({{ 'admin.holiday.fields.type.entries.entry1'|trans }}){% endif %} - {{ holiday.date|date_event }}{% if holiday.yearly %} &nbsp; <i class="action-icon fa fa-fw fa-repeat" style="font-size: x-small;"></i>{% endif %}</li>
             {% endfor %}
         </ol>
     {% else %}

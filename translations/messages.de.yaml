@@ -287,6 +287,12 @@ admin:
       yearly:
         label: 'Jährlich'
         help: 'Der Jährlich Status dieses Eintrags.'
+      type:
+        label: 'Typ'
+        help: 'Der Typ dieses Eintrags.'
+        entries:
+          entry0: 'Gesetzlicher Feiertag'
+          entry1: 'Nicht gesetzlicher Feiertag'
       configJson:
         label: 'Konfiguration'
         help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'

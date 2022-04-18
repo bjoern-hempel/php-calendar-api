@@ -178,9 +178,9 @@ abstract class BaseCrudController extends AbstractCrudController
                     case 'type':
                         return ChoiceField::new($fieldName)
                             ->setChoices([
-                                sprintf('admin.event.fields.type.entries.entry%d', 0) => 0,
-                                sprintf('admin.event.fields.type.entries.entry%d', 1) => 1,
-                                sprintf('admin.event.fields.type.entries.entry%d', 2) => 2,
+                                sprintf('admin.%s.fields.type.entries.entry%d', $this->getCrudName(), 0) => 0,
+                                sprintf('admin.%s.fields.type.entries.entry%d', $this->getCrudName(), 1) => 1,
+                                sprintf('admin.%s.fields.type.entries.entry%d', $this->getCrudName(), 2) => 2,
                             ])
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                             ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
@@ -194,6 +194,16 @@ abstract class BaseCrudController extends AbstractCrudController
                     case 'holidayGroup':
                         return AssociationField::new($fieldName)
                             ->setRequired(true)
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
+
+                    /* Field type */
+                    case 'type':
+                        return ChoiceField::new($fieldName)
+                            ->setChoices([
+                                sprintf('admin.%s.fields.type.entries.entry%d', $this->getCrudName(), 0) => 0,
+                                sprintf('admin.%s.fields.type.entries.entry%d', $this->getCrudName(), 1) => 1,
+                            ])
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                             ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
                 }

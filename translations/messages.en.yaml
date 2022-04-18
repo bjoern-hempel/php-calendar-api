@@ -287,6 +287,12 @@ admin:
       yearly:
         label: 'Yearly'
         help: 'The yearly state of this entry.'
+      type:
+        label: 'Type'
+        help: 'The type of this entry.'
+        entries:
+          entry0: 'Public holiday'
+          entry1: 'Non-public holiday'
       configJson:
         label: 'Config'
         help: 'The current configuration of this entry in JSON format.'

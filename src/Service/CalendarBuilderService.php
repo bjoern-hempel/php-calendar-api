@@ -684,7 +684,8 @@ class CalendarBuilderService
         }
 
         /* Print day in red if holiday */
-        if (array_key_exists($this->getDayKey($day), $this->holidays)) {
+        $dayKey = $this->getDayKey($day);
+        if (array_key_exists($dayKey, $this->holidays) && $this->holidays[$dayKey] === true) {
             return $this->colors['red'];
         }
 
@@ -1189,8 +1190,9 @@ class CalendarBuilderService
      *
      * @param string $key
      * @param string $name
+     * @param bool $holiday
      */
-    protected function addEventOrHoliday(string $key, string $name): void
+    protected function addEventOrHoliday(string $key, string $name, bool $holiday = false): void
     {
         /* Add new key */
         if (!array_key_exists($key, $this->eventsAndHolidaysRaw)) {
@@ -1201,6 +1203,9 @@ class CalendarBuilderService
 
         /* Add name */
         $this->eventsAndHolidaysRaw[$key]['name'][] = $name;
+
+        /* Add holiday */
+        $this->holidays[$key] = $holiday;
     }
 
     /**
@@ -1286,10 +1291,7 @@ class CalendarBuilderService
             }
 
             /* Add event or holiday label */
-            $this->addEventOrHoliday($holidayKey, $holiday->getName());
-
-            /* Add holiday */
-            $this->holidays[$holidayKey] = true;
+            $this->addEventOrHoliday($holidayKey, $holiday->getName(), $holiday->getType() === Holiday::FIELD_TYPE_PUBLIC_DATE);
         }
     }
 

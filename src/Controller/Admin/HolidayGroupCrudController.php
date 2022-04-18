@@ -86,10 +86,12 @@ class HolidayGroupCrudController extends BaseCrudController
         $actions = parent::configureActions($actions);
 
         $newHoliday = Action::new(self::ACTION_NEW_HOLIDAY, 'admin.holidayGroup.fields.newHoliday.label', 'fa fa-plus-square-o')
-            ->linkToCrudAction(self::ACTION_NEW_HOLIDAY);
+            ->linkToCrudAction(self::ACTION_NEW_HOLIDAY)
+            ->setCssClass('action-new btn btn-primary');
 
         $actions
-            ->add(Crud::PAGE_DETAIL, $newHoliday);
+            ->add(Crud::PAGE_DETAIL, $newHoliday)
+            ->reorder(Crud::PAGE_DETAIL, [Action::INDEX, Action::DELETE, self::ACTION_NEW_HOLIDAY, Action::EDIT]);
 
         return $actions;
     }
