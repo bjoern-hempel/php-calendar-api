@@ -106,17 +106,17 @@ class Calendar implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson', 'published'];
+    public const CRUD_FIELDS_INDEX = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson', 'published'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'configJson', 'published'];
+    public const CRUD_FIELDS_NEW = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'configJson', 'published'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'title', 'subtitle', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
 
-    public const CRUD_FIELDS_FILTER = ['name', 'title', 'subtitle', 'user', 'published'];
+    public const CRUD_FIELDS_FILTER = ['name', 'title', 'subtitle', 'defaultYear', 'user', 'published'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -179,6 +179,9 @@ class Calendar implements EntityInterface
     #[Groups(['calendar_extended', 'calendar'])]
     private bool $published = false;
 
+    #[ORM\Column(name: 'default_year', type: 'integer')]
+    private int $defaultYear;
+
     private ArrayToObject $configObject;
 
     /**
@@ -188,6 +191,9 @@ class Calendar implements EntityInterface
     public function __construct()
     {
         $this->calendarImages = new ArrayCollection();
+
+        /* Sets default year */
+        $this->defaultYear = intval(date('Y')) + 1;
     }
 
     /**
@@ -541,6 +547,29 @@ class Calendar implements EntityInterface
     public function setPublished(bool $published): self
     {
         $this->published = $published;
+
+        return $this;
+    }
+
+    /**
+     * Gets the default year.
+     *
+     * @return int
+     */
+    public function getDefaultYear(): int
+    {
+        return $this->defaultYear;
+    }
+
+    /**
+     * Sets the default year.
+     *
+     * @param int $defaultYear
+     * @return $this
+     */
+    public function setDefaultYear(int $defaultYear): self
+    {
+        $this->defaultYear = $defaultYear;
 
         return $this;
     }

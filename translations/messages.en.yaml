@@ -89,6 +89,33 @@ admin:
       subtitle:
         label: 'Subtitle'
         help: 'The subtitle of this entry.'
+      defaultYear:
+        label: 'Default year'
+        help: 'The default year of this entry.'
+        entries:
+          2010: 'Calendar year 2010'
+          2011: 'Calendar year 2011'
+          2012: 'Calendar year 2012'
+          2013: 'Calendar year 2013'
+          2014: 'Calendar year 2014'
+          2015: 'Calendar year 2015'
+          2016: 'Calendar year 2016'
+          2017: 'Calendar year 2017'
+          2018: 'Calendar year 2018'
+          2019: 'Calendar year 2019'
+          2020: 'Calendar year 2020'
+          2021: 'Calendar year 2021'
+          2022: 'Calendar year 2022'
+          2023: 'Calendar year 2023'
+          2024: 'Calendar year 2024'
+          2025: 'Calendar year 2025'
+          2026: 'Calendar year 2026'
+          2027: 'Calendar year 2027'
+          2028: 'Calendar year 2028'
+          2029: 'Calendar year 2029'
+          2030: 'Calendar year 2030'
+          2031: 'Calendar year 2031'
+          2032: 'Calendar year 2032'
       configJson:
         label: 'Config'
         help: 'The current configuration of this entry in JSON format.'
@@ -113,6 +140,9 @@ admin:
       viewCalendarSheets:
         label: 'View Calendar Sheets'
         help: 'Show the Calendar Sheets'
+      newCalendarImage:
+        label: 'Add calendar image'
+        help: 'Adds a calendar image.'
 
   # CalendarImage section
   calendarImage:
@@ -208,6 +238,9 @@ admin:
       buildCalendarSheet:
         label: 'Build Calendar Sheet'
         help: 'Build the Calendar Sheet'
+      rebuildUrl:
+        label: 'Set url automatically'
+        help: 'Sets the url automatically'
 
   # CalendarStyle section
   calendarStyle:
@@ -430,8 +463,27 @@ admin:
 
 # Words
 words:
+  cancel: 'Cancel'
+  delete: 'Delete'
+  disconnect: 'Disconnect'
+  image: 'Image'
+  month: 'Month'
+  position: 'Position'
+  title: 'Title'
+  url: 'Url'
+  year: 'Year'
   yearUnknown: 'Year unknown'
   yearly: 'annual'
+
+# Modals
+modal:
+  general:
+    delete:
+      title: Do you really want to delete the element?
+      text: This action cannot be undone.
+  calendarImage:
+    delete:
+      title: Should the calendar image with the title "%title%" really be removed from the calendar?
 
 # Pages
 page:

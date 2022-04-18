@@ -1386,9 +1386,12 @@ class CalendarBuilderService
         foreach ($imageFiles as $imageFile) {
 
             /* To avoid accidental deletion. */
-            if (!preg_match('~/[a-f0-9]{40}/target/[0-9]+/[^\.]+(\.[0-9]+)?\.([a-z][a-z0-9]+)$~', $imageFile)) {
+            $matches = [];
+            if (!preg_match('~([a-f0-9]{40}/target/[0-9]+)/(?:([a-f0-9]{10})\.)?([^\.]+)(?:\.([0-9]+))?\.([a-z][a-z0-9]+)$~', $imageFile, $matches)) {
                 throw new Exception(sprintf('Unexpected image path given: "%s" (%s:%d).', $imageFile, __FILE__, __LINE__));
             }
+
+            list($path, $fileHash, $fileName, $width, $extension) = $matches;
 
             if (file_exists($imageFile)) {
                 unlink($imageFile);

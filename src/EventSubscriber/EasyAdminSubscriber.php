@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\Controller\Base\BaseController;
-use App\Entity\Calendar;
 use App\Entity\CalendarImage;
 use App\Entity\HolidayGroup;
 use App\Service\CalendarSheetCreateService;
 use App\Service\ImageService;
 use App\Service\UrlService;
 use chillerlan\QRCode\QRCode;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityPersistedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityUpdatedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
@@ -30,14 +29,15 @@ use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Class EasyAdminSubscriber.
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-02-26)
+ * @version 1.0.1 (2022-04-18)
+ * @since 1.0.1 (2022-04-18) EasyAdmin: Possibility to choose the images directly in the calendar (#88)
+ * @since 1.0.0 (2022-02-26) First version.
  * @package App\EventSubscriber
  */
 class EasyAdminSubscriber implements EventSubscriberInterface
@@ -50,6 +50,8 @@ class EasyAdminSubscriber implements EventSubscriberInterface
 
     protected UrlService $urlService;
 
+    protected EntityManagerInterface $manager;
+
     /**
      * EasyAdminSubscriber constructor.
      *
@@ -57,8 +59,9 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      * @param CalendarSheetCreateService $calendarSheetCreateService
      * @param RequestStack $requestStack
      * @param UrlService $urlService
+     * @param EntityManagerInterface $manager
      */
-    public function __construct(ImageService $imageService, CalendarSheetCreateService $calendarSheetCreateService, RequestStack $requestStack, UrlService $urlService)
+    public function __construct(ImageService $imageService, CalendarSheetCreateService $calendarSheetCreateService, RequestStack $requestStack, UrlService $urlService, EntityManagerInterface $manager)
     {
         $this->imageService = $imageService;
 
@@ -67,6 +70,8 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         $this->requestStack = $requestStack;
 
         $this->urlService = $urlService;
+
+        $this->manager = $manager;
     }
 
     /**
@@ -78,10 +83,10 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            BeforeEntityPersistedEvent::class => ['addLinkCalendarImagePersisted'],
-            BeforeEntityUpdatedEvent::class => ['addLinkCalendarImageUpdated'],
-            AfterEntityPersistedEvent::class => ['createCalendarImagePersisted'],
-            AfterEntityUpdatedEvent::class => ['createCalendarImageUpdated'],
+            AfterEntityPersistedEvent::class => ['doAfterEntityPersistedEvent'],
+            AfterEntityUpdatedEvent::class => ['doAfterEntityUpdatedEvent'],
+            BeforeEntityPersistedEvent::class => ['doBeforeEntityPersistedEvent'],
+            BeforeEntityUpdatedEvent::class => ['doBeforeEntityUpdatedEvent'],
         ];
     }
 
@@ -154,10 +159,11 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      * Adds url to calendar image if url is empty.
      *
      * @param CalendarImage $calendarImage
+     * @param bool $persist
      * @return bool
      * @throws Exception
      */
-    protected function addUrl(CalendarImage $calendarImage): bool
+    protected function addUrl(CalendarImage $calendarImage, bool $persist = false): bool
     {
         if (!empty($calendarImage->getUrl())) {
             return true;
@@ -166,17 +172,23 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         /* Set new url to calendar image. */
         $calendarImage->setUrl($this->urlService->getUrl($calendarImage));
 
+        /* Persist calendar image if needed. */
+        if ($persist) {
+            $this->manager->persist($calendarImage);
+            $this->manager->flush();
+        }
+
         return true;
     }
 
     /**
-     * Creates calendar sheet (create).
+     * Creates calendar sheet (create) and update url.
      *
      * @param AfterEntityPersistedEvent $entityInstance
      * @return void
      * @throws Exception
      */
-    public function createCalendarImagePersisted(AfterEntityPersistedEvent $entityInstance): void
+    public function doAfterEntityPersistedEvent(AfterEntityPersistedEvent $entityInstance): void
     {
         $entity = $entityInstance->getEntityInstance();
 
@@ -184,35 +196,39 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $this->addUrl($entity, true);
+
         $this->buildTargetImage($entity);
     }
 
     /**
-     * Creates calendar sheet (update).
+     * Creates calendar sheet (update) and update url.
      *
      * @param AfterEntityUpdatedEvent $entityInstance
      * @return void
      * @throws Exception
      */
-    public function createCalendarImageUpdated(AfterEntityUpdatedEvent $entityInstance): void
+    public function doAfterEntityUpdatedEvent(AfterEntityUpdatedEvent $entityInstance): void
     {
         $entity = $entityInstance->getEntityInstance();
 
         if (!$entity instanceof CalendarImage) {
             return;
         }
+
+        $this->addUrl($entity, true);
 
         $this->buildTargetImage($entity);
     }
 
     /**
-     * Adds calendar sheet (create).
+     * Make changes to calendar image if entity is persisted.
      *
      * @param BeforeEntityPersistedEvent $entityInstance
      * @return void
      * @throws Exception
      */
-    public function addLinkCalendarImagePersisted(BeforeEntityPersistedEvent $entityInstance): void
+    public function doBeforeEntityPersistedEvent(BeforeEntityPersistedEvent $entityInstance): void
     {
         $entity = $entityInstance->getEntityInstance();
 
@@ -220,17 +236,17 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->addUrl($entity);
+        // Todo: Do something with $entity
     }
 
     /**
-     * Adds calendar sheet (update).
+     * Make changes to calendar image if entity is updated.
      *
      * @param BeforeEntityUpdatedEvent $entityInstance
      * @return void
      * @throws Exception
      */
-    public function addLinkCalendarImageUpdated(BeforeEntityUpdatedEvent $entityInstance): void
+    public function doBeforeEntityUpdatedEvent(BeforeEntityUpdatedEvent $entityInstance): void
     {
         $entity = $entityInstance->getEntityInstance();
 
@@ -238,6 +254,6 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->addUrl($entity);
+        // Todo: Do something with $entity
     }
 }

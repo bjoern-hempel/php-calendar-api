@@ -33,6 +33,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
@@ -128,6 +129,17 @@ abstract class BaseCrudController extends AbstractCrudController
     }
 
     /**
+     * Returns the year selection.
+     *
+     * @return int[]
+     */
+    protected function getYearSelection(): array
+    {
+        $years = range(intval(date('Y')) - 3, intval(date('Y') + 10));
+        return array_combine($years, $years);
+    }
+
+    /**
      * Returns the field by given name.
      *
      * @param string $fieldName
@@ -161,6 +173,10 @@ abstract class BaseCrudController extends AbstractCrudController
                         return CollectionCalendarImageField::new($fieldName)
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                             ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
+
+                    /* Choice field */
+                    case 'defaultYear':
+                        return $this->easyAdminField->getChoiceField($fieldName, $this->getYearSelection());
                 }
                 break;
 
@@ -545,6 +561,38 @@ abstract class BaseCrudController extends AbstractCrudController
             ->setEntityLabelInPlural(sprintf('admin.%s.plural', $this->getCrudName()))
             ->overrideTemplate('crud/detail', 'admin/crud/detail.html.twig')
             ->overrideTemplate('crud/index', 'admin/crud/index.html.twig');
+    }
+
+    /**
+     * Configures assets.
+     *
+     * @param Assets $assets
+     * @return Assets
+     */
+    public function configureAssets(Assets $assets): Assets
+    {
+        return $assets
+            // adds the CSS and JS assets associated to the given Webpack Encore entry
+            // it's equivalent to adding these inside the <head> element:
+            // {{ encore_entry_link_tags('...') }} and {{ encore_entry_script_tags('...') }}
+            //->addWebpackEncoreEntry('admin-app')
+
+            // it's equivalent to adding this inside the <head> element:
+            // <link rel="stylesheet" href="{{ asset('...') }}">
+            //->addCssFile('build/admin.css')
+            //->addCssFile('https://example.org/css/admin2.css')
+
+            // it's equivalent to adding this inside the <head> element:
+            // <script src="{{ asset('...') }}"></script>
+            ->addJsFile('js/easyadmin.js')
+            //->addJsFile('https://example.org/js/admin2.js')
+
+            // use these generic methods to add any code before </head> or </body>
+            // the contents are included "as is" in the rendered page (without escaping them)
+            //->addHtmlContentToHead('<link rel="dns-prefetch" href="https://assets.example.com">')
+            //->addHtmlContentToBody('<script> ... </script>')
+            //->addHtmlContentToBody('<!-- generated at '.time().' -->')
+        ;
     }
 
     /**

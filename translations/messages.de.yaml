@@ -86,6 +86,33 @@ admin:
       title:
         label: 'Titel'
         help: 'Der Titel dieses Eintrags.'
+      defaultYear:
+        label: 'Standardjahr'
+        help: 'Das Standardjahr dieses Eintrags.'
+        entries:
+          2010: 'Kalenderjahr 2010'
+          2011: 'Kalenderjahr 2011'
+          2012: 'Kalenderjahr 2012'
+          2013: 'Kalenderjahr 2013'
+          2014: 'Kalenderjahr 2014'
+          2015: 'Kalenderjahr 2015'
+          2016: 'Kalenderjahr 2016'
+          2017: 'Kalenderjahr 2017'
+          2018: 'Kalenderjahr 2018'
+          2019: 'Kalenderjahr 2019'
+          2020: 'Kalenderjahr 2020'
+          2021: 'Kalenderjahr 2021'
+          2022: 'Kalenderjahr 2022'
+          2023: 'Kalenderjahr 2023'
+          2024: 'Kalenderjahr 2024'
+          2025: 'Kalenderjahr 2025'
+          2026: 'Kalenderjahr 2026'
+          2027: 'Kalenderjahr 2027'
+          2028: 'Kalenderjahr 2028'
+          2029: 'Kalenderjahr 2029'
+          2030: 'Kalenderjahr 2030'
+          2031: 'Kalenderjahr 2031'
+          2032: 'Kalenderjahr 2032'
       subtitle:
         label: 'Untertitel'
         help: 'Der Untertitel dieses Eintrags.'
@@ -113,6 +140,9 @@ admin:
       viewCalendarSheets:
         label: 'Kalenderblätter anzeigen'
         help: 'Zeigt die Kalenderblätter an'
+      newCalendarImage:
+        label: 'Kalenderbild hinzufügen'
+        help: 'Fügt ein Kalenderbild hinzu.'
 
   # CalendarImage section
   calendarImage:
@@ -208,6 +238,9 @@ admin:
       buildCalendarSheet:
         label: 'Kalenderblatt generieren'
         help: 'Generiert das Kalenderblatt'
+      rebuildUrl:
+        label: 'Url automatisch setzen'
+        help: 'Setzt die Url automatisch'
 
   # CalendarStyle section
   calendarStyle:
@@ -430,8 +463,27 @@ admin:
 
 # Words
 words:
+  cancel: 'Abbrechen'
+  delete: 'Löschen'
+  disconnect: 'Verbindung aufheben'
+  image: 'Bild'
+  month: 'Monat'
+  position: 'Position'
+  title: 'Titel'
+  url: 'Url'
+  year: 'Jahr'
   yearUnknown: 'Jahr unbekannt'
   yearly: 'jährlich stattfindend'
+
+# Modals
+modal:
+  general:
+    delete:
+      title: Soll das Element wirklich gelöscht werden?
+      text: Diese Aktion kann nicht rückgängig gemacht werden.
+  calendarImage:
+    delete:
+      title: Soll das Kalenderbild mit dem Titel "%title%" wirklich vom Kalender entfernt werden?
 
 # Pages
 page:
