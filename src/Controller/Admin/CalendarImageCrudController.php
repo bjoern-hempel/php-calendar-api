@@ -22,7 +22,10 @@ use App\Service\Entity\CalendarLoaderService;
 use App\Service\Entity\ImageLoaderService;
 use App\Service\Entity\UserLoaderService;
 use App\Service\SecurityService;
+use App\Service\UrlService;
+use App\Utils\FileNameConverter;
 use chillerlan\QRCode\QRCode;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -33,6 +36,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use Exception;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -53,7 +57,17 @@ class CalendarImageCrudController extends BaseCrudController
 
     protected CalendarSheetCreateService $calendarSheetCreateService;
 
+    protected RequestStack $requestStack;
+
+    protected UrlService $urlService;
+
+    protected EntityManagerInterface $manager;
+
     public const ACTION_BUILD_CALENDAR_SHEET = 'buildCalendarSheet';
+
+    public const ACTION_REBUILD_URL = 'rebuildUrl';
+
+    public const PARAMETER_CALENDAR = 'calendar';
 
     /**
      * CalendarImageCrudController constructor.
@@ -64,10 +78,15 @@ class CalendarImageCrudController extends BaseCrudController
      * @param ImageLoaderService $imageLoaderService
      * @param UserLoaderService $userLoaderService
      * @param CalendarSheetCreateService $calendarSheetCreateService
+     * @param RequestStack $requestStack
+     * @param UrlService $urlService
+     * @param EntityManagerInterface $manager
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarLoaderService $calendarLoaderService, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, CalendarSheetCreateService $calendarSheetCreateService)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarLoaderService $calendarLoaderService, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, CalendarSheetCreateService $calendarSheetCreateService, RequestStack $requestStack, UrlService $urlService, EntityManagerInterface $manager)
     {
+        parent::__construct($securityService, $translator);
+
         $this->calendarLoaderService = $calendarLoaderService;
 
         $this->imageLoaderService = $imageLoaderService;
@@ -76,7 +95,11 @@ class CalendarImageCrudController extends BaseCrudController
 
         $this->calendarSheetCreateService = $calendarSheetCreateService;
 
-        parent::__construct($securityService, $translator);
+        $this->requestStack = $requestStack;
+
+        $this->urlService = $urlService;
+
+        $this->manager = $manager;
     }
 
     /**
@@ -98,17 +121,6 @@ class CalendarImageCrudController extends BaseCrudController
     public function getEntity(): string
     {
         return self::getEntityFqcn();
-    }
-
-    /**
-     * Returns the year selection.
-     *
-     * @return int[]
-     */
-    protected function getYearSelection(): array
-    {
-        $years = range(intval(date('Y')) - 3, intval(date('Y') + 10));
-        return array_combine($years, $years);
     }
 
     /**
@@ -144,6 +156,8 @@ class CalendarImageCrudController extends BaseCrudController
      */
     protected function getField(string $fieldName): FieldInterface
     {
+        $previewWidth = 100;
+
         return match ($fieldName) {
             'user' => AssociationField::new($fieldName)
                 ->setFormTypeOption('choices', $this->userLoaderService->loadUsers())
@@ -156,14 +170,30 @@ class CalendarImageCrudController extends BaseCrudController
                 ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                 ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
             'image' => AssociationField::new($fieldName)
+                ->renderAsNativeWidget()
                 ->setFormTypeOption('choices', $this->imageLoaderService->loadImages())
+                ->setFormTypeOption('expanded', true)
+                ->setFormTypeOption('label_html', true)
+                ->setFormTypeOption(
+                    'choice_label',
+                    function (Image $image) use ($previewWidth) {
+                        return sprintf(
+                            '<p><img class="preview" src="%s" width="%d" title="%s" alt="%s" data-title> &nbsp; %s</p>',
+                            $image->getPath(outputMode: FileNameConverter::MODE_OUTPUT_RELATIVE, width: $previewWidth),
+                            $previewWidth,
+                            $image->getName(),
+                            $image->getName(),
+                            $image->getName()
+                        );
+                    }
+                )
                 ->setRequired(true)
                 ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                 ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
             'year' => $this->easyAdminField->getChoiceField($fieldName, $this->getYearSelection()),
-            'month' => $this->easyAdminField->getChoiceField($fieldName, $this->getMonthSelection()),
+            'month' => $this->easyAdminField->getChoiceField($fieldName, $this->getMonthSelection(), true),
             'pathSource', 'pathTarget' => ImageField::new($fieldName)
-                    ->setBasePath(sprintf('%s/%s', Image::PATH_DATA, Image::PATH_IMAGES))
+                    //->setBasePath(sprintf('%s/%s', Image::PATH_DATA, Image::PATH_IMAGES))
                     ->setTemplatePath('admin/crud/field/image_preview.html.twig')
                     ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                     ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
@@ -192,10 +222,25 @@ class CalendarImageCrudController extends BaseCrudController
                 'data-bs-target' => '#modal-calendar-sheet',
             ]);
 
+        $rebuildUrl = Action::new(self::ACTION_REBUILD_URL, 'admin.calendarImage.fields.rebuildUrl.label', 'fa fa-calendar-alt')
+            ->linkToCrudAction(self::ACTION_REBUILD_URL)
+            ->setHtmlAttributes([
+                'data-bs-toggle' => 'modal',
+                'data-bs-target' => '#modal-calendar-sheet',
+            ]);
+
         $actions
             ->add(Crud::PAGE_DETAIL, $buildCalendarSheet)
+            ->add(Crud::PAGE_DETAIL, $rebuildUrl)
             ->add(Crud::PAGE_INDEX, $buildCalendarSheet)
-            ->reorder(Crud::PAGE_INDEX, [Action::DETAIL, Action::EDIT, self::ACTION_BUILD_CALENDAR_SHEET, Action::DELETE]);
+            ->add(Crud::PAGE_INDEX, $rebuildUrl)
+            ->reorder(Crud::PAGE_INDEX, [
+                Action::DETAIL,
+                Action::EDIT,
+                self::ACTION_BUILD_CALENDAR_SHEET,
+                self::ACTION_REBUILD_URL,
+                Action::DELETE
+            ]);
 
         $this->setIcon($actions, Crud::PAGE_INDEX, Action::DETAIL, 'fa fa-eye');
         $this->setIcon($actions, Crud::PAGE_INDEX, Action::EDIT, 'fa fa-edit');
@@ -278,5 +323,61 @@ class CalendarImageCrudController extends BaseCrudController
         }
 
         return $this->redirect($referrer);
+    }
+
+    /**
+     * Rebuilds the url.
+     *
+     * @param AdminContext $context
+     * @return RedirectResponse
+     * @throws Exception
+     */
+    public function rebuildUrl(AdminContext $context): RedirectResponse
+    {
+        /** @var CalendarImage $calendarImage */
+        $calendarImage = $context->getEntity()->getInstance();
+
+        if (!$calendarImage instanceof CalendarImage) {
+            throw new Exception(sprintf('CalendarImage class of instance expected (%s:%d).', __FILE__, __LINE__));
+        }
+
+        /* Set new url to calendar image. */
+        $calendarImage->setUrl($this->urlService->getUrl($calendarImage));
+        $this->manager->persist($calendarImage);
+        $this->manager->flush();
+
+        return $this->buildCalendarSheet($context);
+    }
+
+    /**
+     * Set default settings from
+     *
+     * @param string $entityFqcn
+     * @return CalendarImage
+     * @throws Exception
+     */
+    public function createEntity(string $entityFqcn): CalendarImage
+    {
+        /** @var CalendarImage $calendarImage */
+        $calendarImage = new $entityFqcn();
+
+        $currentRequest = $this->requestStack->getCurrentRequest();
+
+        if ($currentRequest === null) {
+            throw new Exception(sprintf('Unable to get current request (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $query = $currentRequest->query;
+
+        if ($query->has(self::PARAMETER_CALENDAR)) {
+            $calendarId = intval($query->get(self::PARAMETER_CALENDAR));
+
+            $calendar = $this->calendarLoaderService->findOneById($calendarId);
+
+            $calendarImage->setCalendar($calendar);
+            $calendarImage->setYear($calendar->getDefaultYear());
+        }
+
+        return $calendarImage;
     }
 }

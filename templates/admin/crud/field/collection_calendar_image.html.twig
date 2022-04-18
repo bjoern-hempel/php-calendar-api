@@ -6,13 +6,74 @@
     {% set calendarImages = [calendarImages] %}
 {% endif %}
 
+<table style="width: 100%; border-spacing: 20px; border-collapse: separate; margin-top: -20px; margin-left: -20px;">
+    <tr>
+        <th>{{ 'words.image'|trans }}</th>
+        <th>{{ 'words.title'|trans }}</th>
+        <th>{{ 'words.month'|trans }}</th>
+        <th>{{ 'words.year'|trans }}</th>
+        <th>{{ 'words.position'|trans }}</th>
+        <th>{{ 'words.url'|trans }}</th>
+        <th></th>
+    </tr>
 {% for calendarImage in calendarImages %}
     {% set html_id = 'ea-lightbox-' ~ field.uniqueId ~ '-' ~ loop.index %}
-    <a href="#" class="ea-lightbox-thumbnail" data-ea-lightbox-content-selector="#{{ html_id }}">
-        <img src="{{ asset(calendarImage.pathTarget|path_preview(100)|add_hash) }}" class="img-fluid" style="max-height: 44px;">
-    </a>
+    <tr>
+        <td>
+            <div style="width: 100px">
+                <a href="#" class="ea-lightbox-thumbnail" data-ea-lightbox-content-selector="#{{ html_id }}">
+                    <img src="{{ asset(calendarImage.pathTarget|path_preview(100)|add_hash) }}" class="img-fluid" style="max-height: 70px; ">
+                </a>
+                <div id="{{ html_id }}" class="ea-lightbox">
+                    <img src="{{ asset(calendarImage.pathTarget|path_orig|add_hash) }}">
+                </div>
+            </div>
+        </td>
+        <td>{{ calendarImage.title }}</td>
+        <td>{{ calendarImage.month|month_translation|trans }}</td>
+        <td>{{ calendarImage.year }}</td>
+        <td>{{ calendarImage.position }}</td>
+        <td><a href="{{ calendarImage.url }}" target="_blank">{{ calendarImage.url }}</a></td>
+        <td style="text-align: right;">
+            {% set detailUrl = ea_url().setController('App\\Controller\\Admin\\CalendarImageCrudController').setAction('detail').setEntityId(calendarImage.id) %}
+            {% set deleteUrl = ea_url().setController('App\\Controller\\Admin\\CalendarImageCrudController').setAction('delete').setEntityId(calendarImage.id) %}
+            {% set calendarUrl = ea_url().setController('App\\Controller\\Admin\\CalendarCrudController').setAction('detail').setEntityId(calendarImage.calendar.id) %}
 
-    <div id="{{ html_id }}" class="ea-lightbox">
-        <img src="{{ asset(calendarImage.pathTarget|path_orig|add_hash) }}">
-    </div>
+            <a class="action-delete btn btn-secondary pr-0 text-danger" href="{{ deleteUrl }}" data-action-name="delete" formaction="{{ deleteUrl }}" data-bs-toggle="modal" data-bs-target="#modal-delete-calendar-image-{{ calendarImage.id }}" style="margin-left: 7px;">
+                <i class="action-icon fa fa-unlink"></i>
+                <span class="action-label">{{ 'words.disconnect'|trans }}</span>
+            </a>
+
+            <a class="action-new btn btn-primary" href="{{ detailUrl }}" data-action-name="viewCalendarImage" style="margin-left: 7px;"><i class="action-icon fa fa-eye"></i> <span class="action-label"></span></a>
+
+            <div id="modal-delete-calendar-image-{{ calendarImage.id }}" class="modal fade" tabindex="-1" style="text-align: left;">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <h4>{{ 'modal.calendarImage.delete.title'|trans({'%title%': calendarImage.title}) }}</h4>
+                            <p>{{ 'modal.general.delete.text'|trans }}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">
+                                <span class="btn-label">{{ 'words.cancel'|trans }}</span>
+                            </button>
+
+                            <form action="{{ ea_url().setController('App\\Controller\\Admin\\CalendarImageCrudController')
+                                .setAction('delete')
+                                .setEntityId(calendarImage.id)
+                                .set('referrer', calendarUrl) }}" method="post">
+
+                                <input type="hidden" name="token" value="{{ csrf_token('ea-delete') }}" />
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fa fa-unlink"></i>
+                                    <span class="action-label">{{ 'words.disconnect'|trans }}</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
 {% endfor %}
+</table>

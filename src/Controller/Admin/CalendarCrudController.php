@@ -27,6 +27,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
@@ -49,11 +50,15 @@ class CalendarCrudController extends BaseCrudController
 
     public const ACTION_VIEW_CALENDAR_SHEETS = 'viewCalendarSheets';
 
+    public const ACTION_NEW_CALENDAR_IMAGE = 'newCalendarImage';
+
     protected CalendarSheetCreateService $calendarSheetCreateService;
 
     protected UrlService $urlService;
 
     protected EntityManagerInterface $manager;
+
+    protected AdminUrlGenerator $adminUrlGenerator;
 
     /**
      * CalendarCrudController constructor.
@@ -63,17 +68,20 @@ class CalendarCrudController extends BaseCrudController
      * @param CalendarSheetCreateService $calendarSheetCreateService
      * @param UrlService $urlService
      * @param EntityManagerInterface $manager
+     * @param AdminUrlGenerator $adminUrlGenerator
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarSheetCreateService $calendarSheetCreateService, UrlService $urlService, EntityManagerInterface $manager)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarSheetCreateService $calendarSheetCreateService, UrlService $urlService, EntityManagerInterface $manager, AdminUrlGenerator $adminUrlGenerator)
     {
+        parent::__construct($securityService, $translator);
+
         $this->calendarSheetCreateService = $calendarSheetCreateService;
 
         $this->urlService = $urlService;
 
         $this->manager = $manager;
 
-        parent::__construct($securityService, $translator);
+        $this->adminUrlGenerator = $adminUrlGenerator;
     }
 
     /**
@@ -127,6 +135,10 @@ class CalendarCrudController extends BaseCrudController
                 'data-bs-target' => '#modal-calendar-urls',
             ]);
 
+        $newHoliday = Action::new(self::ACTION_NEW_CALENDAR_IMAGE, 'admin.calendar.fields.newCalendarImage.label', 'fa fa-plus-square-o')
+            ->linkToCrudAction(self::ACTION_NEW_CALENDAR_IMAGE)
+            ->setCssClass('action-new btn btn-primary');
+
         $actions
             ->add(Crud::PAGE_INDEX, $viewCalendarSheets)
             ->add(Crud::PAGE_DETAIL, $viewCalendarSheets)
@@ -134,6 +146,7 @@ class CalendarCrudController extends BaseCrudController
             ->add(Crud::PAGE_DETAIL, $buildCalendarSheets)
             ->add(Crud::PAGE_INDEX, $buildCalendarUrls)
             ->add(Crud::PAGE_DETAIL, $buildCalendarUrls)
+            ->add(Crud::PAGE_DETAIL, $newHoliday)
             ->reorder(Crud::PAGE_INDEX, [
                 Action::DETAIL,
                 Action::EDIT,
@@ -141,6 +154,15 @@ class CalendarCrudController extends BaseCrudController
                 self::ACTION_VIEW_CALENDAR_SHEETS,
                 self::ACTION_BUILD_CALENDAR_SHEETS,
                 self::ACTION_BUILD_CALENDAR_URLS
+            ])
+            ->reorder(Crud::PAGE_DETAIL, [
+                Action::INDEX,
+                self::ACTION_VIEW_CALENDAR_SHEETS,
+                self::ACTION_BUILD_CALENDAR_SHEETS,
+                self::ACTION_BUILD_CALENDAR_URLS,
+                Action::DELETE,
+                self::ACTION_NEW_CALENDAR_IMAGE,
+                Action::EDIT
             ]);
 
         $this->setIcon($actions, Crud::PAGE_INDEX, Action::DETAIL, 'fa fa-eye');
@@ -310,5 +332,25 @@ class CalendarCrudController extends BaseCrudController
         }
 
         return $this->redirect($referrer);
+    }
+
+    /**
+     * New calendar image.
+     *
+     * @param AdminContext $context
+     * @return RedirectResponse
+     */
+    public function newCalendarImage(AdminContext $context): RedirectResponse
+    {
+        /** @var Calendar $calendar */
+        $calendar = $context->getEntity()->getInstance();
+
+        $url = $this->adminUrlGenerator
+            ->setController(CalendarImageCrudController::class)
+            ->setAction(Action::NEW)
+            ->set(CalendarImageCrudController::PARAMETER_CALENDAR, $calendar->getId())
+            ->generateUrl();
+
+        return $this->redirect($url);
     }
 }

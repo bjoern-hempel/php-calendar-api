@@ -54,10 +54,11 @@ class EasyAdminField
      *
      * @param string $fieldName
      * @param string[]|int[] $choices
+     * @param bool $expanded
      * @return ChoiceField
      * @throws Exception
      */
-    public function getChoiceField(string $fieldName, array $choices = []): ChoiceField
+    public function getChoiceField(string $fieldName, array $choices = [], bool $expanded = false): ChoiceField
     {
         $choicesRendered = [];
         array_walk($choices, function (&$value, $key) use (&$choicesRendered, $fieldName) {
@@ -65,6 +66,8 @@ class EasyAdminField
         });
 
         return ChoiceField::new($fieldName)
+            ->renderExpanded($expanded)
+            ->setRequired(true)
             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
             ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName))
             ->setChoices($choicesRendered);

@@ -361,4 +361,22 @@ class CalendarLoaderService extends BaseLoaderService
 
         return $this->image;
     }
+
+    /**
+     * Returns a calendar given by id.
+     *
+     * @param int $id
+     * @return Calendar
+     * @throws Exception
+     */
+    public function findOneById(int $id): Calendar
+    {
+        $calendar = $this->getCalendarRepository()->findOneBy(['id' => $id]);
+
+        if ($calendar === null) {
+            throw new Exception(sprintf('Unable to find calendar with given id "%d" (%s:%d).', $id, __FILE__, __LINE__));
+        }
+
+        return $calendar;
+    }
 }
