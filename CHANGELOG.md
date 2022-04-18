@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.27.1] - 2022-04-18
+
+* Bump async from 2.6.3 to 2.6.4
+
 ### [0.27.0] - 2022-04-18
 
 * [#89](https://github.com/bjoern-hempel/php-calendar-api/issues/89) - EasyAdmin: Holiday overview within HolidayGroup
