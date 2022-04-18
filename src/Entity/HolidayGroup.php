@@ -14,19 +14,16 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Command\CreateHolidayCommand;
 use App\Entity\Trait\TimestampsTrait;
 use App\EventListener\Entity\UserListener;
 use App\Repository\HolidayGroupRepository;
 use App\Utils\HolidayCollection;
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Entity class HolidayGroup
@@ -208,12 +205,15 @@ class HolidayGroup implements EntityInterface
     /**
      * Gets all related holidays grouped.
      *
-     * @return Array<int, Collection<int, Holiday>>
+     * @return Array<string, Array<int, Collection<int, Holiday>>|HolidayGroup>
      * @throws Exception
      */
     public function getHolidaysGrouped(): array
     {
-        return HolidayCollection::getHolidaysGrouped($this->getHolidays());
+        return [
+            'holidayGroup' => $this,
+            'holidays' => HolidayCollection::getHolidaysGrouped($this->getHolidays())
+        ];
     }
 
     /**

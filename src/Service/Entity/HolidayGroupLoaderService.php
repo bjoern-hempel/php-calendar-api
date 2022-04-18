@@ -111,4 +111,22 @@ class HolidayGroupLoaderService extends BaseLoaderService
     {
         return $this->holidayGroup;
     }
+
+    /**
+     * Returns a holiday group given by id.
+     *
+     * @param int $id
+     * @return HolidayGroup
+     * @throws Exception
+     */
+    public function findOneById(int $id): HolidayGroup
+    {
+        $holidayGroup = $this->getHolidayGroupRepository()->findOneBy(['id' => $id]);
+
+        if ($holidayGroup === null) {
+            throw new Exception(sprintf('Unable to find holiday group with given id "%d" (%s:%d).', $id, __FILE__, __LINE__));
+        }
+
+        return $holidayGroup;
+    }
 }

@@ -323,6 +323,9 @@ admin:
       createdAt:
         label: 'Angelegt am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+      newHoliday:
+        label: 'Feiertag anlegen'
+        help: 'Legt einen neuen Feiertag an.'
 
   # Image section
   image:

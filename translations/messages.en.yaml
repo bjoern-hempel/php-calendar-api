@@ -323,6 +323,9 @@ admin:
       createdAt:
         label: 'Created At'
         help: 'The date and time when this entry was created.'
+      newHoliday:
+        label: 'Create new holiday'
+        help: 'Creates a new holiday.'
 
   # Image section
   image:

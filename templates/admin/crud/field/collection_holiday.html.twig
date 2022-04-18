@@ -1,12 +1,13 @@
 {# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
 {# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
 {# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
-{% set holidayGroup = field.formattedValue %}
-{% if holidayGroup is not iterable %}
-    {% set holidayGroup = [holidayGroup] %}
+{% set holidayGroup = field.formattedValue.holidayGroup %}
+{% set holidayGroups = field.formattedValue.holidays %}
+{% if holidayGroups is not iterable %}
+    {% set holidayGroups = [holidayGroups] %}
 {% endif %}
 
-{% for year, holidays in holidayGroup %}
+{% for year, holidays in holidayGroups %}
     {% if ea.crud.currentAction == 'detail' %}
         <h4 style="margin-bottom: 15px;">{{ year }}</h4>
         <ol>
@@ -15,12 +16,6 @@
                 <li><a href="{{ editUrl }}"><b>{{ holiday.name }}</b></a> - {{ holiday.date|date_event }}{% if holiday.yearly %} &nbsp; <i class="action-icon fa fa-fw fa-repeat" style="font-size: x-small;"></i>{% endif %}</li>
             {% endfor %}
         </ol>
-
-        <p>
-            {# https://stackoverflow.com/questions/67334635/easyadmin3-symfony-twig-url-generator-with-route-name-and-params-in-twig-t #}
-            {% set createUrl = ea_url().setController('App\\Controller\\Admin\\HolidayCrudController').setAction('new').set('Holiday[holidayGroup]', 13) %}
-            <a class="action-new btn btn-primary" href="{{ createUrl }}" data-action-name="new"><span class="action-label">{{ 'page_title.new'|trans({'%entity_label_singular%': 'admin.holiday.singular'|trans}) }}</span></a>
-        </p>
     {% else %}
         <b>{{ year }}</b> ({{ holidays|length }}){% if not loop.last %},{% endif %}
     {% endif %}
