@@ -88,17 +88,21 @@ class Holiday implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = [];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_INDEX = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'configJson'];
+    public const CRUD_FIELDS_NEW = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_FILTER = ['holidayGroup', 'name', 'date', 'yearly'];
+    public const CRUD_FIELDS_FILTER = ['holidayGroup', 'name', 'date', 'yearly', 'type'];
+
+    public const FIELD_TYPE_PUBLIC_DATE = 0;
+
+    public const FIELD_TYPE_NON_PUBLIC_DATE = 1;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -130,7 +134,7 @@ class Holiday implements EntityInterface
     private ArrayToObject $configObject;
 
     #[ORM\Column(type: 'integer')]
-    private int $type;
+    private int $type = 0;
 
     /**
      * __toString method.
