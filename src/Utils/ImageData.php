@@ -143,7 +143,7 @@ class ImageData
      */
     public function getDataExif(): array
     {
-        $dataExif = exif_read_data($this->imagePath, 'EXIF');
+        $dataExif = @exif_read_data($this->imagePath, 'EXIF');
 
         if ($dataExif === false) {
             return [];
