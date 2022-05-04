@@ -136,4 +136,104 @@ class Color
 
         return ($rgb['r'] * 65536) + ($rgb['g'] * 256) + ($rgb['b']);
     }
+
+    /**
+     * Converts given rgb value to srgb.
+     *
+     * @param int $value
+     * @return float
+     */
+    public static function convertRgbToSrgb(int $value): float
+    {
+        $value /= 255;
+
+        return $value <= .03928 ?
+            $value / 12.92 :
+            pow(($value + .055) / 1.055, 2.4);
+    }
+
+    /**
+     * Converts given xyz value to Lab value.
+     *
+     * @param float $value
+     * @return float
+     */
+    public static function convertXyzToLab(float $value): float
+    {
+        return $value > 216 / 24389 ? pow($value, 1 / 3) : 841 * $value / 108 + 4 / 29;
+    }
+
+    /**
+     * Converts int color to lab array.
+     *
+     * @param int $color
+     * @return array{L: float, a: float, b: float}
+     */
+    #[ArrayShape(['L' => "float", 'a' => "float", 'b' => "float"])]
+    public static function convertIntToLabArray(int $color): array
+    {
+        return self::convertXyzArrayToLabArray(
+            self::convertSrgbArrayToXyzArray(
+                self::convertRgbArrayToSrgbArray(
+                    self::convertIntToRgb($color)
+                )
+            )
+        );
+    }
+
+    /**
+     * Converts given rgb array to srgb array.
+     *
+     * @param array{r: int, g: int, b: int} $rgb
+     * @return array{r: float, g: float, b: float}
+     */
+    #[Pure]
+    #[ArrayShape(['r' => "float", 'g' => "float", 'b' => "float"])]
+    public static function convertRgbArrayToSrgbArray(array $rgb): array
+    {
+        return [
+            'r' => self::convertRgbToSrgb($rgb['r']),
+            'g' => self::convertRgbToSrgb($rgb['g']),
+            'b' => self::convertRgbToSrgb($rgb['b']),
+        ];
+    }
+
+    /**
+     * Converts given srgb array into xyz array.
+     *
+     * @param array{r: float, g: float, b: float} $rgb
+     * @return array{x: float, y: float, z: float}
+     */
+    #[ArrayShape(['x' => "float", 'y' => "float", 'z' => "float"])]
+    public static function convertSrgbArrayToXyzArray(array $rgb): array
+    {
+        return [
+            'x' => (.4124564 * $rgb['r']) + (.3575761 * $rgb['g']) + (.1804375 * $rgb['b']),
+            'y' => (.2126729 * $rgb['r']) + (.7151522 * $rgb['g']) + (.0721750 * $rgb['b']),
+            'z' => (.0193339 * $rgb['r']) + (.1191920 * $rgb['g']) + (.9503041 * $rgb['b']),
+        ];
+    }
+
+    /**
+     * Converts xyz array to lab array.
+     *
+     * @param array{x: float, y: float, z: float} $xyz
+     * @return array{L: float, a: float, b: float}
+     */
+    #[Pure]
+    #[ArrayShape(['L' => "float", 'a' => "float", 'b' => "float"])]
+    public static function convertXyzArrayToLabArray(array $xyz): array
+    {
+        /* http://en.wikipedia.org/wiki/Illuminant_D65#Definition */
+        $Xn = .95047;
+        $Yn = 1;
+        $Zn = 1.08883;
+
+        /* http://en.wikipedia.org/wiki/Lab_color_space#CIELAB-CIEXYZ_conversions */
+        return [
+            'L' => 116 * self::convertXyzToLab($xyz['y'] / $Yn) - 16,
+            'a' => 500 * (self::convertXyzToLab($xyz['x'] / $Xn) - self::convertXyzToLab($xyz['y'] / $Yn)),
+            'b' => 200 * (self::convertXyzToLab($xyz['y'] / $Yn) - self::convertXyzToLab($xyz['z'] / $Zn)),
+        ];
+    }
 }

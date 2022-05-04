@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Utils\Image\Color;
+use App\Utils\Image\ColorDetector;
+use App\Utils\Image\Palette;
 use App\Utils\ImageData;
 use Exception;
 use GdImage;
@@ -162,13 +164,14 @@ EOT
      * @param OutputInterface $output
      * @param int $width
      * @param int $mode
-     * @return void
+     * @return GdImage
      * @throws Exception
      */
-    protected function printImageGd(string $imagePath, OutputInterface $output, int $width = self::DEFAULT_IMAGE_WIDTH, int $mode = self::DEFAULT_IMAGE_MODE): void
+    protected function printImageGd(string $imagePath, OutputInterface $output, int $width = self::DEFAULT_IMAGE_WIDTH, int $mode = self::DEFAULT_IMAGE_MODE): GdImage
     {
         $output->writeln('');
-        $output->writeln('Image (Gd)');
+        $output->writeln('Image');
+        $output->writeln('-----');
         $output->writeln('');
 
         $gdImage = $this->resizeImageGd($this->createGdImageFromGivenPath($imagePath), $width, $mode);
@@ -199,6 +202,43 @@ EOT
             }
             $output->writeln('');
         }
+
+        $output->writeln('');
+        $output->writeln('');
+
+        return $gdImage;
+    }
+
+    /**
+     * Prints the colors of image.
+     *
+     * @param GdImage $gdImage
+     * @param OutputInterface $output
+     * @return void
+     * @throws Exception
+     */
+    protected function printColors(GdImage $gdImage, OutputInterface $output): void
+    {
+        $output->writeln('');
+        $output->writeln('Image colors');
+        $output->writeln('------------');
+        $output->writeln('');
+
+        $palette = Palette::createPaletteFromGdImage($gdImage);
+
+        $colorDetector = new ColorDetector($palette);
+
+        $colors = $colorDetector->extract(8);
+
+        foreach ($colors as $color) {
+            $colorHex = Color::convertIntToHex($color);
+            $this->print1x2Pixel($output, $colorHex, $colorHex, 2);
+            $output->write(' ');
+        }
+
+        $output->writeln('');
+        $output->writeln('');
+        $output->writeln('');
     }
 
     /**
@@ -256,10 +296,14 @@ EOT
      */
     protected function printImageData(ImageData $imageData, OutputInterface $output): void
     {
+        $output->writeln('');
+        $output->writeln('Image properties');
+        $output->writeln('----------------');
+        $output->writeln('');
+
         $outputLines = $this->getOutputLines($imageData);
         $outputMaxLength = $this->getMaxLength($outputLines);
 
-        $output->writeln('');
         $format = sprintf(self::REGEXP_OUTPUT, ImageData::WIDTH_TITLE, ImageData::WIDTH_TITLE, '%s');
         $output->writeln(sprintf($format, 'Title', 'Key', '', 'Value', ''));
         $output->writeln(str_repeat('-', $outputMaxLength));
@@ -275,10 +319,11 @@ EOT
      * @param OutputInterface $output
      * @param string $colorTop
      * @param string|null $colorBottom
+     * @param int $repeat
      * @return void
      * @throws Exception
      */
-    protected function print1x2Pixel(OutputInterface $output, string $colorTop, ?string $colorBottom = null): void
+    protected function print1x2Pixel(OutputInterface $output, string $colorTop, ?string $colorBottom = null, int $repeat = 1): void
     {
         if ($colorBottom === null) {
             $colorBottom = $colorTop;
@@ -293,17 +338,17 @@ EOT
 
         switch (true) {
             case $colorTop === self::NAME_TRANSPARENT && $colorBottom === self::NAME_TRANSPARENT:
-                $output->write(' ');
+                $output->write(str_repeat(' ', $repeat));
                 return;
 
             case $colorTop === self::NAME_TRANSPARENT:
                 $rgb = Color::convertHexToRgb($colorTop);
-                $output->write(sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", $rgb['r'], $rgb['g'], $rgb['b'], '▄'));
+                $output->write(sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", $rgb['r'], $rgb['g'], $rgb['b'], str_repeat('▄', $repeat)));
                 return;
 
             case $colorBottom === self::NAME_TRANSPARENT:
                 $rgb = Color::convertHexToRgb($colorTop);
-                $output->write(sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", $rgb['r'], $rgb['g'], $rgb['b'], '▀'));
+                $output->write(sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", $rgb['r'], $rgb['g'], $rgb['b'], str_repeat('▀', $repeat)));
                 return;
 
             default:
@@ -317,7 +362,7 @@ EOT
                     $rgbBottom['r'],
                     $rgbBottom['g'],
                     $rgbBottom['b'],
-                    '▀'
+                    str_repeat('▀', $repeat)
                 ));
         }
     }
@@ -340,8 +385,11 @@ EOT
             return Command::INVALID;
         }
 
-        /* Print image */
-        $this->printImageGd($imagePath, $output);
+        /* Print image. */
+        $gdImage = $this->printImageGd($imagePath, $output);
+
+        /* Print colors. */
+        $this->printColors($gdImage, $output);
 
         /* Print image data. */
         $this->printImageData(new ImageData($imagePath), $output);
