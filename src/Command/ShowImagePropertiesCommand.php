@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Utils\Image\Color;
 use App\Utils\ImageData;
 use Exception;
+use GdImage;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,10 +37,14 @@ class ShowImagePropertiesCommand extends Command
 
     protected const REGEXP_OUTPUT = '%%-%ds %%-%ds %%s%s%%s';
 
-    /* sudo apt install catimg */
-    protected const IMAGE_VIEWER = 'catimg';
+    protected const NAME_TRANSPARENT = 'transparent';
 
-    protected const IMAGE_WIDTH = 180;
+    protected const DEFAULT_INTERMEDIATE_STEP = 1.0;
+
+    protected const DEFAULT_IMAGE_WIDTH = 120;
+
+    /* @see https://www.php.net/manual/de/function.imagesetinterpolation.php */
+    protected const DEFAULT_IMAGE_MODE = IMG_GAUSSIAN;
 
     /**
      * ShowImagePropertiesCommand constructor.
@@ -130,30 +136,114 @@ EOT
     }
 
     /**
+     * Resize given GdImage.
+     *
+     * @param GdImage $gdImage
+     * @param int $width
+     * @param int $mode
+     * @return GdImage
+     * @throws Exception
+     */
+    protected function resizeImageGd(GdImage $gdImage, int $width = self::DEFAULT_IMAGE_WIDTH, int $mode = self::DEFAULT_IMAGE_MODE): GdImage
+    {
+        $gdImageResized = imagescale($gdImage, $width, -1, $mode);
+
+        if ($gdImageResized === false) {
+            throw new Exception(sprintf('Unable to resize given image (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $gdImageResized;
+    }
+
+    /**
      * Prints image to screen.
      *
      * @param string $imagePath
      * @param OutputInterface $output
+     * @param int $width
+     * @param int $mode
      * @return void
+     * @throws Exception
      */
-    protected function printImage(string $imagePath, OutputInterface $output): void
+    protected function printImageGd(string $imagePath, OutputInterface $output, int $width = self::DEFAULT_IMAGE_WIDTH, int $mode = self::DEFAULT_IMAGE_MODE): void
     {
         $output->writeln('');
-        $output->writeln('Image');
+        $output->writeln('Image (Gd)');
         $output->writeln('');
 
-        if ($this->commandExist(self::IMAGE_VIEWER)) {
-            $shellOutput = shell_exec(sprintf('%s -w %d %s', self::IMAGE_VIEWER, self::IMAGE_WIDTH, $imagePath));
+        $gdImage = $this->resizeImageGd($this->createGdImageFromGivenPath($imagePath), $width, $mode);
 
-            if ($shellOutput === null || $shellOutput === false) {
-                $output->writeln(sprintf('Unable to execute %s command.', self::IMAGE_VIEWER));
-            } else {
-                $output->writeln($shellOutput);
+        $width = imagesx($gdImage);
+        $height = imagesy($gdImage);
+
+        for ($y = 0; $y < floor($height / 2); $y++) {
+            for ($x = 0; $x < $width; $x++) {
+                $yTop = 2 * $y;
+                $yBottom = 2 * $y + 1;
+
+                $colorTop = imagecolorat($gdImage, $x, $yTop);
+                $colorBottom = $yBottom + 1 <= $height ? imagecolorat($gdImage, $x, $yBottom) : null;
+
+                if ($colorTop === false) {
+                    throw new Exception(sprintf('Unable to get pixel (%s:%d).', __FILE__, __LINE__));
+                }
+                if ($colorBottom === false) {
+                    throw new Exception(sprintf('Unable to get pixel (%s:%d).', __FILE__, __LINE__));
+                }
+
+                $this->print1x2Pixel(
+                    $output,
+                    Color::convertIntToHex($colorTop),
+                    $colorBottom === null ? self::NAME_TRANSPARENT : Color::convertIntToHex($colorBottom)
+                );
             }
-        } else {
-            $output->writeln(sprintf('Application %s does not exists on your system.', self::IMAGE_VIEWER));
-            $output->writeln(sprintf('You can install it via: sudo apt install %s', self::IMAGE_VIEWER));
+            $output->writeln('');
         }
+    }
+
+    /**
+     * Gets image info.
+     *
+     * @param string $path
+     * @return string[]|int[]
+     * @throws Exception
+     */
+    protected function getImageInfo(string $path): array
+    {
+        /* Get information about image. */
+        $imageInfo = getimagesize($path);
+
+        if ($imageInfo === false) {
+            throw new Exception(sprintf('Unable to get image information from "%s" (%s:%d).', $path, __FILE__, __LINE__));
+        }
+
+        return $imageInfo;
+    }
+
+    /**
+     * Creates image from given path.
+     *
+     * @param string $path
+     * @return GdImage
+     * @throws Exception
+     */
+    protected function createGdImageFromGivenPath(string $path): GdImage
+    {
+        $imageInfo = $this->getImageInfo($path);
+
+        /* Create image. */
+        $gdImage = match ($imageInfo[2]) {
+            IMAGETYPE_GIF => imagecreatefromgif($path),
+            IMAGETYPE_PNG => imagecreatefrompng($path),
+            IMAGETYPE_JPEG => imagecreatefromjpeg($path),
+            default => throw new Exception(sprintf('Unsupported image type %d - %s (%s:%d)', $imageInfo[2], $imageInfo['mime'], __FILE__, __LINE__)),
+        };
+
+        if ($gdImage === false) {
+            throw new Exception(sprintf('Unable to load image (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $gdImage;
     }
 
     /**
@@ -180,6 +270,59 @@ EOT
     }
 
     /**
+     * Prints 1x2 pixel.
+     *
+     * @param OutputInterface $output
+     * @param string $colorTop
+     * @param string|null $colorBottom
+     * @return void
+     * @throws Exception
+     */
+    protected function print1x2Pixel(OutputInterface $output, string $colorTop, ?string $colorBottom = null): void
+    {
+        if ($colorBottom === null) {
+            $colorBottom = $colorTop;
+        }
+
+        if ($colorTop !== self::NAME_TRANSPARENT && !preg_match('~^#[a-f0-9]{6,6}$~i', $colorTop)) {
+            throw new Exception(sprintf('Unexpected color given "%s" (%s:%d).', $colorTop, __FILE__, __LINE__));
+        }
+        if ($colorBottom !== self::NAME_TRANSPARENT && !preg_match('~^#[a-f0-9]{6,6}$~i', $colorBottom)) {
+            throw new Exception(sprintf('Unexpected color given "%s" (%s:%d).', $colorBottom, __FILE__, __LINE__));
+        }
+
+        switch (true) {
+            case $colorTop === self::NAME_TRANSPARENT && $colorBottom === self::NAME_TRANSPARENT:
+                $output->write(' ');
+                return;
+
+            case $colorTop === self::NAME_TRANSPARENT:
+                $rgb = Color::convertHexToRgb($colorTop);
+                $output->write(sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", $rgb['r'], $rgb['g'], $rgb['b'], '▄'));
+                return;
+
+            case $colorBottom === self::NAME_TRANSPARENT:
+                $rgb = Color::convertHexToRgb($colorTop);
+                $output->write(sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", $rgb['r'], $rgb['g'], $rgb['b'], '▀'));
+                return;
+
+            default:
+                $rgbTop = Color::convertHexToRgb($colorTop);
+                $rgbBottom = Color::convertHexToRgb($colorBottom);
+                $output->write(sprintf(
+                    "\x1b[38;2;%d;%d;%dm\x1b[48;2;%d;%d;%dm%s\x1b[0m",
+                    $rgbTop['r'],
+                    $rgbTop['g'],
+                    $rgbTop['b'],
+                    $rgbBottom['r'],
+                    $rgbBottom['g'],
+                    $rgbBottom['b'],
+                    '▀'
+                ));
+        }
+    }
+
+    /**
      * Execute the commands.
      *
      * @param InputInterface $input
@@ -198,7 +341,7 @@ EOT
         }
 
         /* Print image */
-        $this->printImage($imagePath, $output);
+        $this->printImageGd($imagePath, $output);
 
         /* Print image data. */
         $this->printImageData(new ImageData($imagePath), $output);
