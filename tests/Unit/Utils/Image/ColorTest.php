@@ -119,23 +119,23 @@ final class ColorTest extends TestCase
              */
             [++$number, 'convertIntegersToHex', 0, 0, 0, true, '#000000'],
             [++$number, 'convertIntegersToHex', 128, 128, 128, true, '#808080'],
-            [++$number, 'convertIntegersToHex', 255, 255, 255, true, '#FFFFFF'],
-            [++$number, 'convertIntegersToHex', 255, 0, 0, true, '#FF0000'],
-            [++$number, 'convertIntegersToHex', 0, 255, 0, true, '#00FF00'],
-            [++$number, 'convertIntegersToHex', 0, 0, 255, true, '#0000FF'],
-            [++$number, 'convertIntegersToHex', 0, 0, 0, false, '000000'],
-            [++$number, 'convertIntegersToHex', 128, 128, 128, false, '808080'],
-            [++$number, 'convertIntegersToHex', 255, 255, 255, false, 'FFFFFF'],
-            [++$number, 'convertIntegersToHex', 255, 0, 0, false, 'FF0000'],
-            [++$number, 'convertIntegersToHex', 0, 255, 0, false, '00FF00'],
-            [++$number, 'convertIntegersToHex', 0, 0, 255, false, '0000FF'],
+            [++$number, 'convertIntegersToHex', 255, 255, 255, true, '#ffffff'],
+            [++$number, 'convertIntegersToHex', 255, 0, 0, true, '#ff0000'],
+            [++$number, 'convertIntegersToHex', 0, 255, 0, true, '#00ff00'],
+            [++$number, 'convertIntegersToHex', 0, 0, 255, true, '#0000ff'],
+            [++$number, 'convertIntegersToHex', 0, 0, 0, false, '#000000'],
+            [++$number, 'convertIntegersToHex', 128, 128, 128, false, '#808080'],
+            [++$number, 'convertIntegersToHex', 255, 255, 255, false, '#FFFFFF'],
+            [++$number, 'convertIntegersToHex', 255, 0, 0, false, '#FF0000'],
+            [++$number, 'convertIntegersToHex', 0, 255, 0, false, '#00FF00'],
+            [++$number, 'convertIntegersToHex', 0, 0, 255, false, '#0000FF'],
 
             /**
              * Test: convertIntToHex
              */
             [++$number, 'convertIntToHex', Color::convertIntegersToInt(0, 0, 0), true, null, null, '#000000'],
             [++$number, 'convertIntToHex', Color::convertIntegersToInt(128, 128, 128), true, null, null, '#808080'],
-            [++$number, 'convertIntToHex', Color::convertIntegersToInt(255, 255, 255), true, null, null, '#FFFFFF'],
+            [++$number, 'convertIntToHex', Color::convertIntegersToInt(255, 255, 255), true, null, null, '#ffffff'],
 
             /**
              * Test: convertIntToRgb
@@ -154,9 +154,9 @@ final class ColorTest extends TestCase
             /**
              * Test: convertRgbToInt
              */
-            [++$number, 'convertRgbToInt', ['r' => 0, 'g' => 0, 'b' => 0], null, null, null, Color::convertIntegersToInt(0, 0, 0)],
-            [++$number, 'convertRgbToInt', ['r' => 128, 'g' => 128, 'b' => 128], true, null, null, Color::convertIntegersToInt(128, 128, 128)],
-            [++$number, 'convertRgbToInt', ['r' => 255, 'g' => 255, 'b' => 255], true, null, null, Color::convertIntegersToInt(255, 255, 255)],
+            [++$number, 'convertRgbArrayToInt', ['r' => 0, 'g' => 0, 'b' => 0], null, null, null, Color::convertIntegersToInt(0, 0, 0)],
+            [++$number, 'convertRgbArrayToInt', ['r' => 128, 'g' => 128, 'b' => 128], true, null, null, Color::convertIntegersToInt(128, 128, 128)],
+            [++$number, 'convertRgbArrayToInt', ['r' => 255, 'g' => 255, 'b' => 255], true, null, null, Color::convertIntegersToInt(255, 255, 255)],
         ];
     }
 }

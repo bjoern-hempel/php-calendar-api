@@ -65,12 +65,19 @@ class Color
      * 128*256*256 + 0*256 + 128 → #800080
      *
      * @param int $color
+     * @param bool $lowercase
      * @param bool $prependHash = true
      * @return string
      */
-    public static function convertIntToHex(int $color, bool $prependHash = true): string
+    public static function convertIntToHex(int $color, bool $lowercase = false, bool $prependHash = true): string
     {
-        return ($prependHash ? self::VALUE_HASH : '').sprintf('%06X', $color);
+        $colorHex = ($prependHash ? self::VALUE_HASH : '').sprintf('%06X', $color);
+
+        if (!$lowercase) {
+            return $colorHex;
+        }
+
+        return strtolower($colorHex);
     }
 
     /**
@@ -125,7 +132,7 @@ class Color
      * @param array{r:int, g:int, b:int} $rgb
      * @return int
      */
-    public static function convertRgbToInt(array $rgb): int
+    public static function convertRgbArrayToInt(array $rgb): int
     {
         assert(array_key_exists('r', $rgb));
         assert(array_key_exists('g', $rgb));
@@ -134,7 +141,20 @@ class Color
         assert(is_int($rgb['g']));
         assert(is_int($rgb['b']));
 
-        return ($rgb['r'] * 65536) + ($rgb['g'] * 256) + ($rgb['b']);
+        return ($rgb['r'] * 256 * 256) + ($rgb['g'] * 256) + ($rgb['b']);
+    }
+
+    /**
+     * Converts given rgb array into integer.
+     *
+     * @param array{r:int, g:int, b:int} $rgb
+     * @param bool $lowercase
+     * @param bool $prependHash
+     * @return string
+     */
+    public static function convertRgbArrayToHex(array $rgb, bool $lowercase = false, bool $prependHash = true): string
+    {
+        return self::convertIntToHex(self::convertRgbArrayToInt($rgb), $lowercase, $prependHash);
     }
 
     /**

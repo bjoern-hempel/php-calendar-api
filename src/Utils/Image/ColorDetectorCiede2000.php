@@ -18,7 +18,7 @@ use SplFixedArray;
 use SplPriorityQueue;
 
 /**
- * Class ColorDetector
+ * Class ColorDetectorCiede2000
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2022-05-04)
@@ -30,7 +30,7 @@ use SplPriorityQueue;
  * @license The code was ported to PHP 8 and made PHPStan capable.
  * @license https://github.com/thephpleague/color-extractor/blob/master/LICENSE
  */
-class ColorDetector
+class ColorDetectorCiede2000
 {
     protected Palette $palette;
 
@@ -38,7 +38,7 @@ class ColorDetector
     protected ?SplFixedArray $sortedColors = null;
 
     /**
-     * ColorDetector constructor.
+     * ColorDetectorCiede2000 constructor.
      */
     public function __construct(Palette $palette)
     {

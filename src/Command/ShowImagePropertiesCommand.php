@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Utils\Image\Color;
-use App\Utils\Image\ColorDetector;
+use App\Utils\Image\ColorDetectorSimple;
+use App\Utils\Image\ColorDetectorCiede2000;
 use App\Utils\Image\Palette;
 use App\Utils\ImageData;
+use App\Utils\Timer;
 use Exception;
 use GdImage;
 use Symfony\Component\Console\Command\Command;
@@ -41,12 +43,14 @@ class ShowImagePropertiesCommand extends Command
 
     protected const NAME_TRANSPARENT = 'transparent';
 
-    protected const DEFAULT_INTERMEDIATE_STEP = 1.0;
-
     protected const DEFAULT_IMAGE_WIDTH = 120;
+
+    protected const DEFAULT_COLOR_COUNT = 5;
 
     /* @see https://www.php.net/manual/de/function.imagesetinterpolation.php */
     protected const DEFAULT_IMAGE_MODE = IMG_GAUSSIAN;
+
+    protected const LINE_BREAK = "\n";
 
     /**
      * ShowImagePropertiesCommand constructor.
@@ -158,27 +162,18 @@ EOT
     }
 
     /**
-     * Prints image to screen.
+     * Converts given image to string.
      *
-     * @param string $imagePath
-     * @param OutputInterface $output
-     * @param int $width
-     * @param int $mode
-     * @return GdImage
+     * @param GdImage $gdImage
+     * @return string
      * @throws Exception
      */
-    protected function printImageGd(string $imagePath, OutputInterface $output, int $width = self::DEFAULT_IMAGE_WIDTH, int $mode = self::DEFAULT_IMAGE_MODE): GdImage
+    protected function convertImageToString(GdImage $gdImage): string
     {
-        $output->writeln('');
-        $output->writeln('Image');
-        $output->writeln('-----');
-        $output->writeln('');
-
-        $gdImage = $this->resizeImageGd($this->createGdImageFromGivenPath($imagePath), $width, $mode);
-
         $width = imagesx($gdImage);
         $height = imagesy($gdImage);
 
+        $image = '';
         for ($y = 0; $y < floor($height / 2); $y++) {
             for ($x = 0; $x < $width; $x++) {
                 $yTop = 2 * $y;
@@ -194,19 +189,85 @@ EOT
                     throw new Exception(sprintf('Unable to get pixel (%s:%d).', __FILE__, __LINE__));
                 }
 
-                $this->print1x2Pixel(
-                    $output,
+                $image .= $this->get1x2Pixel(
                     Color::convertIntToHex($colorTop),
                     $colorBottom === null ? self::NAME_TRANSPARENT : Color::convertIntToHex($colorBottom)
                 );
             }
-            $output->writeln('');
+            $image .= self::LINE_BREAK;
         }
 
+        return $image;
+    }
+
+    /**
+     * Prints image to screen.
+     *
+     * @param string $imagePath
+     * @param OutputInterface $output
+     * @param int $width
+     * @param int $mode
+     * @return GdImage
+     * @throws Exception
+     */
+    protected function printImageGd(string $imagePath, OutputInterface $output, int $width = self::DEFAULT_IMAGE_WIDTH, int $mode = self::DEFAULT_IMAGE_MODE): GdImage
+    {
+        $timer = Timer::start();
+
+        $gdImage = $this->resizeImageGd($this->createGdImageFromGivenPath($imagePath), $width, $mode);
+
+        $imageString = $this->convertImageToString($gdImage);
+
+        $time = Timer::stop($timer);
+
+        $title = sprintf('Image (%.4fs)', $time);
+
         $output->writeln('');
+        $output->writeln($title);
+        $output->writeln(str_repeat('-', strlen($title)));
+        $output->writeln('');
+        $output->writeln($imageString);
         $output->writeln('');
 
         return $gdImage;
+    }
+
+    /**
+     * Prints the colors of image (ciede 2000).
+     *
+     * @param GdImage $gdImage
+     * @param OutputInterface $output
+     * @return void
+     * @throws Exception
+     */
+    protected function printColorsCiede2000(GdImage $gdImage, OutputInterface $output): void
+    {
+        $timer = Timer::start();
+
+        $palette = Palette::createPaletteFromGdImage($gdImage);
+
+        $colorDetector = new ColorDetectorCiede2000($palette);
+
+        $colors = $colorDetector->extract(self::DEFAULT_COLOR_COUNT);
+
+        $time = Timer::stop($timer);
+
+        $colorText = '';
+        foreach ($colors as $color) {
+            $colorHex = Color::convertIntToHex($color);
+            $colorText .= $this->get1x2Pixel($colorHex, $colorHex, 2);
+            $colorText .= ' ';
+        }
+
+        $title = sprintf('Image colors - Ciede 2000 (%.4fs)', $time);
+
+        $output->writeln('');
+        $output->writeln($title);
+        $output->writeln(str_repeat('-', strlen($title)));
+        $output->writeln('');
+        $output->writeln($colorText);
+        $output->writeln('');
+        $output->writeln('');
     }
 
     /**
@@ -217,26 +278,29 @@ EOT
      * @return void
      * @throws Exception
      */
-    protected function printColors(GdImage $gdImage, OutputInterface $output): void
+    protected function printColorsSimple(GdImage $gdImage, OutputInterface $output): void
     {
-        $output->writeln('');
-        $output->writeln('Image colors');
-        $output->writeln('------------');
-        $output->writeln('');
+        $timer = Timer::start();
 
-        $palette = Palette::createPaletteFromGdImage($gdImage);
+        $colorMostCommon = new ColorDetectorSimple($gdImage);
 
-        $colorDetector = new ColorDetector($palette);
+        $colors = $colorMostCommon->getColors(self::DEFAULT_COLOR_COUNT, ColorDetectorSimple::DEFAULT_REDUCE_BRIGHTNESS, ColorDetectorSimple::DEFAULT_REDUCE_GRADIENTS, ColorDetectorSimple::DEFAULT_DELTA);
 
-        $colors = $colorDetector->extract(8);
+        $time = Timer::stop($timer);
 
-        foreach ($colors as $color) {
-            $colorHex = Color::convertIntToHex($color);
-            $this->print1x2Pixel($output, $colorHex, $colorHex, 2);
-            $output->write(' ');
+        $colorText = '';
+        foreach ($colors as $colorHex => $frequency) {
+            $colorText .= $this->get1x2Pixel('#'.strval($colorHex), '#'.strval($colorHex), 2);
+            $colorText .= ' ';
         }
 
+        $title = sprintf('Image colors - Simple (%.4fs)', $time);
+
         $output->writeln('');
+        $output->writeln($title);
+        $output->writeln(str_repeat('-', strlen($title)));
+        $output->writeln('');
+        $output->writeln($colorText);
         $output->writeln('');
         $output->writeln('');
     }
@@ -316,14 +380,13 @@ EOT
     /**
      * Prints 1x2 pixel.
      *
-     * @param OutputInterface $output
      * @param string $colorTop
      * @param string|null $colorBottom
      * @param int $repeat
-     * @return void
+     * @return string
      * @throws Exception
      */
-    protected function print1x2Pixel(OutputInterface $output, string $colorTop, ?string $colorBottom = null, int $repeat = 1): void
+    protected function get1x2Pixel(string $colorTop, ?string $colorBottom = null, int $repeat = 1): string
     {
         if ($colorBottom === null) {
             $colorBottom = $colorTop;
@@ -338,23 +401,20 @@ EOT
 
         switch (true) {
             case $colorTop === self::NAME_TRANSPARENT && $colorBottom === self::NAME_TRANSPARENT:
-                $output->write(str_repeat(' ', $repeat));
-                return;
+                return str_repeat(' ', $repeat);
 
             case $colorTop === self::NAME_TRANSPARENT:
                 $rgb = Color::convertHexToRgb($colorTop);
-                $output->write(sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", $rgb['r'], $rgb['g'], $rgb['b'], str_repeat('▄', $repeat)));
-                return;
+                return sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", $rgb['r'], $rgb['g'], $rgb['b'], str_repeat('▄', $repeat));
 
             case $colorBottom === self::NAME_TRANSPARENT:
                 $rgb = Color::convertHexToRgb($colorTop);
-                $output->write(sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", $rgb['r'], $rgb['g'], $rgb['b'], str_repeat('▀', $repeat)));
-                return;
+                return sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", $rgb['r'], $rgb['g'], $rgb['b'], str_repeat('▀', $repeat));
 
             default:
                 $rgbTop = Color::convertHexToRgb($colorTop);
                 $rgbBottom = Color::convertHexToRgb($colorBottom);
-                $output->write(sprintf(
+                return sprintf(
                     "\x1b[38;2;%d;%d;%dm\x1b[48;2;%d;%d;%dm%s\x1b[0m",
                     $rgbTop['r'],
                     $rgbTop['g'],
@@ -363,7 +423,7 @@ EOT
                     $rgbBottom['g'],
                     $rgbBottom['b'],
                     str_repeat('▀', $repeat)
-                ));
+                );
         }
     }
 
@@ -386,10 +446,14 @@ EOT
         }
 
         /* Print image. */
-        $gdImage = $this->printImageGd($imagePath, $output);
+        $this->printImageGd($imagePath, $output);
+
+        $gdImage = $this->resizeImageGd($this->createGdImageFromGivenPath($imagePath), 150, self::DEFAULT_IMAGE_MODE);
 
         /* Print colors. */
-        $this->printColors($gdImage, $output);
+        $this->printColorsCiede2000($gdImage, $output);
+
+        $this->printColorsSimple($gdImage, $output);
 
         /* Print image data. */
         $this->printImageData(new ImageData($imagePath), $output);
