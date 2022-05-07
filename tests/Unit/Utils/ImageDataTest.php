@@ -29,6 +29,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Utils;
 
 use App\Utils\ImageData;
+use App\Utils\StringConverter;
 use Exception;
 use PHPUnit\Framework\TestCase;
 
@@ -62,7 +63,7 @@ final class ImageDataTest extends TestCase
         $current = $imageData->getDataImage();
 
         /* Assert */
-        $this->assertSame($expected, $current);
+        $this->assertEquals($expected, $current);
     }
 
     /**
@@ -175,6 +176,15 @@ final class ImageDataTest extends TestCase
                     'unit-before' => 'F/',
                     'value' => 2.2,
                     'value-formatted' => 'F/2.2',
+                ],
+                'image-date-time-original' => [
+                    'title' => 'Image Date Time Original',
+                    'format' => '%s',
+                    'unit' => null,
+                    'unit-before' => null,
+                    'value' => '2021-11-21T14:12:29',
+                    'value-formatted' => '2021-11-21T14:12:29',
+                    'value-date-time' => StringConverter::convertDateTime('2021-11-21T14:12:29'),
                 ],
                 'image-exposure-bias-value' => [
                     'title' => 'Image Exposure Bias Value',
@@ -311,6 +321,15 @@ final class ImageDataTest extends TestCase
                     'value' => 4,
                     'value-formatted' => 'F/4',
                 ],
+                'image-date-time-original' => [
+                    'title' => 'Image Date Time Original',
+                    'format' => '%s',
+                    'unit' => null,
+                    'unit-before' => null,
+                    'value' => '2021-06-24T12:48:44',
+                    'value-formatted' => '2021-06-24T12:48:44',
+                    'value-date-time' => StringConverter::convertDateTime('2021-06-24T12:48:44'),
+                ],
                 'image-exposure-bias-value' => [
                     'title' => 'Image Exposure Bias Value',
                     'format' => '%d',
@@ -437,6 +456,15 @@ final class ImageDataTest extends TestCase
                     'unit-before' => null,
                     'value' => '0231',
                     'value-formatted' => '0231',
+                ],
+                'image-date-time-original' => [
+                    'title' => 'Image Date Time Original',
+                    'format' => '%s',
+                    'unit' => null,
+                    'unit-before' => null,
+                    'value' => '2021-11-07T18:56:01',
+                    'value-formatted' => '2021-11-07T18:56:01',
+                    'value-date-time' => StringConverter::convertDateTime('2021-11-07T18:56:01'),
                 ],
                 'image-exposure-bias-value' => [
                     'title' => 'Image Exposure Bias Value',

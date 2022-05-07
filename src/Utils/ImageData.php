@@ -27,6 +27,8 @@ class ImageData
 {
     protected string $imagePath;
 
+    protected const DEBUG = false;
+
     public const WIDTH_TITLE = 30;
 
     public const KEY_NAME_FORMAT = 'format';
@@ -43,12 +45,15 @@ class ImageData
 
     public const KEY_NAME_VALUE_FORMATTED = 'value-formatted';
 
+    public const KEY_NAME_VALUE_DATE_TIME = 'value-date-time';
+
     public const KEY_NAME_DEVICE_MANUFACTURER = 'device-manufacturer';
     public const KEY_NAME_DEVICE_MODEL = 'device-model';
 
     public const KEY_NAME_EXIF_VERSION = 'exif-version';
 
     public const KEY_NAME_IMAGE_APERTURE = 'image-aperture';
+    public const KEY_NAME_IMAGE_DATE_TIME_ORIGINAL = 'image-date-time-original';
     public const KEY_NAME_IMAGE_EXPOSURE_BIAS_VALUE = 'image-exposure-bias-value';
     public const KEY_NAME_IMAGE_EXPOSURE_TIME = 'image-exposure-time';
     public const KEY_NAME_IMAGE_FILENAME = 'image-filename';
@@ -94,7 +99,7 @@ class ImageData
      * @return array<string, string|mixed|null>
      */
     #[ArrayShape([self::KEY_NAME_TITLE => "string", self::KEY_NAME_FORMAT => "string", self::KEY_NAME_UNIT => "null|string", self::KEY_NAME_UNIT_BEFORE => "null|string", self::KEY_NAME_VALUE => "mixed", self::KEY_NAME_VALUE_FORMATTED => "string"])]
-    protected function getData(string $title, mixed $value, string $format, ?string $unit, ?string $unitBefore = null, ?string $valueFormatted = null, mixed $valueOriginal = null): array
+    protected function getData(string $title, mixed $value, string $format, ?string $unit, ?string $unitBefore = null, ?string $valueFormatted = null, array $addValues = null): array
     {
         $data = [
             self::KEY_NAME_TITLE => $title,
@@ -105,32 +110,11 @@ class ImageData
             self::KEY_NAME_VALUE_FORMATTED => sprintf('%s%s%s', $unitBefore, $valueFormatted !== null ? $valueFormatted : strval($value), $unit),
         ];
 
-        if ($valueOriginal !== null) {
-            $data[self::KEY_NAME_VALUE_ORIGINAL] = $valueOriginal;
+        if ($addValues !== null) {
+            $data = array_merge($data, $addValues);
         }
 
         return $data;
-    }
-
-    /**
-     * Returns the calculated value.
-     *
-     * @param string $value
-     * @param int $precision
-     * @return int|float
-     * @throws Exception
-     */
-    protected function calculate(string $value, int $precision = -1): int|float
-    {
-        $matches = [];
-        if (!preg_match('~([\-]?[0-9]+)([/])([0-9]+)+~', $value, $matches)) {
-            return intval($value);
-        }
-
-        return match ($matches[2]) {
-            '/' => $precision === -1 ? intval($matches[1]) / intval($matches[3]) : round(intval($matches[1]) / intval($matches[3]), $precision),
-            default => throw new Exception(sprintf('Unsupported calculation "%s" (%s:%d).', $matches[2], __FILE__, __LINE__)),
-        };
     }
 
     /**
@@ -141,9 +125,9 @@ class ImageData
      */
     protected function getCoordinate(array $coordinate, string $ref): string
     {
-        $value1 = $this->calculate($coordinate[0]);
-        $value2 = $this->calculate($coordinate[1]);
-        $value3 = $this->calculate($coordinate[2]);
+        $value1 = StringConverter::calculate($coordinate[0]);
+        $value2 = StringConverter::calculate($coordinate[1]);
+        $value3 = StringConverter::calculate($coordinate[2]);
 
         return sprintf('%d°%d’%.2f"%s', $value1, $value2, $value3, $ref);
     }
@@ -160,6 +144,11 @@ class ImageData
 
         if ($dataExif === false) {
             return [];
+        }
+
+        /** @phpstan-ignore-next-line → I know that this condition is always false. ;) */
+        if (self::DEBUG) {
+            print_r($dataExif);
         }
 
         $dataExifReturn = [];
@@ -179,7 +168,7 @@ class ImageData
 
         /* GPS properties */
         if (array_key_exists('GPSAltitude', $dataExif)) {
-            $dataExifReturn[self::KEY_NAME_GPS_HEIGHT] = $this->getData('GPS Height', $this->calculate($dataExif['GPSAltitude']), '%.2f', ' m');
+            $dataExifReturn[self::KEY_NAME_GPS_HEIGHT] = $this->getData('GPS Height', StringConverter::calculate($dataExif['GPSAltitude']), '%.2f', ' m');
         }
         if (array_key_exists('GPSLatitude', $dataExif) && array_key_exists('GPSLongitude', $dataExif)) {
             $dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DMS] = $this->getData('GPS Latitude DMS', $this->getCoordinate($dataExif['GPSLatitude'], $dataExif['GPSLatitudeRef']), '%s', null);
@@ -199,20 +188,43 @@ class ImageData
         }
 
         /* Image properties */
-        if (array_key_exists('ApertureValue', $dataExif)) {
-            $dataExifReturn[self::KEY_NAME_IMAGE_APERTURE] = $this->getData('Image Aperture', $this->calculate($dataExif['FNumber']), '%.1f', null, 'F/');
+        if (array_key_exists('FNumber', $dataExif)) {
+            $dataExifReturn[self::KEY_NAME_IMAGE_APERTURE] = $this->getData('Image Aperture', StringConverter::calculate($dataExif['FNumber']), '%.1f', null, 'F/');
+        }
+        if (array_key_exists('DateTimeOriginal', $dataExif)) {
+            $dataExifReturn[self::KEY_NAME_IMAGE_DATE_TIME_ORIGINAL] = $this->getData(
+                'Image Date Time Original',
+                strval(StringConverter::convertDateTime($dataExif['DateTimeOriginal'], 'Y-m-d\\TH:i:s')),
+                '%s',
+                null,
+                null,
+                null,
+                [
+                    self::KEY_NAME_VALUE_DATE_TIME => StringConverter::convertDateTime($dataExif['DateTimeOriginal']),
+                ]
+            );
         }
         if (array_key_exists('ExposureBiasValue', $dataExif)) {
-            $dataExifReturn[self::KEY_NAME_IMAGE_EXPOSURE_BIAS_VALUE] =  $this->getData('Image Exposure Bias Value', $this->calculate($dataExif['ExposureBiasValue']), '%d', ' steps');
+            $dataExifReturn[self::KEY_NAME_IMAGE_EXPOSURE_BIAS_VALUE] =  $this->getData('Image Exposure Bias Value', StringConverter::calculate($dataExif['ExposureBiasValue']), '%d', ' steps');
         }
         if (array_key_exists('ExposureTime', $dataExif)) {
-            $dataExifReturn[self::KEY_NAME_IMAGE_EXPOSURE_TIME] =  $this->getData('Image Exposure Time', $this->calculate($dataExif['ExposureTime'], 5), '%s', ' s', null, $dataExif['ExposureTime'], $dataExif['ExposureTime']);
+            $dataExifReturn[self::KEY_NAME_IMAGE_EXPOSURE_TIME] =  $this->getData(
+                'Image Exposure Time',
+                StringConverter::calculate($dataExif['ExposureTime'], 5),
+                '%s',
+                ' s',
+                null,
+                StringConverter::optimizeSlashString($dataExif['ExposureTime']),
+                [
+                    self::KEY_NAME_VALUE_ORIGINAL => StringConverter::optimizeSlashString($dataExif['ExposureTime'])
+                ]
+            );
         }
         if (array_key_exists('FileName', $dataExif)) {
             $dataExifReturn[self::KEY_NAME_IMAGE_FILENAME] = $this->getData('Image Filename', strval($dataExif['FileName']), '%s', null);
         }
         if (array_key_exists('FocalLength', $dataExif)) {
-            $dataExifReturn[self::KEY_NAME_IMAGE_FOCAL_LENGTH] =  $this->getData('Image Focal Length', $this->calculate($dataExif['FocalLength']), '%d', ' mm');
+            $dataExifReturn[self::KEY_NAME_IMAGE_FOCAL_LENGTH] =  $this->getData('Image Focal Length', StringConverter::calculate($dataExif['FocalLength']), '%d', ' mm');
         }
         if (array_key_exists('ImageLength', $dataExif)) {
             $dataExifReturn[self::KEY_NAME_IMAGE_HEIGHT] = $this->getData('Image Height', intval($dataExif['ImageLength']), '%d', ' px');
@@ -224,10 +236,15 @@ class ImageData
             $dataExifReturn[self::KEY_NAME_IMAGE_WIDTH] = $this->getData('Image Width', intval($dataExif['ImageWidth']), '%d', ' px');
         }
         if (array_key_exists('XResolution', $dataExif)) {
-            $dataExifReturn[self::KEY_NAME_IMAGE_X_RESOLUTION] = $this->getData('Image X-Resolution', $this->calculate($dataExif['XResolution']), '%d', ' dpi');
+            $dataExifReturn[self::KEY_NAME_IMAGE_X_RESOLUTION] = $this->getData('Image X-Resolution', StringConverter::calculate($dataExif['XResolution']), '%d', ' dpi');
         }
         if (array_key_exists('YResolution', $dataExif)) {
-            $dataExifReturn[self::KEY_NAME_IMAGE_Y_RESOLUTION] = $this->getData('Image Y-Resolution', $this->calculate($dataExif['YResolution']), '%d', ' dpi');
+            $dataExifReturn[self::KEY_NAME_IMAGE_Y_RESOLUTION] = $this->getData('Image Y-Resolution', StringConverter::calculate($dataExif['YResolution']), '%d', ' dpi');
+        }
+
+        /** @phpstan-ignore-next-line → I know that this condition is always false. ;) */
+        if (self::DEBUG) {
+            print_r($dataExifReturn);
         }
 
         return $dataExifReturn;
