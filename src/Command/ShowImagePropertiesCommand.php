@@ -39,7 +39,7 @@ class ShowImagePropertiesCommand extends Command
 {
     protected static $defaultName = 'app:image:show';
 
-    protected const REGEXP_OUTPUT = '%%-%ds %%-%ds %%s%s%%s';
+    protected const REGEXP_OUTPUT = '%%-%ds %%-%ds %%s';
 
     protected const NAME_TRANSPARENT = 'transparent';
 
@@ -107,14 +107,10 @@ EOT
         $outputLines = [];
 
         foreach ($dataImage as $key => $data) {
-            $value = $data[ImageData::KEY_NAME_VALUE];
+            $valueFormatted = strval($data[ImageData::KEY_NAME_VALUE_FORMATTED]);
 
-            if (!is_bool($value) && !is_float($value) && !is_int($value) && !is_string($value) && !is_null($value)) {
-                throw new Exception(sprintf('Unsupported type "%s" given (%s:%d).', gettype($value), __FILE__, __LINE__));
-            }
-
-            $format = sprintf(self::REGEXP_OUTPUT, ImageData::WIDTH_TITLE, ImageData::WIDTH_TITLE, strval($data[ImageData::KEY_NAME_FORMAT]));
-            $outputLine = sprintf($format, strval($data[ImageData::KEY_NAME_TITLE]), $key, strval($data[ImageData::KEY_NAME_UNIT_BEFORE]), $value, strval($data[ImageData::KEY_NAME_UNIT]));
+            $format = sprintf(self::REGEXP_OUTPUT, ImageData::WIDTH_TITLE, ImageData::WIDTH_TITLE);
+            $outputLine = sprintf($format, strval($data[ImageData::KEY_NAME_TITLE]), $key, $valueFormatted);
 
             $outputLines[] = $outputLine;
         }
@@ -368,8 +364,8 @@ EOT
         $outputLines = $this->getOutputLines($imageData);
         $outputMaxLength = $this->getMaxLength($outputLines);
 
-        $format = sprintf(self::REGEXP_OUTPUT, ImageData::WIDTH_TITLE, ImageData::WIDTH_TITLE, '%s');
-        $output->writeln(sprintf($format, 'Title', 'Key', '', 'Value', ''));
+        $format = sprintf(self::REGEXP_OUTPUT, ImageData::WIDTH_TITLE, ImageData::WIDTH_TITLE);
+        $output->writeln(sprintf($format, 'Title', 'Key', 'Value'));
         $output->writeln(str_repeat('-', $outputMaxLength));
         foreach ($outputLines as $outputLine) {
             $output->writeln($outputLine);

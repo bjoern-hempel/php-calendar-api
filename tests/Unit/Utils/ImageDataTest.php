@@ -86,7 +86,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'OnePlus',
-                    'value-formatted' => 'OnePlus ',
+                    'value-formatted' => 'OnePlus',
                 ],
                 'device-model' => [
                     'title' => 'Device Model',
@@ -94,7 +94,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'IN2023',
-                    'value-formatted' => 'IN2023 ',
+                    'value-formatted' => 'IN2023',
                 ],
                 'exif-version' => [
                     'title' => 'Exif Version',
@@ -102,7 +102,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => '0220',
-                    'value-formatted' => '0220 ',
+                    'value-formatted' => '0220',
                 ],
                 'gps-google-link' => [
                     'title' => 'GPS Google',
@@ -110,7 +110,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'https://www.google.de/maps/place/14°25′1.92″E+50°3′46.1484″N',
-                    'value-formatted' => 'https://www.google.de/maps/place/14°25′1.92″E+50°3′46.1484″N ',
+                    'value-formatted' => 'https://www.google.de/maps/place/14°25′1.92″E+50°3′46.1484″N',
                 ],
                 'gps-height' => [
                     'title' => 'GPS Height',
@@ -118,7 +118,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' m',
                     'unit-before' => null,
                     'value' => 278.471,
-                    'value-formatted' => '278.471  m',
+                    'value-formatted' => '278.471 m',
                 ],
                 'gps-latitude-decimal-degree' => [
                     'title' => 'GPS Latitude Decimal Degree',
@@ -126,7 +126,7 @@ final class ImageDataTest extends TestCase
                     'unit' => '°',
                     'unit-before' => null,
                     'value' => 50.062819,
-                    'value-formatted' => '50.062819 °',
+                    'value-formatted' => '50.062819°',
                 ],
                 'gps-latitude-direction' => [
                     'title' => 'GPS Latitude Direction',
@@ -134,7 +134,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'N',
-                    'value-formatted' => 'N ',
+                    'value-formatted' => 'N',
                 ],
                 'gps-latitude-dms' => [
                     'title' => 'GPS Latitude DMS',
@@ -142,7 +142,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => '50°3’46.15"N',
-                    'value-formatted' => '50°3’46.15"N ',
+                    'value-formatted' => '50°3’46.15"N',
                 ],
                 'gps-longitude-decimal-degree' => [
                     'title' => 'GPS Longitude Decimal Degree',
@@ -150,7 +150,7 @@ final class ImageDataTest extends TestCase
                     'unit' => '°',
                     'unit-before' => null,
                     'value' => 14.4172,
-                    'value-formatted' => '14.4172 °',
+                    'value-formatted' => '14.4172°',
                 ],
                 'gps-longitude-direction' => [
                     'title' => 'GPS Longitude Direction',
@@ -158,7 +158,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'E',
-                    'value-formatted' => 'E ',
+                    'value-formatted' => 'E',
                 ],
                 'gps-longitude-dms' => [
                     'title' => 'GPS Longitude',
@@ -166,15 +166,15 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => '14°25’1.92"E',
-                    'value-formatted' => '14°25’1.92"E ',
+                    'value-formatted' => '14°25’1.92"E',
                 ],
                 'image-aperture' => [
                     'title' => 'Image Aperture',
                     'format' => '%.1f',
                     'unit' => null,
                     'unit-before' => 'F/',
-                    'value' => 2.27,
-                    'value-formatted' => 'F/2.27 ',
+                    'value' => 2.2,
+                    'value-formatted' => 'F/2.2',
                 ],
                 'image-exposure-bias-value' => [
                     'title' => 'Image Exposure Bias Value',
@@ -182,7 +182,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' steps',
                     'unit-before' => null,
                     'value' => 0,
-                    'value-formatted' => '0  steps',
+                    'value-formatted' => '0 steps',
                 ],
                 'image-exposure-time' => [
                     'title' => 'Image Exposure Time',
@@ -190,7 +190,8 @@ final class ImageDataTest extends TestCase
                     'unit' => ' s',
                     'unit-before' => null,
                     'value' => 0.01266,
-                    'value-formatted' => '0.01266  s',
+                    'value-formatted' => '1/79 s',
+                    'value-original' => '1/79',
                 ],
                 'image-filename' => [
                     'title' => 'Image Filename',
@@ -198,7 +199,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'img-with-gps.jpg',
-                    'value-formatted' => 'img-with-gps.jpg ',
+                    'value-formatted' => 'img-with-gps.jpg',
                 ],
                 'image-focal-length' => [
                     'title' => 'Image Focal Length',
@@ -206,7 +207,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' mm',
                     'unit-before' => null,
                     'value' => 3.05,
-                    'value-formatted' => '3.05  mm',
+                    'value-formatted' => '3.05 mm',
                 ],
                 'image-height' => [
                     'title' => 'Image Height',
@@ -214,15 +215,15 @@ final class ImageDataTest extends TestCase
                     'unit' => ' px',
                     'unit-before' => null,
                     'value' => 480,
-                    'value-formatted' => '480  px',
+                    'value-formatted' => '480 px',
                 ],
                 'image-iso' => [
                     'title' => 'Image ISO',
                     'format' => '%d',
                     'unit' => null,
-                    'unit-before' => null,
+                    'unit-before' => 'ISO-',
                     'value' => 100,
-                    'value-formatted' => '100 ',
+                    'value-formatted' => 'ISO-100',
                 ],
                 'image-mime' => [
                     'title' => 'Image Mime',
@@ -230,7 +231,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'image/jpeg',
-                    'value-formatted' => 'image/jpeg ',
+                    'value-formatted' => 'image/jpeg',
                 ],
                 'image-size' => [
                     'title' => 'Image Size',
@@ -238,7 +239,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' Bytes',
                     'unit-before' => null,
                     'value' => 105514,
-                    'value-formatted' => '105514  Bytes',
+                    'value-formatted' => '105514 Bytes',
                 ],
                 'image-size-human' => [
                     'title' => 'Image Size Human',
@@ -246,7 +247,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => '103.04 kB',
-                    'value-formatted' => '103.04 kB ',
+                    'value-formatted' => '103.04 kB',
                 ],
                 'image-width' => [
                     'title' => 'Image Width',
@@ -254,7 +255,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' px',
                     'unit-before' => null,
                     'value' => 640,
-                    'value-formatted' => '640  px',
+                    'value-formatted' => '640 px',
                 ],
                 'image-x-resolution' => [
                     'title' => 'Image X-Resolution',
@@ -262,7 +263,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' dpi',
                     'unit-before' => null,
                     'value' => 72,
-                    'value-formatted' => '72  dpi',
+                    'value-formatted' => '72 dpi',
                 ],
                 'image-y-resolution' => [
                     'title' => 'Image Y-Resolution',
@@ -270,7 +271,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' dpi',
                     'unit-before' => null,
                     'value' => 72,
-                    'value-formatted' => '72  dpi',
+                    'value-formatted' => '72 dpi',
                 ],
             ]],
 
@@ -284,7 +285,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'SONY',
-                    'value-formatted' => 'SONY ',
+                    'value-formatted' => 'SONY',
                 ],
                 'device-model' => [
                     'title' => 'Device Model',
@@ -292,7 +293,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'ILCE-7M2',
-                    'value-formatted' => 'ILCE-7M2 ',
+                    'value-formatted' => 'ILCE-7M2',
                 ],
                 'exif-version' => [
                     'title' => 'Exif Version',
@@ -300,7 +301,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => '0231',
-                    'value-formatted' => '0231 ',
+                    'value-formatted' => '0231',
                 ],
                 'image-aperture' => [
                     'title' => 'Image Aperture',
@@ -308,7 +309,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => 'F/',
                     'value' => 4,
-                    'value-formatted' => 'F/4 ',
+                    'value-formatted' => 'F/4',
                 ],
                 'image-exposure-bias-value' => [
                     'title' => 'Image Exposure Bias Value',
@@ -316,7 +317,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' steps',
                     'unit-before' => null,
                     'value' => -1,
-                    'value-formatted' => '-1  steps',
+                    'value-formatted' => '-1 steps',
                 ],
                 'image-exposure-time' => [
                     'title' => 'Image Exposure Time',
@@ -324,7 +325,8 @@ final class ImageDataTest extends TestCase
                     'unit' => ' s',
                     'unit-before' => null,
                     'value' => 0.00125,
-                    'value-formatted' => '0.00125  s',
+                    'value-formatted' => '1/800 s',
+                    'value-original' => '1/800',
                 ],
                 'image-filename' => [
                     'title' => 'Image Filename',
@@ -332,7 +334,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'img-without-gps.jpg',
-                    'value-formatted' => 'img-without-gps.jpg ',
+                    'value-formatted' => 'img-without-gps.jpg',
                 ],
                 'image-focal-length' => [
                     'title' => 'Image Focal Length',
@@ -340,7 +342,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' mm',
                     'unit-before' => null,
                     'value' => 50,
-                    'value-formatted' => '50  mm',
+                    'value-formatted' => '50 mm',
                 ],
                 'image-height' => [
                     'title' => 'Image Height',
@@ -348,15 +350,15 @@ final class ImageDataTest extends TestCase
                     'unit' => ' px',
                     'unit-before' => null,
                     'value' => 480,
-                    'value-formatted' => '480  px',
+                    'value-formatted' => '480 px',
                 ],
                 'image-iso' => [
                     'title' => 'Image ISO',
                     'format' => '%d',
                     'unit' => null,
-                    'unit-before' => null,
+                    'unit-before' => 'ISO-',
                     'value' => 50,
-                    'value-formatted' => '50 ',
+                    'value-formatted' => 'ISO-50',
                 ],
                 'image-mime' => [
                     'title' => 'Image Mime',
@@ -364,7 +366,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'image/jpeg',
-                    'value-formatted' => 'image/jpeg ',
+                    'value-formatted' => 'image/jpeg',
                 ],
                 'image-size' => [
                     'title' => 'Image Size',
@@ -372,7 +374,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' Bytes',
                     'unit-before' => null,
                     'value' => 200642,
-                    'value-formatted' => '200642  Bytes',
+                    'value-formatted' => '200642 Bytes',
                 ],
                 'image-size-human' => [
                     'title' => 'Image Size Human',
@@ -380,7 +382,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => '195.94 kB',
-                    'value-formatted' => '195.94 kB ',
+                    'value-formatted' => '195.94 kB',
                 ],
                 'image-width' => [
                     'title' => 'Image Width',
@@ -388,7 +390,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' px',
                     'unit-before' => null,
                     'value' => 720,
-                    'value-formatted' => '720  px',
+                    'value-formatted' => '720 px',
                 ],
                 'image-x-resolution' => [
                     'title' => 'Image X-Resolution',
@@ -396,7 +398,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' dpi',
                     'unit-before' => null,
                     'value' => 240,
-                    'value-formatted' => '240  dpi',
+                    'value-formatted' => '240 dpi',
                 ],
                 'image-y-resolution' => [
                     'title' => 'Image Y-Resolution',
@@ -404,7 +406,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' dpi',
                     'unit-before' => null,
                     'value' => 240,
-                    'value-formatted' => '240  dpi',
+                    'value-formatted' => '240 dpi',
                 ],
             ]],
 
@@ -418,7 +420,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'SONY',
-                    'value-formatted' => 'SONY ',
+                    'value-formatted' => 'SONY',
                 ],
                 'device-model' => [
                     'title' => 'Device Model',
@@ -426,7 +428,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'ILCE-7M2',
-                    'value-formatted' => 'ILCE-7M2 ',
+                    'value-formatted' => 'ILCE-7M2',
                 ],
                 'exif-version' => [
                     'title' => 'Exif Version',
@@ -434,7 +436,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => '0231',
-                    'value-formatted' => '0231 ',
+                    'value-formatted' => '0231',
                 ],
                 'image-exposure-bias-value' => [
                     'title' => 'Image Exposure Bias Value',
@@ -442,7 +444,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' steps',
                     'unit-before' => null,
                     'value' => -0.7,
-                    'value-formatted' => '-0.7  steps',
+                    'value-formatted' => '-0.7 steps',
                 ],
                 'image-exposure-time' => [
                     'title' => 'Image Exposure Time',
@@ -450,7 +452,8 @@ final class ImageDataTest extends TestCase
                     'unit' => ' s',
                     'unit-before' => null,
                     'value' => 0.005,
-                    'value-formatted' => '0.005  s',
+                    'value-formatted' => '1/200 s',
+                    'value-original' => '1/200',
                 ],
                 'image-filename' => [
                     'title' => 'Image Filename',
@@ -458,7 +461,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'img-without-focal.jpg',
-                    'value-formatted' => 'img-without-focal.jpg ',
+                    'value-formatted' => 'img-without-focal.jpg',
                 ],
                 'image-height' => [
                     'title' => 'Image Height',
@@ -466,15 +469,15 @@ final class ImageDataTest extends TestCase
                     'unit' => ' px',
                     'unit-before' => null,
                     'value' => 480,
-                    'value-formatted' => '480  px',
+                    'value-formatted' => '480 px',
                 ],
                 'image-iso' => [
                     'title' => 'Image ISO',
                     'format' => '%d',
                     'unit' => null,
-                    'unit-before' => null,
+                    'unit-before' => 'ISO-',
                     'value' => 50,
-                    'value-formatted' => '50 ',
+                    'value-formatted' => 'ISO-50',
                 ],
                 'image-mime' => [
                     'title' => 'Image Mime',
@@ -482,7 +485,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'image/jpeg',
-                    'value-formatted' => 'image/jpeg ',
+                    'value-formatted' => 'image/jpeg',
                 ],
                 'image-size' => [
                     'title' => 'Image Size',
@@ -490,7 +493,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' Bytes',
                     'unit-before' => null,
                     'value' => 184780,
-                    'value-formatted' => '184780  Bytes',
+                    'value-formatted' => '184780 Bytes',
                 ],
                 'image-size-human' => [
                     'title' => 'Image Size Human',
@@ -498,7 +501,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => '180.45 kB',
-                    'value-formatted' => '180.45 kB ',
+                    'value-formatted' => '180.45 kB',
                 ],
                 'image-width' => [
                     'title' => 'Image Width',
@@ -506,7 +509,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' px',
                     'unit-before' => null,
                     'value' => 702,
-                    'value-formatted' => '702  px',
+                    'value-formatted' => '702 px',
                 ],
                 'image-x-resolution' => [
                     'title' => 'Image X-Resolution',
@@ -514,7 +517,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' dpi',
                     'unit-before' => null,
                     'value' => 240,
-                    'value-formatted' => '240  dpi',
+                    'value-formatted' => '240 dpi',
                 ],
                 'image-y-resolution' => [
                     'title' => 'Image Y-Resolution',
@@ -522,7 +525,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' dpi',
                     'unit-before' => null,
                     'value' => 240,
-                    'value-formatted' => '240  dpi',
+                    'value-formatted' => '240 dpi',
                 ],
             ]],
 
@@ -536,7 +539,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' px',
                     'unit-before' => null,
                     'value' => 480,
-                    'value-formatted' => '480  px',
+                    'value-formatted' => '480 px',
                 ],
                 'image-mime' => [
                     'title' => 'Image Mime',
@@ -544,7 +547,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => 'image/jpeg',
-                    'value-formatted' => 'image/jpeg ',
+                    'value-formatted' => 'image/jpeg',
                 ],
                 'image-size' => [
                     'title' => 'Image Size',
@@ -552,7 +555,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' Bytes',
                     'unit-before' => null,
                     'value' => 113490,
-                    'value-formatted' => '113490  Bytes',
+                    'value-formatted' => '113490 Bytes',
                 ],
                 'image-size-human' => [
                     'title' => 'Image Size Human',
@@ -560,7 +563,7 @@ final class ImageDataTest extends TestCase
                     'unit' => null,
                     'unit-before' => null,
                     'value' => '110.83 kB',
-                    'value-formatted' => '110.83 kB ',
+                    'value-formatted' => '110.83 kB',
                 ],
                 'image-width' => [
                     'title' => 'Image Width',
@@ -568,7 +571,7 @@ final class ImageDataTest extends TestCase
                     'unit' => ' px',
                     'unit-before' => null,
                     'value' => 679,
-                    'value-formatted' => '679  px',
+                    'value-formatted' => '679 px',
                 ],
             ]],
         ];

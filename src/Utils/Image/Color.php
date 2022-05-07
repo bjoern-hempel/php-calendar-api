@@ -55,14 +55,14 @@ class Color
 
     /* @see https://en.wikipedia.org/wiki/SRGB */
     public const COLOR_INDEX_SRGB_RED = 'r';
-    public const COLOR_VALUE_SRGB_RED_MIN = 0;
-    public const COLOR_VALUE_SRGB_RED_MAX = 255;
+    public const COLOR_VALUE_SRGB_RED_MIN = 0.;
+    public const COLOR_VALUE_SRGB_RED_MAX = 1.;
     public const COLOR_INDEX_SRGB_GREEN = 'g';
-    public const COLOR_VALUE_SRGB_GREEN_MIN = 0;
-    public const COLOR_VALUE_SRGB_GREEN_MAX = 255;
+    public const COLOR_VALUE_SRGB_GREEN_MIN = 0.;
+    public const COLOR_VALUE_SRGB_GREEN_MAX = 1.;
     public const COLOR_INDEX_SRGB_BLUE = 'b';
-    public const COLOR_VALUE_SRGB_BLUE_MIN = 0;
-    public const COLOR_VALUE_SRGB_BLUE_MAX = 255;
+    public const COLOR_VALUE_SRGB_BLUE_MIN = 0.;
+    public const COLOR_VALUE_SRGB_BLUE_MAX = 1.;
 
     public const COLORS_SRGB = [
         self::COLOR_INDEX_SRGB_RED,
@@ -90,13 +90,13 @@ class Color
     /* @see https://en.wikipedia.org/wiki/CIE_1931_color_space */
     public const COLOR_INDEX_XYZ_X = 'x';
     public const COLOR_VALUE_XYZ_X_MIN = 0.;
-    public const COLOR_VALUE_XYZ_X_MAX = 100.;
+    public const COLOR_VALUE_XYZ_X_MAX = 1.;
     public const COLOR_INDEX_XYZ_Y = 'y';
-    public const COLOR_VALUE_XYZ_Y_MIN = -128.;
-    public const COLOR_VALUE_XYZ_Y_MAX = 127.;
+    public const COLOR_VALUE_XYZ_Y_MIN = 0.;
+    public const COLOR_VALUE_XYZ_Y_MAX = 1.;
     public const COLOR_INDEX_XYZ_Z = 'z';
-    public const COLOR_VALUE_XYZ_Z_MIN = -128.;
-    public const COLOR_VALUE_XYZ_Z_MAX = 127.;
+    public const COLOR_VALUE_XYZ_Z_MIN = 0.;
+    public const COLOR_VALUE_XYZ_Z_MAX = 1.;
 
     public const COLORS_XYZ = [
         self::COLOR_INDEX_XYZ_X,

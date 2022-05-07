@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Utils;
 
 use Exception;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * Class ImageData
@@ -37,6 +38,8 @@ class ImageData
     public const KEY_NAME_UNIT_BEFORE = 'unit-before';
 
     public const KEY_NAME_VALUE = 'value';
+
+    public const KEY_NAME_VALUE_ORIGINAL = 'value-original';
 
     public const KEY_NAME_VALUE_FORMATTED = 'value-formatted';
 
@@ -86,28 +89,38 @@ class ImageData
      * @param string $format
      * @param string|null $unit
      * @param string|null $unitBefore
+     * @param string|null $valueFormatted
+     * @param string|null $valueOriginal
      * @return array<string, string|mixed|null>
      */
-    protected function getData(string $title, mixed $value, string $format, ?string $unit, ?string $unitBefore = null): array
+    #[ArrayShape([self::KEY_NAME_TITLE => "string", self::KEY_NAME_FORMAT => "string", self::KEY_NAME_UNIT => "null|string", self::KEY_NAME_UNIT_BEFORE => "null|string", self::KEY_NAME_VALUE => "mixed", self::KEY_NAME_VALUE_FORMATTED => "string"])]
+    protected function getData(string $title, mixed $value, string $format, ?string $unit, ?string $unitBefore = null, ?string $valueFormatted = null, mixed $valueOriginal = null): array
     {
-        return [
+        $data = [
             self::KEY_NAME_TITLE => $title,
             self::KEY_NAME_FORMAT => $format,
             self::KEY_NAME_UNIT => $unit,
             self::KEY_NAME_UNIT_BEFORE => $unitBefore,
             self::KEY_NAME_VALUE => $value,
-            self::KEY_NAME_VALUE_FORMATTED => sprintf('%s%s %s', $unitBefore, strval($value), $unit),
+            self::KEY_NAME_VALUE_FORMATTED => sprintf('%s%s%s', $unitBefore, $valueFormatted !== null ? $valueFormatted : strval($value), $unit),
         ];
+
+        if ($valueOriginal !== null) {
+            $data[self::KEY_NAME_VALUE_ORIGINAL] = $valueOriginal;
+        }
+
+        return $data;
     }
 
     /**
      * Returns the calculated value.
      *
      * @param string $value
+     * @param int $precision
      * @return int|float
      * @throws Exception
      */
-    protected function calculate(string $value): int|float
+    protected function calculate(string $value, int $precision = -1): int|float
     {
         $matches = [];
         if (!preg_match('~([\-]?[0-9]+)([/])([0-9]+)+~', $value, $matches)) {
@@ -115,7 +128,7 @@ class ImageData
         }
 
         return match ($matches[2]) {
-            '/' => $matches[1] / $matches[3],
+            '/' => $precision === -1 ? intval($matches[1]) / intval($matches[3]) : round(intval($matches[1]) / intval($matches[3]), $precision),
             default => throw new Exception(sprintf('Unsupported calculation "%s" (%s:%d).', $matches[2], __FILE__, __LINE__)),
         };
     }
@@ -187,13 +200,13 @@ class ImageData
 
         /* Image properties */
         if (array_key_exists('ApertureValue', $dataExif)) {
-            $dataExifReturn[self::KEY_NAME_IMAGE_APERTURE] = $this->getData('Image Aperture', $this->calculate($dataExif['ApertureValue']), '%.1f', null, 'F/');
+            $dataExifReturn[self::KEY_NAME_IMAGE_APERTURE] = $this->getData('Image Aperture', $this->calculate($dataExif['FNumber']), '%.1f', null, 'F/');
         }
         if (array_key_exists('ExposureBiasValue', $dataExif)) {
             $dataExifReturn[self::KEY_NAME_IMAGE_EXPOSURE_BIAS_VALUE] =  $this->getData('Image Exposure Bias Value', $this->calculate($dataExif['ExposureBiasValue']), '%d', ' steps');
         }
         if (array_key_exists('ExposureTime', $dataExif)) {
-            $dataExifReturn[self::KEY_NAME_IMAGE_EXPOSURE_TIME] =  $this->getData('Image Exposure Time', round($this->calculate($dataExif['ExposureTime']), 5), '%s', ' s');
+            $dataExifReturn[self::KEY_NAME_IMAGE_EXPOSURE_TIME] =  $this->getData('Image Exposure Time', $this->calculate($dataExif['ExposureTime'], 5), '%s', ' s', null, $dataExif['ExposureTime'], $dataExif['ExposureTime']);
         }
         if (array_key_exists('FileName', $dataExif)) {
             $dataExifReturn[self::KEY_NAME_IMAGE_FILENAME] = $this->getData('Image Filename', strval($dataExif['FileName']), '%s', null);
@@ -205,7 +218,7 @@ class ImageData
             $dataExifReturn[self::KEY_NAME_IMAGE_HEIGHT] = $this->getData('Image Height', intval($dataExif['ImageLength']), '%d', ' px');
         }
         if (array_key_exists('ISOSpeedRatings', $dataExif)) {
-            $dataExifReturn[self::KEY_NAME_IMAGE_ISO] = $this->getData('Image ISO', intval($dataExif['ISOSpeedRatings']), '%d', null);
+            $dataExifReturn[self::KEY_NAME_IMAGE_ISO] = $this->getData('Image ISO', intval($dataExif['ISOSpeedRatings']), '%d', null, 'ISO-');
         }
         if (array_key_exists('ImageWidth', $dataExif)) {
             $dataExifReturn[self::KEY_NAME_IMAGE_WIDTH] = $this->getData('Image Width', intval($dataExif['ImageWidth']), '%d', ' px');
