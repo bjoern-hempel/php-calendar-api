@@ -404,16 +404,16 @@ EOT
                 return str_repeat(' ', $repeat);
 
             case $colorTop === self::NAME_TRANSPARENT:
-                $rgb = Color::convertHexToRgb($colorTop);
+                $rgb = Color::convertHexToRgbArray($colorTop);
                 return sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", $rgb['r'], $rgb['g'], $rgb['b'], str_repeat('▄', $repeat));
 
             case $colorBottom === self::NAME_TRANSPARENT:
-                $rgb = Color::convertHexToRgb($colorTop);
+                $rgb = Color::convertHexToRgbArray($colorTop);
                 return sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", $rgb['r'], $rgb['g'], $rgb['b'], str_repeat('▀', $repeat));
 
             default:
-                $rgbTop = Color::convertHexToRgb($colorTop);
-                $rgbBottom = Color::convertHexToRgb($colorBottom);
+                $rgbTop = Color::convertHexToRgbArray($colorTop);
+                $rgbBottom = Color::convertHexToRgbArray($colorBottom);
                 return sprintf(
                     "\x1b[38;2;%d;%d;%dm\x1b[48;2;%d;%d;%dm%s\x1b[0m",
                     $rgbTop['r'],

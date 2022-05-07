@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace App\Utils\Image;
 
+use InvalidArgumentException;
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
+use UnexpectedValueException;
 
 /**
  * Class Color
@@ -25,10 +27,141 @@ use JetBrains\PhpStorm\Pure;
  */
 class Color
 {
-    protected const VALUE_HASH = '#';
+    public const VALUE_HASH = '#';
+
+    /* @see http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html (sRGB → XYZ) */
+    public const MATRIX_SRGB_XYZ = [
+        [.4124564, .3575761, .1804375, ],
+        [.2126729, .7151522, .0721750, ],
+        [.0193339, .1191920, .9503041, ],
+    ];
+
+    /* @see https://en.wikipedia.org/wiki/SRGB */
+    public const COLOR_INDEX_RGB_RED = 'r';
+    public const COLOR_VALUE_RGB_RED_MIN = 0;
+    public const COLOR_VALUE_RGB_RED_MAX = 255;
+    public const COLOR_INDEX_RGB_GREEN = 'g';
+    public const COLOR_VALUE_RGB_GREEN_MIN = 0;
+    public const COLOR_VALUE_RGB_GREEN_MAX = 255;
+    public const COLOR_INDEX_RGB_BLUE = 'b';
+    public const COLOR_VALUE_RGB_BLUE_MIN = 0;
+    public const COLOR_VALUE_RGB_BLUE_MAX = 255;
+
+    public const COLORS_RGB = [
+        self::COLOR_INDEX_RGB_RED,
+        self::COLOR_INDEX_RGB_GREEN,
+        self::COLOR_INDEX_RGB_BLUE,
+    ];
+
+    /* @see https://en.wikipedia.org/wiki/SRGB */
+    public const COLOR_INDEX_SRGB_RED = 'r';
+    public const COLOR_VALUE_SRGB_RED_MIN = 0;
+    public const COLOR_VALUE_SRGB_RED_MAX = 255;
+    public const COLOR_INDEX_SRGB_GREEN = 'g';
+    public const COLOR_VALUE_SRGB_GREEN_MIN = 0;
+    public const COLOR_VALUE_SRGB_GREEN_MAX = 255;
+    public const COLOR_INDEX_SRGB_BLUE = 'b';
+    public const COLOR_VALUE_SRGB_BLUE_MIN = 0;
+    public const COLOR_VALUE_SRGB_BLUE_MAX = 255;
+
+    public const COLORS_SRGB = [
+        self::COLOR_INDEX_SRGB_RED,
+        self::COLOR_INDEX_SRGB_GREEN,
+        self::COLOR_INDEX_SRGB_BLUE,
+    ];
+
+    /* @see https://en.wikipedia.org/wiki/CIELAB_color_space */
+    public const COLOR_INDEX_LAB_LIGHTNESS = 'L';
+    public const COLOR_VALUE_LAB_LIGHTNESS_MIN = 0.;
+    public const COLOR_VALUE_LAB_LIGHTNESS_MAX = 100.;
+    public const COLOR_INDEX_LAB_A = 'a';
+    public const COLOR_VALUE_LAB_A_MIN = -128.;
+    public const COLOR_VALUE_LAB_A_MAX = 127.;
+    public const COLOR_INDEX_LAB_B = 'b';
+    public const COLOR_VALUE_LAB_B_MIN = -128.;
+    public const COLOR_VALUE_LAB_B_MAX = 127.;
+
+    public const COLORS_LAB = [
+        self::COLOR_INDEX_LAB_LIGHTNESS,
+        self::COLOR_INDEX_LAB_A,
+        self::COLOR_INDEX_LAB_B,
+    ];
+
+    /* @see https://en.wikipedia.org/wiki/CIE_1931_color_space */
+    public const COLOR_INDEX_XYZ_X = 'x';
+    public const COLOR_VALUE_XYZ_X_MIN = 0.;
+    public const COLOR_VALUE_XYZ_X_MAX = 100.;
+    public const COLOR_INDEX_XYZ_Y = 'y';
+    public const COLOR_VALUE_XYZ_Y_MIN = -128.;
+    public const COLOR_VALUE_XYZ_Y_MAX = 127.;
+    public const COLOR_INDEX_XYZ_Z = 'z';
+    public const COLOR_VALUE_XYZ_Z_MIN = -128.;
+    public const COLOR_VALUE_XYZ_Z_MAX = 127.;
+
+    public const COLORS_XYZ = [
+        self::COLOR_INDEX_XYZ_X,
+        self::COLOR_INDEX_XYZ_Y,
+        self::COLOR_INDEX_XYZ_Z,
+    ];
 
     /**
-     * Converts given rgb integer values to integer.
+     * Single color value: Converts given rgb value to hex.
+     *
+     * @param int $value
+     * @param bool $lowercase
+     * @return string
+     */
+    public static function convertRgbToHex(int $value, bool $lowercase = false): string
+    {
+        $colorHex = sprintf('%02X', $value);
+
+        if (!$lowercase) {
+            return $colorHex;
+        }
+
+        return strtolower($colorHex);
+    }
+
+    /**
+     * Single color value: Converts given rgb value to srgb.
+     *
+     * @param int $value
+     * @param int $precision
+     * @return float
+     */
+    public static function convertRgbToSrgb(int $value, int $precision = -1): float
+    {
+        $value /= 255;
+
+        $srgb = $value <= .03928 ? $value / 12.92 : pow(($value + .055) / 1.055, 2.4);
+
+        if ($precision === -1) {
+            return $srgb;
+        }
+
+        return round($srgb, $precision);
+    }
+
+    /**
+     * Single color value: Converts given xyz value to Lab value.
+     *
+     * @param float $value
+     * @param int $precision
+     * @return float
+     */
+    public static function convertXyzToLab(float $value, int $precision = -1): float
+    {
+        $lab = $value > 216 / 24389 ? pow($value, 1 / 3) : 841 * $value / 108 + 4 / 29;
+
+        if ($precision === -1) {
+            return $lab;
+        }
+
+        return round($lab, $precision);
+    }
+
+    /**
+     * Full color value: Converts given rgb integer values to integer.
      *
      * @param int $r
      * @param int $g
@@ -36,28 +169,35 @@ class Color
      * @return int
      */
     #[Pure]
-    public static function convertIntegersToInt(int $r, int $g, int $b): int
+    public static function convertRgbsToInt(int $r, int $g, int $b): int
     {
         return $r * 256 * 256 + $g * 256 + $b;
     }
 
     /**
-     * Converts given rgb integer values to hex value.
+     * Full color value: Converts given rgb integer values to hex value.
      *
      * @param int $r
      * @param int $g
      * @param int $b
      * @param bool $prependHash = true
+     * @param bool $lowercase
      * @return string
      */
     #[Pure]
-    public static function convertIntegersToHex(int $r, int $g, int $b, bool $prependHash = true): string
+    public static function convertRgbsToHex(int $r, int $g, int $b, bool $prependHash = true, bool $lowercase = false): string
     {
-        return self::convertIntToHex($r * 256 * 256 + $g * 256 + $b, $prependHash);
+        $colorHex = self::convertIntToHex($r * 256 * 256 + $g * 256 + $b, $prependHash);
+
+        if (!$lowercase) {
+            return $colorHex;
+        }
+
+        return strtolower($colorHex);
     }
 
     /**
-     * Converts given integer to hex value.
+     * Full color value: Converts given integer to hex value.
      *
      * Examples:
      * 255 → #0000FF
@@ -65,11 +205,11 @@ class Color
      * 128*256*256 + 0*256 + 128 → #800080
      *
      * @param int $color
-     * @param bool $lowercase
      * @param bool $prependHash = true
+     * @param bool $lowercase
      * @return string
      */
-    public static function convertIntToHex(int $color, bool $lowercase = false, bool $prependHash = true): string
+    public static function convertIntToHex(int $color, bool $prependHash = true, bool $lowercase = false): string
     {
         $colorHex = ($prependHash ? self::VALUE_HASH : '').sprintf('%06X', $color);
 
@@ -81,23 +221,43 @@ class Color
     }
 
     /**
-     * Converts given integer into rgb array.
+     * Full color value: Converts given integer into rgb array.
      *
      * @param int $color
      * @return array{r:int, g:int, b:int}
      */
-    #[ArrayShape(['r' => "int", 'g' => "int", 'b' => "int"])]
-    public static function convertIntToRgb(int $color): array
+    #[ArrayShape([self::COLOR_INDEX_RGB_RED => "int", self::COLOR_INDEX_RGB_GREEN => "int", self::COLOR_INDEX_RGB_BLUE => "int"])]
+    public static function convertIntToRgbArray(int $color): array
     {
         return [
-            'r' => $color >> 16 & 0xFF,
-            'g' => $color >> 8 & 0xFF,
-            'b' => $color & 0xFF,
+            self::COLOR_INDEX_RGB_RED => $color >> 16 & 0xFF,
+            self::COLOR_INDEX_RGB_GREEN => $color >> 8 & 0xFF,
+            self::COLOR_INDEX_RGB_BLUE => $color & 0xFF,
         ];
     }
 
     /**
-     * Converts given hex value to integer.
+     * Converts int color to lab array.
+     *
+     * @param int $color
+     * @param int $precision
+     * @return array{L: float, a: float, b: float}
+     */
+    #[ArrayShape([self::COLOR_INDEX_LAB_LIGHTNESS => "float", self::COLOR_INDEX_LAB_A => "float", self::COLOR_INDEX_LAB_B => "float"])]
+    public static function convertIntToLabArray(int $color, int $precision = -1): array
+    {
+        return self::convertXyzArrayToLabArray(
+            self::convertSrgbArrayToXyzArray(
+                self::convertRgbArrayToSrgbArray(
+                    self::convertIntToRgbArray($color)
+                )
+            ),
+            $precision
+        );
+    }
+
+    /**
+     * Full color value: Converts given hex value to integer.
      *
      * Examples:
      * #800080 → 128*256*256 + 0*256 + 128
@@ -121,9 +281,9 @@ class Color
      */
     #[Pure]
     #[ArrayShape(['r' => "int", 'g' => "int", 'b' => "int"])]
-    public static function convertHexToRgb(string $color): array
+    public static function convertHexToRgbArray(string $color): array
     {
-        return self::convertIntToRgb(self::convertHexToInt($color));
+        return self::convertIntToRgbArray(self::convertHexToInt($color));
     }
 
     /**
@@ -131,74 +291,26 @@ class Color
      *
      * @param array{r:int, g:int, b:int} $rgb
      * @return int
+     * @throws InvalidArgumentException
      */
     public static function convertRgbArrayToInt(array $rgb): int
     {
-        assert(array_key_exists('r', $rgb));
-        assert(array_key_exists('g', $rgb));
-        assert(array_key_exists('b', $rgb));
-        assert(is_int($rgb['r']));
-        assert(is_int($rgb['g']));
-        assert(is_int($rgb['b']));
+        self::checkRgb($rgb);
 
-        return ($rgb['r'] * 256 * 256) + ($rgb['g'] * 256) + ($rgb['b']);
+        return ($rgb[self::COLOR_INDEX_RGB_RED] * 256 * 256) + ($rgb[self::COLOR_INDEX_RGB_GREEN] * 256) + ($rgb[self::COLOR_INDEX_RGB_BLUE]);
     }
 
     /**
      * Converts given rgb array into integer.
      *
      * @param array{r:int, g:int, b:int} $rgb
-     * @param bool $lowercase
      * @param bool $prependHash
+     * @param bool $lowercase
      * @return string
      */
-    public static function convertRgbArrayToHex(array $rgb, bool $lowercase = false, bool $prependHash = true): string
+    public static function convertRgbArrayToHex(array $rgb, bool $prependHash = true, bool $lowercase = false): string
     {
-        return self::convertIntToHex(self::convertRgbArrayToInt($rgb), $lowercase, $prependHash);
-    }
-
-    /**
-     * Converts given rgb value to srgb.
-     *
-     * @param int $value
-     * @return float
-     */
-    public static function convertRgbToSrgb(int $value): float
-    {
-        $value /= 255;
-
-        return $value <= .03928 ?
-            $value / 12.92 :
-            pow(($value + .055) / 1.055, 2.4);
-    }
-
-    /**
-     * Converts given xyz value to Lab value.
-     *
-     * @param float $value
-     * @return float
-     */
-    public static function convertXyzToLab(float $value): float
-    {
-        return $value > 216 / 24389 ? pow($value, 1 / 3) : 841 * $value / 108 + 4 / 29;
-    }
-
-    /**
-     * Converts int color to lab array.
-     *
-     * @param int $color
-     * @return array{L: float, a: float, b: float}
-     */
-    #[ArrayShape(['L' => "float", 'a' => "float", 'b' => "float"])]
-    public static function convertIntToLabArray(int $color): array
-    {
-        return self::convertXyzArrayToLabArray(
-            self::convertSrgbArrayToXyzArray(
-                self::convertRgbArrayToSrgbArray(
-                    self::convertIntToRgb($color)
-                )
-            )
-        );
+        return self::convertIntToHex(self::convertRgbArrayToInt($rgb), $prependHash, $lowercase);
     }
 
     /**
@@ -207,30 +319,36 @@ class Color
      * @param array{r: int, g: int, b: int} $rgb
      * @return array{r: float, g: float, b: float}
      */
-    #[Pure]
-    #[ArrayShape(['r' => "float", 'g' => "float", 'b' => "float"])]
-    public static function convertRgbArrayToSrgbArray(array $rgb): array
+    #[ArrayShape([self::COLOR_INDEX_SRGB_RED => "float", self::COLOR_INDEX_SRGB_GREEN => "float", self::COLOR_INDEX_SRGB_BLUE => "float"])]
+    public static function convertRgbArrayToSrgbArray(array $rgb, int $precision = -1): array
     {
+        self::checkRgb($rgb);
+
         return [
-            'r' => self::convertRgbToSrgb($rgb['r']),
-            'g' => self::convertRgbToSrgb($rgb['g']),
-            'b' => self::convertRgbToSrgb($rgb['b']),
+            self::COLOR_INDEX_SRGB_RED => self::convertRgbToSrgb($rgb[self::COLOR_INDEX_SRGB_RED], $precision),
+            self::COLOR_INDEX_SRGB_GREEN => self::convertRgbToSrgb($rgb[self::COLOR_INDEX_SRGB_GREEN], $precision),
+            self::COLOR_INDEX_SRGB_BLUE => self::convertRgbToSrgb($rgb[self::COLOR_INDEX_SRGB_BLUE], $precision),
         ];
     }
 
     /**
      * Converts given srgb array into xyz array.
      *
-     * @param array{r: float, g: float, b: float} $rgb
+     * @param array{r: float, g: float, b: float} $srgb
+     * @param int $precision
      * @return array{x: float, y: float, z: float}
      */
-    #[ArrayShape(['x' => "float", 'y' => "float", 'z' => "float"])]
-    public static function convertSrgbArrayToXyzArray(array $rgb): array
+    #[ArrayShape([self::COLOR_INDEX_XYZ_X => "float", self::COLOR_INDEX_XYZ_Y => "float", self::COLOR_INDEX_XYZ_Z => "float"])]
+    public static function convertSrgbArrayToXyzArray(array $srgb, int $precision = -1): array
     {
+        self::checkSrgb($srgb);
+
+        list($x, $y, $z, ) = self::matrixVectorMultiplication(self::MATRIX_SRGB_XYZ, $srgb, $precision);
+
         return [
-            'x' => (.4124564 * $rgb['r']) + (.3575761 * $rgb['g']) + (.1804375 * $rgb['b']),
-            'y' => (.2126729 * $rgb['r']) + (.7151522 * $rgb['g']) + (.0721750 * $rgb['b']),
-            'z' => (.0193339 * $rgb['r']) + (.1191920 * $rgb['g']) + (.9503041 * $rgb['b']),
+            self::COLOR_INDEX_XYZ_X => $x,
+            self::COLOR_INDEX_XYZ_Y => $y,
+            self::COLOR_INDEX_XYZ_Z => $z,
         ];
     }
 
@@ -238,11 +356,12 @@ class Color
      * Converts xyz array to lab array.
      *
      * @param array{x: float, y: float, z: float} $xyz
+     * @param int $precision
      * @return array{L: float, a: float, b: float}
      */
     #[Pure]
-    #[ArrayShape(['L' => "float", 'a' => "float", 'b' => "float"])]
-    public static function convertXyzArrayToLabArray(array $xyz): array
+    #[ArrayShape([self::COLOR_INDEX_LAB_LIGHTNESS => "float", self::COLOR_INDEX_LAB_A => "float", self::COLOR_INDEX_LAB_B => "float"])]
+    public static function convertXyzArrayToLabArray(array $xyz, int $precision = -1): array
     {
         /* http://en.wikipedia.org/wiki/Illuminant_D65#Definition */
         $Xn = .95047;
@@ -250,10 +369,112 @@ class Color
         $Zn = 1.08883;
 
         /* http://en.wikipedia.org/wiki/Lab_color_space#CIELAB-CIEXYZ_conversions */
+        $lightness = floatval(116 * self::convertXyzToLab($xyz[self::COLOR_INDEX_XYZ_Y] / $Yn) - 16);
+        $a = floatval(500 * (self::convertXyzToLab($xyz[self::COLOR_INDEX_XYZ_X] / $Xn) - self::convertXyzToLab($xyz[self::COLOR_INDEX_XYZ_Y] / $Yn)));
+        $b = floatval(200 * (self::convertXyzToLab($xyz[self::COLOR_INDEX_XYZ_Y] / $Yn) - self::convertXyzToLab($xyz[self::COLOR_INDEX_XYZ_Z] / $Zn)));
+
+        $lightness = self::correctRangeFloat($lightness, self::COLOR_VALUE_LAB_LIGHTNESS_MIN, self::COLOR_VALUE_LAB_LIGHTNESS_MAX);
+        $a = self::correctRangeFloat($a, self::COLOR_VALUE_LAB_A_MIN, self::COLOR_VALUE_LAB_A_MAX);
+        $b = self::correctRangeFloat($b, self::COLOR_VALUE_LAB_B_MIN, self::COLOR_VALUE_LAB_B_MAX);
+
+        if ($precision === -1) {
+            return [
+                self::COLOR_INDEX_LAB_LIGHTNESS => $lightness,
+                self::COLOR_INDEX_LAB_A => $a,
+                self::COLOR_INDEX_LAB_B => $b,
+            ];
+        }
+
         return [
-            'L' => 116 * self::convertXyzToLab($xyz['y'] / $Yn) - 16,
-            'a' => 500 * (self::convertXyzToLab($xyz['x'] / $Xn) - self::convertXyzToLab($xyz['y'] / $Yn)),
-            'b' => 200 * (self::convertXyzToLab($xyz['y'] / $Yn) - self::convertXyzToLab($xyz['z'] / $Zn)),
+            self::COLOR_INDEX_LAB_LIGHTNESS => round($lightness, $precision),
+            self::COLOR_INDEX_LAB_A => round($a, $precision),
+            self::COLOR_INDEX_LAB_B => round($b, $precision),
         ];
+    }
+
+    /**
+     * Correct the range of given float value.
+     *
+     * @param float $value
+     * @param float $minValue
+     * @param float $maxValue
+     * @return float
+     */
+    protected static function correctRangeFloat(float $value, float $minValue, float $maxValue): float
+    {
+        $value = floatval(max($value, $minValue));
+
+        return floatval(min($value, $maxValue));
+    }
+
+    /**
+     * Checks given rgb array.
+     *
+     * @param array{r:int, g:int, b:int} $rgb
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    protected static function checkRgb(array $rgb): void
+    {
+        foreach (self::COLORS_RGB as $color) {
+            if (!array_key_exists($color, $rgb)) {
+                throw new InvalidArgumentException(sprintf('Missing color index "%s" (%s:%d).', $color, __FILE__, __LINE__));
+            }
+        }
+
+        foreach (self::COLORS_RGB as $color) {
+            if (!is_int($rgb[$color])) {
+                throw new UnexpectedValueException(sprintf('Unexpected value format given for color "%s". Integer expected (%s:%d).', $color, __FILE__, __LINE__));
+            }
+        }
+    }
+
+    /**
+     * Checks given srgb array.
+     *
+     * @param array{r:float, g:float, b:float} $srgb
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    protected static function checkSrgb(array $srgb): void
+    {
+        foreach (self::COLORS_SRGB as $color) {
+            if (!array_key_exists($color, $srgb)) {
+                throw new InvalidArgumentException(sprintf('Missing color index "%s" (%s:%d).', $color, __FILE__, __LINE__));
+            }
+        }
+
+        foreach (self::COLORS_SRGB as $color) {
+            if (!is_float($srgb[$color])) {
+                throw new UnexpectedValueException(sprintf('Unexpected value format given for color "%s". Float expected (%s:%d).', $color, __FILE__, __LINE__));
+            }
+        }
+    }
+
+    /**
+     * Does a matrix vector multiplication.
+     *
+     * @param array<array<int, float>> $matrix
+     * @param array<string, float> $vector
+     * @param int $precision
+     * @return array<int, float>
+     */
+    protected static function matrixVectorMultiplication(array $matrix, array $vector, int $precision = -1): array
+    {
+        $keys = array_keys($vector);
+
+        $x1 = $vector[$keys[0]];
+        $x2 = $vector[$keys[1]];
+        $x3 = $vector[$keys[2]];
+
+        $y1 = floatval($matrix[0][0] * $x1 + $matrix[0][1] * $x2 + $matrix[0][2] * $x3);
+        $y2 = floatval($matrix[1][0] * $x1 + $matrix[1][1] * $x2 + $matrix[1][2] * $x3);
+        $y3 = floatval($matrix[2][0] * $x1 + $matrix[2][1] * $x2 + $matrix[2][2] * $x3);
+
+        if ($precision === -1) {
+            return [$y1, $y2, $y3, ];
+        }
+
+        return [round($y1, $precision), round($y2, $precision), round($y3, $precision), ];
     }
 }

@@ -216,7 +216,7 @@ class ColorDetectorSimple
         }
 
         for (; $highest < 256; $lowest += $delta, $highest += $delta) {
-            $colorHexNew = Color::convertRgbArrayToHex($colors, true, false);
+            $colorHexNew = Color::convertRgbArrayToHex($colors, false, true);
 
             if (isset($colorArray[$colorHexNew])) {
                 return $colorHexNew;
@@ -245,38 +245,38 @@ class ColorDetectorSimple
         $blue = intval(hexdec(substr(strval($colorHex), 4, 2)));
 
         if ($red > $delta) {
-            $colorHexNew = Color::convertRgbArrayToHex(['r' => $red - $delta, 'g' => $green, 'b' => $blue], true, false);
+            $colorHexNew = Color::convertRgbArrayToHex(['r' => $red - $delta, 'g' => $green, 'b' => $blue], false, true);
             if (isset($gradients[$colorHexNew])) {
                 return $gradients[$colorHexNew];
             }
         }
         if ($green > $delta) {
-            $colorHexNew = Color::convertRgbArrayToHex(['r' => $red, 'g' => $green - $delta, 'b' => $blue], true, false);
+            $colorHexNew = Color::convertRgbArrayToHex(['r' => $red, 'g' => $green - $delta, 'b' => $blue], false, true);
             if (isset($gradients[$colorHexNew])) {
                 return $gradients[$colorHexNew];
             }
         }
         if ($blue > $delta) {
-            $colorHexNew = Color::convertRgbArrayToHex(['r' => $red, 'g' => $green, 'b' => $blue - $delta], true, false);
+            $colorHexNew = Color::convertRgbArrayToHex(['r' => $red, 'g' => $green, 'b' => $blue - $delta], false, true);
             if (isset($gradients[$colorHexNew])) {
                 return $gradients[$colorHexNew];
             }
         }
 
         if ($red < (255 - $delta)) {
-            $colorHexNew = Color::convertRgbArrayToHex(['r' => $red + $delta, 'g' => $green, 'b' => $blue], true, false);
+            $colorHexNew = Color::convertRgbArrayToHex(['r' => $red + $delta, 'g' => $green, 'b' => $blue], false, true);
             if (isset($gradients[$colorHexNew])) {
                 return $gradients[$colorHexNew];
             }
         }
         if ($green < (255 - $delta)) {
-            $colorHexNew = Color::convertRgbArrayToHex(['r' => $red, 'g' => $green + $delta, 'b' => $blue], true, false);
+            $colorHexNew = Color::convertRgbArrayToHex(['r' => $red, 'g' => $green + $delta, 'b' => $blue], false, true);
             if (isset($gradients[$colorHexNew])) {
                 return $gradients[$colorHexNew];
             }
         }
         if ($blue < (255 - $delta)) {
-            $colorHexNew = Color::convertRgbArrayToHex(['r' => $red, 'g' => $green, 'b' => $blue + $delta], true, false);
+            $colorHexNew = Color::convertRgbArrayToHex(['r' => $red, 'g' => $green, 'b' => $blue + $delta], false, true);
             if (isset($gradients[$colorHexNew])) {
                 return $gradients[$colorHexNew];
             }
@@ -322,7 +322,7 @@ class ColorDetectorSimple
                 /* Get the colors for an index. */
                 $colorReduced = $this->reduceColorArrayInformation($color, $delta);
 
-                $colorHex = Color::convertRgbArrayToHex($colorReduced, true, false);
+                $colorHex = Color::convertRgbArrayToHex($colorReduced, false, true);
 
                 if (! isset($colorArray[$colorHex])) {
                     $colorArray[$colorHex] = 1;
