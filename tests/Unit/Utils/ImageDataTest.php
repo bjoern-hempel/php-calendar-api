@@ -30,6 +30,7 @@ namespace App\Tests\Unit\Utils;
 
 use App\Utils\ImageData;
 use App\Utils\StringConverter;
+use DateTime;
 use Exception;
 use PHPUnit\Framework\TestCase;
 
@@ -69,7 +70,7 @@ final class ImageDataTest extends TestCase
     /**
      * Data provider.
      *
-     * @return array<int, array<int, array<string, array<string, float|int|string|null>>|int|string>>
+     * @return array<int, array<int, array<string, array<string, DateTime|float|int|string|null>>|int|string>>
      */
     public function dataProvider(): array
     {

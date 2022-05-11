@@ -108,8 +108,8 @@ final class StringConverterTest extends TestCase
             /**
              * Test:convertDateTime
              */
-            [++$number, 'convertDateTime', '2022:05:01 20:12:35', 'Y-m-d H:i:s', '2022-05-01 20:12:35'],
-            [++$number, 'convertDateTime', '2022:05:01 20:12:35', 'c', '2022-05-01T20:12:35+00:00'],
+            [++$number, 'convertDateTimeFormat', '2022:05:01 20:12:35', 'Y-m-d H:i:s', '2022-05-01 20:12:35'],
+            [++$number, 'convertDateTimeFormat', '2022:05:01 20:12:35', 'c', '2022-05-01T20:12:35+00:00'],
         ];
     }
 }

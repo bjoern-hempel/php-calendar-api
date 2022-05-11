@@ -17,7 +17,7 @@ use Exception;
 use JetBrains\PhpStorm\ArrayShape;
 
 /**
- * Class Coordinate
+ * Class Place
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2022-04-22)
@@ -25,10 +25,10 @@ use JetBrains\PhpStorm\ArrayShape;
  */
 class Coordinate
 {
-    /* X Coordinate */
+    /* X Place */
     protected GPSPosition $longitude;
 
-    /* Y Coordinate */
+    /* Y Place */
     protected GPSPosition $latitude;
 
     public const TYPE_LATITUDE = 'latitude';
@@ -48,7 +48,7 @@ class Coordinate
     public const UNIT_LONGITUDE = [self::DIRECTION_WEST, self::DIRECTION_EAST, ];
 
     /**
-     * Coordinate constructor.
+     * Place constructor.
      *
      * @param GPSPosition $longitude
      * @param GPSPosition $latitude

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Utils;
 
 use DateTime;
+use DateTimeImmutable;
 use Exception;
 use InvalidArgumentException;
 
@@ -42,7 +43,7 @@ class StringConverter
         }
 
         return match ($matches[2]) {
-            '/' => $precision === -1 ? intval($matches[1]) / intval($matches[3]) : round(intval($matches[1]) / intval($matches[3]), $precision),
+            '/' => $precision === -1 ? intval($matches[1]) / (intval(intval($matches[3]) === 0 ? 1 : $matches[3])) : round(intval($matches[1]) / (intval(intval($matches[3]) === 0 ? 1 : $matches[3])), $precision),
             default => throw new Exception(sprintf('Unsupported calculation "%s" (%s:%d).', $matches[2], __FILE__, __LINE__)),
         };
     }
@@ -85,10 +86,9 @@ class StringConverter
      * Converts given date time string into a DateTime object.
      *
      * @param string $dateTimeString
-     * @param string|null $format
-     * @return DateTime|string
+     * @return DateTime
      */
-    public static function convertDateTime(string $dateTimeString, ?string $format = null): DateTime|string
+    public static function convertDateTime(string $dateTimeString): DateTime
     {
         $dateParsed = date_parse($dateTimeString);
 
@@ -107,13 +107,24 @@ class StringConverter
         }
 
         $dateTime = new DateTime();
-        $dateTime->setDate($dateParsed['year'], $dateParsed['month'], $dateParsed['day']);
-        $dateTime->setTime($dateParsed['hour'], $dateParsed['minute'], $dateParsed['second']);
+        $dateTime->setDate(intval($dateParsed['year']), intval($dateParsed['month']), intval($dateParsed['day']));
 
-        if ($format === null) {
-            return $dateTime;
+        if (!empty($dateParsed['hour']) && !empty($dateParsed['minute']) && !empty($dateParsed['second'])) {
+            $dateTime->setTime(intval($dateParsed['hour']), intval($dateParsed['minute']), intval($dateParsed['second']));
         }
 
-        return $dateTime->format($format);
+        return $dateTime;
+    }
+
+    /**
+     * Converts given date time string into a string.
+     *
+     * @param string $dateTimeString
+     * @param string $format
+     * @return string
+     */
+    public static function convertDateTimeFormat(string $dateTimeString, string $format): string
+    {
+        return self::convertDateTime($dateTimeString)->format($format);
     }
 }

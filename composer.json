@@ -6,11 +6,13 @@
     "require": {
         "php": ">=8.0.2",
         "ext-ctype": "*",
+        "ext-exif": "*",
         "ext-gd": "*",
         "ext-iconv": "*",
         "api-platform/core": "^2.6",
         "chillerlan/php-qrcode": "^4.3",
         "composer/package-versions-deprecated": "1.11.99.4",
+        "creof/doctrine2-spatial": "^1.2",
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2.5",
         "doctrine/doctrine-migrations-bundle": "^3.2",
@@ -42,8 +44,7 @@
         "symfony/twig-bundle": "6.0.*",
         "symfony/validator": "6.0.*",
         "symfony/webpack-encore-bundle": "^1.14",
-        "symfony/yaml": "6.0.*",
-        "ext-exif": "*"
+        "symfony/yaml": "6.0.*"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",

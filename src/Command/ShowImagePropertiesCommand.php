@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Entity\Place;
+use App\Repository\PlaceRepository;
 use App\Utils\Image\Color;
 use App\Utils\Image\ColorDetectorSimple;
 use App\Utils\Image\ColorDetectorCiede2000;
@@ -52,12 +54,16 @@ class ShowImagePropertiesCommand extends Command
 
     protected const LINE_BREAK = "\n";
 
+    protected PlaceRepository $placeRepository;
+
     /**
      * ShowImagePropertiesCommand constructor.
      */
-    public function __construct()
+    public function __construct(PlaceRepository $placeRepository)
     {
         parent::__construct();
+
+        $this->placeRepository = $placeRepository;
     }
 
     /**
@@ -452,7 +458,7 @@ EOT
         $this->printColorsSimple($gdImage, $output);
 
         /* Print image data. */
-        $this->printImageData(new ImageData($imagePath), $output);
+        $this->printImageData(new ImageData($imagePath, $this->placeRepository), $output);
 
         /* Command successfully executed. */
         return Command::SUCCESS;

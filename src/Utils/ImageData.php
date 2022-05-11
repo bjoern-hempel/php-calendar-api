@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace App\Utils;
 
+use App\Entity\Place;
+use App\Repository\PlaceRepository;
+use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
 
@@ -26,6 +29,8 @@ use JetBrains\PhpStorm\ArrayShape;
 class ImageData
 {
     protected string $imagePath;
+
+    protected ?PlaceRepository $placeRepository;
 
     protected const DEBUG = false;
 
@@ -76,14 +81,31 @@ class ImageData
     public const KEY_NAME_GPS_LONGITUDE_DECIMAL_DEGREE = 'gps-longitude-decimal-degree';
     public const KEY_NAME_GPS_LONGITUDE_DIRECTION = 'gps-longitude-direction';
 
+    public const KEY_NAME_PLACE = 'place';
+    public const KEY_NAME_PLACE_COUNTRY_CODE = 'place-country-code';
+    public const KEY_NAME_PLACE_TIMEZONE = 'place-timezone';
+    public const KEY_NAME_PLACE_POPULATION = 'place-population';
+    public const KEY_NAME_PLACE_ELEVATION = 'place-elevation';
+    public const KEY_NAME_PLACE_FEATURE_CLASS = 'place-feature-class';
+    public const KEY_NAME_PLACE_FEATURE_CODE = 'place-feature-code';
+    public const KEY_NAME_PLACE_DISTANCE = 'place-distance';
+    public const KEY_NAME_PLACE_DEM = 'place-dem';
+    public const KEY_NAME_PLACE_ADMIN1 = 'place-admin1';
+    public const KEY_NAME_PLACE_ADMIN2 = 'place-admin2';
+    public const KEY_NAME_PLACE_ADMIN3 = 'place-admin3';
+    public const KEY_NAME_PLACE_ADMIN4 = 'place-admin4';
+
     /**
      * ImageData constructor.
      *
      * @param string $imagePath
+     * @param PlaceRepository|null $placeRepository
      */
-    public function __construct(string $imagePath)
+    public function __construct(string $imagePath, ?PlaceRepository $placeRepository = null)
     {
         $this->imagePath = $imagePath;
+
+        $this->placeRepository = $placeRepository;
     }
 
     /**
@@ -95,7 +117,7 @@ class ImageData
      * @param string|null $unit
      * @param string|null $unitBefore
      * @param string|null $valueFormatted
-     * @param string|null $valueOriginal
+     * @param array<string, string|mixed|null> $addValues
      * @return array<string, string|mixed|null>
      */
     #[ArrayShape([self::KEY_NAME_TITLE => "string", self::KEY_NAME_FORMAT => "string", self::KEY_NAME_UNIT => "null|string", self::KEY_NAME_UNIT_BEFORE => "null|string", self::KEY_NAME_VALUE => "mixed", self::KEY_NAME_VALUE_FORMATTED => "string"])]
@@ -130,6 +152,64 @@ class ImageData
         $value3 = StringConverter::calculate($coordinate[2]);
 
         return sprintf('%d°%d’%.2f"%s', $value1, $value2, $value3, $ref);
+    }
+
+    /**
+     * Adds places information.
+     *
+     * @param array<string, array<string, mixed>> $data
+     * @return void
+     * @throws DoctrineDBALException
+     */
+    protected function addPlaceInformation(array &$data): void
+    {
+        if (!$this->placeRepository instanceof PlaceRepository) {
+            return;
+        }
+
+        if (array_key_exists('gps-latitude-decimal-degree', $data) && array_key_exists('gps-longitude-decimal-degree', $data)) {
+            $latitude = floatval($data['gps-latitude-decimal-degree']['value']);
+            $longitude = floatval($data['gps-longitude-decimal-degree']['value']);
+
+            /* PPLX */
+            $places = $this->placeRepository->findPlaceByPosition($latitude, $longitude, 1);
+
+//            foreach (PlaceRepository::FEATURE_CLASSES_ALL as $featureClass) {
+//                $p = $this->placeRepository->findByPosition($latitude, $longitude, 1, $featureClass);
+//
+//                if (count($p) <= 0) {
+//                    continue;
+//                }
+//
+//                print sprintf('%s: %s', $featureClass, $p[0]->getName());
+//                print "\n";
+//            }
+
+            if (count($places) <= 0) {
+                return;
+            }
+
+            $place = $places[0];
+
+            $data = array_merge(
+                $data,
+                [
+                    self::KEY_NAME_PLACE => $this->getData('Place City', $place->getName(), '%s', null),
+                    self::KEY_NAME_PLACE_COUNTRY_CODE => $this->getData('Place Country Code', $place->getCountryCode(), '%s', null),
+                    self::KEY_NAME_PLACE_TIMEZONE => $this->getData('Place Timezone', $place->getTimezone(), '%s', null),
+                    self::KEY_NAME_PLACE_POPULATION => $this->getData('Place Population', $place->getPopulation(), '%s', null),
+                    self::KEY_NAME_PLACE_ELEVATION => $this->getData('Place Elevation', $place->getElevation(), '%s', ' m'),
+                    self::KEY_NAME_PLACE_FEATURE_CLASS => $this->getData('Place Feature Class', $place->getFeatureClass(), '%s', null),
+                    self::KEY_NAME_PLACE_FEATURE_CODE => $this->getData('Place Feature Code', $place->getFeatureCode(), '%s', null),
+                    self::KEY_NAME_PLACE_DISTANCE => $this->getData('Place Feature Code', $place->getDistance(), '%s', null),
+                    self::KEY_NAME_PLACE_DEM => $this->getData('Digital Elevation Model', $place->getDem(), '%s', null),
+                    self::KEY_NAME_PLACE_ADMIN1 => $this->getData('Admin1 Code', $place->getAdmin1Code(), '%s', null),
+                    self::KEY_NAME_PLACE_ADMIN2 => $this->getData('Admin2 Code', $place->getAdmin2Code(), '%s', null),
+                    self::KEY_NAME_PLACE_ADMIN3 => $this->getData('Admin3 Code', $place->getAdmin3Code(), '%s', null),
+                    self::KEY_NAME_PLACE_ADMIN4 => $this->getData('Admin4 Code', $place->getAdmin4Code(), '%s', null),
+                ]
+            );
+        }
     }
 
     /**
@@ -172,12 +252,14 @@ class ImageData
         }
         if (array_key_exists('GPSLatitude', $dataExif) && array_key_exists('GPSLongitude', $dataExif)) {
             $dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DMS] = $this->getData('GPS Latitude DMS', $this->getCoordinate($dataExif['GPSLatitude'], $dataExif['GPSLatitudeRef']), '%s', null);
-            $dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DECIMAL_DEGREE] = $this->getData('GPS Latitude Decimal Degree', GPSConverter::dms2DecimalDegree(strval($dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DMS]['value'])), '%s', '°');
-            $dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DIRECTION] = $this->getData('GPS Latitude Direction', GPSConverter::dms2Direction(strval($dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DMS]['value'])), '%s', null);
+            $latitudeDirection = GPSConverter::dms2Direction(strval($dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DMS]['value']));
+            $dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DECIMAL_DEGREE] = $this->getData('GPS Latitude Decimal Degree', GPSConverter::dms2DecimalDegree(strval($dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DMS]['value']), $latitudeDirection), '%s', '°');
+            $dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DIRECTION] = $this->getData('GPS Latitude Direction', $latitudeDirection, '%s', null);
 
             $dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DMS] = $this->getData('GPS Longitude', $this->getCoordinate($dataExif['GPSLongitude'], $dataExif['GPSLongitudeRef']), '%s', null);
-            $dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DECIMAL_DEGREE] = $this->getData('GPS Longitude Decimal Degree', GPSConverter::dms2DecimalDegree(strval($dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DMS]['value'])), '%s', '°');
-            $dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DIRECTION] = $this->getData('GPS Longitude Direction', GPSConverter::dms2Direction(strval($dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DMS]['value'])), '%s', null);
+            $longitudeDirection = GPSConverter::dms2Direction(strval($dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DMS]['value']));
+            $dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DECIMAL_DEGREE] = $this->getData('GPS Longitude Decimal Degree', GPSConverter::dms2DecimalDegree(strval($dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DMS]['value']), $longitudeDirection), '%s', '°');
+            $dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DIRECTION] = $this->getData('GPS Longitude Direction', $longitudeDirection, '%s', null);
 
             $dataExifReturn[self::KEY_NAME_GPS_GOOGLE_LINK] = $this->getData('GPS Google', GPSConverter::decimalDegree2google(
                 floatval($dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DECIMAL_DEGREE]['value']),
@@ -194,7 +276,7 @@ class ImageData
         if (array_key_exists('DateTimeOriginal', $dataExif)) {
             $dataExifReturn[self::KEY_NAME_IMAGE_DATE_TIME_ORIGINAL] = $this->getData(
                 'Image Date Time Original',
-                strval(StringConverter::convertDateTime($dataExif['DateTimeOriginal'], 'Y-m-d\\TH:i:s')),
+                StringConverter::convertDateTimeFormat($dataExif['DateTimeOriginal'], 'Y-m-d\\TH:i:s'),
                 '%s',
                 null,
                 null,
@@ -291,6 +373,8 @@ class ImageData
         $data[self::KEY_NAME_IMAGE_SIZE] = $this->getData('Image Size', $fileSize, '%d', ' Bytes');
         $data[self::KEY_NAME_IMAGE_SIZE_HUMAN] = $this->getData('Image Size Human', SizeConverter::getHumanReadableSize($fileSize), '%s', null);
 
+        $this->addPlaceInformation($data);
+
         /* Sort by key */
         ksort($data);
 
@@ -303,7 +387,7 @@ class ImageData
      * @return void
      * @throws Exception
      */
-    public function printDataImage()
+    public function printDataImage(): void
     {
         $dataImage = $this->getDataImage();
 

@@ -47,6 +47,11 @@ class GPSConverter
 
     protected const REGEXP_VERSION_2 = 2;
 
+    public const DIRECTION_NORTH = 'N';
+    public const DIRECTION_SOUTH = 'S';
+    public const DIRECTION_WEST = 'W';
+    public const DIRECTION_EAST = 'E';
+
     /**
      * @param array<int, string> $units
      * @param int $version
@@ -191,12 +196,19 @@ class GPSConverter
      * Converts given dms string into decimal degree.
      *
      * @param string $dms
+     * @param string|null $direction
      * @return float
      * @throws Exception
      */
-    public static function dms2DecimalDegree(string $dms): float
+    public static function dms2DecimalDegree(string $dms, ?string $direction = null): float
     {
-        return (new GPSPosition(self::parseDms($dms)))->getDecimalDegree();
+        $value = (new GPSPosition(self::parseDms($dms)))->getDecimalDegree();
+
+        if (in_array($direction, [self::DIRECTION_WEST, self::DIRECTION_SOUTH])) {
+            $value *= -1;
+        }
+
+        return $value;
     }
 
     /**

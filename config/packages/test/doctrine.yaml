@@ -5,3 +5,6 @@ doctrine:
         driver: pdo_sqlite
         #memory: true
         path: "%kernel.cache_dir%/test.db"
+        types:
+            # Tests use sqlite so that CrEOF\Spatial\DBAL\Types\Geometry\PointType is unknown and is not supported.
+            point: Doctrine\DBAL\Types\StringType
