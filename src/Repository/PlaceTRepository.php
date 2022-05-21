@@ -13,32 +13,27 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\Place;
+use App\Entity\PlaceT;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * Class ImageData
+ * Class PlaceTRepository
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-05-08)
+ * @version 1.0 (2022-05-20)
  * @package App\Command
- * @extends ServiceEntityRepository<Place>
- *
- * @method Place|null find($id, $lockMode = null, $lockVersion = null)
- * @method Place|null findOneBy(array $criteria, array $orderBy = null)
- * @method Place[]    findAll()
- * @method Place[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<PlaceT>
  */
-class PlaceRepository extends ServiceEntityRepository
+class PlaceTRepository extends ServiceEntityRepository
 {
     /**
-     * PlaceRepository constructor.
+     * PlaceHRepository constructor.
      *
      * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Place::class);
+        parent::__construct($registry, PlaceT::class);
     }
 }

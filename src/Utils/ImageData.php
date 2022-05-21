@@ -13,8 +13,18 @@ declare(strict_types=1);
 
 namespace App\Utils;
 
-use App\Entity\Place;
+use App\Entity\PlaceA;
+use App\Repository\PlaceARepository;
+use App\Repository\PlaceHRepository;
+use App\Repository\PlaceLRepository;
+use App\Repository\PlacePRepository;
 use App\Repository\PlaceRepository;
+use App\Repository\PlaceRRepository;
+use App\Repository\PlaceSRepository;
+use App\Repository\PlaceTRepository;
+use App\Repository\PlaceURepository;
+use App\Repository\PlaceVRepository;
+use App\Service\Entity\PlaceLoaderService;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
@@ -28,9 +38,11 @@ use JetBrains\PhpStorm\ArrayShape;
  */
 class ImageData
 {
+    protected bool $detailed = false;
+
     protected string $imagePath;
 
-    protected ?PlaceRepository $placeRepository;
+    protected ?PlaceLoaderService $placeLoaderService;
 
     protected const DEBUG = false;
 
@@ -82,6 +94,15 @@ class ImageData
     public const KEY_NAME_GPS_LONGITUDE_DIRECTION = 'gps-longitude-direction';
 
     public const KEY_NAME_PLACE = 'place';
+    public const KEY_NAME_PLACE_FULL = 'place-full';
+    public const KEY_NAME_PLACE_CITY_P = 'place-city-p';
+    public const KEY_NAME_PLACE_CITY_A = 'place-city-a';
+    public const KEY_NAME_PLACE_STATE = 'place-state';
+    public const KEY_NAME_PLACE_PARK = 'place-park';
+    public const KEY_NAME_PLACE_MOUNTAIN = 'place-mountain';
+    public const KEY_NAME_PLACE_SPOT = 'place-spot';
+    public const KEY_NAME_PLACE_FOREST = 'place-forest';
+    public const KEY_NAME_PLACE_COUNTRY = 'place-country';
     public const KEY_NAME_PLACE_COUNTRY_CODE = 'place-country-code';
     public const KEY_NAME_PLACE_TIMEZONE = 'place-timezone';
     public const KEY_NAME_PLACE_POPULATION = 'place-population';
@@ -99,13 +120,16 @@ class ImageData
      * ImageData constructor.
      *
      * @param string $imagePath
-     * @param PlaceRepository|null $placeRepository
+     * @param PlaceLoaderService|null $placeLoaderService
+     * @param bool $detailed
      */
-    public function __construct(string $imagePath, ?PlaceRepository $placeRepository = null)
+    public function __construct(string $imagePath, ?PlaceLoaderService $placeLoaderService = null, bool $detailed = false)
     {
         $this->imagePath = $imagePath;
 
-        $this->placeRepository = $placeRepository;
+        $this->placeLoaderService = $placeLoaderService;
+
+        $this->detailed = $detailed;
     }
 
     /**
@@ -163,7 +187,7 @@ class ImageData
      */
     protected function addPlaceInformation(array &$data): void
     {
-        if (!$this->placeRepository instanceof PlaceRepository) {
+        if (!$this->placeLoaderService instanceof PlaceLoaderService) {
             return;
         }
 
@@ -171,44 +195,94 @@ class ImageData
             $latitude = floatval($data['gps-latitude-decimal-degree']['value']);
             $longitude = floatval($data['gps-longitude-decimal-degree']['value']);
 
-            /* PPLX */
-            $places = $this->placeRepository->findPlaceByPosition($latitude, $longitude, 1);
+            $place = $this->placeLoaderService->findPlacePByPosition($latitude, $longitude);
 
-//            foreach (PlaceRepository::FEATURE_CLASSES_ALL as $featureClass) {
-//                $p = $this->placeRepository->findByPosition($latitude, $longitude, 1, $featureClass);
-//
-//                if (count($p) <= 0) {
-//                    continue;
-//                }
-//
-//                print sprintf('%s: %s', $featureClass, $p[0]->getName());
-//                print "\n";
-//            }
-
-            if (count($places) <= 0) {
+            if ($place === null) {
                 return;
             }
 
-            $place = $places[0];
+            $dataAdd = [
+                self::KEY_NAME_PLACE => $this->getData('Place', $place->getName(), '%s', null),
+            ];
 
-            $data = array_merge(
-                $data,
-                [
-                    self::KEY_NAME_PLACE => $this->getData('Place City', $place->getName(), '%s', null),
-                    self::KEY_NAME_PLACE_COUNTRY_CODE => $this->getData('Place Country Code', $place->getCountryCode(), '%s', null),
-                    self::KEY_NAME_PLACE_TIMEZONE => $this->getData('Place Timezone', $place->getTimezone(), '%s', null),
-                    self::KEY_NAME_PLACE_POPULATION => $this->getData('Place Population', $place->getPopulation(), '%s', null),
-                    self::KEY_NAME_PLACE_ELEVATION => $this->getData('Place Elevation', $place->getElevation(), '%s', ' m'),
-                    self::KEY_NAME_PLACE_FEATURE_CLASS => $this->getData('Place Feature Class', $place->getFeatureClass(), '%s', null),
-                    self::KEY_NAME_PLACE_FEATURE_CODE => $this->getData('Place Feature Code', $place->getFeatureCode(), '%s', null),
-                    self::KEY_NAME_PLACE_DISTANCE => $this->getData('Place Feature Code', $place->getDistance(), '%s', null),
-                    self::KEY_NAME_PLACE_DEM => $this->getData('Digital Elevation Model', $place->getDem(), '%s', null),
-                    self::KEY_NAME_PLACE_ADMIN1 => $this->getData('Admin1 Code', $place->getAdmin1Code(), '%s', null),
-                    self::KEY_NAME_PLACE_ADMIN2 => $this->getData('Admin2 Code', $place->getAdmin2Code(), '%s', null),
-                    self::KEY_NAME_PLACE_ADMIN3 => $this->getData('Admin3 Code', $place->getAdmin3Code(), '%s', null),
-                    self::KEY_NAME_PLACE_ADMIN4 => $this->getData('Admin4 Code', $place->getAdmin4Code(), '%s', null),
-                ]
-            );
+            /* PlaceP */
+            if ($place->getCityP() !== null) {
+                $dataAdd = array_merge($dataAdd, [
+                    self::KEY_NAME_PLACE_CITY_P => $this->getData('Place City P', $place->getCityP()->getName($this->detailed), '%s', null),
+                ]);
+            }
+
+            /* PlaceA */
+            if ($place->getCityA() !== null) {
+                $dataAdd = array_merge($dataAdd, [
+                    self::KEY_NAME_PLACE_CITY_A => $this->getData('Place City A', $place->getCityA()->getName($this->detailed), '%s', null),
+                ]);
+            }
+
+            /* PlaceA */
+            if ($place->getState() !== null) {
+                $dataAdd = array_merge($dataAdd, [
+                    self::KEY_NAME_PLACE_STATE => $this->getData('Place State', $place->getState()->getName($this->detailed), '%s', null),
+                ]);
+            }
+
+            /* PlaceL */
+            if (count($place->getParks()) > 0) {
+                $park = $place->getParks()[0];
+
+                $dataAdd = array_merge($dataAdd, [
+                    self::KEY_NAME_PLACE_PARK => $this->getData('Place Park', $park->getName($this->detailed), '%s', null),
+                ]);
+            }
+
+            /* PlaceT */
+            if (count($place->getMountains()) > 0) {
+                $mountain = $place->getMountains()[0];
+
+                $dataAdd = array_merge($dataAdd, [
+                    self::KEY_NAME_PLACE_MOUNTAIN => $this->getData('Place Mountain', $mountain->getName($this->detailed), '%s', null),
+                ]);
+            }
+
+            /* PlaceS */
+            if (count($place->getSpots()) > 0) {
+                $spot = $place->getSpots()[0];
+
+                $dataAdd = array_merge($dataAdd, [
+                    self::KEY_NAME_PLACE_SPOT => $this->getData('Place Spot', $spot->getName($this->detailed), '%s', null),
+                ]);
+            }
+
+            /* PlaceV */
+            if (count($place->getForests()) > 0) {
+                $spot = $place->getForests()[0];
+
+                $dataAdd = array_merge($dataAdd, [
+                    self::KEY_NAME_PLACE_FOREST => $this->getData('Place Forest', $spot->getName($this->detailed), '%s', null),
+                ]);
+            }
+
+            $dataAdd = array_merge($dataAdd, [
+                self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->detailed), '%s', null),
+            ]);
+
+            $dataAdd = array_merge($dataAdd, [
+                self::KEY_NAME_PLACE_COUNTRY => $this->getData('Place Country (translated)', $place->getCountry(), '%s', null),
+                self::KEY_NAME_PLACE_COUNTRY_CODE => $this->getData('Place Country Code', $place->getCountryCode(), '%s', null),
+                self::KEY_NAME_PLACE_TIMEZONE => $this->getData('Place Timezone', $place->getTimezone(), '%s', null),
+                self::KEY_NAME_PLACE_POPULATION => $this->getData('Place Population', $place->getPopulation(), '%s', null),
+                self::KEY_NAME_PLACE_ELEVATION => $this->getData('Place Elevation', $place->getElevation(), '%s', ' m'),
+                self::KEY_NAME_PLACE_FEATURE_CLASS => $this->getData('Place Feature Class', $place->getFeatureClass(), '%s', null),
+                self::KEY_NAME_PLACE_FEATURE_CODE => $this->getData('Place Feature Code', $place->getFeatureCode(), '%s', null),
+                self::KEY_NAME_PLACE_DISTANCE => $this->getData('Place Feature Code', $place->getDistance(), '%s', null),
+                self::KEY_NAME_PLACE_DEM => $this->getData('Digital Elevation Model', $place->getDem(), '%s', null),
+                self::KEY_NAME_PLACE_ADMIN1 => $this->getData('Admin1 Code', $place->getAdmin1Code(), '%s', null),
+                self::KEY_NAME_PLACE_ADMIN2 => $this->getData('Admin2 Code', $place->getAdmin2Code(), '%s', null),
+                self::KEY_NAME_PLACE_ADMIN3 => $this->getData('Admin3 Code', $place->getAdmin3Code(), '%s', null),
+                self::KEY_NAME_PLACE_ADMIN4 => $this->getData('Admin4 Code', $place->getAdmin4Code(), '%s', null),
+            ]);
+
+            $data = array_merge($data, $dataAdd);
         }
     }
 

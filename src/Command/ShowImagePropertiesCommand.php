@@ -13,8 +13,19 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use ApiPlatform\Core\Action\PlaceholderAction;
 use App\Entity\Place;
+use App\Repository\PlaceARepository;
+use App\Repository\PlaceHRepository;
+use App\Repository\PlaceLRepository;
+use App\Repository\PlacePRepository;
 use App\Repository\PlaceRepository;
+use App\Repository\PlaceRRepository;
+use App\Repository\PlaceSRepository;
+use App\Repository\PlaceTRepository;
+use App\Repository\PlaceURepository;
+use App\Repository\PlaceVRepository;
+use App\Service\Entity\PlaceLoaderService;
 use App\Utils\Image\Color;
 use App\Utils\Image\ColorDetectorSimple;
 use App\Utils\Image\ColorDetectorCiede2000;
@@ -26,6 +37,7 @@ use GdImage;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -54,16 +66,18 @@ class ShowImagePropertiesCommand extends Command
 
     protected const LINE_BREAK = "\n";
 
-    protected PlaceRepository $placeRepository;
+    protected PlaceLoaderService $placeLoaderService;
+
+    protected bool $detailed = false;
 
     /**
      * ShowImagePropertiesCommand constructor.
      */
-    public function __construct(PlaceRepository $placeRepository)
+    public function __construct(PlaceLoaderService $placeLoaderService)
     {
         parent::__construct();
 
-        $this->placeRepository = $placeRepository;
+        $this->placeLoaderService = $placeLoaderService;
     }
 
     /**
@@ -75,7 +89,8 @@ class ShowImagePropertiesCommand extends Command
             ->setName('app:image:show')
             ->setDescription('Shows image properties.')
             ->setDefinition([
-                new InputArgument('path', InputArgument::REQUIRED, 'The path to image'),
+                new InputArgument('path', InputArgument::REQUIRED, 'The path to image.'),
+                new InputOption('detailed', 'd', InputOption::VALUE_NONE, 'Switch to debug mode.'),
             ])
             ->setHelp(
                 <<<'EOT'
@@ -84,19 +99,6 @@ The <info>app:image:show</info> shows image properties:
   <info>php %command.full_name%</info>
 EOT
             );
-    }
-
-    /**
-     * Returns if given command application exists.
-     *
-     * @param string $cmd
-     * @return bool
-     */
-    protected function commandExist(string $cmd): bool
-    {
-        $return = shell_exec(sprintf("which %s", escapeshellarg($cmd)));
-
-        return !empty($return);
     }
 
     /**
@@ -355,27 +357,42 @@ EOT
     /**
      * Prints image data.
      *
-     * @param ImageData $imageData
+     * @param string $imagePath
      * @param OutputInterface $output
      * @return void
      * @throws Exception
      */
-    protected function printImageData(ImageData $imageData, OutputInterface $output): void
+    protected function printImageData(string $imagePath, OutputInterface $output): void
     {
-        $output->writeln('');
-        $output->writeln('Image properties');
-        $output->writeln('----------------');
-        $output->writeln('');
+        $timer = Timer::start();
+
+        $imageData = new ImageData(
+            $imagePath,
+            $this->placeLoaderService,
+            $this->detailed
+        );
 
         $outputLines = $this->getOutputLines($imageData);
         $outputMaxLength = $this->getMaxLength($outputLines);
 
         $format = sprintf(self::REGEXP_OUTPUT, ImageData::WIDTH_TITLE, ImageData::WIDTH_TITLE);
-        $output->writeln(sprintf($format, 'Title', 'Key', 'Value'));
-        $output->writeln(str_repeat('-', $outputMaxLength));
+
+        $imageDataText = sprintf($format, 'Title', 'Key', 'Value').self::LINE_BREAK;
+        $imageDataText .= str_repeat('-', $outputMaxLength).self::LINE_BREAK;
         foreach ($outputLines as $outputLine) {
-            $output->writeln($outputLine);
+            $imageDataText .= $outputLine.self::LINE_BREAK;
         }
+
+        $time = Timer::stop($timer);
+
+        $title = sprintf('Image properties (%.4fs)', $time);
+
+        $output->writeln('');
+        $output->writeln($title);
+        $output->writeln(str_repeat('-', strlen($title)));
+        $output->writeln('');
+        $output->writeln($imageDataText);
+        $output->writeln('');
         $output->writeln('');
     }
 
@@ -439,6 +456,8 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->detailed = boolval($input->getOption('detailed'));
+
         /* Read parameter. */
         $imagePath = strval($input->getArgument('path'));
 
@@ -458,7 +477,7 @@ EOT
         $this->printColorsSimple($gdImage, $output);
 
         /* Print image data. */
-        $this->printImageData(new ImageData($imagePath, $this->placeRepository), $output);
+        $this->printImageData($imagePath, $output);
 
         /* Command successfully executed. */
         return Command::SUCCESS;
