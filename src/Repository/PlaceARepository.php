@@ -15,6 +15,7 @@ namespace App\Repository;
 
 use App\Entity\PlaceA;
 use App\Entity\PlaceP;
+use App\Repository\Base\PlaceRepositoryInterface;
 use App\Service\Entity\PlaceLoaderService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -29,7 +30,7 @@ use Exception;
  * @package App\Command
  * @extends ServiceEntityRepository<PlaceA>
  */
-class PlaceARepository extends ServiceEntityRepository
+class PlaceARepository extends ServiceEntityRepository implements PlaceRepositoryInterface
 {
     /**
      * PlaceARepository constructor.

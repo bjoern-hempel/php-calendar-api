@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Entity\Trait\PlaceTrait;
 use App\Entity\Trait\TimestampsTrait;
 use App\Repository\PlaceRRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -27,7 +28,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity(repositoryClass: PlaceRRepository::class)]
 #[ApiResource]
-class PlaceR extends Place
+class PlaceR
 {
     use TimestampsTrait;
+
+    use PlaceTrait;
 }

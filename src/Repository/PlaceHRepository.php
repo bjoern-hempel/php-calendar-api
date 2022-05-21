@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\PlaceH;
+use App\Repository\Base\PlaceRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -25,7 +26,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @package App\Command
  * @extends ServiceEntityRepository<PlaceH>
  */
-class PlaceHRepository extends ServiceEntityRepository
+class PlaceHRepository extends ServiceEntityRepository implements PlaceRepositoryInterface
 {
     /**
      * PlaceHRepository constructor.

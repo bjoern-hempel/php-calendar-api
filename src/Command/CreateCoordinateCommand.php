@@ -13,8 +13,17 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Entity\Place;
-use App\Repository\PlaceRepository;
+use App\Repository\Base\PlaceRepositoryInterface;
+use App\Repository\PlaceARepository;
+use App\Repository\PlaceHRepository;
+use App\Repository\PlaceLRepository;
+use App\Repository\PlacePRepository;
+use App\Repository\PlaceRRepository;
+use App\Repository\PlaceSRepository;
+use App\Repository\PlaceTRepository;
+use App\Repository\PlaceURepository;
+use App\Repository\PlaceVRepository;
+use App\Service\Entity\PlaceLoaderService;
 use App\Utils\Timer;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use DateTime;
@@ -44,16 +53,53 @@ class CreateCoordinateCommand extends Command
 
     private EntityManagerInterface $manager;
 
+    protected PlaceARepository $placeARepository;
+
+    protected PlaceHRepository $placeHRepository;
+
+    protected PlaceLRepository $placeLRepository;
+
+    protected PlacePRepository $placePRepository;
+
+    protected PlaceRRepository $placeRRepository;
+
+    protected PlaceSRepository $placeSRepository;
+
+    protected PlaceTRepository $placeTRepository;
+
+    protected PlaceURepository $placeURepository;
+
+    protected PlaceVRepository $placeVRepository;
+
     /**
      * CreateUserCommand constructor.
      *
      * @param EntityManagerInterface $manager
+     * @param PlaceARepository $placeARepository
+     * @param PlaceHRepository $placeHRepository
+     * @param PlaceLRepository $placeLRepository
+     * @param PlacePRepository $placePRepository
+     * @param PlaceRRepository $placeRRepository
+     * @param PlaceSRepository $placeSRepository
+     * @param PlaceTRepository $placeTRepository
+     * @param PlaceURepository $placeURepository
+     * @param PlaceVRepository $placeVRepository
      */
-    public function __construct(EntityManagerInterface $manager)
+    public function __construct(EntityManagerInterface $manager, PlaceARepository $placeARepository, PlaceHRepository $placeHRepository, PlaceLRepository $placeLRepository, PlacePRepository $placePRepository, PlaceRRepository $placeRRepository, PlaceSRepository $placeSRepository, PlaceTRepository $placeTRepository, PlaceURepository $placeURepository, PlaceVRepository $placeVRepository)
     {
         parent::__construct();
 
         $this->manager = $manager;
+
+        $this->placeARepository = $placeARepository;
+        $this->placeHRepository = $placeHRepository;
+        $this->placeLRepository = $placeLRepository;
+        $this->placePRepository = $placePRepository;
+        $this->placeRRepository = $placeRRepository;
+        $this->placeSRepository = $placeSRepository;
+        $this->placeTRepository = $placeTRepository;
+        $this->placeURepository = $placeURepository;
+        $this->placeVRepository = $placeVRepository;
     }
 
     /**
@@ -77,6 +123,29 @@ EOT
     }
 
     /**
+     * Returns the place repository according to given feature class.
+     *
+     * @param string $featureClass
+     * @return PlaceRepositoryInterface
+     * @throws Exception
+     */
+    protected function getPlaceRepository(string $featureClass): PlaceRepositoryInterface
+    {
+        return match ($featureClass) {
+            PlaceLoaderService::FEATURE_CLASS_A => $this->placeARepository,
+            PlaceLoaderService::FEATURE_CLASS_H => $this->placeHRepository,
+            PlaceLoaderService::FEATURE_CLASS_L => $this->placeLRepository,
+            PlaceLoaderService::FEATURE_CLASS_P => $this->placePRepository,
+            PlaceLoaderService::FEATURE_CLASS_R => $this->placeRRepository,
+            PlaceLoaderService::FEATURE_CLASS_S => $this->placeSRepository,
+            PlaceLoaderService::FEATURE_CLASS_T => $this->placeTRepository,
+            PlaceLoaderService::FEATURE_CLASS_U => $this->placeURepository,
+            PlaceLoaderService::FEATURE_CLASS_V => $this->placeVRepository,
+            default => throw new Exception(sprintf('Unexpected feature class "%s" (%s:%d).', $featureClass, __FILE__, __LINE__)),
+        };
+    }
+
+    /**
      * Execute the commands.
      *
      * @param InputInterface $input
@@ -91,9 +160,6 @@ EOT
     {
         /* Read parameter. */
         $file = strval($input->getArgument('file'));
-
-        /** @var PlaceRepository $placeRepository */
-        $placeRepository = $this->manager->getRepository(Place::class);
 
         $timer = Timer::start();
 
@@ -130,13 +196,17 @@ EOT
                 continue;
             }
 
+            /* Get some data. */
             $geonameId = intval($row[0]);
             $name = strval($row[1]);
+            $featureClass = strval($row[6]);
+
+            $placeRepository = $this->getPlaceRepository($featureClass);
 
             $place = $placeRepository->findOneBy(['geonameId' => $geonameId]);
 
-            if (!$place instanceof Place) {
-                $place = new Place();
+            if ($place === null) {
+                $place = PlaceLoaderService::getPlace($featureClass);
             }
 
             $point = new Point(floatval($row[4]), floatval($row[5]));
@@ -150,7 +220,7 @@ EOT
             $place->setAsciiName(strval($row[2]));
             $place->setAlternateNames(strval($row[3]));
             $place->setCoordinate($point);
-            $place->setFeatureClass(strval($row[6]));
+            $place->setFeatureClass($featureClass);
             $place->setFeatureCode(strval($row[7]));
             $place->setCountryCode(strval($row[8]));
             $place->setCc2(strval($row[9]));

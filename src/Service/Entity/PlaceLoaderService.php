@@ -264,16 +264,15 @@ SQL;
     }
 
     /**
-     * Builds place from given row.
+     * Return new place instance.
      *
-     * @param array<string,mixed> $row
      * @param string $featureClass
      * @return PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
      * @throws Exception
      */
-    protected function buildPlaceFromRow(array $row, string $featureClass = self::FEATURE_CLASS_A): PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
+    public static function getPlace(string $featureClass): PlaceS|PlaceL|PlaceP|PlaceT|PlaceH|PlaceR|PlaceV|PlaceU|PlaceA
     {
-        $place = match ($featureClass) {
+        return match ($featureClass) {
             self::FEATURE_CLASS_A => new PlaceA(),
             self::FEATURE_CLASS_H => new PlaceH(),
             self::FEATURE_CLASS_L => new PlaceL(),
@@ -285,6 +284,19 @@ SQL;
             self::FEATURE_CLASS_V => new PlaceV(),
             default => throw new Exception(sprintf('Unsupported feature class "%s" (%s:%d).', $featureClass, __FILE__, __LINE__)),
         };
+    }
+
+    /**
+     * Builds place from given row.
+     *
+     * @param array<string,mixed> $row
+     * @param string $featureClass
+     * @return PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
+     * @throws Exception
+     */
+    protected function buildPlaceFromRow(array $row, string $featureClass = self::FEATURE_CLASS_A): PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
+    {
+        $place = self::getPlace($featureClass);
 
         $place->setIdTmp(intval($row['id']));
         $place->setGeonameId(intval($row['geoname_id']));
@@ -431,12 +443,12 @@ SQL;
     /**
      * Returns country name by given place.
      *
-     * @param Place $place
+     * @param PlaceP $placeP
      * @return string
      */
-    public function getCountryByPlace(Place $place): string
+    public function getCountryByPlaceP(PlaceP $placeP): string
     {
-        $countryCode = strtolower($place->getCountryCode());
+        $countryCode = strtolower($placeP->getCountryCode());
 
         return $this->translator->trans(sprintf('country.alpha2.%s', $countryCode), [], 'countries', $countryCode);
     }
@@ -520,7 +532,7 @@ SQL;
         }
 
         /* Get country */
-        $country = $this->getCountryByPlace($placeP);
+        $country = $this->getCountryByPlaceP($placeP);
         $placeP->setCountry($country);
 
         /* Parks, Areas → L */
