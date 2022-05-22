@@ -19,6 +19,7 @@ use App\EventListener\Entity\UserListener;
 use App\Repository\ImageRepository;
 use App\Security\Voter\UserVoter;
 use App\Utils\FileNameConverter;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -149,6 +150,62 @@ class Image implements EntityInterface
     #[ORM\OneToMany(mappedBy: 'image', targetEntity: CalendarImage::class, orphanRemoval: true)]
     #[Groups(['image', 'image_extended'])]
     private Collection $calendarImages;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?float $latitude;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?float $longitude;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $title;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $url;
+
+    #[ORM\Column(name: 'gps_height', type: 'integer', nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?int $gpsHeight;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?int $iso;
+
+    #[ORM\Column(type: 'string', length: 63, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $mime;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $place;
+
+    #[ORM\Column(name: 'place_city', type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $placeCity;
+
+    #[ORM\Column(name: 'place_state', type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $placeState;
+
+    #[ORM\Column(name: 'place_country', type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $placeCountry;
+
+    #[ORM\Column(name: 'place_timezone', type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $placeTimezone;
+
+    /** @var array<string|int|float|bool> $information */
+    #[ORM\Column(type: 'json')]
+    #[Groups(['image_extended'])]
+    private array $information = [];
+
+    #[ORM\Column(name: 'taken_at', type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $takenAt;
 
     public const PATH_TYPE_SOURCE = 'source';
 
@@ -654,6 +711,328 @@ class Image implements EntityInterface
                 $calendarImage->setImage(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Gets the latitude of this image.
+     *
+     * @return float|null
+     */
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    /**
+     * Sets the latitude of this image.
+     *
+     * @param float|null $latitude
+     * @return $this
+     */
+    public function setLatitude(?float $latitude): self
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    /**
+     * Gets the longitude of this image.
+     *
+     * @return float|null
+     */
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    /**
+     * Sets the longitude of this image.
+     *
+     * @param float|null $longitude
+     * @return $this
+     */
+    public function setLongitude(?float $longitude): self
+    {
+        $this->longitude = $longitude;
+
+        return $this;
+    }
+
+    /**
+     * Gets the title of this image.
+     *
+     * @return string|null
+     */
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    /**
+     * Sets the title of this image.
+     *
+     * @param string|null $title
+     * @return $this
+     */
+    public function setTitle(?string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * Gets the url of this image.
+     *
+     * @return string|null
+     */
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    /**
+     * Sets the title of this image.
+     *
+     * @param string|null $url
+     * @return $this
+     */
+    public function setUrl(?string $url): self
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Gets the gps height of this image.
+     *
+     * @return int|null
+     */
+    public function getGpsHeight(): ?int
+    {
+        return $this->gpsHeight;
+    }
+
+    /**
+     * Sets the gps height of this image.
+     *
+     * @param int|null $gpsHeight
+     * @return $this
+     */
+    public function setGpsHeight(?int $gpsHeight): self
+    {
+        $this->gpsHeight = $gpsHeight;
+
+        return $this;
+    }
+
+    /**
+     * Gets the iso of this image.
+     *
+     * @return int|null
+     */
+    public function getIso(): ?int
+    {
+        return $this->iso;
+    }
+
+    /**
+     * Sets the iso of this image.
+     *
+     * @param int|null $iso
+     * @return $this
+     */
+    public function setIso(?int $iso): self
+    {
+        $this->iso = $iso;
+
+        return $this;
+    }
+
+    /**
+     * Gets the mime type of this image.
+     *
+     * @return string|null
+     */
+    public function getMime(): ?string
+    {
+        return $this->mime;
+    }
+
+    /**
+     * Sets the mime type of this image.
+     *
+     * @param string|null $mime
+     * @return $this
+     */
+    public function setMime(?string $mime): self
+    {
+        $this->mime = $mime;
+
+        return $this;
+    }
+
+    /**
+     * Gets the place name of this image.
+     *
+     * @return string|null
+     */
+    public function getPlace(): ?string
+    {
+        return $this->place;
+    }
+
+    /**
+     * Sets the place name of this image.
+     *
+     * @param string|null $place
+     * @return $this
+     */
+    public function setPlace(?string $place): self
+    {
+        $this->place = $place;
+
+        return $this;
+    }
+
+    /**
+     * Gets the city of this image.
+     *
+     * @return string|null
+     */
+    public function getPlaceCity(): ?string
+    {
+        return $this->placeCity;
+    }
+
+    /**
+     * Sets the city of this image.
+     *
+     * @param string|null $placeCity
+     * @return $this
+     */
+    public function setPlaceCity(?string $placeCity): self
+    {
+        $this->placeCity = $placeCity;
+
+        return $this;
+    }
+
+    /**
+     * Gets the state of this image.
+     *
+     * @return string|null
+     */
+    public function getPlaceState(): ?string
+    {
+        return $this->placeState;
+    }
+
+    /**
+     * Sets the state of this image.
+     *
+     * @param string|null $placeState
+     * @return $this
+     */
+    public function setPlaceState(?string $placeState): self
+    {
+        $this->placeState = $placeState;
+
+        return $this;
+    }
+
+    /**
+     * Gets the country of this image.
+     *
+     * @return string|null
+     */
+    public function getPlaceCountry(): ?string
+    {
+        return $this->placeCountry;
+    }
+
+    /**
+     * Sets the country of this image.
+     *
+     * @param string|null $placeCountry
+     * @return $this
+     */
+    public function setPlaceCountry(?string $placeCountry): self
+    {
+        $this->placeCountry = $placeCountry;
+
+        return $this;
+    }
+
+    /**
+     * Gets the timezone of this image.
+     *
+     * @return string|null
+     */
+    public function getPlaceTimezone(): ?string
+    {
+        return $this->placeTimezone;
+    }
+
+    /**
+     * Sets the timezone of this image.
+     *
+     * @param string|null $placeTimezone
+     * @return $this
+     */
+    public function setPlaceTimezone(?string $placeTimezone): self
+    {
+        $this->placeTimezone = $placeTimezone;
+
+        return $this;
+    }
+
+    /**
+     * Gets the information of this image.
+     *
+     * @return bool[]|float[]|int[]|string[]|null
+     */
+    public function getInformation(): ?array
+    {
+        return $this->information;
+    }
+
+    /**
+     * Sets the information of this image.
+     *
+     * @param array<string|int|float|bool> $information
+     * @return $this
+     */
+    public function setInformation(array $information): self
+    {
+        $this->information = $information;
+
+        return $this;
+    }
+
+    /**
+     * Gets the time taken at of this image.
+     *
+     * @return DateTimeImmutable|null
+     */
+    public function getTakenAt(): ?DateTimeImmutable
+    {
+        return $this->takenAt;
+    }
+
+    /**
+     * Sets the time taken at of this image.
+     *
+     * @param DateTimeImmutable|null $takenAt
+     * @return $this
+     */
+    public function setTakenAt(?DateTimeImmutable $takenAt): self
+    {
+        $this->takenAt = $takenAt;
 
         return $this;
     }

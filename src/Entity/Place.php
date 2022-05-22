@@ -445,12 +445,12 @@ abstract class Place
     /**
      * Sets the population of this place.
      *
-     * @param string|null $population
+     * @param string|int|null $population
      * @return $this
      */
-    public function setPopulation(?string $population): self
+    public function setPopulation(string|int|null $population): self
     {
-        $this->population = $population;
+        $this->population = strval($population);
 
         return $this;
     }

@@ -496,6 +496,9 @@ SQL;
 
         if ($cityP !== null) {
             $placeP->setCityP($cityP);
+            if ($cityP->getPopulation() !== null) {
+                $placeP->setPopulation($cityP->getPopulation());
+            }
         }
 
         return $cityP;
