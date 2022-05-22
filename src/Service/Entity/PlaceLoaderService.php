@@ -33,10 +33,12 @@ use App\Repository\PlaceTRepository;
 use App\Repository\PlaceURepository;
 use App\Repository\PlaceVRepository;
 use App\Utils\StringConverter;
+use App\Utils\Timer;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use DateTimeImmutable;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -232,6 +234,17 @@ SQL;
     }
 
     /**
+     * @param bool $debug
+     * @return PlaceLoaderService
+     */
+    public function setDebug(bool $debug): PlaceLoaderService
+    {
+        $this->debug = $debug;
+
+        return $this;
+    }
+
+    /**
      * Returns the entity manager.
      *
      * @return EntityManagerInterface
@@ -416,11 +429,24 @@ SQL;
             $limit
         );
 
-        if ($this->debug) {
-            print $sqlRaw."\n";
-        }
-
         return $sqlRaw;
+    }
+
+    /**
+     * Returns raw query to get a PlaceA object ordered by location.
+     *
+     * @param float $latitude
+     * @param float $longitude
+     * @param PlaceP $placeP
+     * @return string
+     * @throws Exception
+     */
+    protected function getRawQueryPlaceAFromPlaceP(float $latitude, float $longitude, PlaceP $placeP): string
+    {
+        return match ($placeP->getCountryCode()) {
+            'AT', 'CH', 'ES', 'PL' => $this->getRawSqlPosition($latitude, $longitude, 1, self::FEATURE_CLASS_A, self::FEATURE_CODE_A_ADM3, $placeP->getCountry(), null, null, $placeP->getAdmin3Code(), $placeP->getAdmin4Code()),
+            default => $this->getRawSqlPosition($latitude, $longitude, 1, self::FEATURE_CLASS_A, self::FEATURE_CODE_A_ADM4, $placeP->getCountry(), null, null, null, $placeP->getAdmin4Code()),
+        };
     }
 
     /**
@@ -454,6 +480,76 @@ SQL;
     }
 
     /**
+     * Returns another PlaceP entry, if given entry has no population.
+     *
+     * @param PlaceP $placeP
+     * @param PlaceP[] $placesP
+     * @return PlaceP|null
+     */
+    public function getCityPWithPopulationFromPlacesP(PlaceP $placeP, array $placesP): ?PlaceP
+    {
+        if ($placeP->getPopulation(true) > 0) {
+            return null;
+        }
+
+        $cityP = $this->findCityByPlacesP($placesP);
+
+        if ($cityP !== null) {
+            $placeP->setCityP($cityP);
+        }
+
+        return $cityP;
+    }
+
+    /**
+     * Gets a PlaceA entry from Place P
+     *
+     * @param PlaceP $placeP
+     * @return PlaceA|null
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function getCityAByPlaceP(PlaceP $placeP): ?PlaceA
+    {
+        if ($this->placeARepository === null) {
+            return null;
+        }
+
+        $cityATimer = Timer::start();
+        $cityA = $this->placeARepository->findCityByPlaceP($placeP);
+        $cityATime = Timer::stop($cityATimer);
+        $this->printRawQuery('cityA', $this->placeARepository->getLastSQL(), $cityATime);
+
+        return $cityA;
+    }
+
+    /**
+     * Gets the state from cityA.
+     *
+     * @param PlaceA|null $cityA
+     * @return PlaceA|null
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function getStateFromCityA(?PlaceA $cityA): ?PlaceA
+    {
+        if ($cityA === null) {
+            return null;
+        }
+
+        if ($this->placeARepository === null) {
+            return null;
+        }
+
+        $stateTimer = Timer::start();
+        $state = $this->placeARepository->findStateByCity($cityA);
+        $stateTime = Timer::stop($stateTimer);
+        $this->printRawQuery('state', $this->placeARepository->getLastSQL(), $stateTime);
+
+        return $state;
+    }
+
+    /**
      * Finds the nearest place by coordinate.
      *
      * @param float $latitude
@@ -476,10 +572,12 @@ SQL;
         $featureClass = self::FEATURE_CLASS_P;
 
         /* Find feature class P */
+        $cityPTimer = Timer::start();
         $sqlRaw = $this->getRawSqlPosition($latitude, $longitude, 20, $featureClass, $featureCodes);
-
         $statement = $connection->prepare($sqlRaw);
         $result = $statement->executeQuery();
+        $cityPTime = Timer::stop($cityPTimer);
+        $this->printRawQuery('cityP', $sqlRaw, $cityPTime);
 
         /* Reads all results. */
         while (($row = $result->fetchAssociative()) !== false) {
@@ -503,32 +601,23 @@ SQL;
         /** @var PlaceP $placeP */
         $placeP = $placesP[0];
 
-        $cityP = null;
-
         /* Find city by population > 0 */
-        if ($placeP->getPopulation(true) === 0) {
-            $cityP = $this->findCityByPlacesP($placesP);
-
-            if ($cityP !== null) {
-                $placeP->setCityP($cityP);
-            }
-        }
+        $cityP = $this->getCityPWithPopulationFromPlacesP($placeP, $placesP);
 
         /* Find city by feature_class A */
-        $cityA = $this->placeARepository->findCityByPlaceP($placeP);
-
+        $cityA = $this->getCityAByPlaceP($placeP);
         if ($cityA !== null) {
             $placeP->setCityA($cityA);
 
             if ($cityP !== null && $cityP->getName() === $cityA->getName()) {
                 $placeP->setCityP(null);
             }
+        }
 
-            $state = $this->placeARepository->findStateByCity($cityA);
-
-            if ($state !== null) {
-                $placeP->setState($state);
-            }
+        /* Find state from cityA */
+        $state = $this->getStateFromCityA($cityA);
+        if ($state !== null) {
+            $placeP->setState($state);
         }
 
         /* Get country */
@@ -560,7 +649,7 @@ SQL;
         }
 
         /* Mountain → T */
-        $placesMountain = $this->findByPosition($latitude, $longitude, 1, [self::FEATURE_CLASS_T]);
+        $placesMountain = $this->findByPosition($latitude, $longitude, 1, self::FEATURE_CLASS_T);
         foreach ($placesMountain as $placeMountain) {
             if (!$placeMountain instanceof PlaceT) {
                 throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeMountain), __FILE__, __LINE__));
@@ -572,7 +661,7 @@ SQL;
         }
 
         /* Add point of interest → S */
-        $placesSpot = $this->findByPosition($latitude, $longitude, 1, [self::FEATURE_CLASS_S]);
+        $placesSpot = $this->findByPosition($latitude, $longitude, 1, self::FEATURE_CLASS_S);
         foreach ($placesSpot as $placeSpot) {
             if (!$placeSpot instanceof PlaceS) {
                 throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeSpot), __FILE__, __LINE__));
@@ -592,7 +681,7 @@ SQL;
      * @param float $latitude
      * @param float $longitude
      * @param int $limit
-     * @param string|string[] $featureClasses
+     * @param string $featureClass
      * @param string|string[]|null $featureCodes
      * @param string|null $countryCode
      * @param string|null $adminCode3
@@ -601,33 +690,52 @@ SQL;
      * @throws DoctrineDBALException
      * @throws Exception
      */
-    public function findByPosition(float $latitude, float $longitude, int $limit = 1, string|array $featureClasses = self::FEATURE_CLASS_P, string|array|null $featureCodes = null, ?string $countryCode = null, ?string $adminCode3 = null, ?string $adminCode4 = null): array
+    public function findByPosition(float $latitude, float $longitude, int $limit = 1, string $featureClass = self::FEATURE_CLASS_P, string|array|null $featureCodes = null, ?string $countryCode = null, ?string $adminCode3 = null, ?string $adminCode4 = null): array
     {
         $places = [];
 
         $connection = $this->getEntityManager()->getConnection();
 
-        if (is_string($featureClasses)) {
-            $featureClasses = [$featureClasses];
-        }
+        $positionTimer = Timer::start();
+        $sqlRaw = $this->getRawSqlPosition($latitude, $longitude, $limit, $featureClass, $featureCodes, $countryCode, null, null, $adminCode3, $adminCode4);
+        $statement = $connection->prepare($sqlRaw);
+        $result = $statement->executeQuery();
+        $positionTime = Timer::stop($positionTimer);
+        $this->printRawQuery(sprintf('Place%s', $featureClass), $sqlRaw, $positionTime);
 
-        foreach ($featureClasses as $featureClass) {
-            $sqlRaw = $this->getRawSqlPosition($latitude, $longitude, $limit, $featureClass, $featureCodes, $countryCode, null, null, $adminCode3, $adminCode4);
+        while (($row = $result->fetchAssociative()) !== false) {
 
-            $statement = $connection->prepare($sqlRaw);
-            $result = $statement->executeQuery();
+            /* Build place. */
+            $place = $this->buildPlaceFromRow($row, $featureClass);
 
-            while (($row = $result->fetchAssociative()) !== false) {
+            $place->setName(ucfirst($place->getName()));
 
-                /* Build place. */
-                $place = $this->buildPlaceFromRow($row, $featureClass);
-
-                $place->setName(ucfirst($place->getName()));
-
-                $places[] = $place;
-            }
+            $places[] = $place;
         }
 
         return $places;
+    }
+
+    /**
+     * Prints raw query.
+     *
+     * @param string $name
+     * @param string $sqlRaw
+     * @param float $time
+     * @return void
+     */
+    protected function printRawQuery(string $name, string $sqlRaw, float $time): void
+    {
+        if (!$this->debug) {
+            return;
+        }
+
+        $title = sprintf('SQL "%s" - %.4fs', $name, $time);
+
+        print $title."\n";
+        print str_repeat('-', strlen($title))."\n";
+        print $sqlRaw."\n";
+        print str_repeat('-', strlen($title))."\n";
+        print "\n";
     }
 }

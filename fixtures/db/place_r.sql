@@ -10,9 +10,44 @@
 /*!40101 SET NAMES utf8 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `place_r`
+--
+
+DROP TABLE IF EXISTS `place_r`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `place_r` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `geoname_id` int(11) NOT NULL,
+  `name` varchar(1024) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ascii_name` varchar(1024) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `alternate_names` varchar(4096) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `coordinate` point NOT NULL COMMENT '(DC2Type:point)',
+  `feature_class` varchar(1) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `feature_code` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `country_code` varchar(2) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cc2` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `population` bigint(20) DEFAULT NULL,
+  `elevation` int(11) DEFAULT NULL,
+  `dem` int(11) DEFAULT NULL,
+  `timezone` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `modification_date` date NOT NULL,
+  `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `updated_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `admin1_code` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `admin2_code` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `admin3_code` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `admin4_code` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  SPATIAL KEY `coordinate_place_r` (`coordinate`)
+) ENGINE=InnoDB AUTO_INCREMENT=678986 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `place_r`
@@ -1367,9 +1402,10 @@ UNLOCK TABLES;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-05-22  0:00:49
+-- Dump completed on 2022-05-22 16:03:40

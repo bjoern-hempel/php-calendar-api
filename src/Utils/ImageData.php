@@ -129,6 +129,8 @@ class ImageData
 
         $this->placeLoaderService = $placeLoaderService;
 
+        $this->placeLoaderService?->setDebug($detailed);
+
         $this->detailed = $detailed;
     }
 

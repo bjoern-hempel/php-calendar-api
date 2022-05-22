@@ -19,6 +19,8 @@ use App\Repository\Base\PlaceRepositoryInterface;
 use App\Service\Entity\PlaceLoaderService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 
@@ -32,6 +34,8 @@ use Exception;
  */
 class PlaceARepository extends ServiceEntityRepository implements PlaceRepositoryInterface
 {
+    protected ?QueryBuilder $lastSQL = null;
+
     /**
      * PlaceARepository constructor.
      *
@@ -40,6 +44,67 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, PlaceA::class);
+    }
+
+    /**
+     * Gets the last SQL query.
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getLastSQL(): string
+    {
+        if ($this->lastSQL === null) {
+            throw new Exception(sprintf('Unable to get lastSQL (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $sql = strval($this->lastSQL->getQuery()->getSQL());
+
+        /** @var Parameter $parameter */
+        foreach ($this->lastSQL->getParameters() as $parameter) {
+            $value = strval($parameter->getValue());
+
+            if ($parameter->getType() === 2) {
+                $value = sprintf('"%s"', $value);
+            }
+
+            if ($sql === null) {
+                throw new Exception(sprintf('Unable to get SQL (%s:%d).', __FILE__, __LINE__));
+            }
+
+            $sql = preg_replace('~\?~', $value, $sql, 1);
+        }
+
+        if ($sql === null) {
+            throw new Exception(sprintf('Unable to get SQL (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return str_replace([
+            'SELECT ',
+            'FROM ',
+            'WHERE ',
+            'AND ',
+            ', ',
+        ], [
+            'SELECT'."\n".'    ',
+            "\n".'FROM'."\n".'    ',
+            "\n".'WHERE'."\n".'    ',
+            'AND'."\n".'    ',
+            ','."\n".'    ',
+        ], $sql);
+    }
+
+    /**
+     * Sets the last SQL query.
+     *
+     * @param QueryBuilder $lastSQL
+     * @return PlaceARepository
+     */
+    public function setLastSQL(QueryBuilder $lastSQL): PlaceARepository
+    {
+        $this->lastSQL = $lastSQL;
+
+        return $this;
     }
 
     /**
@@ -82,6 +147,8 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
                     ->setParameter('ac', $place->getAdmin4Code());
         }
 
+        $this->setLastSQL($queryBuilder);
+
         $result = $queryBuilder->getQuery()->getOneOrNullResult();
 
         if ($result === null || $result instanceof PlaceA) {
@@ -121,6 +188,8 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
                 $queryBuilder->andWhere('a.admin1Code = :ac')
                     ->setParameter('ac', $city->getAdmin1Code());
         }
+
+        $this->setLastSQL($queryBuilder);
 
         $result = $queryBuilder->getQuery()->getOneOrNullResult();
 

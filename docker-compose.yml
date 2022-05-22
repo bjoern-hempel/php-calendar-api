@@ -176,6 +176,8 @@ services:
       - db-data:/var/lib/mysql:delegated
       # Add db config file
       - ./docker/mysql/conf.d/mysqld.cnf:/etc/mysql/conf.d/mysqld.cnf
+      # Add fixture directory
+      - ./fixtures/db:/fixtures
     networks:
       - network-internal
 
@@ -193,6 +195,8 @@ services:
     volumes:
       # Add db config file
       - ./docker/mysql/conf.d/mysqld.cnf:/etc/mysql/conf.d/mysqld.cnf
+      # Add fixture directory
+      - ./fixtures/db:/fixtures
     networks:
       - network-internal
 
