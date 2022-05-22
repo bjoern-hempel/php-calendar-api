@@ -26,7 +26,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: PlaceURepository::class)]
-#[ORM\Index(columns: ["coordinate"], name: 'coordinate', flags: ["spatial"])]
+#[ORM\Index(columns: ["coordinate"], name: 'coordinate_place_u', flags: ["spatial"])]
 #[ApiResource]
 class PlaceU extends Place
 {
