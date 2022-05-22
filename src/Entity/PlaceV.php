@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Entity\Trait\PlaceTrait;
 use App\Entity\Trait\TimestampsTrait;
 use App\Repository\PlaceVRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -27,10 +26,9 @@ use Doctrine\ORM\Mapping as ORM;
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: PlaceVRepository::class)]
+#[ORM\Index(columns: ["coordinate"], name: 'coordinate', flags: ["spatial"])]
 #[ApiResource]
-class PlaceV
+class PlaceV extends Place
 {
     use TimestampsTrait;
-
-    use PlaceTrait;
 }

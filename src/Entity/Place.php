@@ -11,28 +11,21 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace App\Entity\Trait;
+namespace App\Entity;
 
-use App\Entity\PlaceA;
-use App\Entity\PlaceL;
-use App\Entity\PlaceP;
-use App\Entity\PlaceS;
-use App\Entity\PlaceT;
-use App\Entity\PlaceV;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Trait PlaceTrait
+ * Base entity superclass.
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-05-21)
- * @package App\Entity
- *
- * @see http://download.geonames.org/export/dump/readme.txt (The main 'geoname' table has the following fields.)
+ * @version 1.0.0 (2022-05-21)
+ * @package App\Entity\Base
  */
-trait PlaceTrait
+#[ORM\MappedSuperclass]
+abstract class Place
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
