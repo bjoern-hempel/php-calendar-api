@@ -26,22 +26,22 @@ declare(strict_types=1);
  * SOFTWARE.
  */
 
-namespace App\Tests\Unit\Utils;
+namespace App\Tests\Unit\Service;
 
-use App\Utils\ImageData;
+use App\Service\ImageDataService;
 use App\Utils\StringConverter;
 use DateTime;
 use Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class ImageDataTest
+ * Class ImageDataServiceTest
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2022-04-25)
  * @package App\Tests\Unit\Utils
  */
-final class ImageDataTest extends TestCase
+final class ImageDataServiceTest extends TestCase
 {
     /**
      * Test wrapper.
@@ -58,7 +58,7 @@ final class ImageDataTest extends TestCase
     public function wrapper(int $number, string $imagePath, array $expected): void
     {
         /* Arrange */
-        $imageData = new ImageData($imagePath);
+        $imageData = new ImageDataService($imagePath);
 
         /* Act */
         $current = $imageData->getImageDataFull();

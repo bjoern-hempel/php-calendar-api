@@ -248,11 +248,12 @@ class LocationDataService
     {
         $theta = $longitudeFrom - $longitudeTo;
 
-        /* Calculate miles */
+        /* Calculate distance. */
         $distance = (sin(deg2rad($latitudeFrom)) * sin(deg2rad($latitudeTo))) + (cos(deg2rad($latitudeFrom)) * cos(deg2rad($latitudeTo)) * cos(deg2rad($theta)));
         $distance = acos($distance);
         $distance = rad2deg($distance);
 
+        /* Convert distances. */
         $miles = $distance * 60 * 1.1515;
         $feet = $miles * 5280;
         $yards = $feet / 3;

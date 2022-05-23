@@ -13,25 +13,14 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use ApiPlatform\Core\Action\PlaceholderAction;
-use App\Entity\Place;
-use App\Repository\PlaceARepository;
-use App\Repository\PlaceHRepository;
-use App\Repository\PlaceLRepository;
-use App\Repository\PlacePRepository;
 use App\Repository\PlaceRepository;
-use App\Repository\PlaceRRepository;
-use App\Repository\PlaceSRepository;
-use App\Repository\PlaceTRepository;
-use App\Repository\PlaceURepository;
-use App\Repository\PlaceVRepository;
 use App\Service\Entity\PlaceLoaderService;
+use App\Service\ImageDataService;
 use App\Service\LocationDataService;
 use App\Utils\Image\Color;
-use App\Utils\Image\ColorDetectorSimple;
 use App\Utils\Image\ColorDetectorCiede2000;
+use App\Utils\Image\ColorDetectorSimple;
 use App\Utils\Image\Palette;
-use App\Utils\ImageData;
 use App\Utils\Timer;
 use Exception;
 use GdImage;
@@ -111,21 +100,21 @@ EOT
     /**
      * Returns the output lines from image data.
      *
-     * @param ImageData $imageData
+     * @param ImageDataService $imageData
      * @return string[]
      * @throws Exception
      */
-    protected function getOutputLines(ImageData $imageData): array
+    protected function getOutputLines(ImageDataService $imageData): array
     {
         $dataImage = $imageData->getImageDataFull();
 
         $outputLines = [];
 
         foreach ($dataImage as $key => $data) {
-            $valueFormatted = strval($data[ImageData::KEY_NAME_VALUE_FORMATTED]);
+            $valueFormatted = strval($data[ImageDataService::KEY_NAME_VALUE_FORMATTED]);
 
-            $format = sprintf(self::REGEXP_OUTPUT, ImageData::WIDTH_TITLE, ImageData::WIDTH_TITLE);
-            $outputLine = sprintf($format, strval($data[ImageData::KEY_NAME_TITLE]), $key, $valueFormatted);
+            $format = sprintf(self::REGEXP_OUTPUT, ImageDataService::WIDTH_TITLE, ImageDataService::WIDTH_TITLE);
+            $outputLine = sprintf($format, strval($data[ImageDataService::KEY_NAME_TITLE]), $key, $valueFormatted);
 
             $outputLines[] = $outputLine;
         }
@@ -373,7 +362,7 @@ EOT
     {
         $timer = Timer::start();
 
-        $imageData = new ImageData(
+        $imageData = new ImageDataService(
             $imagePath,
             $this->placeLoaderService,
             $this->locationDataService,
@@ -384,7 +373,7 @@ EOT
         $outputLines = $this->getOutputLines($imageData);
         $outputMaxLength = $this->getMaxLength($outputLines);
 
-        $format = sprintf(self::REGEXP_OUTPUT, ImageData::WIDTH_TITLE, ImageData::WIDTH_TITLE);
+        $format = sprintf(self::REGEXP_OUTPUT, ImageDataService::WIDTH_TITLE, ImageDataService::WIDTH_TITLE);
 
         $imageDataText = sprintf($format, 'Title', 'Key', 'Value').self::LINE_BREAK;
         $imageDataText .= str_repeat('-', $outputMaxLength).self::LINE_BREAK;

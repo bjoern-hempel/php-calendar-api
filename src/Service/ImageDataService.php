@@ -11,21 +11,23 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace App\Utils;
+namespace App\Service;
 
 use App\Service\Entity\PlaceLoaderService;
-use App\Service\LocationDataService;
+use App\Utils\GPSConverter;
+use App\Utils\SizeConverter;
+use App\Utils\StringConverter;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
 
 /**
- * Class ImageData
+ * Class ImageDataService
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2022-04-20)
  * @package App\Command
  */
-class ImageData
+class ImageDataService
 {
     protected bool $debug = false;
 
