@@ -183,6 +183,9 @@ class Image implements EntityInterface
     #[Groups(['image_extended'])]
     private ?string $place;
 
+    #[ORM\Column(name: 'place_district', type: 'string', length: 255, nullable: true)]
+    private ?string $placeDistrict;
+
     #[ORM\Column(name: 'place_city', type: 'string', length: 255, nullable: true)]
     #[Groups(['image_extended'])]
     private ?string $placeCity;
@@ -895,6 +898,29 @@ class Image implements EntityInterface
     public function setPlace(?string $place): self
     {
         $this->place = $place;
+
+        return $this;
+    }
+
+    /**
+     * Gets the district name of this image.
+     *
+     * @return string|null
+     */
+    public function getPlaceDistrict(): ?string
+    {
+        return $this->placeDistrict;
+    }
+
+    /**
+     * Sets the district name of this image.
+     *
+     * @param string|null $placeDistrict
+     * @return $this
+     */
+    public function setPlaceDistrict(?string $placeDistrict): self
+    {
+        $this->placeDistrict = $placeDistrict;
 
         return $this;
     }

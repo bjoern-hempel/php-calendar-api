@@ -161,12 +161,12 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
     /**
      * Find state by given city.
      *
-     * @param PlaceA $city
+     * @param PlaceP $city
      * @return PlaceA|null
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function findStateByCity(PlaceA $city): ?PlaceA
+    public function findStateByPlaceP(PlaceP $city): ?PlaceA
     {
         $countryCode = $city->getCountryCode();
 

@@ -68,7 +68,9 @@ class ShowImagePropertiesCommand extends Command
 
     protected PlaceLoaderService $placeLoaderService;
 
-    protected bool $detailed = false;
+    protected bool $debug = false;
+
+    protected bool $verbose = false;
 
     /**
      * ShowImagePropertiesCommand constructor.
@@ -90,7 +92,7 @@ class ShowImagePropertiesCommand extends Command
             ->setDescription('Shows image properties.')
             ->setDefinition([
                 new InputArgument('path', InputArgument::REQUIRED, 'The path to image.'),
-                new InputOption('detailed', 'd', InputOption::VALUE_NONE, 'Switch to debug mode.'),
+                new InputOption('debug', 'd', InputOption::VALUE_NONE, 'Switch to debug mode.'),
             ])
             ->setHelp(
                 <<<'EOT'
@@ -110,7 +112,7 @@ EOT
      */
     protected function getOutputLines(ImageData $imageData): array
     {
-        $dataImage = $imageData->getDataImage();
+        $dataImage = $imageData->getImageData();
 
         $outputLines = [];
 
@@ -369,7 +371,8 @@ EOT
         $imageData = new ImageData(
             $imagePath,
             $this->placeLoaderService,
-            $this->detailed
+            $this->debug,
+            $this->verbose
         );
 
         $outputLines = $this->getOutputLines($imageData);
@@ -456,7 +459,8 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->detailed = boolval($input->getOption('detailed'));
+        $this->debug = boolval($input->getOption('debug'));
+        $this->verbose = boolval($input->getOption('verbose'));
 
         /* Read parameter. */
         $imagePath = strval($input->getArgument('path'));

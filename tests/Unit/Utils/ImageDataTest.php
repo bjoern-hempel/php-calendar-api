@@ -61,7 +61,7 @@ final class ImageDataTest extends TestCase
         $imageData = new ImageData($imagePath);
 
         /* Act */
-        $current = $imageData->getDataImage();
+        $current = $imageData->getImageData();
 
         /* Assert */
         $this->assertEquals($expected, $current);

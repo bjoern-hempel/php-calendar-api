@@ -38,7 +38,9 @@ use JetBrains\PhpStorm\ArrayShape;
  */
 class ImageData
 {
-    protected bool $detailed = false;
+    protected bool $debug = false;
+
+    protected bool $verbose = false;
 
     protected string $imagePath;
 
@@ -97,6 +99,8 @@ class ImageData
     public const KEY_NAME_PLACE_FULL = 'place-full';
     public const KEY_NAME_PLACE_CITY_P = 'place-city-p';
     public const KEY_NAME_PLACE_CITY_A = 'place-city-a';
+    public const KEY_NAME_PLACE_DISTRICT = 'place-district';
+    public const KEY_NAME_PLACE_CITY = 'place-city';
     public const KEY_NAME_PLACE_STATE = 'place-state';
     public const KEY_NAME_PLACE_PARK = 'place-park';
     public const KEY_NAME_PLACE_MOUNTAIN = 'place-mountain';
@@ -121,17 +125,21 @@ class ImageData
      *
      * @param string $imagePath
      * @param PlaceLoaderService|null $placeLoaderService
-     * @param bool $detailed
+     * @param bool $debug
+     * @param bool $verbose
      */
-    public function __construct(string $imagePath, ?PlaceLoaderService $placeLoaderService = null, bool $detailed = false)
+    public function __construct(string $imagePath, ?PlaceLoaderService $placeLoaderService = null, bool $debug = false, bool $verbose = false)
     {
         $this->imagePath = $imagePath;
 
         $this->placeLoaderService = $placeLoaderService;
 
-        $this->placeLoaderService?->setDebug($detailed);
+        $this->placeLoaderService?->setDebug($debug);
+        $this->placeLoaderService?->setVerbose($verbose);
 
-        $this->detailed = $detailed;
+        $this->debug = $debug;
+
+        $this->verbose = $verbose;
     }
 
     /**
@@ -208,23 +216,23 @@ class ImageData
             ];
 
             /* PlaceP */
-            if ($place->getCityP() !== null) {
+            if ($place->getDistrict() !== null) {
                 $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_CITY_P => $this->getData('Place City P', $place->getCityP()->getName($this->detailed), '%s', null),
+                    self::KEY_NAME_PLACE_DISTRICT => $this->getData('District', $place->getDistrict()->getName($this->debug), '%s', null),
                 ]);
             }
 
             /* PlaceA */
-            if ($place->getCityA() !== null) {
+            if ($place->getCity() !== null) {
                 $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_CITY_A => $this->getData('Place City A', $place->getCityA()->getName($this->detailed), '%s', null),
+                    self::KEY_NAME_PLACE_CITY => $this->getData('City', $place->getCity()->getName($this->debug), '%s', null),
                 ]);
             }
 
             /* PlaceA */
             if ($place->getState() !== null) {
                 $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_STATE => $this->getData('Place State', $place->getState()->getName($this->detailed), '%s', null),
+                    self::KEY_NAME_PLACE_STATE => $this->getData('Place State', $place->getState()->getName($this->debug), '%s', null),
                 ]);
             }
 
@@ -233,7 +241,7 @@ class ImageData
                 $park = $place->getParks()[0];
 
                 $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_PARK => $this->getData('Place Park', $park->getName($this->detailed), '%s', null),
+                    self::KEY_NAME_PLACE_PARK => $this->getData('Place Park', $park->getName($this->debug), '%s', null),
                 ]);
             }
 
@@ -242,7 +250,7 @@ class ImageData
                 $mountain = $place->getMountains()[0];
 
                 $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_MOUNTAIN => $this->getData('Place Mountain', $mountain->getName($this->detailed), '%s', null),
+                    self::KEY_NAME_PLACE_MOUNTAIN => $this->getData('Place Mountain', $mountain->getName($this->debug), '%s', null),
                 ]);
             }
 
@@ -251,7 +259,7 @@ class ImageData
                 $spot = $place->getSpots()[0];
 
                 $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_SPOT => $this->getData('Place Spot', $spot->getName($this->detailed), '%s', null),
+                    self::KEY_NAME_PLACE_SPOT => $this->getData('Place Spot', $spot->getName($this->debug), '%s', null),
                 ]);
             }
 
@@ -260,12 +268,12 @@ class ImageData
                 $spot = $place->getForests()[0];
 
                 $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_FOREST => $this->getData('Place Forest', $spot->getName($this->detailed), '%s', null),
+                    self::KEY_NAME_PLACE_FOREST => $this->getData('Place Forest', $spot->getName($this->debug), '%s', null),
                 ]);
             }
 
             $dataAdd = array_merge($dataAdd, [
-                self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->detailed), '%s', null),
+                self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->debug), '%s', null),
             ]);
 
             $dataAdd = array_merge($dataAdd, [
@@ -414,7 +422,7 @@ class ImageData
      * @return array<string, array<string, mixed>>
      * @throws Exception
      */
-    public function getDataImage(): array
+    public function getImageData(): array
     {
         $data = $this->getDataExif();
 
@@ -458,6 +466,25 @@ class ImageData
     }
 
     /**
+     * Returns simple array.
+     *
+     * @return array<string, mixed>
+     * @throws Exception
+     */
+    public function getImageDataSimple(): array
+    {
+        $imageData = $this->getImageData();
+
+        $array = [];
+
+        foreach ($imageData as $key => $data) {
+            $array[$key] = $data['value'];
+        }
+
+        return $array;
+    }
+
+    /**
      * Prints image data.
      *
      * @return void
@@ -465,7 +492,7 @@ class ImageData
      */
     public function printDataImage(): void
     {
-        $dataImage = $this->getDataImage();
+        $dataImage = $this->getImageData();
 
         foreach ($dataImage as $key => $data) {
             $value = $data[self::KEY_NAME_VALUE];

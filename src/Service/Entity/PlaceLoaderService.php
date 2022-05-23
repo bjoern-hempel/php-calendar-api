@@ -52,6 +52,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class PlaceLoaderService
 {
     protected bool $debug = false;
+    protected bool $verbose = false;
 
     public const FEATURE_CLASS_A = 'A'; /* country, state, region,... */
     public const FEATURE_CLASS_H = 'H'; /* stream, lake, ... */
@@ -111,12 +112,12 @@ class PlaceLoaderService
         self::FEATURE_CLASS_L => [],
         self::FEATURE_CLASS_P => [
             self::FEATURE_CODE_P_PPL,
-            self::FEATURE_CODE_P_PPLA,
-            self::FEATURE_CODE_P_PPLA2,
-            self::FEATURE_CODE_P_PPLA3,
-            self::FEATURE_CODE_P_PPLA4,
-            self::FEATURE_CODE_P_PPLA5,
-            self::FEATURE_CODE_P_PPLC,
+            self::FEATURE_CODE_P_PPLA,#
+            self::FEATURE_CODE_P_PPLA2,#
+            self::FEATURE_CODE_P_PPLA3,#
+            self::FEATURE_CODE_P_PPLA4,#
+            self::FEATURE_CODE_P_PPLA5,#
+            self::FEATURE_CODE_P_PPLC,#
             self::FEATURE_CODE_P_PPLCH,
             self::FEATURE_CODE_P_PPLF,
             self::FEATURE_CODE_P_PPLG,
@@ -143,6 +144,11 @@ class PlaceLoaderService
         self::FEATURE_CODE_P_PPLA4,
         self::FEATURE_CODE_P_PPLA5,
         self::FEATURE_CODE_P_PPLC
+    ];
+
+    public const FEATURE_CODES_P_DISTRICT_PLACES = [
+        self::FEATURE_CODE_P_PPL,
+        self::FEATURE_CODE_P_PPLX
     ];
 
     /* 40.000km: 40.000.000m / 360° * 0.01 = 1111.1m → Parks must be less than 1111.1m away. Otherwise, it will not be displayed. */
@@ -234,12 +240,27 @@ SQL;
     }
 
     /**
+     * Set debug mode.
+     *
      * @param bool $debug
-     * @return PlaceLoaderService
+     * @return $this
      */
-    public function setDebug(bool $debug): PlaceLoaderService
+    public function setDebug(bool $debug): self
     {
         $this->debug = $debug;
+
+        return $this;
+    }
+
+    /**
+     * Set verbose mode.
+     *
+     * @param bool $verbose
+     * @return $this
+     */
+    public function setVerbose(bool $verbose): self
+    {
+        $this->verbose = $verbose;
 
         return $this;
     }
@@ -505,14 +526,14 @@ SQL;
     }
 
     /**
-     * Gets a PlaceA entry from Place P
+     * Gets a PlaceA entry (city) from Place P
      *
      * @param PlaceP $placeP
      * @return PlaceA|null
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function getCityAByPlaceP(PlaceP $placeP): ?PlaceA
+    public function getCityByPlacePFromAdmin(PlaceP $placeP): ?PlaceA
     {
         if ($this->placeARepository === null) {
             return null;
@@ -529,14 +550,13 @@ SQL;
     /**
      * Gets the state from cityA.
      *
-     * @param PlaceA|null $cityA
+     * @param PlaceP|null $placeP
      * @return PlaceA|null
      * @throws NonUniqueResultException
-     * @throws Exception
      */
-    public function getStateFromCityA(?PlaceA $cityA): ?PlaceA
+    public function getStateFromPlaceP(PlaceP|null $placeP): ?PlaceA
     {
-        if ($cityA === null) {
+        if ($placeP === null) {
             return null;
         }
 
@@ -545,11 +565,73 @@ SQL;
         }
 
         $stateTimer = Timer::start();
-        $state = $this->placeARepository->findStateByCity($cityA);
+        $state = $this->placeARepository->findStateByPlaceP($placeP);
         $stateTime = Timer::stop($stateTimer);
         $this->printRawQuery('state', $this->placeARepository->getLastSQL(), $stateTime);
 
         return $state;
+    }
+
+    /**
+     * Finds next admin place.
+     *
+     * @param PlaceP[] $placesP
+     * @param PlaceP $district
+     * @return PlaceP|null
+     */
+    protected function findNextAdminCity(array $placesP, PlaceP $district): ?PlaceP
+    {
+        foreach ($placesP as $placeP) {
+            switch (true) {
+                case in_array($placeP->getFeatureCode(), self::FEATURE_CODES_P_ADMIN_PLACES) && $district->getAdmin4Code() == $placeP->getAdmin4Code():
+                    return $placeP;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Finds next place with more than 0 population.
+     *
+     * @param PlaceP[] $placesP
+     * @param PlaceP $district
+     * @return PlaceP|null
+     */
+    protected function findNextCityPopulation(array $placesP, PlaceP $district): ?PlaceP
+    {
+        if ($district->getPopulation(true) > 0) {
+            return null;
+        }
+
+        foreach ($placesP as $placeP) {
+            switch (true) {
+                case $placeP->getPopulation(true) > 0 && $district->getAdmin4Code() == $placeP->getAdmin4Code():
+                    $district->setPopulation($placeP->getPopulation());
+                    return $placeP;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Finds next admin place.
+     *
+     * @param PlaceP[] $placesP
+     * @param PlaceP $city
+     * @return PlaceP|null
+     */
+    protected function findNextDistrict(array $placesP, PlaceP $city): ?PlaceP
+    {
+        foreach ($placesP as $placeP) {
+            switch (true) {
+                case in_array($placeP->getFeatureCode(), self::FEATURE_CODES_P_DISTRICT_PLACES) && $city->getAdmin4Code() == $placeP->getAdmin4Code():
+                    return $placeP;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -568,21 +650,20 @@ SQL;
             return null;
         }
 
-        $placesP = [];
-
         $connection = $this->getEntityManager()->getConnection();
-
         $featureClass = self::FEATURE_CLASS_P;
 
         /* Find feature class P */
         $cityPTimer = Timer::start();
-        $sqlRaw = $this->getRawSqlPosition($latitude, $longitude, 20, $featureClass, $featureCodes);
+        $sqlRaw = $this->getRawSqlPosition($latitude, $longitude, 50, $featureClass, $featureCodes);
         $statement = $connection->prepare($sqlRaw);
         $result = $statement->executeQuery();
         $cityPTime = Timer::stop($cityPTimer);
-        $this->printRawQuery('cityP', $sqlRaw, $cityPTime);
+        $this->printRawQuery('places', $sqlRaw, $cityPTime);
 
         /* Reads all results. */
+        /** @var PlaceP[] $placesP */
+        $placesP = [];
         while (($row = $result->fetchAssociative()) !== false) {
 
             /* Build and add place. */
@@ -600,32 +681,50 @@ SQL;
             return null;
         }
 
-        /* Use next place. */
-        /** @var PlaceP $placeP */
-        $placeP = $placesP[0];
+        /* Verbose information */
+        $this->printPlaces($placesP);
 
-        /* Find city by population > 0 */
-        $cityP = $this->getCityPWithPopulationFromPlacesP($placeP, $placesP);
+        $place = $placesP[0];
+        $city = null;
+        $district = null;
+        switch (true) {
+            case in_array($place->getFeatureCode(), self::FEATURE_CODES_P_DISTRICT_PLACES):
+                $district = array_shift($placesP);
+                $city1 = $this->getCityByPlacePFromAdmin($district);
+                $city2 = $this->findNextAdminCity($placesP, $district);
+                $city3 = $this->findNextCityPopulation($placesP, $district);
 
-        /* Find city by feature_class A */
-        $cityA = $this->getCityAByPlaceP($placeP);
-        if ($cityA !== null) {
-            $placeP->setCityA($cityA);
+                switch (true) {
+                    case $city1 === null:
+                        $city = $city2 !== null && $city2->getPopulation(true) > 0 ? $city2 : $city3;
+                        break;
 
-            if ($cityP !== null && $cityP->getName() === $cityA->getName()) {
-                $placeP->setCityP(null);
-            }
+                    default:
+//                        /* Maspalomas vs Meloneras */
+//                        if ($place->getCountryCode() === 'ES') {
+//                            $city = $city1->getPopulation(true) > $city3->getPopulation(true) ? $city3 : $city1;
+//                        } else {
+//                            $city = $city1;
+//                        }
+                        $city = $city1;
+                        break;
+                }
+
+                break;
+
+            case in_array($place->getFeatureCode(), self::FEATURE_CODES_P_ADMIN_PLACES):
+                $city = array_shift($placesP);
+                $district = $this->findNextDistrict($placesP, $city);
+                break;
         }
 
-        /* Find state from cityA */
-        $state = $this->getStateFromCityA($cityA);
-        if ($state !== null) {
-            $placeP->setState($state);
-        }
+        $state = $this->getStateFromPlaceP($place);
+        $country = $this->getCountryByPlaceP($place);
 
-        /* Get country */
-        $country = $this->getCountryByPlaceP($placeP);
-        $placeP->setCountry($country);
+        $place->setDistrict($district);
+        $place->setCity($city);
+        $place->setState($state);
+        $place->setCountry($country);
 
         /* Parks, Areas → L */
         $placesPark = $this->findByPosition($latitude, $longitude, 1, self::FEATURE_CLASS_L);
@@ -635,7 +734,7 @@ SQL;
             }
 
             if ($placePark->getDistance() <= self::MAX_DISTANCE_PARKS) {
-                $placeP->addPark($placePark);
+                $place->addPark($placePark);
             }
         }
 
@@ -647,7 +746,7 @@ SQL;
             }
 
             if ($placeForest->getDistance() <= self::MAX_DISTANCE_FOREST) {
-                $placeP->addForest($placeForest);
+                $place->addForest($placeForest);
             }
         }
 
@@ -659,7 +758,7 @@ SQL;
             }
 
             if ($placeMountain->getDistance() <= self::MAX_DISTANCE_MOUNTAIN) {
-                $placeP->addMountain($placeMountain);
+                $place->addMountain($placeMountain);
             }
         }
 
@@ -671,11 +770,14 @@ SQL;
             }
 
             if ($placeSpot->getDistance() <= self::MAX_DISTANCE_SPOT) {
-                $placeP->addSpot($placeSpot);
+                $place->addSpot($placeSpot);
             }
         }
 
-        return $placeP;
+        /* Verbose information */
+        $this->printPlaceInformation($place);
+
+        return $place;
     }
 
     /**
@@ -720,6 +822,44 @@ SQL;
     }
 
     /**
+     * Use sprintf in a utf8 way.
+     *
+     * @param string $format
+     * @param mixed ...$args
+     * @return string
+     * @throws Exception
+     */
+    protected function mbSprintf(string $format, ...$args): string
+    {
+        $params = $args;
+
+        $callback = function ($length) use (&$params) {
+            $value = array_shift($params);
+
+            $value = match (true) {
+                is_null($value) => '',
+                default => strval($value),
+            };
+
+            return strlen($value) - mb_strlen($value) + $length[0];
+        };
+
+        /** @phpstan-ignore-next-line → PHPStan does not detect $callback as valid */
+        $format = preg_replace_callback('/(?<=%|%-)\d+(?=s)/', $callback, $format);
+
+        if ($format === null) {
+            throw new Exception(sprintf('Unable to execute preg_replace_callback (%s:%d).', __FILE__, __LINE__));
+        }
+
+        foreach ($args as &$arg) {
+            $arg = strval($arg);
+        }
+
+        /** @phpstan-ignore-next-line → All arguments are already converted into string. */
+        return sprintf($format, ...$args);
+    }
+
+    /**
      * Prints raw query.
      *
      * @param string $name
@@ -739,6 +879,102 @@ SQL;
         print str_repeat('-', strlen($title))."\n";
         print $sqlRaw."\n";
         print str_repeat('-', strlen($title))."\n";
+        print "\n";
+    }
+
+    /**
+     * Prints next places.
+     *
+     * @param PlaceP[] $placesP
+     * @return void
+     * @throws Exception
+     */
+    protected function printPlaces(array $placesP): void
+    {
+        if (!$this->verbose) {
+            return;
+        }
+
+        $title = 'Next 50 places';
+        $format = '%-63s %-6s %6s %6s %6s %10s %10s %12s';
+
+        print "\n";
+        print $title."\n";
+        print str_repeat('-', strlen($title))."\n";
+
+        $caption = $this->mbSprintf($format, 'Name', 'FC', 'ADM1', 'ADM2', 'ADM3', 'ADM4', 'Population', 'Distance');
+
+        print $caption."\n";
+        print str_repeat('-', strlen($caption))."\n";
+        foreach ($placesP as $placeP) {
+            print $this->mbSprintf(
+                $format,
+                $placeP->getName(),
+                $placeP->getFeatureCode(),
+                $placeP->getAdmin1Code(),
+                $placeP->getAdmin2Code(),
+                $placeP->getAdmin3Code(),
+                $placeP->getAdmin4Code(),
+                $placeP->getPopulation(),
+                $placeP->getDistanceInMeter()
+            )."\n";
+        }
+
+        print "\n";
+    }
+
+    /**
+     * Prints district, city, state and country.
+     *
+     * @param PlaceP $place
+     * @return void
+     * @throws Exception
+     */
+    protected function printPlaceInformation(PlaceP $place): void
+    {
+        if (!$this->verbose) {
+            return;
+        }
+
+        $title = 'Place information';
+        $format = '%-10s %-63s %-6s';
+        $district = $place->getDistrict();
+        $city = $place->getCity();
+        $state = $place->getState();
+        $country = $place->getCountry();
+
+        $caption = $this->mbSprintf($format, '', 'Name', 'FC');
+
+        print "\n";
+        print $title."\n";
+        print str_repeat('-', strlen($title))."\n";
+        print $caption."\n";
+        print str_repeat('-', strlen($caption))."\n";
+
+        if ($district !== null) {
+            print $this->mbSprintf($format, 'District', $district->getName(), $district->getFeatureCode())."\n";
+        } else {
+            print $this->mbSprintf($format, 'District', 'Kein Stadtteil gefunden.', '')."\n";
+        }
+
+        if ($city !== null) {
+            print $this->mbSprintf($format, 'City', $city->getName(), $city->getFeatureCode())."\n";
+        } else {
+            print $this->mbSprintf($format, 'City', 'Keine Stadt gefunden.', '')."\n";
+        }
+
+        if ($state !== null) {
+            print $this->mbSprintf($format, 'State', $state->getName(), $state->getFeatureCode())."\n";
+        } else {
+            print $this->mbSprintf($format, 'State', 'Keine Bundesland/Gemeinde gefunden.', '')."\n";
+        }
+
+        if ($country !== null) {
+            print $this->mbSprintf($format, 'Country', $country, '')."\n";
+        } else {
+            print $this->mbSprintf($format, 'Country', 'Kein Land angegeben.', '')."\n";
+        }
+
         print "\n";
     }
 }

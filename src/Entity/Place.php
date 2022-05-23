@@ -92,6 +92,10 @@ abstract class Place
 
     protected ?PlaceA $cityA = null;
 
+    protected PlaceA|PlaceP|null $district = null;
+
+    protected PlaceA|PlaceP|null $city = null;
+
     protected ?PlaceA $state = null;
 
     /** @var PlaceL[] $parks */
@@ -186,12 +190,12 @@ abstract class Place
     {
         $name = ucfirst($this->getName($detailed));
 
-        if ($this->getCityP() !== null && !str_contains($name, $this->getCityP()->getName())) {
-            $name = sprintf($this->templateAddName, $name, $this->getCityP()->getName($detailed));
+        if ($this->getDistrict() !== null && !str_contains($name, $this->getDistrict()->getName())) {
+            $name = sprintf($this->templateAddName, $name, $this->getDistrict()->getName($detailed));
         }
 
-        if ($this->getCityA() !== null && !str_contains($name, $this->getCityA()->getName())) {
-            $name = sprintf($this->templateAddName, $name, $this->getCityA()->getName($detailed));
+        if ($this->getCity() !== null && !str_contains($name, $this->getCity()->getName())) {
+            $name = sprintf($this->templateAddName, $name, $this->getCity()->getName($detailed));
         }
 
         if ($this->getState() !== null && !str_contains($name, $this->getState()->getName())) {
@@ -650,6 +654,22 @@ abstract class Place
     }
 
     /**
+     * Gets distance of this place (if given from select query to a given place). Not used for db.
+     *
+     * @param int $decimal
+     * @param bool $withUnit
+     * @return float|string
+     */
+    public function getDistanceInMeter(int $decimal = 1, bool $withUnit = true): float|string
+    {
+        $mDegree = 40000000 / 360;
+
+        $distance = round($mDegree * $this->getDistance(), $decimal);
+
+        return $withUnit ? sprintf(sprintf('%%.%df m', $decimal), $distance) : $distance;
+    }
+
+    /**
      * Sets distance of this place (if given from select query to a given place). Not used for db.
      *
      * @param float $distance
@@ -704,6 +724,52 @@ abstract class Place
     public function setCityA(?PlaceA $cityA): self
     {
         $this->cityA = $cityA;
+
+        return $this;
+    }
+
+    /**
+     * Gets district of this place. Not used for db.
+     *
+     * @return PlaceA|PlaceP|null
+     */
+    public function getDistrict(): PlaceA|PlaceP|null
+    {
+        return $this->district;
+    }
+
+    /**
+     * Sets district of this place. Not used for db.
+     *
+     * @param PlaceA|PlaceP|null $district
+     * @return $this
+     */
+    public function setDistrict(PlaceA|PlaceP|null $district): self
+    {
+        $this->district = $district;
+
+        return $this;
+    }
+
+    /**
+     * Gets city of this place. Not used for db.
+     *
+     * @return PlaceA|PlaceP|null
+     */
+    public function getCity(): PlaceA|PlaceP|null
+    {
+        return $this->city;
+    }
+
+    /**
+     * Sets city of this place. Not used for db.
+     *
+     * @param PlaceA|PlaceP|null $city
+     * @return $this
+     */
+    public function setCity(PlaceA|PlaceP|null $city): self
+    {
+        $this->city = $city;
 
         return $this;
     }
