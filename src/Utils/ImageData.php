@@ -13,19 +13,8 @@ declare(strict_types=1);
 
 namespace App\Utils;
 
-use App\Entity\PlaceA;
-use App\Repository\PlaceARepository;
-use App\Repository\PlaceHRepository;
-use App\Repository\PlaceLRepository;
-use App\Repository\PlacePRepository;
-use App\Repository\PlaceRepository;
-use App\Repository\PlaceRRepository;
-use App\Repository\PlaceSRepository;
-use App\Repository\PlaceTRepository;
-use App\Repository\PlaceURepository;
-use App\Repository\PlaceVRepository;
 use App\Service\Entity\PlaceLoaderService;
-use Doctrine\DBAL\Exception as DoctrineDBALException;
+use App\Service\LocationDataService;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
 
@@ -46,7 +35,7 @@ class ImageData
 
     protected ?PlaceLoaderService $placeLoaderService;
 
-    protected const DEBUG = false;
+    protected ?LocationDataService $locationDataService;
 
     public const WIDTH_TITLE = 30;
 
@@ -95,40 +84,16 @@ class ImageData
     public const KEY_NAME_GPS_LONGITUDE_DECIMAL_DEGREE = 'gps-longitude-decimal-degree';
     public const KEY_NAME_GPS_LONGITUDE_DIRECTION = 'gps-longitude-direction';
 
-    public const KEY_NAME_PLACE = 'place';
-    public const KEY_NAME_PLACE_FULL = 'place-full';
-    public const KEY_NAME_PLACE_CITY_P = 'place-city-p';
-    public const KEY_NAME_PLACE_CITY_A = 'place-city-a';
-    public const KEY_NAME_PLACE_DISTRICT = 'place-district';
-    public const KEY_NAME_PLACE_CITY = 'place-city';
-    public const KEY_NAME_PLACE_STATE = 'place-state';
-    public const KEY_NAME_PLACE_PARK = 'place-park';
-    public const KEY_NAME_PLACE_MOUNTAIN = 'place-mountain';
-    public const KEY_NAME_PLACE_SPOT = 'place-spot';
-    public const KEY_NAME_PLACE_FOREST = 'place-forest';
-    public const KEY_NAME_PLACE_COUNTRY = 'place-country';
-    public const KEY_NAME_PLACE_COUNTRY_CODE = 'place-country-code';
-    public const KEY_NAME_PLACE_TIMEZONE = 'place-timezone';
-    public const KEY_NAME_PLACE_POPULATION = 'place-population';
-    public const KEY_NAME_PLACE_ELEVATION = 'place-elevation';
-    public const KEY_NAME_PLACE_FEATURE_CLASS = 'place-feature-class';
-    public const KEY_NAME_PLACE_FEATURE_CODE = 'place-feature-code';
-    public const KEY_NAME_PLACE_DISTANCE = 'place-distance';
-    public const KEY_NAME_PLACE_DEM = 'place-dem';
-    public const KEY_NAME_PLACE_ADMIN1 = 'place-admin1';
-    public const KEY_NAME_PLACE_ADMIN2 = 'place-admin2';
-    public const KEY_NAME_PLACE_ADMIN3 = 'place-admin3';
-    public const KEY_NAME_PLACE_ADMIN4 = 'place-admin4';
-
     /**
      * ImageData constructor.
      *
      * @param string $imagePath
      * @param PlaceLoaderService|null $placeLoaderService
+     * @param LocationDataService|null $locationDataService
      * @param bool $debug
      * @param bool $verbose
      */
-    public function __construct(string $imagePath, ?PlaceLoaderService $placeLoaderService = null, bool $debug = false, bool $verbose = false)
+    public function __construct(string $imagePath, ?PlaceLoaderService $placeLoaderService = null, ?LocationDataService $locationDataService = null, bool $debug = false, bool $verbose = false)
     {
         $this->imagePath = $imagePath;
 
@@ -136,6 +101,8 @@ class ImageData
 
         $this->placeLoaderService?->setDebug($debug);
         $this->placeLoaderService?->setVerbose($verbose);
+
+        $this->locationDataService = $locationDataService;
 
         $this->debug = $debug;
 
@@ -189,114 +156,6 @@ class ImageData
     }
 
     /**
-     * Adds places information.
-     *
-     * @param array<string, array<string, mixed>> $data
-     * @return void
-     * @throws DoctrineDBALException
-     */
-    protected function addPlaceInformation(array &$data): void
-    {
-        if (!$this->placeLoaderService instanceof PlaceLoaderService) {
-            return;
-        }
-
-        if (array_key_exists('gps-latitude-decimal-degree', $data) && array_key_exists('gps-longitude-decimal-degree', $data)) {
-            $latitude = floatval($data['gps-latitude-decimal-degree']['value']);
-            $longitude = floatval($data['gps-longitude-decimal-degree']['value']);
-
-            $place = $this->placeLoaderService->findPlacePByPosition($latitude, $longitude);
-
-            if ($place === null) {
-                return;
-            }
-
-            $dataAdd = [
-                self::KEY_NAME_PLACE => $this->getData('Place', $place->getName(), '%s', null),
-            ];
-
-            /* PlaceP */
-            if ($place->getDistrict() !== null) {
-                $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_DISTRICT => $this->getData('District', $place->getDistrict()->getName($this->debug), '%s', null),
-                ]);
-            }
-
-            /* PlaceA */
-            if ($place->getCity() !== null) {
-                $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_CITY => $this->getData('City', $place->getCity()->getName($this->debug), '%s', null),
-                ]);
-            }
-
-            /* PlaceA */
-            if ($place->getState() !== null) {
-                $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_STATE => $this->getData('Place State', $place->getState()->getName($this->debug), '%s', null),
-                ]);
-            }
-
-            /* PlaceL */
-            if (count($place->getParks()) > 0) {
-                $park = $place->getParks()[0];
-
-                $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_PARK => $this->getData('Place Park', $park->getName($this->debug), '%s', null),
-                ]);
-            }
-
-            /* PlaceT */
-            if (count($place->getMountains()) > 0) {
-                $mountain = $place->getMountains()[0];
-
-                $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_MOUNTAIN => $this->getData('Place Mountain', $mountain->getName($this->debug), '%s', null),
-                ]);
-            }
-
-            /* PlaceS */
-            if (count($place->getSpots()) > 0) {
-                $spot = $place->getSpots()[0];
-
-                $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_SPOT => $this->getData('Place Spot', $spot->getName($this->debug), '%s', null),
-                ]);
-            }
-
-            /* PlaceV */
-            if (count($place->getForests()) > 0) {
-                $spot = $place->getForests()[0];
-
-                $dataAdd = array_merge($dataAdd, [
-                    self::KEY_NAME_PLACE_FOREST => $this->getData('Place Forest', $spot->getName($this->debug), '%s', null),
-                ]);
-            }
-
-            $dataAdd = array_merge($dataAdd, [
-                self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->debug), '%s', null),
-            ]);
-
-            $dataAdd = array_merge($dataAdd, [
-                self::KEY_NAME_PLACE_COUNTRY => $this->getData('Place Country (translated)', $place->getCountry(), '%s', null),
-                self::KEY_NAME_PLACE_COUNTRY_CODE => $this->getData('Place Country Code', $place->getCountryCode(), '%s', null),
-                self::KEY_NAME_PLACE_TIMEZONE => $this->getData('Place Timezone', $place->getTimezone(), '%s', null),
-                self::KEY_NAME_PLACE_POPULATION => $this->getData('Place Population', $place->getPopulation(), '%s', null),
-                self::KEY_NAME_PLACE_ELEVATION => $this->getData('Place Elevation', $place->getElevation(), '%s', ' m'),
-                self::KEY_NAME_PLACE_FEATURE_CLASS => $this->getData('Place Feature Class', $place->getFeatureClass(), '%s', null),
-                self::KEY_NAME_PLACE_FEATURE_CODE => $this->getData('Place Feature Code', $place->getFeatureCode(), '%s', null),
-                self::KEY_NAME_PLACE_DISTANCE => $this->getData('Place Feature Code', $place->getDistance(), '%s', null),
-                self::KEY_NAME_PLACE_DEM => $this->getData('Digital Elevation Model', $place->getDem(), '%s', null),
-                self::KEY_NAME_PLACE_ADMIN1 => $this->getData('Admin1 Code', $place->getAdmin1Code(), '%s', null),
-                self::KEY_NAME_PLACE_ADMIN2 => $this->getData('Admin2 Code', $place->getAdmin2Code(), '%s', null),
-                self::KEY_NAME_PLACE_ADMIN3 => $this->getData('Admin3 Code', $place->getAdmin3Code(), '%s', null),
-                self::KEY_NAME_PLACE_ADMIN4 => $this->getData('Admin4 Code', $place->getAdmin4Code(), '%s', null),
-            ]);
-
-            $data = array_merge($data, $dataAdd);
-        }
-    }
-
-    /**
      * Returns the exif data from given image path.
      *
      * @return array<string, array<string, mixed>>
@@ -310,8 +169,7 @@ class ImageData
             return [];
         }
 
-        /** @phpstan-ignore-next-line → I know that this condition is always false. ;) */
-        if (self::DEBUG) {
+        if ($this->debug) {
             print_r($dataExif);
         }
 
@@ -408,8 +266,7 @@ class ImageData
             $dataExifReturn[self::KEY_NAME_IMAGE_Y_RESOLUTION] = $this->getData('Image Y-Resolution', StringConverter::calculate($dataExif['YResolution']), '%d', ' dpi');
         }
 
-        /** @phpstan-ignore-next-line → I know that this condition is always false. ;) */
-        if (self::DEBUG) {
+        if ($this->debug) {
             print_r($dataExifReturn);
         }
 
@@ -417,12 +274,12 @@ class ImageData
     }
 
     /**
-     * Gets data of image.
+     * Gets full image data.
      *
      * @return array<string, array<string, mixed>>
      * @throws Exception
      */
-    public function getImageData(): array
+    public function getImageDataFull(): array
     {
         $data = $this->getDataExif();
 
@@ -450,14 +307,22 @@ class ImageData
         $data[self::KEY_NAME_IMAGE_WIDTH] = $this->getData('Image Width', intval($width), '%d', ' px');
         $data[self::KEY_NAME_IMAGE_HEIGHT] = $this->getData('Image Height', intval($height), '%d', ' px');
 
-        /* Add image mime */
+        /* Add image mime. */
         $data[self::KEY_NAME_IMAGE_MIME] = $this->getData('Image Mime', $imageMime, '%s', null);
 
-        /* Add image size */
+        /* Add image size. */
         $data[self::KEY_NAME_IMAGE_SIZE] = $this->getData('Image Size', $fileSize, '%d', ' Bytes');
         $data[self::KEY_NAME_IMAGE_SIZE_HUMAN] = $this->getData('Image Size Human', SizeConverter::getHumanReadableSize($fileSize), '%s', null);
 
-        $this->addPlaceInformation($data);
+        /* Add place information. */
+        if ($this->locationDataService !== null && array_key_exists('gps-latitude-decimal-degree', $data) && array_key_exists('gps-longitude-decimal-degree', $data)) {
+            $latitude = floatval($data['gps-latitude-decimal-degree']['value']);
+            $longitude = floatval($data['gps-longitude-decimal-degree']['value']);
+
+            $dataPlaceInformation = $this->locationDataService->getLocationDataFull($latitude, $longitude);
+
+            $data = array_merge($data, $dataPlaceInformation);
+        }
 
         /* Sort by key */
         ksort($data);
@@ -466,14 +331,14 @@ class ImageData
     }
 
     /**
-     * Returns simple array.
+     * Gets image data.
      *
      * @return array<string, mixed>
      * @throws Exception
      */
-    public function getImageDataSimple(): array
+    public function getImageData(): array
     {
-        $imageData = $this->getImageData();
+        $imageData = $this->getImageDataFull();
 
         $array = [];
 
@@ -482,27 +347,5 @@ class ImageData
         }
 
         return $array;
-    }
-
-    /**
-     * Prints image data.
-     *
-     * @return void
-     * @throws Exception
-     */
-    public function printDataImage(): void
-    {
-        $dataImage = $this->getImageData();
-
-        foreach ($dataImage as $key => $data) {
-            $value = $data[self::KEY_NAME_VALUE];
-
-            if (!is_bool($value) && !is_float($value) && !is_int($value) && !is_string($value) && !is_null($value)) {
-                throw new Exception(sprintf('Unsupported type "%s" given (%s:%d).', gettype($value), __FILE__, __LINE__));
-            }
-
-            $format = sprintf('%%-%ds %%-%ds %%s%s%%s'."\n", self::WIDTH_TITLE, self::WIDTH_TITLE, strval($data[self::KEY_NAME_FORMAT]));
-            print sprintf($format, strval($data[self::KEY_NAME_TITLE]), $key, strval($data[self::KEY_NAME_UNIT_BEFORE]), $value, strval($data[self::KEY_NAME_UNIT]));
-        }
     }
 }

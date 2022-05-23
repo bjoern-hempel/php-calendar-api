@@ -26,6 +26,7 @@ use App\Repository\PlaceTRepository;
 use App\Repository\PlaceURepository;
 use App\Repository\PlaceVRepository;
 use App\Service\Entity\PlaceLoaderService;
+use App\Service\LocationDataService;
 use App\Utils\Image\Color;
 use App\Utils\Image\ColorDetectorSimple;
 use App\Utils\Image\ColorDetectorCiede2000;
@@ -68,6 +69,8 @@ class ShowImagePropertiesCommand extends Command
 
     protected PlaceLoaderService $placeLoaderService;
 
+    protected LocationDataService $locationDataService;
+
     protected bool $debug = false;
 
     protected bool $verbose = false;
@@ -75,11 +78,13 @@ class ShowImagePropertiesCommand extends Command
     /**
      * ShowImagePropertiesCommand constructor.
      */
-    public function __construct(PlaceLoaderService $placeLoaderService)
+    public function __construct(PlaceLoaderService $placeLoaderService, LocationDataService $locationDataService)
     {
         parent::__construct();
 
         $this->placeLoaderService = $placeLoaderService;
+
+        $this->locationDataService = $locationDataService;
     }
 
     /**
@@ -112,7 +117,7 @@ EOT
      */
     protected function getOutputLines(ImageData $imageData): array
     {
-        $dataImage = $imageData->getImageData();
+        $dataImage = $imageData->getImageDataFull();
 
         $outputLines = [];
 
@@ -371,6 +376,7 @@ EOT
         $imageData = new ImageData(
             $imagePath,
             $this->placeLoaderService,
+            $this->locationDataService,
             $this->debug,
             $this->verbose
         );
