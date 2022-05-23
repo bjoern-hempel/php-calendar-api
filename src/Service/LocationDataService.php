@@ -233,4 +233,40 @@ class LocationDataService
 
         return $array;
     }
+
+    /**
+     * Calculate the distance between two points.
+     *
+     * @param float $latitudeFrom
+     * @param float $longitudeFrom
+     * @param float $latitudeTo
+     * @param float $longitudeTo
+     * @param int|null $decimals
+     * @return array<string, float>
+     */
+    public static function getDistanceBetweenTwoPoints(float $latitudeFrom, float $longitudeFrom, float $latitudeTo, float $longitudeTo, ?int $decimals = null): array
+    {
+        $theta = $longitudeFrom - $longitudeTo;
+
+        /* Calculate miles */
+        $distance = (sin(deg2rad($latitudeFrom)) * sin(deg2rad($latitudeTo))) + (cos(deg2rad($latitudeFrom)) * cos(deg2rad($latitudeTo)) * cos(deg2rad($theta)));
+        $distance = acos($distance);
+        $distance = rad2deg($distance);
+
+        $miles = $distance * 60 * 1.1515;
+        $feet = $miles * 5280;
+        $yards = $feet / 3;
+        $kilometers = $miles * 1.609344;
+        $meters = $kilometers * 1000;
+
+        if ($decimals !== null) {
+            $miles = round($miles, $decimals);
+            $feet = round($feet, $decimals);
+            $yards = round($yards, $decimals);
+            $kilometers = round($kilometers, $decimals);
+            $meters = round($meters, $decimals);
+        }
+
+        return compact('miles', 'feet', 'yards', 'kilometers', 'meters');
+    }
 }

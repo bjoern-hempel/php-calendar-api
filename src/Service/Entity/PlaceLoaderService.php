@@ -32,6 +32,7 @@ use App\Repository\PlaceSRepository;
 use App\Repository\PlaceTRepository;
 use App\Repository\PlaceURepository;
 use App\Repository\PlaceVRepository;
+use App\Service\LocationDataService;
 use App\Utils\StringConverter;
 use App\Utils\Timer;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
@@ -682,7 +683,7 @@ SQL;
         }
 
         /* Verbose information */
-        $this->printPlaces($placesP);
+        $this->printPlaces($placesP, $latitude, $longitude);
 
         $place = $placesP[0];
         $city = null;
@@ -886,27 +887,32 @@ SQL;
      * Prints next places.
      *
      * @param PlaceP[] $placesP
+     * @param float $latitude
+     * @param float $longitude
      * @return void
      * @throws Exception
      */
-    protected function printPlaces(array $placesP): void
+    protected function printPlaces(array $placesP, float $latitude, float $longitude): void
     {
         if (!$this->verbose) {
             return;
         }
 
-        $title = 'Next 50 places';
-        $format = '%-63s %-6s %6s %6s %6s %10s %10s %12s';
+        $title = sprintf('Next 50 places (%.4f° %.4f°)', $latitude, $longitude);
+        $format = '%-42s %-6s %6s %6s %6s %10s %10s %10s %10s %12s';
 
         print "\n";
         print $title."\n";
         print str_repeat('-', strlen($title))."\n";
 
-        $caption = $this->mbSprintf($format, 'Name', 'FC', 'ADM1', 'ADM2', 'ADM3', 'ADM4', 'Population', 'Distance');
+        $caption = $this->mbSprintf($format, 'Name', 'FC', 'ADM1', 'ADM2', 'ADM3', 'ADM4', 'Population', 'Latitude', 'Longitude', 'Distance');
 
         print $caption."\n";
         print str_repeat('-', strlen($caption))."\n";
         foreach ($placesP as $placeP) {
+            /* TODO: Change latitude and longitude within db. It is reversed. */
+            $distance = LocationDataService::getDistanceBetweenTwoPoints($latitude, $longitude, $placeP->getCoordinate()->getLongitude(), $placeP->getCoordinate()->getLatitude());
+
             print $this->mbSprintf(
                 $format,
                 $placeP->getName(),
@@ -916,7 +922,9 @@ SQL;
                 $placeP->getAdmin3Code(),
                 $placeP->getAdmin4Code(),
                 $placeP->getPopulation(),
-                $placeP->getDistanceInMeter()
+                sprintf('%.4f°', $placeP->getCoordinate()->getLongitude()), /* TODO: Change latitude and longitude within db. It is reversed. */
+                sprintf('%.4f°', $placeP->getCoordinate()->getLatitude()), /* TODO: Change latitude and longitude within db. It is reversed. */
+                sprintf('%.1f m', $distance['meters'])
             )."\n";
         }
 

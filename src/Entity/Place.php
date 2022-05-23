@@ -662,7 +662,7 @@ abstract class Place
      */
     public function getDistanceInMeter(int $decimal = 1, bool $withUnit = true): float|string
     {
-        $mDegree = 40000000 / 360;
+        $mDegree = 42000000 / 360;
 
         $distance = round($mDegree * $this->getDistance(), $decimal);
 
