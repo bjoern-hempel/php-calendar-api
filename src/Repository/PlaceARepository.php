@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Constant\Code;
 use App\Entity\PlaceA;
 use App\Entity\PlaceP;
 use App\Repository\Base\PlaceRepositoryInterface;
@@ -126,7 +127,7 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
             ->setParameter('cc', $countryCode);
 
         $queryBuilder->andWhere('a.featureClass = :fc')
-            ->setParameter('fc', PlaceLoaderService::FEATURE_CLASS_A);
+            ->setParameter('fc', Code::FEATURE_CLASS_A);
 
         switch ($countryCode) {
             case 'AT':
@@ -134,7 +135,7 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
             case 'ES':
             case 'PL':
                 $queryBuilder->andWhere('a.featureCode = :fco')
-                    ->setParameter('fco', PlaceLoaderService::FEATURE_CODE_A_ADM3);
+                    ->setParameter('fco', Code::FEATURE_CODE_A_ADM3);
                 $queryBuilder->andWhere('a.admin3Code = :ac')
                     ->setParameter('ac', $place->getAdmin3Code());
                 break;
@@ -142,7 +143,7 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
             /* de, etc. */
             default:
                 $queryBuilder->andWhere('a.featureCode = :fco')
-                    ->setParameter('fco', PlaceLoaderService::FEATURE_CODE_A_ADM4);
+                    ->setParameter('fco', Code::FEATURE_CODE_A_ADM4);
                 $queryBuilder->andWhere('a.admin4Code = :ac')
                     ->setParameter('ac', $place->getAdmin4Code());
         }
@@ -177,14 +178,14 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
             ->setParameter('cc', $countryCode);
 
         $queryBuilder->andWhere('a.featureClass = :fc')
-            ->setParameter('fc', PlaceLoaderService::FEATURE_CLASS_A);
+            ->setParameter('fc', Code::FEATURE_CLASS_A);
 
         switch ($countryCode) {
 
             /* de, etc. */
             default:
                 $queryBuilder->andWhere('a.featureCode = :fco')
-                    ->setParameter('fco', PlaceLoaderService::FEATURE_CODE_A_ADM1);
+                    ->setParameter('fco', Code::FEATURE_CODE_A_ADM1);
                 $queryBuilder->andWhere('a.admin1Code = :ac')
                     ->setParameter('ac', $city->getAdmin1Code());
         }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Constant\Code;
 use App\Repository\Base\PlaceRepositoryInterface;
 use App\Repository\PlaceARepository;
 use App\Repository\PlaceHRepository;
@@ -132,15 +133,15 @@ EOT
     protected function getPlaceRepository(string $featureClass): PlaceRepositoryInterface
     {
         return match ($featureClass) {
-            PlaceLoaderService::FEATURE_CLASS_A => $this->placeARepository,
-            PlaceLoaderService::FEATURE_CLASS_H => $this->placeHRepository,
-            PlaceLoaderService::FEATURE_CLASS_L => $this->placeLRepository,
-            PlaceLoaderService::FEATURE_CLASS_P => $this->placePRepository,
-            PlaceLoaderService::FEATURE_CLASS_R => $this->placeRRepository,
-            PlaceLoaderService::FEATURE_CLASS_S => $this->placeSRepository,
-            PlaceLoaderService::FEATURE_CLASS_T => $this->placeTRepository,
-            PlaceLoaderService::FEATURE_CLASS_U => $this->placeURepository,
-            PlaceLoaderService::FEATURE_CLASS_V => $this->placeVRepository,
+            Code::FEATURE_CLASS_A => $this->placeARepository,
+            Code::FEATURE_CLASS_H => $this->placeHRepository,
+            Code::FEATURE_CLASS_L => $this->placeLRepository,
+            Code::FEATURE_CLASS_P => $this->placePRepository,
+            Code::FEATURE_CLASS_R => $this->placeRRepository,
+            Code::FEATURE_CLASS_S => $this->placeSRepository,
+            Code::FEATURE_CLASS_T => $this->placeTRepository,
+            Code::FEATURE_CLASS_U => $this->placeURepository,
+            Code::FEATURE_CLASS_V => $this->placeVRepository,
             default => throw new Exception(sprintf('Unexpected feature class "%s" (%s:%d).', $featureClass, __FILE__, __LINE__)),
         };
     }

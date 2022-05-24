@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace App\Service\Entity;
 
+use App\Constant\Code;
+use App\Constant\Country;
 use App\Entity\Place;
 use App\Entity\PlaceA;
 use App\Entity\PlaceH;
@@ -54,103 +56,6 @@ class PlaceLoaderService
 {
     protected bool $debug = false;
     protected bool $verbose = false;
-
-    public const FEATURE_CLASS_A = 'A'; /* country, state, region,... */
-    public const FEATURE_CLASS_H = 'H'; /* stream, lake, ... */
-    public const FEATURE_CLASS_L = 'L'; /* parks, area, ... */
-    public const FEATURE_CLASS_P = 'P'; /* city, village, ... */
-    public const FEATURE_CLASS_R = 'R'; /* road, railroad, ... */
-    public const FEATURE_CLASS_S = 'S'; /* spot, building, farm, ... */
-    public const FEATURE_CLASS_T = 'T'; /* mountain, hill, rock,... */
-    public const FEATURE_CLASS_U = 'U'; /* undersea */
-    public const FEATURE_CLASS_V = 'V'; /* forest, heath, ... */
-
-    public const FEATURE_CLASSES_ALL = [
-        self::FEATURE_CLASS_A,
-        self::FEATURE_CLASS_H,
-        self::FEATURE_CLASS_L,
-        self::FEATURE_CLASS_P,
-        self::FEATURE_CLASS_R,
-        self::FEATURE_CLASS_S,
-        self::FEATURE_CLASS_T,
-        self::FEATURE_CLASS_U,
-        self::FEATURE_CLASS_V,
-    ];
-
-    /* @see http://www.geonames.org/export/codes.html */
-    public const FEATURE_CODE_P_PPL = 'PPL'; /* populated place; a city, town, village, or other agglomeration of buildings where people live and work */
-    public const FEATURE_CODE_P_PPLA = 'PPLA'; /* seat of a first-order administrative division; seat of a first-order administrative division (PPLC takes precedence over PPLA) */
-    public const FEATURE_CODE_P_PPLA2 = 'PPLA2'; /* seat of a second-order administrative division */
-    public const FEATURE_CODE_P_PPLA3 = 'PPLA3'; /* seat of a third-order administrative division */
-    public const FEATURE_CODE_P_PPLA4 = 'PPLA4'; /* seat of a fourth-order administrative division */
-    public const FEATURE_CODE_P_PPLA5 = 'PPLA5'; /* seat of a fifth-order administrative division */
-    public const FEATURE_CODE_P_PPLC = 'PPLC'; /* PPLC; capital of a political entity */
-    public const FEATURE_CODE_P_PPLCH = 'PPLCH'; /* historical capital of a political entity; a former capital of a political entity */
-    public const FEATURE_CODE_P_PPLF = 'PPLF'; /* farm village; a populated place where the population is largely engaged in agricultural activities */
-    public const FEATURE_CODE_P_PPLG = 'PPLG'; /* seat of government of a political entity */
-    public const FEATURE_CODE_P_PPLH = 'PPLH'; /* historical populated place; a populated place that no longer exists */
-    public const FEATURE_CODE_P_PPLL = 'PPLL'; /* populated locality; an area similar to a locality but with a small group of dwellings or other buildings */
-    public const FEATURE_CODE_P_PPLQ = 'PPLQ'; /* abandoned populated place */
-    public const FEATURE_CODE_P_PPLR = 'PPLR'; /* religious populated place; a populated place whose population is largely engaged in religious occupations */
-    public const FEATURE_CODE_P_PPLS = 'PPLS'; /* populated places; cities, towns, villages, or other agglomerations of buildings where people live and work */
-    public const FEATURE_CODE_P_PPLW = 'PPLW'; /* destroyed populated place; a village, town or city destroyed by a natural disaster, or by war */
-    public const FEATURE_CODE_P_PPLX = 'PPLX'; /* section of populated place */
-    public const FEATURE_CODE_P_STLMT = 'STLMT'; /* israeli settlement */
-
-    public const FEATURE_CODE_A_ADM1 = 'ADM1'; /* first-order administrative division; a primary administrative division of a country, such as a state in the United States */
-    public const FEATURE_CODE_A_ADM2 = 'ADM2';
-    public const FEATURE_CODE_A_ADM3 = 'ADM3';
-    public const FEATURE_CODE_A_ADM4 = 'ADM4';
-
-    public const FEATURE_CODES_ALL = [
-        self::FEATURE_CLASS_A => [
-            self::FEATURE_CODE_A_ADM1,
-            self::FEATURE_CODE_A_ADM2,
-            self::FEATURE_CODE_A_ADM3,
-            self::FEATURE_CODE_A_ADM4,
-        ],
-        self::FEATURE_CLASS_H => [],
-        self::FEATURE_CLASS_L => [],
-        self::FEATURE_CLASS_P => [
-            self::FEATURE_CODE_P_PPL,
-            self::FEATURE_CODE_P_PPLA,#
-            self::FEATURE_CODE_P_PPLA2,#
-            self::FEATURE_CODE_P_PPLA3,#
-            self::FEATURE_CODE_P_PPLA4,#
-            self::FEATURE_CODE_P_PPLA5,#
-            self::FEATURE_CODE_P_PPLC,#
-            self::FEATURE_CODE_P_PPLCH,
-            self::FEATURE_CODE_P_PPLF,
-            self::FEATURE_CODE_P_PPLG,
-            self::FEATURE_CODE_P_PPLH,
-            self::FEATURE_CODE_P_PPLL,
-            self::FEATURE_CODE_P_PPLQ,
-            self::FEATURE_CODE_P_PPLR,
-            self::FEATURE_CODE_P_PPLS,
-            self::FEATURE_CODE_P_PPLW,
-            self::FEATURE_CODE_P_PPLX,
-            self::FEATURE_CODE_P_STLMT,
-        ],
-        self::FEATURE_CLASS_R => [],
-        self::FEATURE_CLASS_S => [],
-        self::FEATURE_CLASS_T => [],
-        self::FEATURE_CLASS_U => [],
-        self::FEATURE_CLASS_V => [],
-    ];
-
-    public const FEATURE_CODES_P_ADMIN_PLACES = [
-        self::FEATURE_CODE_P_PPLA,
-        self::FEATURE_CODE_P_PPLA2,
-        self::FEATURE_CODE_P_PPLA3,
-        self::FEATURE_CODE_P_PPLA4,
-        self::FEATURE_CODE_P_PPLA5,
-        self::FEATURE_CODE_P_PPLC
-    ];
-
-    public const FEATURE_CODES_P_DISTRICT_PLACES = [
-        self::FEATURE_CODE_P_PPL,
-        self::FEATURE_CODE_P_PPLX
-    ];
 
     /* 40.000km: 40.000.000m / 360° * 0.01 = 1111.1m → Parks must be less than 1111.1m away. Otherwise, it will not be displayed. */
     protected const MAX_DISTANCE_PARKS = .01;
@@ -308,15 +213,15 @@ SQL;
     public static function getPlace(string $featureClass): PlaceS|PlaceL|PlaceP|PlaceT|PlaceH|PlaceR|PlaceV|PlaceU|PlaceA
     {
         return match ($featureClass) {
-            self::FEATURE_CLASS_A => new PlaceA(),
-            self::FEATURE_CLASS_H => new PlaceH(),
-            self::FEATURE_CLASS_L => new PlaceL(),
-            self::FEATURE_CLASS_P => new PlaceP(),
-            self::FEATURE_CLASS_R => new PlaceR(),
-            self::FEATURE_CLASS_S => new PlaceS(),
-            self::FEATURE_CLASS_T => new PlaceT(),
-            self::FEATURE_CLASS_U => new PlaceU(),
-            self::FEATURE_CLASS_V => new PlaceV(),
+            Code::FEATURE_CLASS_A => new PlaceA(),
+            Code::FEATURE_CLASS_H => new PlaceH(),
+            Code::FEATURE_CLASS_L => new PlaceL(),
+            Code::FEATURE_CLASS_P => new PlaceP(),
+            Code::FEATURE_CLASS_R => new PlaceR(),
+            Code::FEATURE_CLASS_S => new PlaceS(),
+            Code::FEATURE_CLASS_T => new PlaceT(),
+            Code::FEATURE_CLASS_U => new PlaceU(),
+            Code::FEATURE_CLASS_V => new PlaceV(),
             default => throw new Exception(sprintf('Unsupported feature class "%s" (%s:%d).', $featureClass, __FILE__, __LINE__)),
         };
     }
@@ -331,7 +236,7 @@ SQL;
      * @return PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
      * @throws Exception
      */
-    protected function buildPlaceFromRow(array $row, float $latitude, float $longitude, string $featureClass = self::FEATURE_CLASS_A): PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
+    protected function buildPlaceFromRow(array $row, float $latitude, float $longitude, string $featureClass = Code::FEATURE_CLASS_A): PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
     {
         $place = self::getPlace($featureClass);
 
@@ -382,7 +287,7 @@ SQL;
         float $latitude,
         float $longitude,
         int $limit = 1,
-        string $featureClass = self::FEATURE_CLASS_P,
+        string $featureClass = Code::FEATURE_CLASS_P,
         string|array|null $featureCodes = null,
         ?string $countryCode = null,
         ?string $adminCode1 = null,
@@ -394,11 +299,11 @@ SQL;
             $featureCodes = [$featureCodes];
         }
 
-        if (!array_key_exists($featureClass, self::FEATURE_CODES_ALL)) {
+        if (!array_key_exists($featureClass, Code::FEATURE_CODES_ALL)) {
             throw new Exception(sprintf('Unable to find feature class set with feature code "%s" (%s:%d).', $featureClass, __FILE__, __LINE__));
         }
 
-        $featureCodesAll = self::FEATURE_CODES_ALL[$featureClass];
+        $featureCodesAll = Code::FEATURE_CODES_ALL[$featureClass];
 
         /* @see http://www.geonames.org/export/codes.html */
         if ($this->inArray($featureCodes, $featureCodesAll)) {
@@ -439,7 +344,7 @@ SQL;
 
         $tableName = sprintf('place_%s', strtolower($featureClass));
 
-        $sqlRaw = sprintf(
+        return sprintf(
             self::RAW_SQL_POSITION,
             $latitude,
             $longitude,
@@ -453,8 +358,6 @@ SQL;
             $sqlWhereAdmin4Code,
             $limit
         );
-
-        return $sqlRaw;
     }
 
     /**
@@ -469,8 +372,8 @@ SQL;
     protected function getRawQueryPlaceAFromPlaceP(float $latitude, float $longitude, PlaceP $placeP): string
     {
         return match ($placeP->getCountryCode()) {
-            'AT', 'CH', 'ES', 'PL' => $this->getRawSqlPosition($latitude, $longitude, 1, self::FEATURE_CLASS_A, self::FEATURE_CODE_A_ADM3, $placeP->getCountry(), null, null, $placeP->getAdmin3Code(), $placeP->getAdmin4Code()),
-            default => $this->getRawSqlPosition($latitude, $longitude, 1, self::FEATURE_CLASS_A, self::FEATURE_CODE_A_ADM4, $placeP->getCountry(), null, null, null, $placeP->getAdmin4Code()),
+            Country::AUSTRIA_ISO_2, Country::SWITZERLAND_ISO_2, Country::SPAIN_ISO_2, Country::POLAND_ISO_2 => $this->getRawSqlPosition($latitude, $longitude, 1, Code::FEATURE_CLASS_A, Code::FEATURE_CODE_A_ADM3, $placeP->getCountry(), null, null, $placeP->getAdmin3Code(), $placeP->getAdmin4Code()),
+            default => $this->getRawSqlPosition($latitude, $longitude, 1, Code::FEATURE_CLASS_A, Code::FEATURE_CODE_A_ADM4, $placeP->getCountry(), null, null, null, $placeP->getAdmin4Code()),
         };
     }
 
@@ -587,7 +490,7 @@ SQL;
     {
         foreach ($placesP as $placeP) {
             switch (true) {
-                case in_array($placeP->getFeatureCode(), self::FEATURE_CODES_P_ADMIN_PLACES) && $district->getAdmin4Code() == $placeP->getAdmin4Code():
+                case in_array($placeP->getFeatureCode(), Code::FEATURE_CODES_P_ADMIN_PLACES) && $district->getAdmin4Code() == $placeP->getAdmin4Code():
                     return $placeP;
             }
         }
@@ -630,12 +533,40 @@ SQL;
     {
         foreach ($placesP as $placeP) {
             switch (true) {
-                case in_array($placeP->getFeatureCode(), self::FEATURE_CODES_P_DISTRICT_PLACES) && $city->getAdmin4Code() == $placeP->getAdmin4Code():
+                case in_array($placeP->getFeatureCode(), Code::FEATURE_CODES_P_DISTRICT_PLACES) && $city->getAdmin4Code() == $placeP->getAdmin4Code():
                     return $placeP;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Translate given place.
+     *
+     * @param Place $place
+     * @return void
+     */
+    protected function translateFeatureCode(Place $place): void
+    {
+        $translate = false;
+
+        switch (true) {
+            case $place->getFeatureClass() === Code::FEATURE_CLASS_L && $place->getFeatureCode() === Code::FEATURE_CODE_L_PRK:
+            case $place->getFeatureClass() === Code::FEATURE_CLASS_S && $place->getFeatureCode() === Code::FEATURE_CODE_S_RSTN:
+            case $place->getFeatureClass() === Code::FEATURE_CLASS_T && $place->getFeatureCode() === Code::FEATURE_CODE_T_BCH:
+                $translate = true;
+                break;
+        }
+
+        if ($translate) {
+            $value = $this->translator->trans(sprintf('%s.%s', $place->getFeatureClass(), $place->getFeatureCode()), [], 'place', strtolower($place->getCountryCode()));
+            $name = $place->getName();
+
+            if (!str_contains($name, $value)) {
+                $place->setName(sprintf('%s %s', $value, $name));
+            }
+        }
     }
 
     /**
@@ -655,7 +586,7 @@ SQL;
         }
 
         $connection = $this->getEntityManager()->getConnection();
-        $featureClass = self::FEATURE_CLASS_P;
+        $featureClass = Code::FEATURE_CLASS_P;
 
         /* Find feature class P */
         $cityPTimer = Timer::start();
@@ -697,7 +628,7 @@ SQL;
         $city = null;
         $district = null;
         switch (true) {
-            case in_array($place->getFeatureCode(), self::FEATURE_CODES_P_DISTRICT_PLACES):
+            case in_array($place->getFeatureCode(), Code::FEATURE_CODES_P_DISTRICT_PLACES):
                 $district = array_shift($placesP);
                 $city1 = $this->getCityByPlacePFromAdmin($district);
                 $city2 = $this->findNextAdminCity($placesP, $district);
@@ -710,7 +641,7 @@ SQL;
 
                     default:
 //                        /* Maspalomas vs Meloneras */
-//                        if ($place->getCountryCode() === 'ES') {
+//                        if ($place->getCountryCode() === Country::SPAIN_ISO_2) {
 //                            $city = $city1->getPopulation(true) > $city3->getPopulation(true) ? $city3 : $city1;
 //                        } else {
 //                            $city = $city1;
@@ -721,7 +652,7 @@ SQL;
 
                 break;
 
-            case in_array($place->getFeatureCode(), self::FEATURE_CODES_P_ADMIN_PLACES):
+            case in_array($place->getFeatureCode(), Code::FEATURE_CODES_P_ADMIN_PLACES):
                 $city = array_shift($placesP);
                 $district = $this->findNextDistrict($placesP, $city);
                 break;
@@ -740,51 +671,59 @@ SQL;
         $place->setState($state);
         $place->setCountry($country);
 
-        /* Parks, Areas → L */
-        $placesPark = $this->findByPosition($latitude, $longitude, 1, self::FEATURE_CLASS_L);
+        /* L → Parks, Areas */
+        $placesPark = $this->findByPosition($latitude, $longitude, 1, Code::FEATURE_CLASS_L);
         foreach ($placesPark as $placePark) {
             if (!$placePark instanceof PlaceL) {
                 throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placePark), __FILE__, __LINE__));
             }
+
+            $this->translateFeatureCode($placePark);
 
             if ($placePark->getDistanceDb() <= self::MAX_DISTANCE_PARKS) {
                 $place->addPark($placePark);
             }
         }
 
-        /* Forest → V */
-        $placesForest = $this->findByPosition($latitude, $longitude, 1, self::FEATURE_CLASS_V);
-        foreach ($placesForest as $placeForest) {
-            if (!$placeForest instanceof PlaceV) {
-                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeForest), __FILE__, __LINE__));
+        /* S → Add point of interest (Hotel, Rail station) */
+        $placesSpot = $this->findByPosition($latitude, $longitude, 1, Code::FEATURE_CLASS_S);
+        foreach ($placesSpot as $placeSpot) {
+            if (!$placeSpot instanceof PlaceS) {
+                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeSpot), __FILE__, __LINE__));
             }
 
-            if ($placeForest->getDistanceDb() <= self::MAX_DISTANCE_FOREST) {
-                $place->addForest($placeForest);
+            $this->translateFeatureCode($placeSpot);
+
+            if ($placeSpot->getDistanceDb() <= self::MAX_DISTANCE_SPOT) {
+                $place->addSpot($placeSpot);
             }
         }
 
-        /* Mountain → T */
-        $placesMountain = $this->findByPosition($latitude, $longitude, 1, self::FEATURE_CLASS_T);
+        /* T → Mountain */
+        $placesMountain = $this->findByPosition($latitude, $longitude, 1, Code::FEATURE_CLASS_T);
         foreach ($placesMountain as $placeMountain) {
             if (!$placeMountain instanceof PlaceT) {
                 throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeMountain), __FILE__, __LINE__));
             }
+
+            $this->translateFeatureCode($placeMountain);
 
             if ($placeMountain->getDistanceDb() <= self::MAX_DISTANCE_MOUNTAIN) {
                 $place->addMountain($placeMountain);
             }
         }
 
-        /* Add point of interest → S */
-        $placesSpot = $this->findByPosition($latitude, $longitude, 1, self::FEATURE_CLASS_S);
-        foreach ($placesSpot as $placeSpot) {
-            if (!$placeSpot instanceof PlaceS) {
-                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeSpot), __FILE__, __LINE__));
+        /* V → Forest */
+        $placesForest = $this->findByPosition($latitude, $longitude, 1, Code::FEATURE_CLASS_V);
+        foreach ($placesForest as $placeForest) {
+            if (!$placeForest instanceof PlaceV) {
+                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeForest), __FILE__, __LINE__));
             }
 
-            if ($placeSpot->getDistanceDb() <= self::MAX_DISTANCE_SPOT) {
-                $place->addSpot($placeSpot);
+            $this->translateFeatureCode($placeForest);
+
+            if ($placeForest->getDistanceDb() <= self::MAX_DISTANCE_FOREST) {
+                $place->addForest($placeForest);
             }
         }
 
@@ -809,7 +748,7 @@ SQL;
      * @throws DoctrineDBALException
      * @throws Exception
      */
-    public function findByPosition(float $latitude, float $longitude, int $limit = 1, string $featureClass = self::FEATURE_CLASS_P, string|array|null $featureCodes = null, ?string $countryCode = null, ?string $adminCode3 = null, ?string $adminCode4 = null): array
+    public function findByPosition(float $latitude, float $longitude, int $limit = 1, string $featureClass = Code::FEATURE_CLASS_P, string|array|null $featureCodes = null, ?string $countryCode = null, ?string $adminCode3 = null, ?string $adminCode4 = null): array
     {
         $places = [];
 
