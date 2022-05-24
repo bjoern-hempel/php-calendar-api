@@ -31,6 +31,8 @@ class LocationDataService
 
     protected bool $debug = false;
 
+    protected bool $verbose = false;
+
     public const KEY_NAME_FORMAT = 'format';
     public const KEY_NAME_TITLE = 'title';
     public const KEY_NAME_UNIT = 'unit';
@@ -38,6 +40,8 @@ class LocationDataService
     public const KEY_NAME_VALUE = 'value';
     public const KEY_NAME_VALUE_FORMATTED = 'value-formatted';
 
+    public const KEY_NAME_PLACE_LATITUDE = 'place-latitude';
+    public const KEY_NAME_PLACE_LONGITUDE = 'place-longitude';
     public const KEY_NAME_PLACE = 'place';
     public const KEY_NAME_PLACE_FULL = 'place-full';
     public const KEY_NAME_PLACE_DISTRICT = 'place-district';
@@ -54,12 +58,15 @@ class LocationDataService
     public const KEY_NAME_PLACE_ELEVATION = 'place-elevation';
     public const KEY_NAME_PLACE_FEATURE_CLASS = 'place-feature-class';
     public const KEY_NAME_PLACE_FEATURE_CODE = 'place-feature-code';
-    public const KEY_NAME_PLACE_DISTANCE = 'place-distance';
+    public const KEY_NAME_PLACE_DISTANCE_DB = 'place-distance-db';
+    public const KEY_NAME_PLACE_DISTANCE_METER = 'place-distance-meter';
     public const KEY_NAME_PLACE_DEM = 'place-dem';
     public const KEY_NAME_PLACE_ADMIN1 = 'place-admin1';
     public const KEY_NAME_PLACE_ADMIN2 = 'place-admin2';
     public const KEY_NAME_PLACE_ADMIN3 = 'place-admin3';
     public const KEY_NAME_PLACE_ADMIN4 = 'place-admin4';
+
+    public const WIDTH_TITLE = 30;
 
     /**
      * LocationDataService constructor.
@@ -80,6 +87,23 @@ class LocationDataService
     public function setDebug(bool $debug): self
     {
         $this->debug = $debug;
+
+        $this->placeLoaderService->setDebug($debug);
+
+        return $this;
+    }
+
+    /**
+     * Sets verbose mode.
+     *
+     * @param bool $verbose
+     * @return $this
+     */
+    public function setVerbose(bool $verbose): self
+    {
+        $this->verbose = $verbose;
+
+        $this->placeLoaderService->setVerbose($verbose);
 
         return $this;
     }
@@ -132,7 +156,8 @@ class LocationDataService
         }
 
         $data = [
-            self::KEY_NAME_PLACE => $this->getData('Place', $place->getName(), '%s', null),
+            self::KEY_NAME_PLACE_LATITUDE => $this->getData('Latitude', $latitude, '%.4f', '°'),
+            self::KEY_NAME_PLACE_LONGITUDE => $this->getData('Longitude', $longitude, '%.4f', '°'),
         ];
 
         /* PlaceP */
@@ -204,7 +229,8 @@ class LocationDataService
             self::KEY_NAME_PLACE_ELEVATION => $this->getData('Place Elevation', $place->getElevation(), '%s', ' m'),
             self::KEY_NAME_PLACE_FEATURE_CLASS => $this->getData('Place Feature Class', $place->getFeatureClass(), '%s', null),
             self::KEY_NAME_PLACE_FEATURE_CODE => $this->getData('Place Feature Code', $place->getFeatureCode(), '%s', null),
-            self::KEY_NAME_PLACE_DISTANCE => $this->getData('Place Feature Code', $place->getDistance(), '%s', null),
+            self::KEY_NAME_PLACE_DISTANCE_DB => $this->getData('Place Distance DB', sprintf('%.6f', $place->getDistanceDb()), '%s', null),
+            self::KEY_NAME_PLACE_DISTANCE_METER => $this->getData('Place Distance Meters', sprintf('%.2f', $place->getDistanceMeter()), '%.2f', 'm'),
             self::KEY_NAME_PLACE_DEM => $this->getData('Digital Elevation Model', $place->getDem(), '%s', null),
             self::KEY_NAME_PLACE_ADMIN1 => $this->getData('Admin1 Code', $place->getAdmin1Code(), '%s', null),
             self::KEY_NAME_PLACE_ADMIN2 => $this->getData('Admin2 Code', $place->getAdmin2Code(), '%s', null),
@@ -269,5 +295,22 @@ class LocationDataService
         }
 
         return compact('miles', 'feet', 'yards', 'kilometers', 'meters');
+    }
+
+    /**
+     * Calculate the distance between two points in meters.
+     *
+     * @param float $latitudeFrom
+     * @param float $longitudeFrom
+     * @param float $latitudeTo
+     * @param float $longitudeTo
+     * @param int|null $decimals
+     * @return float
+     */
+    public static function getDistanceBetweenTwoPointsInMeter(float $latitudeFrom, float $longitudeFrom, float $latitudeTo, float $longitudeTo, ?int $decimals = null): float
+    {
+        $distance = self::getDistanceBetweenTwoPoints($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $decimals);
+
+        return $distance['meters'];
     }
 }

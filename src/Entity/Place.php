@@ -86,7 +86,9 @@ abstract class Place
     #[ORM\Column(type: 'string', length: 20, nullable: true)]
     protected ?string $admin4Code = null;
 
-    protected float $distance = .0;
+    protected float $distanceDb = .0;
+
+    protected float $distanceMeter = .0;
 
     protected ?PlaceP $cityP = null;
 
@@ -648,9 +650,9 @@ abstract class Place
      *
      * @return float
      */
-    public function getDistance(): float
+    public function getDistanceDb(): float
     {
-        return $this->distance;
+        return $this->distanceDb;
     }
 
     /**
@@ -660,11 +662,11 @@ abstract class Place
      * @param bool $withUnit
      * @return float|string
      */
-    public function getDistanceInMeter(int $decimal = 1, bool $withUnit = true): float|string
+    public function getDistanceDbInMeter(int $decimal = 1, bool $withUnit = true): float|string
     {
         $mDegree = 42000000 / 360;
 
-        $distance = round($mDegree * $this->getDistance(), $decimal);
+        $distance = round($mDegree * $this->getDistanceDb(), $decimal);
 
         return $withUnit ? sprintf(sprintf('%%.%df m', $decimal), $distance) : $distance;
     }
@@ -672,13 +674,35 @@ abstract class Place
     /**
      * Sets distance of this place (if given from select query to a given place). Not used for db.
      *
-     * @param float $distance
+     * @param float $distanceDb
      * @return $this
      */
-    public function setDistance(float $distance): self
+    public function setDistanceDb(float $distanceDb): self
     {
-        $this->distance = $distance;
+        $this->distanceDb = $distanceDb;
 
+        return $this;
+    }
+
+    /**
+     * Gets distance in m of this place (if given from select query to a given place). Not used for db.
+     *
+     * @return float
+     */
+    public function getDistanceMeter(): float
+    {
+        return $this->distanceMeter;
+    }
+
+    /**
+     * Sets distance in m of this place (if given from select query to a given place). Not used for db.
+     *
+     * @param float $distanceMeter
+     * @return Place
+     */
+    public function setDistanceMeter(float $distanceMeter): Place
+    {
+        $this->distanceMeter = $distanceMeter;
         return $this;
     }
 

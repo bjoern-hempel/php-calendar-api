@@ -325,11 +325,13 @@ SQL;
      * Builds place from given row.
      *
      * @param array<string,mixed> $row
+     * @param float $latitude
+     * @param float $longitude
      * @param string $featureClass
      * @return PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
      * @throws Exception
      */
-    protected function buildPlaceFromRow(array $row, string $featureClass = self::FEATURE_CLASS_A): PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
+    protected function buildPlaceFromRow(array $row, float $latitude, float $longitude, string $featureClass = self::FEATURE_CLASS_A): PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
     {
         $place = self::getPlace($featureClass);
 
@@ -350,7 +352,8 @@ SQL;
         $place->setModificationDate(StringConverter::convertDateTime(strval($row['modification_date'])));
         $place->setCreatedAt(DateTimeImmutable::createFromMutable(StringConverter::convertDateTime(strval($row['created_at']))));
         $place->setUpdatedAt(DateTimeImmutable::createFromMutable(StringConverter::convertDateTime(strval($row['updated_at']))));
-        $place->setDistance(floatval($row['distance']));
+        $place->setDistanceDb(floatval($row['distance']));
+        $place->setDistanceMeter(LocationDataService::getDistanceBetweenTwoPointsInMeter($latitude, $longitude, floatval($row['latitude']), floatval($row['longitude'])));
         $place->setAdmin1Code(!empty($row['admin1_code']) ? strval($row['admin1_code']) : null);
         $place->setAdmin2Code(!empty($row['admin2_code']) ? strval($row['admin2_code']) : null);
         $place->setAdmin3Code(!empty($row['admin3_code']) ? strval($row['admin3_code']) : null);
@@ -668,7 +671,7 @@ SQL;
         while (($row = $result->fetchAssociative()) !== false) {
 
             /* Build and add place. */
-            $placeP = $this->buildPlaceFromRow($row, $featureClass);
+            $placeP = $this->buildPlaceFromRow($row, $latitude, $longitude, $featureClass);
 
             if (!$placeP instanceof PlaceP) {
                 throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeP), __FILE__, __LINE__));
@@ -676,6 +679,11 @@ SQL;
 
             $placesP[] = $placeP;
         }
+
+        /* Sort placesP */
+        usort($placesP, function (PlaceP $a, PlaceP $b) {
+            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
+        });
 
         /* No result was found. */
         if (count($placesP) === 0) {
@@ -734,7 +742,7 @@ SQL;
                 throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placePark), __FILE__, __LINE__));
             }
 
-            if ($placePark->getDistance() <= self::MAX_DISTANCE_PARKS) {
+            if ($placePark->getDistanceDb() <= self::MAX_DISTANCE_PARKS) {
                 $place->addPark($placePark);
             }
         }
@@ -746,7 +754,7 @@ SQL;
                 throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeForest), __FILE__, __LINE__));
             }
 
-            if ($placeForest->getDistance() <= self::MAX_DISTANCE_FOREST) {
+            if ($placeForest->getDistanceDb() <= self::MAX_DISTANCE_FOREST) {
                 $place->addForest($placeForest);
             }
         }
@@ -758,7 +766,7 @@ SQL;
                 throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeMountain), __FILE__, __LINE__));
             }
 
-            if ($placeMountain->getDistance() <= self::MAX_DISTANCE_MOUNTAIN) {
+            if ($placeMountain->getDistanceDb() <= self::MAX_DISTANCE_MOUNTAIN) {
                 $place->addMountain($placeMountain);
             }
         }
@@ -770,7 +778,7 @@ SQL;
                 throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeSpot), __FILE__, __LINE__));
             }
 
-            if ($placeSpot->getDistance() <= self::MAX_DISTANCE_SPOT) {
+            if ($placeSpot->getDistanceDb() <= self::MAX_DISTANCE_SPOT) {
                 $place->addSpot($placeSpot);
             }
         }
@@ -812,12 +820,17 @@ SQL;
         while (($row = $result->fetchAssociative()) !== false) {
 
             /* Build place. */
-            $place = $this->buildPlaceFromRow($row, $featureClass);
+            $place = $this->buildPlaceFromRow($row, $latitude, $longitude, $featureClass);
 
             $place->setName(ucfirst($place->getName()));
 
             $places[] = $place;
         }
+
+        /* Sort placesP */
+        usort($places, function (Place $a, Place $b) {
+            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
+        });
 
         return $places;
     }
