@@ -163,21 +163,21 @@ class LocationDataService
         /* PlaceP */
         if ($place->getDistrict() !== null) {
             $data = array_merge($data, [
-                self::KEY_NAME_PLACE_DISTRICT => $this->getData('District', $place->getDistrict()->getName($this->debug), '%s', null),
+                self::KEY_NAME_PLACE_DISTRICT => $this->getData('District', $place->getDistrict()->getName($this->verbose), '%s', null),
             ]);
         }
 
         /* PlaceA */
         if ($place->getCity() !== null) {
             $data = array_merge($data, [
-                self::KEY_NAME_PLACE_CITY => $this->getData('City', $place->getCity()->getName($this->debug), '%s', null),
+                self::KEY_NAME_PLACE_CITY => $this->getData('City', $place->getCity()->getName($this->verbose), '%s', null),
             ]);
         }
 
         /* PlaceA */
         if ($place->getState() !== null) {
             $data = array_merge($data, [
-                self::KEY_NAME_PLACE_STATE => $this->getData('Place State', $place->getState()->getName($this->debug), '%s', null),
+                self::KEY_NAME_PLACE_STATE => $this->getData('Place State', $place->getState()->getName($this->verbose), '%s', null),
             ]);
         }
 
@@ -186,7 +186,7 @@ class LocationDataService
             $park = $place->getParks()[0];
 
             $data = array_merge($data, [
-                self::KEY_NAME_PLACE_PARK => $this->getData('Place Park', $park->getName($this->debug), '%s', null),
+                self::KEY_NAME_PLACE_PARK => $this->getData('Place Park', $park->getName($this->verbose), '%s', null),
             ]);
         }
 
@@ -195,7 +195,7 @@ class LocationDataService
             $mountain = $place->getMountains()[0];
 
             $data = array_merge($data, [
-                self::KEY_NAME_PLACE_MOUNTAIN => $this->getData('Place Mountain', $mountain->getName($this->debug), '%s', null),
+                self::KEY_NAME_PLACE_MOUNTAIN => $this->getData('Place Mountain', $mountain->getName($this->verbose), '%s', null),
             ]);
         }
 
@@ -204,7 +204,7 @@ class LocationDataService
             $spot = $place->getSpots()[0];
 
             $data = array_merge($data, [
-                self::KEY_NAME_PLACE_SPOT => $this->getData('Place Spot', $spot->getName($this->debug), '%s', null),
+                self::KEY_NAME_PLACE_SPOT => $this->getData('Place Spot', $spot->getName($this->verbose), '%s', null),
             ]);
         }
 
@@ -213,12 +213,12 @@ class LocationDataService
             $spot = $place->getForests()[0];
 
             $data = array_merge($data, [
-                self::KEY_NAME_PLACE_FOREST => $this->getData('Place Forest', $spot->getName($this->debug), '%s', null),
+                self::KEY_NAME_PLACE_FOREST => $this->getData('Place Forest', $spot->getName($this->verbose), '%s', null),
             ]);
         }
 
         $data = array_merge($data, [
-            self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->debug), '%s', null),
+            self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->verbose), '%s', null),
         ]);
 
         return array_merge($data, [

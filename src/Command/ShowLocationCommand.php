@@ -192,8 +192,9 @@ EOT
     {
         $this->debug = boolval($input->getOption('debug'));
         $this->verbose = boolval($input->getOption('verbose'));
-        $latitude = floatval($input->getArgument('latitude'));
-        $longitude = floatval($input->getArgument('longitude'));
+
+        $latitude = floatval(preg_replace('~^_~', '-', strval($input->getArgument('latitude'))));
+        $longitude = floatval(preg_replace('~^_~', '-', strval($input->getArgument('longitude'))));
 
         $this->locationDataService->setDebug($this->debug);
         $this->locationDataService->setVerbose($this->verbose);

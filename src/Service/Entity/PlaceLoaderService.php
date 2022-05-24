@@ -727,6 +727,11 @@ SQL;
                 break;
         }
 
+        /* Disable district. */
+        if ($district !== null && $city !== null && $district->getName() === $city->getName()) {
+            $district = null;
+        }
+
         $state = $this->getStateFromPlaceP($place);
         $country = $this->getCountryByPlaceP($place);
 
