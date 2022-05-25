@@ -30,6 +30,8 @@ abstract class BaseController extends AbstractController
 
     public const ROUTE_NAME_APP_IMPRESS = 'app_impress';
 
+    public const ROUTE_NAME_APP_LOCATION = 'app_location';
+
     public const ROUTE_NAME_APP_CALENDAR_INDEX = 'app_calendar_index';
 
     public const ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED = 'app_calendar_index_encoded';

@@ -157,6 +157,8 @@ class GPSPosition
      */
     public function getDecimalDegree(): float
     {
-        return round($this->getDegree() + ((($this->getMinutes() * 60) + $this->getSeconds()) / self::SECONDS_PER_HOUR), 6);
+        $multiplication = in_array($this->getDirection(), [GPSConverter::DIRECTION_SOUTH, GPSConverter::DIRECTION_WEST]) ? -1 : 1;
+
+        return $multiplication * round($this->getDegree() + ((($this->getMinutes() * 60) + $this->getSeconds()) / self::SECONDS_PER_HOUR), 6);
     }
 }

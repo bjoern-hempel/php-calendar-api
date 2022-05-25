@@ -96,7 +96,7 @@ final class GPSConverterTest extends TestCase
     /**
      * Data provider.
      *
-     * @return array<int, array<int, array<string, float|int|string>|string|int|float|null>>
+     * @return array<int, array<int, array<int|string, float|int|string>|float|int|string|null>>
      */
     public function dataProvider(): array
     {
@@ -215,6 +215,24 @@ final class GPSConverterTest extends TestCase
              */
             [++$number, 'decimalDegree2google', 79.857622, 6.932500, 'https://www.google.de/maps/place/79°51′27.4392″+6°55′57″'],
             [++$number, 'decimalDegree2google', 79.857622, 6.932500, 'https://www.google.de/maps/place/79°51′27.4392″E+6°55′57″N', Coordinate::DIRECTION_EAST, Coordinate::DIRECTION_NORTH],
+
+            /**
+             * Full location
+             */
+            [++$number, 'parseFullLocation2DecimalDegrees', '47.900635 13.601868', null, [47.900635, 13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47.900635, 13.601868', null, [47.900635, 13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47.900635,13.601868', null, [47.900635, 13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47.900635°,13.601868°', null, [47.900635, 13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47.900635° -13.601868°', null, [47.900635, -13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47.900635°, -13.601868°', null, [47.900635, -13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47.900635°,-13.601868°', null, [47.900635, -13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47.900635°,_13.601868°', null, [47.900635, -13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47°54′2.286″E 13°36′6.7248″N', null, [47.900635, 13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47°54′2.286″E, 13°36′6.7248″N', null, [47.900635, 13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', 'E47°54′2.286″ N13°36′6.7248″', null, [47.900635, 13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47°54′2.286″W 13°36′6.7248″N', null, [-47.900635, 13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', 'W47°54′2.286″ S13°36′6.7248″', null, [-47.900635, -13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47.900635 13°36′6.7248″N', null, [47.900635, 13.601868]],
         ];
     }
 }

@@ -286,4 +286,55 @@ class GPSConverter
             new GPSPosition(self::parseDecimalDegree($decimalDegreeLatitude, $directionLatitude))
         ))->getGoogle();
     }
+
+    /**
+     * Parse full location string and converts it to a float array.
+     *
+     * Allowed formats:
+     * ----------------
+     * • '47.900635 13.601868'
+     * • '47.900635, 13.601868'
+     * • '47.900635,13.601868'
+     * • '47.900635°,13.601868°'
+     * • '47.900635° -13.601868°'
+     * • '47.900635°, -13.601868°'
+     * • '47.900635°,-13.601868°'
+     * • '47.900635°,_13.601868°'
+     * • '47°54′2.286″E 13°36′6.7248″N'
+     * • 'E47°54′2.286″ N13°36′6.7248″'
+     * • etc.
+     *
+     * @param string $fullLocation
+     * @return float[]
+     * @throws Exception
+     */
+    public static function parseFullLocation2DecimalDegrees(string $fullLocation): array
+    {
+        $split = preg_split('~[, ]+~', $fullLocation);
+
+        if ($split === false) {
+            throw new Exception(sprintf('Unable to split given full location string (%s:%d).', __FILE__, __LINE__));
+        }
+
+        list($latitude, $longitude) = $split;
+
+        $latitude = trim(str_replace('_', '-', $latitude));
+        $longitude = trim(str_replace('_', '-', $longitude));
+
+        $numberRegexp = '~^-?\d+\.\d+[°]*~';
+
+        if (preg_match($numberRegexp, $latitude)) {
+            $latitude = floatval($latitude);
+        } else {
+            $latitude = self::dms2DecimalDegree($latitude);
+        }
+
+        if (preg_match($numberRegexp, $longitude)) {
+            $longitude = floatval($longitude);
+        } else {
+            $longitude = self::dms2DecimalDegree($longitude);
+        }
+
+        return [$latitude, $longitude];
+    }
 }

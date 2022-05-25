@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TwelvePics / Impressum{% endblock %}
+
+{% block body_class %}content content-location bg-light{% endblock %}
+
+{% block body %}
+    {% apply spaceless %}
+
+        {% include 'content/header.html.twig' with {
+            'title': 'Location Check',
+        } %}
+
+        {% embed 'main_layout_without_header.html.twig' %}
+            {% block main_content %}
+                <div id="content-location">
+                    <h1>Location Check</h1>
+                    <h2 style="text-align: left!important; margin-top: 0rem!important; padding-top: 3rem!important;">Koordinaten</h2>
+
+                    {{ form_start(form) }}
+                        {{ form_widget(form) }}
+                        <div>
+                            <button type="submit" class="btn btn-primary">Prüfe Koordinaten</button>
+                        </div>
+                    {{ form_end(form) }}
+
+                    {% if locationData|length > 0 %}
+                        <h2 style="text-align: left!important; margin-top: 0rem!important; padding-top: 3rem!important;">Auswertung</h2>
+
+                        {% if attribute(locationData, 'place-full') is defined %}
+                        <h3 style="text-align: left!important; margin-top: 0rem!important; padding-top: 1.5rem!important;">Ort</h3>
+
+                            <p><b>Ort</b>: {{ attribute(locationData, 'place-full') }}</p>
+                        {% endif %}
+
+                        <h3 style="text-align: left!important; margin-top: 0rem!important; padding-top: 1.5rem!important;">Detailliert</h3>
+
+                        <table>
+                        {% for key,value in locationData %}
+                            <tr>
+                                <td style="padding-right: 10px;"><b>{{ key }}</b>:</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                        </table>
+                    {% endif %}
+                </div>
+            {% endblock %}
+        {% endembed %}
+
+        {% include 'content/footer.html.twig' with {
+
+        } %}
+    {% endapply %}
+{% endblock %}

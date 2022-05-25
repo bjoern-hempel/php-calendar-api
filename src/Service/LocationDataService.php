@@ -247,7 +247,7 @@ class LocationDataService
      * @return array<string, mixed>
      * @throws Exception
      */
-    public function getImageData(float $latitude, float $longitude): array
+    public function getLocationData(float $latitude, float $longitude): array
     {
         $locationData = $this->getLocationDataFull($latitude, $longitude);
 
