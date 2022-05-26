@@ -414,24 +414,42 @@ body.calendar-detail
 
 
 /**
- * Forms
+ * Location
  */
-body.content
-    form
-        div
-            margin-top: 1.5rem
-            width: 100%
-            text-align: center
-
-            input
-                width: 80%
-                padding: 0.5rem 1rem
-                border-radius: 1rem
-
 body.content-location
+
+    .content-main
+        padding: 2rem!important
+
+        @include media-breakpoint-up(md)
+            padding: 3rem!important
+
     #content-location
+        form
+            div
+                margin-top: 1.5rem
+                width: 100%
+                text-align: center
+
+                input
+                    width: 100%
+                    padding: 0.5rem 1rem
+                    border-radius: 1rem
+
+        @include media-breakpoint-up(md)
+            form
+                div
+                    input
+                        width: 80%
+
         p.description
             margin-top: 2rem
+
+        .verbose
+            display: none
+
+            @include media-breakpoint-up(md)
+                display: block
 
         a
             cursor: pointer
@@ -450,7 +468,7 @@ body.content-location
 
         div.cite
             text-align: center
-            margin: 8rem
+            margin: 2rem 0rem
             q
                 font-size: 2rem
                 font-family: Georgia
@@ -462,3 +480,6 @@ body.content-location
 
                 &::after
                     content: close-quote
+
+            @include media-breakpoint-up(md)
+                margin: 8rem

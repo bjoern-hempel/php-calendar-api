@@ -25,8 +25,11 @@
                         </div>
                     {{ form_end(form) }}
 
-                    <p class="description">
-                        Versuche doch einmal Folgendes:
+                    <div class="{{ locationData|length > 0 ? 'verbose' : '' }}">
+                        <p class="description">
+                            Versuche doch einmal Folgendes:
+                        </p>
+
                         <ul class="list-group">
                             <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '52.524889,13.3692797'; document.getElementById('content-location-submit').click();" class="link-primary">Berlin Hauptbahnhof</a></li>
                             <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '47.358580,8.530299'; document.getElementById('content-location-submit').click();" class="link-primary">Museum Rietberg in Zürich</a></li>
@@ -35,7 +38,7 @@
                             <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '27.7351308,-15.599363'; document.getElementById('content-location-submit').click();" class="link-primary">Faro de Maspalomas auf Gran Canaria</a></li>
                             <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '54.4067051,18.6620502'; document.getElementById('content-location-submit').click();" class="link-primary">Westerplatte in Danzig</a></li>
                         </ul>
-                    </p>
+                    </div>
 
                     {% if locationData|length > 0 %}
 
