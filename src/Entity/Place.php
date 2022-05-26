@@ -190,7 +190,7 @@ abstract class Place
      */
     public function getNameFull(bool $detailed = false): string
     {
-        $name = ucfirst($this->getName($detailed));
+        $name = '';
 
         if ($this->getDistrict() !== null && !str_contains($name, $this->getDistrict()->getName())) {
             $name = sprintf($this->templateAddName, $name, $this->getDistrict()->getName($detailed));
@@ -205,6 +205,8 @@ abstract class Place
         }
 
         $name = sprintf($this->templateAddName, $name, $this->getCountry($detailed));
+
+        $name = preg_replace('~^, ~', '', $name);
 
         if (count($this->getParks()) > 0) {
             $park = $this->getParks()[0];
