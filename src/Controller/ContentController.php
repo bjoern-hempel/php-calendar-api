@@ -112,10 +112,17 @@ class ContentController extends BaseController
 
         $form->handleRequest($request);
 
-        $locationData = $this->getLocationData($request, $form);
+        $error = null;
+        try {
+            $locationData = $this->getLocationData($request, $form);
+        } catch (Exception $exception) {
+            $error = 'Leider können wir das noch nicht parsen. Versuche es mit etwas anderem. 😴';
+            $locationData = [];
+        }
 
         return $this->renderForm('content/location.html.twig', [
             'form' => $form,
+            'error' => $error,
             'locationData' => $locationData,
         ]);
     }

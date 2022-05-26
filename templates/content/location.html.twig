@@ -16,6 +16,12 @@
                 <div id="content-location">
                     <h2 class="first">Suche nach Standort</h2>
 
+                    {% if error is not null %}
+                        <p class="error">
+                            {{ error }}
+                        </p>
+                    {% endif %}
+
                     {{ form_start(form) }}
                         <div>
                             {{ form_widget(form.locationFull) }}
