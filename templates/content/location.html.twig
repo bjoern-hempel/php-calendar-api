@@ -8,38 +8,57 @@
     {% apply spaceless %}
 
         {% include 'content/header.html.twig' with {
-            'title': 'Location Check',
+            'title': 'Suche nach Standort',
         } %}
 
         {% embed 'main_layout_without_header.html.twig' %}
             {% block main_content %}
                 <div id="content-location">
-                    <h1>Location Check</h1>
-                    <h2 style="text-align: left!important; margin-top: 0rem!important; padding-top: 3rem!important;">Koordinaten</h2>
+                    <h2 class="first">Suche nach Standort</h2>
 
                     {{ form_start(form) }}
-                        {{ form_widget(form) }}
                         <div>
-                            <button type="submit" class="btn btn-primary">Prüfe Koordinaten</button>
+                            {{ form_widget(form.locationFull) }}
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-primary">Standortsuche</button>
                         </div>
                     {{ form_end(form) }}
 
+                    <p class="description">
+                        Versuche doch einmal Folgendes:
+                        <ul class="list-group">
+                            <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '52.524889,13.3692797';" class="link-primary">Berlin Hauptbahnhof</a></li>
+                            <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '47.358580,8.530299';" class="link-primary">Museum Rietberg in Zürich</a></li>
+                            <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '47.900635,13.601868';" class="link-primary">Miglberg am Attersee</a></li>
+                            <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '51.118500,13.125058';" class="link-primary">Stadtsporthalle Döbeln</a></li>
+                            <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '27.7351308,-15.599363';" class="link-primary">Faro de Maspalomas auf Gran Canaria</a></li>
+                            <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '54.4067051,18.6620502';" class="link-primary">Westerplatte in Danzig</a></li>
+                        </ul>
+                    </p>
+
                     {% if locationData|length > 0 %}
-                        <h2 style="text-align: left!important; margin-top: 0rem!important; padding-top: 3rem!important;">Auswertung</h2>
 
                         {% if attribute(locationData, 'place-full') is defined %}
-                        <h3 style="text-align: left!important; margin-top: 0rem!important; padding-top: 1.5rem!important;">Ort</h3>
-
-                            <p><b>Ort</b>: {{ attribute(locationData, 'place-full') }}</p>
+                            <div class="cite">
+                                <p>Sieht so aus, als ob du nach Folgendem suchst. 😍</p>
+                                <q>{{ attribute(locationData, 'place-full') }}</q>
+                            </div>
                         {% endif %}
 
-                        <h3 style="text-align: left!important; margin-top: 0rem!important; padding-top: 1.5rem!important;">Detailliert</h3>
+                        <h3>Detailliert</h3>
 
-                        <table>
+                        <table class="table">
                         {% for key,value in locationData %}
                             <tr>
-                                <td style="padding-right: 10px;"><b>{{ key }}</b>:</td>
-                                <td>{{ value }}</td>
+                                <td><b>{{ key|camel_case|trans([], 'location') }}</b></td>
+                                <td>
+                                    {% if value is not empty %}
+                                        {{ value }}
+                                    {% else %}
+                                        <i>{{ 'notGiven'|trans([], 'location') }}</i>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                         </table>

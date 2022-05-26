@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Service\Entity\PlaceLoaderService;
+use App\Utils\Timer;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
@@ -65,6 +66,7 @@ class LocationDataService
     public const KEY_NAME_PLACE_ADMIN2 = 'place-admin2';
     public const KEY_NAME_PLACE_ADMIN3 = 'place-admin3';
     public const KEY_NAME_PLACE_ADMIN4 = 'place-admin4';
+    public const KEY_NAME_PLACE_TIME_TAKEN = 'time-taken';
 
     public const WIDTH_TITLE = 30;
 
@@ -129,7 +131,7 @@ class LocationDataService
             self::KEY_NAME_UNIT => $unit,
             self::KEY_NAME_UNIT_BEFORE => $unitBefore,
             self::KEY_NAME_VALUE => $value,
-            self::KEY_NAME_VALUE_FORMATTED => sprintf('%s%s%s', $unitBefore, $valueFormatted !== null ? $valueFormatted : strval($value), $unit),
+            self::KEY_NAME_VALUE_FORMATTED => sprintf('%s%s%s', $unitBefore, $valueFormatted !== null ? $valueFormatted : sprintf($format, $value), $unit),
         ];
 
         if ($addValues !== null) {
@@ -146,10 +148,13 @@ class LocationDataService
      * @param float $longitude
      * @return array<string, array<string, mixed>>
      * @throws DoctrineDBALException
+     * @throws Exception
      */
     public function getLocationDataFull(float $latitude, float $longitude): array
     {
+        $timer = Timer::start();
         $place = $this->placeLoaderService->findPlacePByPosition($latitude, $longitude);
+        $time = Timer::stop($timer);
 
         if ($place === null) {
             return [];
@@ -230,13 +235,35 @@ class LocationDataService
             self::KEY_NAME_PLACE_FEATURE_CLASS => $this->getData('Place Feature Class', $place->getFeatureClass(), '%s', null),
             self::KEY_NAME_PLACE_FEATURE_CODE => $this->getData('Place Feature Code', $place->getFeatureCode(), '%s', null),
             self::KEY_NAME_PLACE_DISTANCE_DB => $this->getData('Place Distance DB', sprintf('%.6f', $place->getDistanceDb()), '%s', null),
-            self::KEY_NAME_PLACE_DISTANCE_METER => $this->getData('Place Distance Meters', sprintf('%.2f', $place->getDistanceMeter()), '%.2f', 'm'),
-            self::KEY_NAME_PLACE_DEM => $this->getData('Digital Elevation Model', $place->getDem(), '%s', null),
+            self::KEY_NAME_PLACE_DISTANCE_METER => $this->getData('Place Distance Meters', sprintf('%.2f', $place->getDistanceMeter()), '%.2f', ' m'),
+            self::KEY_NAME_PLACE_DEM => $this->getData('Digital Elevation Model', $place->getDem(), '%s', ' m'),
             self::KEY_NAME_PLACE_ADMIN1 => $this->getData('Admin1 Code', $place->getAdmin1Code(), '%s', null),
             self::KEY_NAME_PLACE_ADMIN2 => $this->getData('Admin2 Code', $place->getAdmin2Code(), '%s', null),
             self::KEY_NAME_PLACE_ADMIN3 => $this->getData('Admin3 Code', $place->getAdmin3Code(), '%s', null),
             self::KEY_NAME_PLACE_ADMIN4 => $this->getData('Admin4 Code', $place->getAdmin4Code(), '%s', null),
+            self::KEY_NAME_PLACE_TIME_TAKEN => $this->getData('Time', $time, '%.3f', ' s'),
         ]);
+    }
+
+    /**
+     * Gets location data.
+     *
+     * @param float $latitude
+     * @param float $longitude
+     * @return array<string, mixed>
+     * @throws Exception
+     */
+    public function getLocationDataFormatted(float $latitude, float $longitude): array
+    {
+        $locationData = $this->getLocationDataFull($latitude, $longitude);
+
+        $array = [];
+
+        foreach ($locationData as $key => $data) {
+            $array[$key] = $data[self::KEY_NAME_VALUE_FORMATTED];
+        }
+
+        return $array;
     }
 
     /**

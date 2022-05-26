@@ -420,8 +420,45 @@ body.content
     form
         div
             margin-top: 1.5rem
-            div
-                margin-top: 1.5rem
+            width: 100%
+            text-align: center
 
-                label
-                    width: 150px
+            input
+                width: 80%
+                padding: 0.5rem 1rem
+                border-radius: 1rem
+
+body.content-location
+    #content-location
+        p.description
+            margin-top: 2rem
+
+        a
+            cursor: pointer
+
+        h2
+            margin-top: 0rem!important
+            padding-top: 1.5rem!important
+
+            &.first
+                margin-top: 0!important
+                padding-top: 0!important
+
+        h3
+            margin-top: 0rem!important
+            padding-top: 1.5rem!important
+
+        div.cite
+            text-align: center
+            margin: 8rem
+            q
+                font-size: 2rem
+                font-family: Georgia
+                font-style: italic
+                color: #909090
+
+                &::before
+                    content: open-quote
+
+                &::after
+                    content: close-quote

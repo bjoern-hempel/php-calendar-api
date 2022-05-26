@@ -89,7 +89,7 @@ class ContentController extends BaseController
 
         list($latitude, $longitude) = GPSConverter::parseFullLocation2DecimalDegrees($location->getLocationFull());
 
-        return $this->locationDataService->getLocationData($latitude, $longitude);
+        return $this->locationDataService->getLocationDataFormatted($latitude, $longitude);
     }
 
     /**
