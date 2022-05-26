@@ -54,7 +54,11 @@
                                 <td><b>{{ key|camel_case|trans([], 'location') }}</b></td>
                                 <td>
                                     {% if value is not empty %}
-                                        {{ value }}
+                                        {% if key == 'place-google-link' %}
+                                            <a href="{{ value }}" target="_blank">Google Maps</a>
+                                        {% else %}
+                                            {{ value }}
+                                        {% endif %}
                                     {% else %}
                                         <i>{{ 'notGiven'|trans([], 'location') }}</i>
                                     {% endif %}

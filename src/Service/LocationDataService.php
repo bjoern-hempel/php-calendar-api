@@ -46,6 +46,7 @@ class LocationDataService
     public const KEY_NAME_PLACE_LONGITUDE = 'place-longitude';
     public const KEY_NAME_PLACE_LATITUDE_DMS = 'place-latitude-dms';
     public const KEY_NAME_PLACE_LONGITUDE_DMS = 'place-longitude-dms';
+    public const KEY_NAME_PLACE_GOOGLE_LINK = 'place-google-link';
     public const KEY_NAME_PLACE = 'place';
     public const KEY_NAME_PLACE_FULL = 'place-full';
     public const KEY_NAME_PLACE_DISTRICT = 'place-district';
@@ -170,6 +171,7 @@ class LocationDataService
             //self::KEY_NAME_PLACE_LONGITUDE => $this->getData('Longitude', $longitude, '%.4f', '°'),
             self::KEY_NAME_PLACE_LATITUDE_DMS => $this->getData('Latitude DMS', GPSConverter::decimalDegree2dms($latitude, $latitude < 0 ? GPSConverter::DIRECTION_SOUTH : GPSConverter::DIRECTION_NORTH), '%s', null),
             self::KEY_NAME_PLACE_LONGITUDE_DMS => $this->getData('Longitude DMS', GPSConverter::decimalDegree2dms($longitude, $longitude < 0 ? GPSConverter::DIRECTION_WEST : GPSConverter::DIRECTION_EAST), '%s', null),
+            self::KEY_NAME_PLACE_GOOGLE_LINK => $this->getData('Google Link', GPSConverter::decimalDegree2google($latitude, $longitude, $latitude < 0 ? GPSConverter::DIRECTION_SOUTH : GPSConverter::DIRECTION_NORTH, $longitude < 0 ? GPSConverter::DIRECTION_WEST : GPSConverter::DIRECTION_EAST), '%s', null),
         ];
 
         /* PlaceP */
