@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Service\Entity\PlaceLoaderService;
+use App\Utils\GPSConverter;
 use App\Utils\Timer;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Exception;
@@ -43,6 +44,8 @@ class LocationDataService
 
     public const KEY_NAME_PLACE_LATITUDE = 'place-latitude';
     public const KEY_NAME_PLACE_LONGITUDE = 'place-longitude';
+    public const KEY_NAME_PLACE_LATITUDE_DMS = 'place-latitude-dms';
+    public const KEY_NAME_PLACE_LONGITUDE_DMS = 'place-longitude-dms';
     public const KEY_NAME_PLACE = 'place';
     public const KEY_NAME_PLACE_FULL = 'place-full';
     public const KEY_NAME_PLACE_DISTRICT = 'place-district';
@@ -125,13 +128,15 @@ class LocationDataService
     #[ArrayShape([self::KEY_NAME_TITLE => "string", self::KEY_NAME_FORMAT => "string", self::KEY_NAME_UNIT => "null|string", self::KEY_NAME_UNIT_BEFORE => "null|string", self::KEY_NAME_VALUE => "mixed", self::KEY_NAME_VALUE_FORMATTED => "string"])]
     protected function getData(string $title, mixed $value, string $format, ?string $unit, ?string $unitBefore = null, ?string $valueFormatted = null, array $addValues = null): array
     {
+        $formatted = sprintf($format, strval($value));
+
         $data = [
             self::KEY_NAME_TITLE => $title,
             self::KEY_NAME_FORMAT => $format,
             self::KEY_NAME_UNIT => $unit,
             self::KEY_NAME_UNIT_BEFORE => $unitBefore,
             self::KEY_NAME_VALUE => $value,
-            self::KEY_NAME_VALUE_FORMATTED => sprintf('%s%s%s', $unitBefore, $valueFormatted !== null ? $valueFormatted : sprintf($format, $value), $unit),
+            self::KEY_NAME_VALUE_FORMATTED => sprintf('%s%s%s', $unitBefore, $valueFormatted !== null ? $valueFormatted : $formatted, $unit),
         ];
 
         if ($addValues !== null) {
@@ -161,8 +166,10 @@ class LocationDataService
         }
 
         $data = [
-            self::KEY_NAME_PLACE_LATITUDE => $this->getData('Latitude', $latitude, '%.4f', '°'),
-            self::KEY_NAME_PLACE_LONGITUDE => $this->getData('Longitude', $longitude, '%.4f', '°'),
+            //self::KEY_NAME_PLACE_LATITUDE => $this->getData('Latitude', $latitude, '%.4f', '°'),
+            //self::KEY_NAME_PLACE_LONGITUDE => $this->getData('Longitude', $longitude, '%.4f', '°'),
+            self::KEY_NAME_PLACE_LATITUDE_DMS => $this->getData('Latitude DMS', GPSConverter::decimalDegree2dms($latitude, $latitude < 0 ? GPSConverter::DIRECTION_SOUTH : GPSConverter::DIRECTION_NORTH), '%s', null),
+            self::KEY_NAME_PLACE_LONGITUDE_DMS => $this->getData('Longitude DMS', GPSConverter::decimalDegree2dms($longitude, $longitude < 0 ? GPSConverter::DIRECTION_WEST : GPSConverter::DIRECTION_EAST), '%s', null),
         ];
 
         /* PlaceP */

@@ -248,6 +248,10 @@ class GPSConverter
      */
     public static function decimalDegree2dms(float $decimalDegree, ?string $direction = null, string $format = GPSPosition::FORMAT_DMS_SHORT_1): string
     {
+        if ($direction !== null) {
+            $decimalDegree = $decimalDegree < 0 ? -$decimalDegree : $decimalDegree;
+        }
+
         return (new GPSPosition(self::parseDecimalDegree($decimalDegree), $direction))->getDms($format);
     }
 

@@ -1,5 +1,7 @@
 placeLatitude:	"Latitude"
 placeLongitude: "Longitude"
+placeLatitudeDms:	"Latitude"
+placeLongitudeDms: "Longitude"
 placeDistrict:	"Stadtteil / Ortschaft"
 placeCity:	"Stadt / Gemeinde"
 placeState: "Bundesland"
