@@ -16,6 +16,7 @@ namespace App\Entity;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 
 /**
  * Base entity superclass.
@@ -187,6 +188,7 @@ abstract class Place
      *
      * @param bool $detailed
      * @return string
+     * @throws Exception
      */
     public function getNameFull(bool $detailed = false): string
     {
@@ -207,6 +209,10 @@ abstract class Place
         $name = sprintf($this->templateAddName, $name, $this->getCountry($detailed));
 
         $name = preg_replace('~^, ~', '', $name);
+
+        if ($name === null) {
+            throw new Exception(sprintf('Unable to replace comma (%s:%d).', __FILE__, __LINE__));
+        }
 
         if (count($this->getParks()) > 0) {
             $park = $this->getParks()[0];
