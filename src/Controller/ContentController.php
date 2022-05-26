@@ -24,6 +24,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Throwable;
 
 /**
  * Class ContentController
@@ -115,7 +116,7 @@ class ContentController extends BaseController
         $error = null;
         try {
             $locationData = $this->getLocationData($request, $form);
-        } catch (Exception $exception) {
+        } catch (Throwable $throwable) {
             $error = 'Leider können wir das noch nicht parsen. Versuche es mit etwas anderem. 😴';
             $locationData = [];
         }
