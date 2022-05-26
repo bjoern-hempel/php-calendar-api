@@ -285,6 +285,14 @@ class GPSConverter
     #[ArrayShape(['longitude' => "string", 'latitude' => "string"])]
     public static function decimalDegree2google(float $decimalDegreeLongitude, float $decimalDegreeLatitude, ?string $directionLongitude = null, ?string $directionLatitude = null): string
     {
+        if ($directionLatitude !== null) {
+            $decimalDegreeLongitude = $decimalDegreeLongitude < 0 ? -$decimalDegreeLongitude : $decimalDegreeLongitude;
+        }
+
+        if ($directionLatitude !== null) {
+            $decimalDegreeLatitude = $decimalDegreeLatitude < 0 ? -$decimalDegreeLatitude : $decimalDegreeLatitude;
+        }
+
         return (new Coordinate(
             new GPSPosition(self::parseDecimalDegree($decimalDegreeLongitude, $directionLongitude)),
             new GPSPosition(self::parseDecimalDegree($decimalDegreeLatitude, $directionLatitude))
