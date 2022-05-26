@@ -322,6 +322,71 @@ class GPSConverter
      */
     public static function parseFullLocation2DecimalDegrees(string $fullLocation): array
     {
+        $matches = [];
+        switch (true) {
+            /* Google Link https://maps.app.goo.gl/PHq5axBaDdgRWj4T6 */
+            case preg_match('~(https://maps.app.goo.gl/[a-zA-Z0-9]+)$~', $fullLocation, $matches):
+                list($latitude, $longitude) = self::parseLatitudeAndLongitudeFromGoogleLink($matches[1]);
+                break;
+
+            default:
+                list($latitude, $longitude) = self::parseLatitudeAndLongitudeFromString($fullLocation);
+        }
+
+        return [$latitude, $longitude];
+    }
+
+    /**
+     * Parses Google Link.
+     *
+     * @param string $googleLink
+     * @return float[]
+     * @throws Exception
+     */
+    protected static function parseLatitudeAndLongitudeFromGoogleLink(string $googleLink): array
+    {
+        $curl = curl_init($googleLink);
+
+        if ($curl === false) {
+            throw new Exception(sprintf('Unable to initiate curl (%s:%d).', __FILE__, __LINE__));
+        }
+
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        $response = curl_exec($curl);
+
+        if (is_bool($response)) {
+            throw new Exception(sprintf('Unable to exec curl (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $header_size = intval(curl_getinfo($curl, CURLINFO_HEADER_SIZE));
+
+        $headerLines = substr($response, 0, $header_size);
+
+        // location: https://www.google.com/maps/place/Malbork,+Polen/data=!4m6!3m5!1s0x46fd5bffa9b675d5:0xb4e2fe366cccb936!7e2!8m2!3d54.073048299999996!4d18.992402?utm_source=mstt_1&entry=gps
+        $matchesLocation = [];
+        if (preg_match('~^location: .+!3d([0-9]+\.[0-9]+)+.+!4d([0-9]+\.[0-9]+).+~m', $headerLines, $matchesLocation)) {
+            list(, $latitude, $longitude) = $matchesLocation;
+
+            $latitude = floatval($latitude);
+            $longitude = floatval($longitude);
+        } else {
+            $latitude = 47.900635;
+            $longitude = 13.601868;
+        }
+
+        return [$latitude, $longitude];
+    }
+
+    /**
+     * Parse from full location string.
+     *
+     * @param string $fullLocation
+     * @return float[]
+     * @throws Exception
+     */
+    protected static function parseLatitudeAndLongitudeFromString(string $fullLocation): array
+    {
         $split = preg_split('~[, ]+~', $fullLocation);
 
         if ($split === false) {
