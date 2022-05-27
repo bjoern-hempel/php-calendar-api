@@ -22,7 +22,7 @@ namespace App\Utils;
  */
 class Icon
 {
-   const ICON_SLEEP = '😴';
-   const ICON_HALO = '😇';
-   const ICON_HEART = '😍';
+    public const ICON_SLEEP = '😴';
+    public const ICON_HALO = '😇';
+    public const ICON_HEART = '😍';
 }

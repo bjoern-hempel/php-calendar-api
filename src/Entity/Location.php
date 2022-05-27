@@ -25,9 +25,9 @@ namespace App\Entity;
  */
 class Location
 {
-    const DEFAULT_LATITUDE = '47.900635';
+    public const DEFAULT_LATITUDE = '47.900635';
 
-    const DEFAULT_LONGITUDE = '13.601868';
+    public const DEFAULT_LONGITUDE = '13.601868';
 
     protected string $locationFull;
 
