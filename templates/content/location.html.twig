@@ -33,16 +33,17 @@
 
                     <div class="{{ locationData|length > 0 ? 'verbose' : '' }}">
                         <p class="description">
-                            Versuche doch einmal Folgendes:
+                            {{ 'general.tryThis'|trans([], 'location') }}:
                         </p>
 
                         <ul class="list-group">
-                            <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '52.524889,13.3692797'; document.getElementById('content-location-submit').click();" class="link-primary">Berlin Hauptbahnhof</a></li>
-                            <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '47.358580,8.530299'; document.getElementById('content-location-submit').click();" class="link-primary">Museum Rietberg in Zürich</a></li>
-                            <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '47.900635,13.601868'; document.getElementById('content-location-submit').click();" class="link-primary">Miglberg am Attersee</a></li>
-                            <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '51.118500,13.125058'; document.getElementById('content-location-submit').click();" class="link-primary">Stadtsporthalle Döbeln</a></li>
-                            <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '27.7351308,-15.599363'; document.getElementById('content-location-submit').click();" class="link-primary">Faro de Maspalomas auf Gran Canaria</a></li>
-                            <li class="list-group-item"><a onclick="document.getElementById('full_location_locationFull').value = '54.4067051,18.6620502'; document.getElementById('content-location-submit').click();" class="link-primary">Westerplatte in Danzig</a></li>
+                            <li class="list-group-item"><a class="link-primary location-own-position">Dein aktueller Standort</a> {{ constant('App\\Utils\\Icon::ICON_HALO') }}</li>
+                            <li class="list-group-item"><a class="link-primary location-position" data-latitude="52.524889" data-longitude="13.3692797">Berlin Hauptbahnhof</a></li>
+                            <li class="list-group-item"><a class="link-primary location-position" data-latitude="47.358580" data-longitude="8.530299">Museum Rietberg in Zürich</a></li>
+                            <li class="list-group-item"><a class="link-primary location-position" data-latitude="47.900635" data-longitude="13.601868">Miglberg am Attersee</a></li>
+                            <li class="list-group-item"><a class="link-primary location-position" data-latitude="51.118500" data-longitude="13.125058">Stadtsporthalle Döbeln</a></li>
+                            <li class="list-group-item"><a class="link-primary location-position" data-latitude="27.7351308" data-longitude="-15.599363">Faro de Maspalomas auf Gran Canaria</a></li>
+                            <li class="list-group-item"><a class="link-primary location-position" data-latitude="54.4067051" data-longitude="18.6620502">Westerplatte in Danzig</a></li>
                         </ul>
                     </div>
 
@@ -50,7 +51,7 @@
 
                         {% if attribute(locationData, 'place-full') is defined %}
                             <div class="cite">
-                                <p>Sieht so aus, als ob du nach Folgendem suchst. 😍</p>
+                                <p>Sieht so aus, als ob du nach Folgendem suchst. {{ constant('App\\Utils\\Icon::ICON_HEART') }}</p>
                                 <q>{{ attribute(locationData, 'place-full') }}</q>
                             </div>
                         {% endif %}
@@ -60,7 +61,7 @@
                         <table class="table">
                         {% for key,value in locationData %}
                             <tr>
-                                <td><b>{{ key|camel_case|trans([], 'location') }}</b></td>
+                                <td><b>{{ ('place.' ~ key|camel_case)|trans([], 'location') }}</b></td>
                                 <td>
                                     {% if value is not empty %}
                                         {% if key == 'place-google-link' %}
@@ -69,7 +70,7 @@
                                             {{ value }}
                                         {% endif %}
                                     {% else %}
-                                        <i>{{ 'notGiven'|trans([], 'location') }}</i>
+                                        <i>{{ 'general.notGiven'|trans([], 'location') }}</i>
                                     {% endif %}
                                 </td>
                             </tr>

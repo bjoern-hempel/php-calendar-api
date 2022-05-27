@@ -143,3 +143,37 @@ let buildLightbox = (e) => {
 document.querySelectorAll('.lightbox-own').forEach(
     (e) => e.addEventListener('click', buildLightbox)
 );
+
+/**
+ * Submits given position.
+ *
+ * @param position
+ */
+let submitPosition = (position) => {
+    document.getElementById('full_location_locationFull').value = position;
+    document.getElementById('content-location-submit').click();
+};
+
+document.querySelectorAll('.location-own-position').forEach(
+    (e) => e.addEventListener('click', () => {
+            navigator.geolocation.getCurrentPosition((position) => {
+                let positionFull = position.coords.latitude + ' ' + position.coords.longitude;
+
+                submitPosition(positionFull);
+            })
+        }
+    )
+);
+
+document.querySelectorAll('.location-position').forEach(
+    (e) => e.addEventListener('click', (e) => {
+        let target = e.target;
+
+        let latitude = target.getAttribute('data-latitude');
+        let longitude = target.getAttribute('data-longitude');
+
+        let position = latitude + ' ' + longitude;
+
+        submitPosition(position);
+    })
+);

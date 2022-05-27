@@ -19,11 +19,11 @@ use App\Form\Type\FullLocationType;
 use App\Service\LocationDataService;
 use App\Utils\GPSConverter;
 use Exception;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 /**
@@ -37,14 +37,19 @@ class ContentController extends BaseController
 {
     protected LocationDataService $locationDataService;
 
+    protected TranslatorInterface $translator;
+
     /**
      * ContentController constructor.
      *
      * @param LocationDataService $locationDataService
+     * @param TranslatorInterface $translator
      */
-    public function __construct(LocationDataService $locationDataService)
+    public function __construct(LocationDataService $locationDataService, TranslatorInterface $translator)
     {
         $this->locationDataService = $locationDataService;
+
+        $this->translator = $translator;
     }
 
     /**
@@ -105,7 +110,7 @@ class ContentController extends BaseController
     {
         // creates a task object and initializes some data for this example
         $location = new Location();
-        $location->setLocationFull('47.900635,13.601868');
+        $location->setLocationFull(sprintf('%s %s', Location::DEFAULT_LATITUDE, Location::DEFAULT_LONGITUDE));
 
         $form = $this->createForm(FullLocationType::class, $location, [
             'method' => Request::METHOD_POST,
@@ -117,7 +122,7 @@ class ContentController extends BaseController
         try {
             $locationData = $this->getLocationData($request, $form);
         } catch (Throwable $throwable) {
-            $error = 'Leider können wir das noch nicht parsen. Versuche es mit etwas anderem. 😴';
+            $error = $this->translator->trans('general.notAvailable', [], 'location');
             $locationData = [];
         }
 
