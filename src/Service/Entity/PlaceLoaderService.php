@@ -59,13 +59,23 @@ class PlaceLoaderService
 
     public const MAX_DISTANCE_PARK_METER = 1000;
 
+    public const MAX_MAX_DISTANCE_PARK_METER = 5000;
+
     public const MAX_DISTANCE_PLACE_METER = 1000;
+
+    public const MAX_MAX_DISTANCE_PLACE_METER = 5000;
 
     public const MAX_DISTANCE_FOREST_METER = 2000;
 
+    public const MAX_MAX_DISTANCE_FOREST_METER = 10000;
+
     public const MAX_DISTANCE_MOUNTAIN_METER = 2000;
 
+    public const MAX_MAX_DISTANCE_MOUNTAIN_METER = 10000;
+
     public const MAX_DISTANCE_SPOT_METER = 300;
+
+    public const MAX_MAX_DISTANCE_SPOT_METER = 1500;
 
     protected const RAW_SQL_POSITION = <<<SQL
 SELECT

@@ -78,16 +78,18 @@
                         </table>
 
                         {% for key,value in data %}
-                            <h3>{{ ('title.' ~ key ~ 'Next')|trans([], 'location') }}</h3>
+                            {% if value|length > 0 %}
+                                <h3>{{ ('title.' ~ key ~ 'Next')|trans([], 'location') }}</h3>
 
-                            <table class="table">
-                            {% for place in value %}
-                                <tr>
-                                    <td style="width: 33%;"><b>{{ place.name }}</b></td>
-                                    <td style="width: 67%;">{{ place.distanceDbInMeter }}</td>
-                                </tr>
-                            {% endfor %}
-                            </table>
+                                <table class="table">
+                                    {% for place in value %}
+                                        <tr>
+                                            <td style="width: 33%;"><b>{{ place.name }}</b></td>
+                                            <td style="width: 67%;">{{ place.distanceDbInMeter }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            {% endif %}
                         {% endfor %}
                     {% endif %}
                 </div>

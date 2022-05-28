@@ -885,6 +885,10 @@ abstract class Place
      */
     public function addPark(PlaceL $park): self
     {
+        if ($park->getDistanceMeter() > PlaceLoaderService::MAX_MAX_DISTANCE_PARK_METER) {
+            return $this;
+        }
+
         $this->parks[] = $park;
 
         return $this;
@@ -942,6 +946,10 @@ abstract class Place
      */
     public function addPlace(PlaceP $place): self
     {
+        if ($place->getDistanceMeter() > PlaceLoaderService::MAX_MAX_DISTANCE_PLACE_METER) {
+            return $this;
+        }
+
         $this->places[] = $place;
 
         return $this;
@@ -998,6 +1006,10 @@ abstract class Place
      */
     public function addSpot(PlaceS $spot): self
     {
+        if ($spot->getDistanceMeter() > PlaceLoaderService::MAX_MAX_DISTANCE_SPOT_METER) {
+            return $this;
+        }
+
         $this->spots[] = $spot;
 
         return $this;
@@ -1054,6 +1066,10 @@ abstract class Place
      */
     public function addMountain(PlaceT $mountain): self
     {
+        if ($mountain->getDistanceMeter() > PlaceLoaderService::MAX_MAX_DISTANCE_MOUNTAIN_METER) {
+            return $this;
+        }
+
         $this->mountains[] = $mountain;
 
         return $this;
@@ -1083,7 +1099,7 @@ abstract class Place
 
         $firstForest = $this->forests[0];
 
-        if (!$checkDistance || $firstForest->getDistanceMeter() <= PlaceLoaderService::MAX_DISTANCE_MOUNTAIN_METER) {
+        if (!$checkDistance || $firstForest->getDistanceMeter() <= PlaceLoaderService::MAX_DISTANCE_FOREST_METER) {
             return $firstForest;
         }
 
@@ -1111,6 +1127,10 @@ abstract class Place
      */
     public function addForest(PlaceV $forest): self
     {
+        if ($forest->getDistanceMeter() > PlaceLoaderService::MAX_MAX_DISTANCE_FOREST_METER) {
+            return $this;
+        }
+
         $this->forests[] = $forest;
 
         return $this;
