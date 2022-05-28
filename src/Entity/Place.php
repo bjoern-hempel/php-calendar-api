@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\DataType\Point;
 use App\Service\Entity\PlaceLoaderService;
-use CrEOF\Spatial\PHP\Types\Geometry\Point;
+use App\Utils\GPSConverter;
+use CrEOF\Spatial\PHP\Types\Geometry\Point as CrEOFSpatialPHPTypesGeometryPoint;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * Base entity superclass.
@@ -47,7 +50,7 @@ abstract class Place
     protected string $alternateNames;
 
     #[ORM\Column(type: 'point')]
-    protected Point $coordinate;
+    protected CrEOFSpatialPHPTypesGeometryPoint $coordinate;
 
     #[ORM\Column(name: 'feature_class', type: 'string', length: 1)]
     protected string $featureClass;
@@ -337,9 +340,9 @@ abstract class Place
     /**
      * Gets the point of this place.
      *
-     * @return Point
+     * @return CrEOFSpatialPHPTypesGeometryPoint
      */
-    public function getCoordinate(): Point
+    public function getCoordinate(): CrEOFSpatialPHPTypesGeometryPoint
     {
         return $this->coordinate;
     }
@@ -347,10 +350,10 @@ abstract class Place
     /**
      * Sets the point of this place.
      *
-     * @param Point $coordinate
+     * @param CrEOFSpatialPHPTypesGeometryPoint $coordinate
      * @return $this
      */
-    public function setCoordinate(Point $coordinate): self
+    public function setCoordinate(CrEOFSpatialPHPTypesGeometryPoint $coordinate): self
     {
         $this->coordinate = $coordinate;
 
@@ -699,11 +702,24 @@ abstract class Place
     /**
      * Gets distance in m of this place (if given from select query to a given place). Not used for db.
      *
-     * @return float
+     * @param int|null $decimal
+     * @param string|null $unit
+     * @param int $divider
+     * @return float|string
      */
-    public function getDistanceMeter(): float
+    public function getDistanceMeter(?int $decimal = null, ?string $unit = null, int $divider = 1): float|string
     {
-        return $this->distanceMeter;
+        $distanceMeter = $this->distanceMeter / $divider;
+
+        if ($decimal !== null) {
+            $distanceMeter = sprintf(sprintf('%%.%df', $decimal), $distanceMeter);
+        }
+
+        if ($unit) {
+            $distanceMeter = str_replace('.', ',', sprintf('%s %s', $distanceMeter, $unit));
+        }
+
+        return $distanceMeter;
     }
 
     /**
@@ -1185,5 +1201,24 @@ abstract class Place
         $this->templateAddName = $templateAddName;
 
         return $this;
+    }
+
+    /**
+     * Returns google link. Not used for db.
+     *
+     * @return string
+     * @throws Exception
+     */
+    #[ArrayShape(['longitude' => "string", 'latitude' => "string"])]
+    public function getGoogleLink(): string
+    {
+        $coordinateTranslated = new Point($this->coordinate->getX(), $this->coordinate->getY(), $this->coordinate->getSrid());
+
+        return GPSConverter::decimalDegree2google(
+            $coordinateTranslated->getLongitude(),
+            $coordinateTranslated->getLatitude(),
+            $coordinateTranslated->getLongitudeDirection(),
+            $coordinateTranslated->getLatitudeDirection()
+        );
     }
 }

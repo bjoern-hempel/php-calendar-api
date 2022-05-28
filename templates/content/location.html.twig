@@ -61,11 +61,11 @@
                         <table class="table">
                         {% for key,value in locationData %}
                             <tr>
-                                <td style="width: 33%;"><b>{{ ('place.' ~ key|camel_case)|trans([], 'location') }}</b></td>
-                                <td style="width: 67%;">
+                                <td class="table-name" style="width: 33%;"><b>{{ ('place.' ~ key|camel_case)|trans([], 'location') }}</b></td>
+                                <td class="table-value" style="width: 67%;">
                                     {% if value is not empty %}
                                         {% if key == 'place-google-link' %}
-                                            <a href="{{ value }}" target="_blank">Google Maps</a>
+                                            <a href="{{ value }}" target="_blank" class="btn btn-primary">Google Maps</a>
                                         {% else %}
                                             {{ value }}
                                         {% endif %}
@@ -79,13 +79,16 @@
 
                         {% for key,value in data %}
                             {% if value|length > 0 %}
-                                <h3>{{ ('title.' ~ key ~ 'Next')|trans([], 'location') }}</h3>
+                                <h3>{{ ('title.' ~ key ~ '.next')|trans([], 'location') }} ({{ key }})</h3>
+                                <p>{{ ('title.' ~ key ~ '.nextDetail')|trans([], 'location') }}</p>
 
                                 <table class="table">
                                     {% for place in value %}
                                         <tr>
-                                            <td style="width: 33%;"><b>{{ place.name }}</b></td>
-                                            <td style="width: 67%;">{{ place.distanceDbInMeter }}</td>
+                                            <td class="table-name"><small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name }}</b><br /><small>{{ (key ~ '.' ~ place.featureCode)|trans([], 'place') }}</small></td>
+                                            <td class="table-value">
+                                                <a href="{{ place.googleLink }}" target="_blank" class="btn btn-primary" style="width: 100px;">{{ place.distanceMeter(3, 'km', 1000) }}</a>
+                                            </td>
                                         </tr>
                                     {% endfor %}
                                 </table>

@@ -29,11 +29,21 @@ place:
   timeTaken: "Benötigte Zeit"
 
 title:
-  placesNext: "Nächste Stadtteile oder Ortschaften"
-  parksNext: "Nächste Parks oder Flächen"
-  spotsNext: "Nächste Orte, Gebäude oder Farmen"
-  mountainsNext: "Nächste Berge, Hügel, Felsen oder Strände"
-  forestsNext: "Nächste Wälde oder Heiden"
+  P:
+    next: "Nächste Stadtteile oder Ortschaften" # P
+    nextDetail: "Stadtteile, Ortschaften, etc." # P
+  L:
+    next: "Nächste Parks oder Flächen" # L
+    nextDetail: "Parks, Flächen, etc." # L
+  S:
+    next: "Nächste Orte, Hotels, Gebäude oder Farmen" # S
+    nextDetail: "Brauereien, Farmen, Flughäfen, Gebäude, Hotels, Krankenhäuser, Kirschen, Orte, etc." # S
+  T:
+    next: "Nächste Berge, Hügel, Felsen oder Strände" # T
+    nextDetail: "Berge, Hügel, Felsen, Strände, etc." # T
+  V:
+    next: "Nächste Wälder oder Heiden" # V
+    nextDetail: "Wälder, Heiden, etc." # V
 
 general:
   notAvailable: "Leider können wir das noch nicht parsen. Versuche es mit etwas anderem. 😴"

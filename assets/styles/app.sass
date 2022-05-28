@@ -468,6 +468,13 @@ body.content-location
         h3
             margin-top: 0rem!important
             padding-top: 1.5rem!important
+            text-align: left!important
+            margin-left: .5rem
+            margin-bottom: 1rem
+            font-weight: 400!important
+
+        p
+            margin-left: .5rem
 
         div.cite
             text-align: center
@@ -486,3 +493,16 @@ body.content-location
 
             @include media-breakpoint-up(md)
                 margin: 8rem
+
+    table
+        .table-name
+            width: auto
+        .table-value
+            width: auto
+            text-align: right
+
+        @include media-breakpoint-up(md)
+            .table-name
+                width: 33%
+            .table-value
+                width: 67%

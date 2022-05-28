@@ -17,7 +17,7 @@ use Exception;
 use JetBrains\PhpStorm\ArrayShape;
 
 /**
- * Class Place
+ * Class Coordinate
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2022-04-22)

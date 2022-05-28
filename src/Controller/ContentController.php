@@ -23,6 +23,7 @@ use Exception;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
@@ -40,17 +41,22 @@ class ContentController extends BaseController
 
     protected TranslatorInterface $translator;
 
+    protected KernelInterface $kernel;
+
     /**
      * ContentController constructor.
      *
      * @param LocationDataService $locationDataService
      * @param TranslatorInterface $translator
+     * @param KernelInterface $kernel
      */
-    public function __construct(LocationDataService $locationDataService, TranslatorInterface $translator)
+    public function __construct(LocationDataService $locationDataService, TranslatorInterface $translator, KernelInterface $kernel)
     {
         $this->locationDataService = $locationDataService;
 
         $this->translator = $translator;
+
+        $this->kernel = $kernel;
     }
 
     /**
@@ -125,7 +131,9 @@ class ContentController extends BaseController
         try {
             $locationData = $this->getLocationData($request, $form, $data);
         } catch (Throwable $throwable) {
-            $error = $this->translator->trans('general.notAvailable', [], 'location');
+            $error = $this->kernel->getEnvironment() !== 'dev' ?
+                $this->translator->trans('general.notAvailable', [], 'location') :
+                sprintf('%s (%s:%d)', $throwable->getMessage(), $throwable->getFile(), $throwable->getLine());
             $locationData = [];
         }
 

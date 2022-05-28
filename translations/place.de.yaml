@@ -163,8 +163,8 @@ H:
   WTRH: "waterhole(s)" # a natural hole, hollow, or small depression that contains water, used by man and animals, especially in arid areas
 L:
   AGRC: "agricultural colony" # a tract of land set aside for agricultural settlement
-  AMUS: "amusement park" # Amusement Park are theme parks, adventure parks offering entertainment, similar to funfairs but with a fix location
-  AREA: "area" # a tract of land without homogeneous character or boundaries
+  AMUS: "Vergnügungspark" # Amusement Park are theme parks, adventure parks offering entertainment, similar to funfairs but with a fix location
+  AREA: "Gebiet" # a tract of land without homogeneous character or boundaries
   BSND: "drainage basin" # an area drained by a stream
   BSNP: "petroleum basin" # an area underlain by an oil-rich structural basin
   BTL: "battlefield" # a site of a land battle of historical importance
@@ -183,7 +183,7 @@ L:
   GVL: "gravel area" # an area covered with gravel
   INDS: "industrial area" # an area characterized by industrial activity
   LAND: "arctic land" # a tract of land in the Arctic
-  LCTY: "locality" # a minor area or place of unspecified or mixed character and indefinite boundaries
+  LCTY: "Ortschaft" # a minor area or place of unspecified or mixed character and indefinite boundaries
   MILB: "military base" # a place used by an army or other armed service for storing arms and supplies, and for accommodating and training troops, a base from which operations can be initiated
   MNA: "mining area" # an area of mine sites where minerals and ores are extracted
   MVA: "maneuver area" # a tract of land where military field exercises are carried out
@@ -211,23 +211,23 @@ L:
   SNOW: "snowfield" # an area of permanent snow and ice forming the accumulation area of a glacier
   TRB: "tribal area" # a tract of land used by nomadic or other tribes
 P:
-  PPL: "populated place" # a city, town, village, or other agglomeration of buildings where people live and work
-  PPLA: "seat of a first-order administrative division" # seat of a first-order administrative division (PPLC takes precedence over PPLA)
-  PPLA2: "seat of a second-order administrative division" #
-  PPLA3: "seat of a third-order administrative division" #
-  PPLA4: "seat of a fourth-order administrative division" #
-  PPLA5: "seat of a fifth-order administrative division" #
-  PPLC: "capital of a political entity" #
-  PPLCH: "historical capital of a political entity" # a former capital of a political entity
-  PPLF: "farm village" # a populated place where the population is largely engaged in agricultural activities
-  PPLG: "seat of government of a political entity" #
-  PPLH: "historical populated place" # a populated place that no longer exists
+  PPL: "Besiedelter Ort (Stadtteil)" # a city, town, village, or other agglomeration of buildings where people live and work
+  PPLA: "Sitz einer Verwaltungseinheit erster Ordnung" # seat of a first-order administrative division (PPLC takes precedence over PPLA)
+  PPLA2: "Sitz einer Verwaltungseinheit zweiter Ordnung" #
+  PPLA3: "Sitz einer Verwaltungseinheit dritter Ordnung" #
+  PPLA4: "Sitz einer Verwaltungseinheit vierter Ordnung" #
+  PPLA5: "Sitz einer Verwaltungseinheit fünfter Ordnung" #
+  PPLC: "Hauptstadt einer politischen Einheit" #
+  PPLCH: "Historische Hauptstadt einer politischen Einheit" # a former capital of a political entity
+  PPLF: "Bauerndorf" # a populated place where the population is largely engaged in agricultural activities
+  PPLG: "Sitz der Regierung einer politischen Einheit" #
+  PPLH: "Historisch besiedelter Ort" # a populated place that no longer exists
   PPLL: "populated locality" # an area similar to a locality but with a small group of dwellings or other buildings
   PPLQ: "abandoned populated place" #
   PPLR: "religious populated place" # a populated place whose population is largely engaged in religious occupations
   PPLS: "populated places" # cities, towns, villages, or other agglomerations of buildings where people live and work
   PPLW: "destroyed populated place" # a village, town or city destroyed by a natural disaster, or by war
-  PPLX: "section of populated place" #
+  PPLX: "Ausschnitt eines besiedelten Ortes (Stadtteil)" #
   STLMT: "israeli settlement" #
 R:
   CSWY: "causeway" # a raised roadway across wet ground or shallow water
@@ -253,7 +253,7 @@ R:
   TNLS: "tunnels" # subterranean passageways for transportation
   TRL: "trail" # a path, track, or route used by pedestrians, animals, or off-road vehicles
 S:
-  ADMF: "administrative facility" # a government building
+  ADMF: "Verwaltungseinrichtung" # a government building
   AGRF: "agricultural facility" # a building and/or tract of land used for improving agriculture
   AIRB: "airbase" # an area used to store supplies, provide barracks for air force personnel, hangars and runways for aircraft, and from which operations are initiated
   AIRF: "airfield" # a place on land where aircraft land and take off; no facilities provided for the commercial handling of passengers and cargo
@@ -272,11 +272,11 @@ S:
   ATHF: "athletic field" # a tract of land used for playing team sports, and athletic track and field events
   ATM: "automatic teller machine" # An unattended electronic machine in a public place, connected to a data system and related equipment and activated by a bank customer to obtain cash withdrawals and other banking services.
   BANK: "bank" # A business establishment in which money is kept for saving or commercial purposes or is invested, supplied for loans, or exchanged.
-  BCN: "beacon" # a fixed artificial navigation mark
-  BDG: "bridge" # a structure erected across an obstacle such as a stream, road, etc., in order to carry roads, railroads, and pedestrians across
+  BCN: "Leuchtturm" # a fixed artificial navigation mark
+  BDG: "Brücke" # a structure erected across an obstacle such as a stream, road, etc., in order to carry roads, railroads, and pedestrians across
   BDGQ: "ruined bridge" # a destroyed or decayed bridge which is no longer functional
   BLDA: "apartment building" # a building containing several individual apartments
-  BLDG: "building(s)" # a structure built for permanent use, as a house, factory, etc.
+  BLDG: "Gebäude" # a structure built for permanent use, as a house, factory, etc.
   BLDO: "office building" # commercial building where business and/or services are conducted
   BP: "boundary marker" # a fixture marking a point along a boundary
   BRKS: "barracks" # a building for lodging military personnel
@@ -284,11 +284,11 @@ S:
   BSTN: "baling station" # a facility for baling agricultural products
   BTYD: "boatyard" # a waterside facility for servicing, repairing, and building small vessels
   BUR: "burial cave(s)" # a cave used for human burials
-  BUSTN: "bus station" # a facility comprising ticket office, platforms, etc. for loading and unloading passengers
-  BUSTP: "bus stop" # a place lacking station facilities
+  BUSTN: "Busbahnhof" # a facility comprising ticket office, platforms, etc. for loading and unloading passengers
+  BUSTP: "Bushaltestelle" # a place lacking station facilities
   CARN: "cairn" # a heap of stones erected as a landmark or for other purposes
   CAVE: "cave(s)" # an underground passageway or chamber, or cavity on the side of a cliff
-  CH: "church" # a building for public Christian worship
+  CH: "Kirche" # a building for public Christian worship
   CMP: "camp(s)" # a site occupied by tents, huts, or other shelters for temporary use
   CMPL: "logging camp" # a camp used by loggers
   CMPLA: "labor camp" # a camp used by migrant or temporary laborers
@@ -327,10 +327,10 @@ S:
   ESTX: "section of estate" #
   FCL: "facility" # a building or buildings housing a center, institute, foundation, hospital, prison, mission, courthouse, etc.
   FNDY: "foundry" # a building or works where metal casting is carried out
-  FRM: "farm" # a tract of land with associated buildings devoted to agriculture
+  FRM: "Farm" # a tract of land with associated buildings devoted to agriculture
   FRMQ: "abandoned farm" #
-  FRMS: "farms" # tracts of land with associated buildings devoted to agriculture
-  FRMT: "farmstead" # the buildings and adjacent service areas of a farm
+  FRMS: "Farmen" # tracts of land with associated buildings devoted to agriculture
+  FRMT: "Bauernhof" # the buildings and adjacent service areas of a farm
   FT: "fort" # a defensive structure or earthworks
   FY: "ferry" # a boat or other floating conveyance and terminal facilities regularly used to transport people and vehicles across a waterbody
   FYT: "ferry terminal" # a place where ferries pick-up and discharge passengers, vehicles and or cargo
@@ -346,12 +346,12 @@ S:
   HMSD: "homestead" # a residence, owner's or manager's, on a sheep or cattle station, woolshed, outcamp, or Aboriginal outstation, specific to Australia and New Zealand
   HSE: "house(s)" # a building used as a human habitation
   HSEC: "country house" # a large house, mansion, or chateau, on a large estate
-  HSP: "hospital" # a building in which sick or injured, especially those confined to bed, are medically treated
-  HSPC: "clinic" # a medical facility associated with a hospital for outpatients
-  HSPD: "dispensary" # a building where medical or dental aid is dispensed
-  HSPL: "leprosarium" # an asylum or hospital for lepers
-  HSTS: "historical site" # a place of historical importance
-  HTL: "hotel" # a building providing lodging and/or meals for the public
+  HSP: "Krankenhaus" # a building in which sick or injured, especially those confined to bed, are medically treated
+  HSPC: "Klinik" # a medical facility associated with a hospital for outpatients
+  HSPD: "Apotheke" # a building where medical or dental aid is dispensed
+  HSPL: "Leprosorium" # an asylum or hospital for lepers
+  HSTS: "Historische Stätte" # a place of historical importance
+  HTL: "Hotel" # a building providing lodging and/or meals for the public
   HUT: "hut" # a small primitive house
   HUTS: "huts" # small primitive houses
   INSM: "military installation" # a facility for use of and control by armed forces
@@ -362,8 +362,8 @@ S:
   LIBR: "library" # A place in which information resources such as books are kept for reading, reference, or lending.
   LNDF: "landfill" # a place for trash and garbage disposal in which the waste is buried between layers of earth to build up low-lying land
   LOCK: "lock(s)" # a basin in a waterway with gates at each end by means of which vessels are passed from one water level to another
-  LTHSE: "lighthouse" # a distinctive structure exhibiting a major navigation light
-  MALL: "mall" # A large, often enclosed shopping complex containing various stores, businesses, and restaurants usually accessible by common passageways.
+  LTHSE: "Leuchtturm" # a distinctive structure exhibiting a major navigation light
+  MALL: "Einkaufszentrum" # A large, often enclosed shopping complex containing various stores, businesses, and restaurants usually accessible by common passageways.
   MAR: "marina" # a harbor facility for small boats, yachts, etc.
   MFG: "factory" # one or more buildings where goods are manufactured, processed or fabricated
   MFGB: "brewery" # one or more buildings where beer is brewed
@@ -398,8 +398,8 @@ S:
   MSSN: "mission" # a place characterized by dwellings, school, church, hospital and other facilities operated by a religious group for the purpose of providing charitable services and to propagate religion
   MSSNQ: "abandoned mission" #
   MSTY: "monastery" # a building and grounds where a community of monks lives in seclusion
-  MTRO: "metro station" # metro station (Underground, Tube, or Metro)
-  MUS: "museum" # a building where objects of permanent interest in one or more of the arts and sciences are preserved and exhibited
+  MTRO: "U-Bahn-Station" # metro station (Underground, Tube, or Metro)
+  MUS: "Museum" # a building where objects of permanent interest in one or more of the arts and sciences are preserved and exhibited
   NOV: "novitiate" # a religious house or school where novices are trained
   NSY: "nursery(-ies)" # a place where plants are propagated for transplanting or grafting
   OBPT: "observation point" # a wildlife or scenic observation point
@@ -438,9 +438,9 @@ S:
   RDIN: "intersection" # a junction of two or more highways by a system of separate levels that permit traffic to pass from one to another without the crossing of traffic streams
   RECG: "golf course" # a recreation field where golf is played
   RECR: "racetrack" # a track where races are held
-  REST: "restaurant" # A place where meals are served to the public
-  RET: "store" # a building where goods and/or services are offered for sale
-  RHSE: "resthouse" # a structure maintained for the rest and shelter of travelers
+  REST: "Restaurant" # A place where meals are served to the public
+  RET: "Geschäft" # a building where goods and/or services are offered for sale
+  RHSE: "Raststätte" # a structure maintained for the rest and shelter of travelers
   RKRY: "rookery" # a breeding place of a colony of birds or seals
   RLG: "religious site" # an ancient site of significant religious importance
   RLGR: "retreat" # a place of temporary seclusion, especially for religious groups
@@ -468,7 +468,7 @@ S:
   SNTR: "sanatorium" # a facility where victims of physical or mental disorders are treated
   SPA: "spa" # a resort area usually developed around a medicinal spring
   SPLY: "spillway" # a passage or outlet through which surplus water flows over, around or through a dam
-  SQR: "square" # a broad, open, public area near the center of a town or city
+  SQR: "Platz" # a broad, open, public area near the center of a town or city
   STBL: "stable" # a building for the shelter and feeding of farm animals, especially horses
   STDM: "stadium" # a structure with an enclosure for athletic games with tiers of seats for spectators
   STNB: "scientific research base" # a scientific facility used as a base from which research is carried out or monitored
@@ -527,12 +527,12 @@ T:
   CRDR: "corridor" # a strip or area of land having significance as an access way
   CRQ: "cirque" # a bowl-like hollow partially surrounded by cliffs or steep slopes at the head of a glaciated valley
   CRQS: "cirques" # bowl-like hollows partially surrounded by cliffs or steep slopes at the head of a glaciated valley
-  CRTR: "crater(s)" # a generally circular saucer or bowl-shaped depression caused by volcanic or meteorite explosive action
+  CRTR: "Krater" # a generally circular saucer or bowl-shaped depression caused by volcanic or meteorite explosive action
   CUET: "cuesta(s)" # an asymmetric ridge formed on tilted strata
   DLTA: "delta" # a flat plain formed by alluvial deposits at the mouth of a stream
-  DPR: "depression(s)" # a low area surrounded by higher land and usually characterized by interior drainage
-  DSRT: "desert" # a large area with little or no vegetation due to extreme environmental conditions
-  DUNE: "dune(s)" # a wave form, ridge or star shape feature composed of sand
+  DPR: "Senke(n)" # a low area surrounded by higher land and usually characterized by interior drainage
+  DSRT: "Wüste" # a large area with little or no vegetation due to extreme environmental conditions
+  DUNE: "Düne(n)" # a wave form, ridge or star shape feature composed of sand
   DVD: "divide" # a line separating adjacent drainage basins
   ERG: "sandy desert" # an extensive tract of shifting sand and sand dunes
   FAN: "fan(s)" # a fan-shaped wedge of coarse alluvium with apex merging with a mountain stream bed and the fan spreading out at a low angle slope onto an adjacent plain
@@ -541,12 +541,12 @@ T:
   GAP: "gap" # a low place in a ridge, not used for transportation
   GRGE: "gorge(s)" # a short, narrow, steep-sided section of a stream valley
   HDLD: "headland" # a high projection of land extending into a large body of water beyond the line of the coast
-  HLL: "hill" # a rounded elevation of limited extent rising above the surrounding land with local relief of less than 300m
-  HLLS: "hills" # rounded elevations of limited extent rising above the surrounding land with local relief of less than 300m
+  HLL: "Hügel" # a rounded elevation of limited extent rising above the surrounding land with local relief of less than 300m
+  HLLS: "Hügel" # rounded elevations of limited extent rising above the surrounding land with local relief of less than 300m
   HMCK: "hammock(s)" # a patch of ground, distinct from and slightly above the surrounding plain or wetland. Often occurs in groups
   HMDA: "rock desert" # a relatively sand-free, high bedrock plateau in a hot desert, with or without a gravel veneer
   INTF: "interfluve" # a relatively undissected upland between adjacent stream valleys
-  ISL: "island" # a tract of land, smaller than a continent, surrounded by water at high water
+  ISL: "Insel" # a tract of land, smaller than a continent, surrounded by water at high water
   ISLET: "islet" # small island, bigger than rock, smaller than island.
   ISLF: "artificial island" # an island created by landfill or diking and filling in a wetland, bay, or lagoon
   ISLM: "mangrove island" # a mangrove swamp surrounded by a waterbody
@@ -560,7 +560,7 @@ T:
   MESA: "mesa(s)" # a flat-topped, isolated elevation with steep slopes on all sides, less extensive than a plateau
   MND: "mound(s)" # a low, isolated, rounded hill
   MRN: "moraine" # a mound, ridge, or other accumulation of glacial till
-  MT: "mountain" # an elevation standing high above the surrounding area with small summit area, steep slopes and local relief of 300m or more
+  MT: "Berg" # an elevation standing high above the surrounding area with small summit area, steep slopes and local relief of 300m or more
   MTS: "mountains" # a mountain range or a group of mountains or high ridges
   NKM: "meander neck" # a narrow strip of land between the two limbs of a meander loop at its narrowest point
   NTK: "nunatak" # a rock or mountain peak protruding through glacial ice
@@ -568,11 +568,11 @@ T:
   PAN: "pan" # a near-level shallow, natural depression or basin, usually containing an intermittent lake, pond, or pool
   PANS: "pans" # a near-level shallow, natural depression or basin, usually containing an intermittent lake, pond, or pool
   PASS: "pass" # a break in a mountain range or other high obstruction, used for transportation from one side to the other [See also gap]
-  PEN: "peninsula" # an elongate area of land projecting into a body of water and nearly surrounded by water
+  PEN: "Halbinsel" # an elongate area of land projecting into a body of water and nearly surrounded by water
   PENX: "section of peninsula" #
-  PK: "peak" # a pointed elevation atop a mountain, ridge, or other hypsographic feature
-  PKS: "peaks" # pointed elevations atop a mountain, ridge, or other hypsographic features
-  PLAT: "plateau" # an elevated plain with steep slopes on one or more sides, and often with incised streams
+  PK: "Gipfel" # a pointed elevation atop a mountain, ridge, or other hypsographic feature
+  PKS: "Gipfel" # pointed elevations atop a mountain, ridge, or other hypsographic features
+  PLAT: "Plateau" # an elevated plain with steep slopes on one or more sides, and often with incised streams
   PLATX: "section of plateau" #
   PLDR: "polder" # an area reclaimed from the sea by diking and draining
   PLN: "plain(s)" # an extensive area of comparatively level to gently undulating land, lacking surface irregularities, and usually adjacent to a higher area
@@ -581,7 +581,7 @@ T:
   PT: "point" # a tapering piece of land projecting into a body of water, less prominent than a cape
   PTS: "points" # tapering pieces of land projecting into a body of water, less prominent than a cape
   RDGB: "beach ridge" # a ridge of sand just inland and parallel to the beach, usually in series
-  RDGE: "ridge(s)" # a long narrow elevation with steep sides, and a more or less continuous crest
+  RDGE: "Bergzug / Bergzüge" # a long narrow elevation with steep sides, and a more or less continuous crest
   REG: "stony desert" # a desert plain characterized by a surface veneer of gravel and stones
   RK: "rock" # a conspicuous, isolated rocky mass
   RKFL: "rockfall" # an irregular mass of fallen rock at the base of a cliff or steep slope
@@ -590,8 +590,8 @@ T:
   SBED: "dry stream bed" # a channel formerly containing the water of a stream
   SCRP: "escarpment" # a long line of cliffs or steep slopes separating level surfaces above and below
   SDL: "saddle" # a broad, open pass crossing a ridge or between hills or mountains
-  SHOR: "shore" # a narrow zone bordering a waterbody which covers and uncovers at high and low water, respectively
-  SINK: "sinkhole" # a small crater-shape depression in a karst area
+  SHOR: "Ufer / Strand" # a narrow zone bordering a waterbody which covers and uncovers at high and low water, respectively
+  SINK: "Krater" # a small crater-shape depression in a karst area
   SLID: "slide" # a mound of earth material, at the base of a slope and the associated scoured area
   SLP: "slope(s)" # a surface with a relatively uniform slope angle
   SPIT: "spit" # a narrow, straight or curved continuation of a beach into a waterbody
@@ -636,15 +636,15 @@ U:
   MESU: "mesa" # an isolated, extensive, flat-topped elevation on the shelf, with relatively steep sides
   MNDU: "mound" # a low, isolated, rounded hill
   MOTU: "moat" # an annular depression that may not be continuous, located at the base of many seamounts, islands, and other isolated elevations
-  MTU: "mountain" # a well-delineated subdivision of a large and complex positive feature
+  MTU: "Berg" # a well-delineated subdivision of a large and complex positive feature
   PKSU: "peaks" # prominent elevations, part of a larger feature, either pointed or of very limited extent across the summit
   PKU: "peak" # a prominent elevation, part of a larger feature, either pointed or of very limited extent across the summit
   PLNU: "plain" # a flat, gently sloping or nearly level region
   PLTU: "plateau" # a comparatively flat-topped feature of considerable extent, dropping off abruptly on one or more sides
   PNLU: "pinnacle" # a high tower or spire-shaped pillar of rock or coral, alone or cresting a summit
   PRVU: "province" # a region identifiable by a group of similar physiographic features whose characteristics are markedly in contrast with surrounding areas
-  RDGU: "ridge" # a long narrow elevation with steep sides
-  RDSU: "ridges" # long narrow elevations with steep sides
+  RDGU: "Bergzug" # a long narrow elevation with steep sides
+  RDSU: "Bergzüge" # long narrow elevations with steep sides
   RFSU: "reefs" # surface-navigation hazards composed of consolidated material
   RFU: "reef" # a surface-navigation hazard composed of consolidated material
   RISU: "rise" # a broad elevation that rises gently, and generally smoothly, from the sea floor
@@ -669,21 +669,21 @@ U:
   VALU: "valley" # a relatively shallow, wide depression, the bottom of which usually has a continuous gradient
   VLSU: "valleys" # a relatively shallow, wide depression, the bottom of which usually has a continuous gradient
 V:
-  BUSH: "bush(es)" # a small clump of conspicuous bushes in an otherwise bare area
-  CULT: "cultivated area" # an area under cultivation
-  FRST: "forest(s)" # an area dominated by tree vegetation
-  FRSTF: "fossilized forest" # a forest fossilized by geologic processes and now exposed at the earth's surface
-  GROVE: "grove" # a small wooded area or collection of trees growing closely together, occurring naturally or deliberately planted
-  GRSLD: "grassland" # an area dominated by grass vegetation
-  GRVC: "coconut grove" # a planting of coconut trees
+  BUSH: "Busch / Büsche" # a small clump of conspicuous bushes in an otherwise bare area
+  CULT: "Anbaufläche" # an area under cultivation
+  FRST: "Wald / Wälder" # an area dominated by tree vegetation
+  FRSTF: "Versteinerter Wald" # a forest fossilized by geologic processes and now exposed at the earth's surface
+  GROVE: "Wäldchen" # a small wooded area or collection of trees growing closely together, occurring naturally or deliberately planted
+  GRSLD: "Weideland" # an area dominated by grass vegetation
+  GRVC: "Kokospalmenhain" # a planting of coconut trees
   GRVO: "olive grove" # a planting of olive trees
-  GRVP: "palm grove" # a planting of palm trees
+  GRVP: "Olivenhain" # a planting of palm trees
   GRVPN: "pine grove" # a planting of pine trees
-  HTH: "heath" # an upland moor or sandy area dominated by low shrubby vegetation including heather
-  MDW: "meadow" # a small, poorly drained area dominated by grassy vegetation
+  HTH: "Heide" # an upland moor or sandy area dominated by low shrubby vegetation including heather
+  MDW: "Wiese" # a small, poorly drained area dominated by grassy vegetation
   OCH: "orchard(s)" # a planting of fruit or nut trees
   SCRB: "scrubland" # an area of low trees, bushes, and shrubs stunted by some environmental limitation
-  TREE: "tree(s)" # a conspicuous tree used as a landmark
-  TUND: "tundra" # a marshy, treeless, high latitude plain, dominated by mosses, lichens, and low shrub vegetation under permafrost conditions
-  VIN: "vineyard" # a planting of grapevines
-  VINS: "vineyards" # plantings of grapevines
+  TREE: "Baum / Bäume" # a conspicuous tree used as a landmark
+  TUND: "Tundra" # a marshy, treeless, high latitude plain, dominated by mosses, lichens, and low shrub vegetation under permafrost conditions
+  VIN: "Weinberg" # a planting of grapevines
+  VINS: "Weinberge" # plantings of grapevines

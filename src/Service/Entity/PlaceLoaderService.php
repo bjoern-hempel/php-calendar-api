@@ -15,6 +15,7 @@ namespace App\Service\Entity;
 
 use App\Constant\Code;
 use App\Constant\Country;
+use App\DataType\Point;
 use App\Entity\Place;
 use App\Entity\PlaceA;
 use App\Entity\PlaceH;
@@ -37,7 +38,6 @@ use App\Repository\PlaceVRepository;
 use App\Service\LocationDataService;
 use App\Utils\StringConverter;
 use App\Utils\Timer;
-use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use DateTimeImmutable;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -610,7 +610,7 @@ SQL;
 
             $placesP[] = $placeP;
         }
-        $data['places'] = array_slice($placesP, 0, 10);
+        $data['P'] = array_slice($placesP, 0, 10);
 
         /* Sort placesP */
         usort($placesP, function (PlaceP $a, PlaceP $b) {
@@ -675,7 +675,7 @@ SQL;
             $this->translateFeatureCode($parkPlace);
             $place->addPark($parkPlace);
         }
-        $data['parks'] = $place->getParks();
+        $data['L'] = $place->getParks();
 
         /* S → Add point of interest (Hotel, Rail station) */
         $spotPlaces = $this->findByPosition($latitude, $longitude, 10, Code::FEATURE_CLASS_S);
@@ -690,7 +690,7 @@ SQL;
             $this->translateFeatureCode($spotPlace);
             $place->addSpot($spotPlace);
         }
-        $data['spots'] = $place->getSpots();
+        $data['S'] = $place->getSpots();
 
         /* T → Mountain */
         $mountainPlaces = $this->findByPosition($latitude, $longitude, 10, Code::FEATURE_CLASS_T);
@@ -705,7 +705,7 @@ SQL;
             $this->translateFeatureCode($mountainPlace);
             $place->addMountain($mountainPlace);
         }
-        $data['mountains'] = $place->getMountains();
+        $data['T'] = $place->getMountains();
 
         /* V → Forest */
         $forestPlaces = $this->findByPosition($latitude, $longitude, 10, Code::FEATURE_CLASS_V);
@@ -720,7 +720,7 @@ SQL;
             $this->translateFeatureCode($forestPlace);
             $place->addForest($forestPlace);
         }
-        $data['forests'] = $place->getForests();
+        $data['V'] = $place->getForests();
 
         /* Verbose information */
         $this->printPlaceInformation($place);

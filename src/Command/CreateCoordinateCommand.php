@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Constant\Code;
+use App\DataType\Point;
 use App\Repository\Base\PlaceRepositoryInterface;
 use App\Repository\PlaceARepository;
 use App\Repository\PlaceHRepository;
@@ -26,7 +27,6 @@ use App\Repository\PlaceURepository;
 use App\Repository\PlaceVRepository;
 use App\Service\Entity\PlaceLoaderService;
 use App\Utils\Timer;
-use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
