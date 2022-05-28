@@ -76,6 +76,19 @@
                             </tr>
                         {% endfor %}
                         </table>
+
+                        {% for key,value in data %}
+                            <h3>{{ ('title.' ~ key ~ 'Next')|trans([], 'location') }}</h3>
+
+                            <table class="table">
+                            {% for place in value %}
+                                <tr>
+                                    <td>{{ place.name }}</td>
+                                    <td>{{ place.distanceDbInMeter }}</td>
+                                </tr>
+                            {% endfor %}
+                            </table>
+                        {% endfor %}
                     {% endif %}
                 </div>
             {% endblock %}

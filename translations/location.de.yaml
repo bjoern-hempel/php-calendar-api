@@ -4,11 +4,13 @@ place:
   placeLatitudeDms:	"Latitude"
   placeLongitudeDms: "Longitude"
   placeGoogleLink: "Google Maps"
-  placeDistrict:	"Stadtteil / Ortschaft"
-  placeCity:	"Stadt / Gemeinde"
-  placeState: "Bundesland"
-  placeMountain: "Berg, Hügel, Fels, Strand"
-  placeSpot: "Ort, Gebäude, Farm"
+  placeDistrict:	"Stadtteil / Ortschaft" # P
+  placeCity:	"Stadt / Gemeinde" # A
+  placeState: "Bundesland" # A
+  placeMountain: "Berg, Hügel, Fels, Strand" # T
+  placePark: "Parks, Flächen" # L
+  placeSpot: "Ort, Gebäude, Farm" # S
+  placeForest: "Wald, Heide" # V
   placeFull:	"Ort"
   placeCountry: "Land"
   placeCountryCode: "Ländercode"
@@ -25,6 +27,13 @@ place:
   placeAdmin3: "Schlüssel Admin 3"
   placeAdmin4: "Schlüssel Admin 4"
   timeTaken: "Benötigte Zeit"
+
+title:
+  placesNext: "Nächste Stadtteile oder Ortschaften"
+  parksNext: "Nächste Parks oder Flächen"
+  spotsNext: "Nächste Orte, Gebäude oder Farmen"
+  mountainsNext: "Nächste Berge, Hügel, Felsen oder Strände"
+  forestsNext: "Nächste Wälde oder Heiden"
 
 general:
   notAvailable: "Leider können wir das noch nicht parsen. Versuche es mit etwas anderem. 😴"

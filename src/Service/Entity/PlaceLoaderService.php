@@ -57,34 +57,22 @@ class PlaceLoaderService
     protected bool $debug = false;
     protected bool $verbose = false;
 
-    /* 40.000km: 40.000.000m / 360° * 0.01 = 1111.1m → Parks must be less than 1111.1m away. Otherwise, it will not be displayed. */
-    protected const MAX_DISTANCE_PARKS = .01;
+    public const MAX_DISTANCE_PARK_METER = 1000;
 
-    /* 40.000km: 40.000.000m / 360° * 0.01 = 1111.1m → Parks must be less than 1111.1m away. Otherwise, it will not be displayed. */
-    protected const MAX_DISTANCE_FOREST = .01;
+    public const MAX_DISTANCE_PLACE_METER = 1000;
 
-    /* 40.000km: 40.000.000m / 360° * 0.01 = 1111.1m → Parks must be less than 1111.1m away. Otherwise, it will not be displayed. */
-    protected const MAX_DISTANCE_MOUNTAIN = .01;
+    public const MAX_DISTANCE_FOREST_METER = 2000;
 
-    /* 40.000km: 40.000.000m / 360° * 0.001 = 111.1m → Point of interest must be less than 111.1m away. Otherwise, it will not be displayed. */
-    protected const MAX_DISTANCE_SPOT = .001;
+    public const MAX_DISTANCE_MOUNTAIN_METER = 2000;
+
+    public const MAX_DISTANCE_SPOT_METER = 300;
 
     protected const RAW_SQL_POSITION = <<<SQL
 SELECT
   p.*,
-  X(p.`coordinate`) AS "latitude",
-  Y(p.`coordinate`) AS "longitude",
-  (
-    GLength(
-      LineStringFromWKB(
-        LineString(
-          p.`coordinate`, 
-          GeomFromText('POINT(%f %f)')
-        )
-      )
-    )
-  )
-  AS distance
+  ST_X(p.`coordinate`) AS latitude,
+  ST_Y(p.`coordinate`) AS longitude,
+  ST_DISTANCE(p.`coordinate`, GeomFromText('POINT(%f %f)')) AS distance
 FROM %s p
 WHERE p.`feature_class` = '%s'%s%s%s%s%s%s
 ORDER BY distance ASC
@@ -575,11 +563,13 @@ SQL;
      * @param float $latitude
      * @param float $longitude
      * @param string|string[]|null $featureCodes
+     * @param array<string, Place[]> $data
      * @return ?PlaceP
      * @throws DoctrineDBALException
+     * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function findPlacePByPosition(float $latitude, float $longitude, string|array|null $featureCodes = null): ?PlaceP
+    public function findPlacePByPosition(float $latitude, float $longitude, string|array|null $featureCodes = null, array &$data = []): ?PlaceP
     {
         if ($this->placeARepository === null) {
             return null;
@@ -610,6 +600,7 @@ SQL;
 
             $placesP[] = $placeP;
         }
+        $data['places'] = array_slice($placesP, 0, 10);
 
         /* Sort placesP */
         usort($placesP, function (PlaceP $a, PlaceP $b) {
@@ -634,21 +625,11 @@ SQL;
                 $city2 = $this->findNextAdminCity($placesP, $district);
                 $city3 = $this->findNextCityPopulation($placesP, $district);
 
-                switch (true) {
-                    case $city1 === null:
-                        $city = $city2 !== null && $city2->getPopulation(true) > 0 ? $city2 : $city3;
-                        break;
-
-                    default:
-//                        /* Maspalomas vs Meloneras */
-//                        if ($place->getCountryCode() === Country::SPAIN_ISO_2) {
-//                            $city = $city1->getPopulation(true) > $city3->getPopulation(true) ? $city3 : $city1;
-//                        } else {
-//                            $city = $city1;
-//                        }
-                        $city = $city1;
-                        break;
-                }
+                $city = match (true) {
+                    $city1 === null => $city2 !== null && $city2->getPopulation(true) > 0 ? $city2 : $city3,
+                    // no break
+                    default => $city1,
+                };
 
                 break;
 
@@ -672,60 +653,64 @@ SQL;
         $place->setCountry($country);
 
         /* L → Parks, Areas */
-        $placesPark = $this->findByPosition($latitude, $longitude, 1, Code::FEATURE_CLASS_L);
-        foreach ($placesPark as $placePark) {
-            if (!$placePark instanceof PlaceL) {
-                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placePark), __FILE__, __LINE__));
+        $parkPlaces = $this->findByPosition($latitude, $longitude, 10, Code::FEATURE_CLASS_L);
+        usort($parkPlaces, function (Place $a, Place $b) {
+            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
+        });
+        foreach ($parkPlaces as $parkPlace) {
+            if (!$parkPlace instanceof PlaceL) {
+                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($parkPlace), __FILE__, __LINE__));
             }
 
-            $this->translateFeatureCode($placePark);
-
-            if ($placePark->getDistanceDb() <= self::MAX_DISTANCE_PARKS) {
-                $place->addPark($placePark);
-            }
+            $this->translateFeatureCode($parkPlace);
+            $place->addPark($parkPlace);
         }
+        $data['parks'] = $place->getParks();
 
         /* S → Add point of interest (Hotel, Rail station) */
-        $placesSpot = $this->findByPosition($latitude, $longitude, 1, Code::FEATURE_CLASS_S);
-        foreach ($placesSpot as $placeSpot) {
-            if (!$placeSpot instanceof PlaceS) {
-                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeSpot), __FILE__, __LINE__));
+        $spotPlaces = $this->findByPosition($latitude, $longitude, 10, Code::FEATURE_CLASS_S);
+        usort($spotPlaces, function (Place $a, Place $b) {
+            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
+        });
+        foreach ($spotPlaces as $spotPlace) {
+            if (!$spotPlace instanceof PlaceS) {
+                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($spotPlace), __FILE__, __LINE__));
             }
 
-            $this->translateFeatureCode($placeSpot);
-
-            if ($placeSpot->getDistanceDb() <= self::MAX_DISTANCE_SPOT) {
-                $place->addSpot($placeSpot);
-            }
+            $this->translateFeatureCode($spotPlace);
+            $place->addSpot($spotPlace);
         }
+        $data['spots'] = $place->getSpots();
 
         /* T → Mountain */
-        $placesMountain = $this->findByPosition($latitude, $longitude, 1, Code::FEATURE_CLASS_T);
-        foreach ($placesMountain as $placeMountain) {
-            if (!$placeMountain instanceof PlaceT) {
-                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeMountain), __FILE__, __LINE__));
+        $mountainPlaces = $this->findByPosition($latitude, $longitude, 10, Code::FEATURE_CLASS_T);
+        usort($mountainPlaces, function (Place $a, Place $b) {
+            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
+        });
+        foreach ($mountainPlaces as $mountainPlace) {
+            if (!$mountainPlace instanceof PlaceT) {
+                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($mountainPlace), __FILE__, __LINE__));
             }
 
-            $this->translateFeatureCode($placeMountain);
-
-            if ($placeMountain->getDistanceDb() <= self::MAX_DISTANCE_MOUNTAIN) {
-                $place->addMountain($placeMountain);
-            }
+            $this->translateFeatureCode($mountainPlace);
+            $place->addMountain($mountainPlace);
         }
+        $data['mountains'] = $place->getMountains();
 
         /* V → Forest */
-        $placesForest = $this->findByPosition($latitude, $longitude, 1, Code::FEATURE_CLASS_V);
-        foreach ($placesForest as $placeForest) {
-            if (!$placeForest instanceof PlaceV) {
-                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeForest), __FILE__, __LINE__));
+        $forestPlaces = $this->findByPosition($latitude, $longitude, 10, Code::FEATURE_CLASS_V);
+        usort($forestPlaces, function (Place $a, Place $b) {
+            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
+        });
+        foreach ($forestPlaces as $forestPlace) {
+            if (!$forestPlace instanceof PlaceV) {
+                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($forestPlace), __FILE__, __LINE__));
             }
 
-            $this->translateFeatureCode($placeForest);
-
-            if ($placeForest->getDistanceDb() <= self::MAX_DISTANCE_FOREST) {
-                $place->addForest($placeForest);
-            }
+            $this->translateFeatureCode($forestPlace);
+            $place->addForest($forestPlace);
         }
+        $data['forests'] = $place->getForests();
 
         /* Verbose information */
         $this->printPlaceInformation($place);

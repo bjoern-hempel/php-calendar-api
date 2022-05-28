@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Service\Entity\PlaceLoaderService;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
@@ -104,14 +105,17 @@ abstract class Place
     /** @var PlaceL[] $parks */
     protected array $parks = [];
 
+    /** @var PlaceP[] $places */
+    protected array $places = [];
+
     /** @var PlaceS[] $spots */
     protected array $spots = [];
 
     /** @var PlaceT[] $mountains */
     protected array $mountains = [];
 
-    /** @var PlaceV[] $forest */
-    protected array $forest = [];
+    /** @var PlaceV[] $forests */
+    protected array $forests = [];
 
     protected ?string $country = null;
 
@@ -214,28 +218,28 @@ abstract class Place
             throw new Exception(sprintf('Unable to replace comma (%s:%d).', __FILE__, __LINE__));
         }
 
-        if (count($this->getParks()) > 0) {
-            $park = $this->getParks()[0];
-
-            if (!str_contains($name, $park->getName())) {
-                $name = sprintf($this->templateAddName, $park->getName($detailed), $name);
-            }
+        /* PlaceL */
+        $firstPark = $this->getFirstPark(true);
+        if (!is_null($firstPark) && !str_contains($name, $firstPark->getName())) {
+            $name = sprintf($this->templateAddName, $firstPark->getName($detailed), $name);
         }
 
-        if (count($this->getMountains()) > 0) {
-            $mountain = $this->getMountains()[0];
-
-            if (!str_contains($name, $mountain->getName())) {
-                $name = sprintf($this->templateAddName, $mountain->getName($detailed), $name);
-            }
+        /* PlaceT */
+        $firstMountain = $this->getFirstMountain(true);
+        if (!is_null($firstMountain) && !str_contains($name, $firstMountain->getName())) {
+            $name = sprintf($this->templateAddName, $firstMountain->getName($detailed), $name);
         }
 
-        if (count($this->getSpots()) > 0) {
-            $spot = $this->getSpots()[0];
+        /* PlaceS */
+        $firstSpot = $this->getFirstSpot(true);
+        if (!is_null($firstSpot) && !str_contains($name, $firstSpot->getName())) {
+            $name = sprintf($this->templateAddName, $firstSpot->getName($detailed), $name);
+        }
 
-            if (!str_contains($name, $spot->getName())) {
-                $name = sprintf($this->templateAddName, $spot->getName($detailed), $name);
-            }
+        /* PlaceV */
+        $firstForest = $this->getFirstForest(true);
+        if (!is_null($firstForest) && !str_contains($name, $firstForest->getName())) {
+            $name = sprintf($this->templateAddName, $firstForest->getName($detailed), $name);
         }
 
         return $name;
@@ -840,6 +844,27 @@ abstract class Place
     }
 
     /**
+     * Gets first park of this place. Not used for db.
+     *
+     * @param bool $checkDistance
+     * @return PlaceL|null
+     */
+    public function getFirstPark(bool $checkDistance = false): ?PlaceL
+    {
+        if (count($this->parks) <= 0) {
+            return null;
+        }
+
+        $firstPark = $this->parks[0];
+
+        if (!$checkDistance || $firstPark->getDistanceMeter() <= PlaceLoaderService::MAX_DISTANCE_PARK_METER) {
+            return $firstPark;
+        }
+
+        return null;
+    }
+
+    /**
      * Sets parks of this place. Not used for db.
      *
      * @param PlaceL[] $parks
@@ -866,6 +891,63 @@ abstract class Place
     }
 
     /**
+     * Gets places of this place. Not used for db.
+     *
+     * @return PlaceP[]
+     */
+    public function getPlaces(): array
+    {
+        return $this->places;
+    }
+
+    /**
+     * Gets first place of this place. Not used for db.
+     *
+     * @param bool $checkDistance
+     * @return PlaceP|null
+     */
+    public function getFirstPlace(bool $checkDistance = false): ?PlaceP
+    {
+        if (count($this->places) <= 0) {
+            return null;
+        }
+
+        $firstPlace = $this->places[0];
+
+        if (!$checkDistance || $firstPlace->getDistanceMeter() <= PlaceLoaderService::MAX_DISTANCE_PLACE_METER) {
+            return $firstPlace;
+        }
+
+        return null;
+    }
+
+    /**
+     * Sets places of this place. Not used for db.
+     *
+     * @param PlaceP[] $places
+     * @return $this
+     */
+    public function setPlaces(array $places): self
+    {
+        $this->places = $places;
+
+        return $this;
+    }
+
+    /**
+     * Adds place to this place. Not used for db.
+     *
+     * @param PlaceP $place
+     * @return $this
+     */
+    public function addPlace(PlaceP $place): self
+    {
+        $this->places[] = $place;
+
+        return $this;
+    }
+
+    /**
      * Gets spots of this place. Not used for db.
      *
      * @return PlaceS[]
@@ -873,6 +955,27 @@ abstract class Place
     public function getSpots(): array
     {
         return $this->spots;
+    }
+
+    /**
+     * Gets first spot of this place. Not used for db.
+     *
+     * @param bool $checkDistance
+     * @return PlaceS|null
+     */
+    public function getFirstSpot(bool $checkDistance = false): ?PlaceS
+    {
+        if (count($this->spots) <= 0) {
+            return null;
+        }
+
+        $firstSpot = $this->spots[0];
+
+        if (!$checkDistance || $firstSpot->getDistanceMeter() <= PlaceLoaderService::MAX_DISTANCE_SPOT_METER) {
+            return $firstSpot;
+        }
+
+        return null;
     }
 
     /**
@@ -911,6 +1014,27 @@ abstract class Place
     }
 
     /**
+     * Gets first mountain of this place. Not used for db.
+     *
+     * @param bool $checkDistance
+     * @return PlaceT|null
+     */
+    public function getFirstMountain(bool $checkDistance = false): ?PlaceT
+    {
+        if (count($this->mountains) <= 0) {
+            return null;
+        }
+
+        $firstMountain = $this->mountains[0];
+
+        if (!$checkDistance || $firstMountain->getDistanceMeter() <= PlaceLoaderService::MAX_DISTANCE_MOUNTAIN_METER) {
+            return $firstMountain;
+        }
+
+        return null;
+    }
+
+    /**
      * Sets mountains of this place. Not used for db.
      *
      * @param PlaceT[] $mountains
@@ -942,7 +1066,28 @@ abstract class Place
      */
     public function getForests(): array
     {
-        return $this->forest;
+        return $this->forests;
+    }
+
+    /**
+     * Gets first forest of this place. Not used for db.
+     *
+     * @param bool $checkDistance
+     * @return PlaceV|null
+     */
+    public function getFirstForest(bool $checkDistance = false): ?PlaceV
+    {
+        if (count($this->forests) <= 0) {
+            return null;
+        }
+
+        $firstForest = $this->forests[0];
+
+        if (!$checkDistance || $firstForest->getDistanceMeter() <= PlaceLoaderService::MAX_DISTANCE_MOUNTAIN_METER) {
+            return $firstForest;
+        }
+
+        return null;
     }
 
     /**
@@ -953,7 +1098,7 @@ abstract class Place
      */
     public function setForests(array $forests): self
     {
-        $this->forest = $forests;
+        $this->forests = $forests;
 
         return $this;
     }
@@ -966,7 +1111,7 @@ abstract class Place
      */
     public function addForest(PlaceV $forest): self
     {
-        $this->forest[] = $forest;
+        $this->forests[] = $forest;
 
         return $this;
     }
@@ -995,6 +1140,29 @@ abstract class Place
     public function setCountry(string $country): self
     {
         $this->country = $country;
+
+        return $this;
+    }
+
+    /**
+     * Gets the template add name. Not used for db.
+     *
+     * @return string
+     */
+    public function getTemplateAddName(): string
+    {
+        return $this->templateAddName;
+    }
+
+    /**
+     * Sets the template add name. Not used for db.
+     *
+     * @param string $templateAddName
+     * @return $this
+     */
+    public function setTemplateAddName(string $templateAddName): self
+    {
+        $this->templateAddName = $templateAddName;
 
         return $this;
     }

@@ -15,6 +15,7 @@ namespace App\Controller;
 
 use App\Controller\Base\BaseController;
 use App\Entity\Location;
+use App\Entity\Place;
 use App\Form\Type\FullLocationType;
 use App\Service\LocationDataService;
 use App\Utils\GPSConverter;
@@ -81,10 +82,11 @@ class ContentController extends BaseController
      *
      * @param Request $request
      * @param FormInterface $form
+     * @param array<string, Place[]> $data
      * @return array<string, mixed>
      * @throws Exception
      */
-    protected function getLocationData(Request $request, FormInterface $form): array
+    protected function getLocationData(Request $request, FormInterface $form, array &$data = []): array
     {
         if (!$form->isSubmitted() || !$form->isValid()) {
             return [];
@@ -95,7 +97,7 @@ class ContentController extends BaseController
 
         list($latitude, $longitude) = GPSConverter::parseFullLocation2DecimalDegrees($location->getLocationFull());
 
-        return $this->locationDataService->getLocationDataFormatted($latitude, $longitude);
+        return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data);
     }
 
     /**
@@ -117,10 +119,11 @@ class ContentController extends BaseController
         ]);
 
         $form->handleRequest($request);
+        $data = [];
 
         $error = null;
         try {
-            $locationData = $this->getLocationData($request, $form);
+            $locationData = $this->getLocationData($request, $form, $data);
         } catch (Throwable $throwable) {
             $error = $this->translator->trans('general.notAvailable', [], 'location');
             $locationData = [];
@@ -130,6 +133,7 @@ class ContentController extends BaseController
             'form' => $form,
             'error' => $error,
             'locationData' => $locationData,
+            'data' => $data,
         ]);
     }
 }
