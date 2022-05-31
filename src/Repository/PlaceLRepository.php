@@ -16,6 +16,8 @@ namespace App\Repository;
 use App\Entity\PlaceL;
 use App\Repository\Base\PlaceRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -36,5 +38,20 @@ class PlaceLRepository extends ServiceEntityRepository implements PlaceRepositor
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, PlaceL::class);
+    }
+
+    /**
+     * Get highest geoname id.
+     *
+     * @return int
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    public function getHighestGeonameId(): int
+    {
+        $queryBuilder = $this->createQueryBuilder('p');
+        $queryBuilder->select('MAX(p.geonameId)');
+
+        return intval($queryBuilder->getQuery()->getSingleScalarResult());
     }
 }

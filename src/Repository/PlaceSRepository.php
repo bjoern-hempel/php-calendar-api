@@ -16,6 +16,9 @@ namespace App\Repository;
 use App\Entity\PlaceS;
 use App\Repository\Base\PlaceRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -28,13 +31,37 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PlaceSRepository extends ServiceEntityRepository implements PlaceRepositoryInterface
 {
+    protected ManagerRegistry $registry;
+
+    protected EntityManagerInterface $manager;
+
     /**
      * PlaceHRepository constructor.
      *
      * @param ManagerRegistry $registry
+     * @param EntityManagerInterface $manager
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $manager)
     {
+        $this->registry = $registry;
+
+        $this->manager = $manager;
+
         parent::__construct($registry, PlaceS::class);
+    }
+
+    /**
+     * Get highest geoname id.
+     *
+     * @return int
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    public function getHighestGeonameId(): int
+    {
+        $queryBuilder = $this->createQueryBuilder('p');
+        $queryBuilder->select('MAX(p.geonameId)');
+
+        return intval($queryBuilder->getQuery()->getSingleScalarResult());
     }
 }

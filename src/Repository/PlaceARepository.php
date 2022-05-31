@@ -20,6 +20,7 @@ use App\Repository\Base\PlaceRepositoryInterface;
 use App\Service\Entity\PlaceLoaderService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -199,5 +200,20 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
         }
 
         throw new Exception(sprintf('Unexpected place instance (!PlaceA) (%s:%d).', __FILE__, __LINE__));
+    }
+
+    /**
+     * Get highest geoname id.
+     *
+     * @return int
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    public function getHighestGeonameId(): int
+    {
+        $queryBuilder = $this->createQueryBuilder('p');
+        $queryBuilder->select('MAX(p.geonameId)');
+
+        return intval($queryBuilder->getQuery()->getSingleScalarResult());
     }
 }

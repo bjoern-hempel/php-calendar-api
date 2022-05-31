@@ -40,4 +40,6 @@ interface PlaceRepositoryInterface
      * @return PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV|null
      */
     public function findOneBy(array $criteria, ?array $orderBy = null);
+
+    public function getHighestGeonameId(): int;
 }

@@ -410,8 +410,8 @@ S:
   OILR: "oil refinery" # a facility for converting crude oil into refined petroleum products
   OILT: "tank farm" # a tract of land occupied by large, cylindrical, metal tanks in which oil or liquid petrochemicals are stored
   OILW: "oil well" # a well from which oil may be pumped
-  OPRA: "opera house" # A theater designed chiefly for the performance of operas.
-  PAL: "palace" # a large stately house, often a royal or presidential residence
+  OPRA: "Opernhaus" # A theater designed chiefly for the performance of operas.
+  PAL: "Palast" # a large stately house, often a royal or presidential residence
   PGDA: "pagoda" # a tower-like storied structure, usually a Buddhist shrine
   PIER: "pier" # a structure built out into navigable water on piles providing berthing for ships and recreation
   PKLT: "parking lot" # an area used for parking vehicles

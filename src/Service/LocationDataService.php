@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Place;
+use App\Entity\PlaceP;
 use App\Service\Entity\PlaceLoaderService;
 use App\Utils\GPSConverter;
 use App\Utils\Timer;
@@ -147,6 +148,21 @@ class LocationDataService
         }
 
         return $data;
+    }
+
+    /**
+     * Gets location place.
+     *
+     * @param float $latitude
+     * @param float $longitude
+     * @param array<string, Place[]> $data
+     * @return PlaceP|null
+     * @throws DoctrineDBALException
+     * @throws NonUniqueResultException
+     */
+    public function getLocationPlace(float $latitude, float $longitude, array &$data = []): ?PlaceP
+    {
+        return $this->placeLoaderService->findPlacePByPosition($latitude, $longitude, null, $data);
     }
 
     /**

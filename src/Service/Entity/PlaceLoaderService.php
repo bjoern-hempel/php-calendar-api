@@ -663,7 +663,7 @@ SQL;
         $place->setCountry($country);
 
         /* L → Parks, Areas */
-        $parkPlaces = $this->findByPosition($latitude, $longitude, 10, Code::FEATURE_CLASS_L);
+        $parkPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_L);
         usort($parkPlaces, function (Place $a, Place $b) {
             return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
         });
@@ -678,7 +678,7 @@ SQL;
         $data['L'] = $place->getParks();
 
         /* S → Add point of interest (Hotel, Rail station) */
-        $spotPlaces = $this->findByPosition($latitude, $longitude, 10, Code::FEATURE_CLASS_S);
+        $spotPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_S);
         usort($spotPlaces, function (Place $a, Place $b) {
             return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
         });
@@ -693,7 +693,7 @@ SQL;
         $data['S'] = $place->getSpots();
 
         /* T → Mountain */
-        $mountainPlaces = $this->findByPosition($latitude, $longitude, 10, Code::FEATURE_CLASS_T);
+        $mountainPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_T);
         usort($mountainPlaces, function (Place $a, Place $b) {
             return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
         });
@@ -708,7 +708,7 @@ SQL;
         $data['T'] = $place->getMountains();
 
         /* V → Forest */
-        $forestPlaces = $this->findByPosition($latitude, $longitude, 10, Code::FEATURE_CLASS_V);
+        $forestPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_V);
         usort($forestPlaces, function (Place $a, Place $b) {
             return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
         });
