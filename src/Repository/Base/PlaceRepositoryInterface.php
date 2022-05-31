@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Repository\Base;
 
+use App\Entity\Place;
 use App\Entity\PlaceA;
 use App\Entity\PlaceH;
 use App\Entity\PlaceL;
@@ -40,6 +41,15 @@ interface PlaceRepositoryInterface
      * @return PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV|null
      */
     public function findOneBy(array $criteria, ?array $orderBy = null);
+
+    /**
+     * Returns many by.
+     *
+     * @param array<string, mixed> $criteria
+     * @param array<string, string>|null $orderBy
+     * @return Place[]
+     */
+    public function findBy(array $criteria, ?array $orderBy = null);
 
     public function getHighestGeonameId(): int;
 }

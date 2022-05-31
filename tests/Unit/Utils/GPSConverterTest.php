@@ -147,10 +147,10 @@ final class GPSConverterTest extends TestCase
             /**
              * Latitude/Longitude, Decimal Degree → Array
              */
-            [++$number, 'parseDecimalDegree',  6.932500, null, ['degree' => 6, 'minutes' => 55, 'seconds' => 57., ]],
-            [++$number, 'parseDecimalDegree',  8.015444, null, ['degree' => 8, 'minutes' => 0, 'seconds' => 55.5984, ]],
-            [++$number, 'parseDecimalDegree', 46.235194, null, ['degree' => 46, 'minutes' => 14, 'seconds' => 6.6984, ]],
-            [++$number, 'parseDecimalDegree', 79.857622, null, ['degree' => 79, 'minutes' => 51, 'seconds' => 27.4392, ]],
+            [++$number, 'parseDecimalDegree',  6.932500, null, ['degree' => 6, 'minutes' => 55, 'seconds' => 57., 'decimal' => 6.9325, ]],
+            [++$number, 'parseDecimalDegree',  8.015444, null, ['degree' => 8, 'minutes' => 0, 'seconds' => 55.5984, 'decimal' => 8.015444, ]],
+            [++$number, 'parseDecimalDegree', 46.235194, null, ['degree' => 46, 'minutes' => 14, 'seconds' => 6.6984, 'decimal' => 46.235194, ]],
+            [++$number, 'parseDecimalDegree', 79.857622, null, ['degree' => 79, 'minutes' => 51, 'seconds' => 27.4392, 'decimal' => 79.857622, ]],
 
             /**
              * Latitude/Longitude, Decimal Degree → String
@@ -163,8 +163,8 @@ final class GPSConverterTest extends TestCase
             /**
              * X, Longitude, Decimal Degree → Array
              */
-            [++$number, 'parseDecimalDegree',  8.015444, null, ['degree' => 8, 'minutes' => 0, 'seconds' => 55.5984, 'type' => Coordinate::TYPE_LONGITUDE, 'direction' => Coordinate::DIRECTION_EAST, ], Coordinate::DIRECTION_EAST],
-            [++$number, 'parseDecimalDegree', 79.857622, null, ['degree' => 79, 'minutes' => 51, 'seconds' => 27.4392, 'type' => Coordinate::TYPE_LONGITUDE, 'direction' => Coordinate::DIRECTION_EAST, ], Coordinate::DIRECTION_EAST],
+            [++$number, 'parseDecimalDegree',  8.015444, null, ['degree' => 8, 'minutes' => 0, 'seconds' => 55.5984, 'decimal' => 8.015444, 'type' => Coordinate::TYPE_LONGITUDE, 'direction' => Coordinate::DIRECTION_EAST, ], Coordinate::DIRECTION_EAST],
+            [++$number, 'parseDecimalDegree', 79.857622, null, ['degree' => 79, 'minutes' => 51, 'seconds' => 27.4392, 'decimal' => 79.857622, 'type' => Coordinate::TYPE_LONGITUDE, 'direction' => Coordinate::DIRECTION_EAST, ], Coordinate::DIRECTION_EAST],
 
             /**
              * X, Longitude, Decimal Degree → String
@@ -179,8 +179,8 @@ final class GPSConverterTest extends TestCase
             /**
              * Y, Latitude, Decimal Degree → Array
              */
-            [++$number, 'parseDecimalDegree',  6.932500, null, ['degree' => 6, 'minutes' => 55, 'seconds' => 57., 'type' => Coordinate::TYPE_LATITUDE, 'direction' => Coordinate::DIRECTION_NORTH, ], Coordinate::DIRECTION_NORTH],
-            [++$number, 'parseDecimalDegree', 46.235194, null, ['degree' => 46, 'minutes' => 14, 'seconds' => 6.6984, 'type' => Coordinate::TYPE_LATITUDE, 'direction' => Coordinate::DIRECTION_NORTH, ], Coordinate::DIRECTION_NORTH],
+            [++$number, 'parseDecimalDegree',  6.932500, null, ['degree' => 6, 'minutes' => 55, 'seconds' => 57., 'decimal' => 6.932500, 'type' => Coordinate::TYPE_LATITUDE, 'direction' => Coordinate::DIRECTION_NORTH, ], Coordinate::DIRECTION_NORTH],
+            [++$number, 'parseDecimalDegree', 46.235194, null, ['degree' => 46, 'minutes' => 14, 'seconds' => 6.6984, 'decimal' => 46.235194, 'type' => Coordinate::TYPE_LATITUDE, 'direction' => Coordinate::DIRECTION_NORTH, ], Coordinate::DIRECTION_NORTH],
 
             /**
              * Y, Latitude, Decimal Degree → String
@@ -213,8 +213,8 @@ final class GPSConverterTest extends TestCase
             /**
              * [X, Y], Longitude, Latitude, Decimal Degree → Google URL
              */
-            [++$number, 'decimalDegree2google', 79.857622, 6.932500, 'https://www.google.de/maps/place/79°51′27.4392″+6°55′57″'],
-            [++$number, 'decimalDegree2google', 79.857622, 6.932500, 'https://www.google.de/maps/place/79°51′27.4392″E+6°55′57″N', Coordinate::DIRECTION_EAST, Coordinate::DIRECTION_NORTH],
+            [++$number, 'decimalDegree2google', 79.857622, 6.932500, 'https://www.google.de/maps/place/79.857622+6.932500'],
+            [++$number, 'decimalDegree2google', 79.857622, 6.932500, 'https://www.google.de/maps/place/79.857622+6.932500', Coordinate::DIRECTION_EAST, Coordinate::DIRECTION_NORTH],
 
             /**
              * Full location

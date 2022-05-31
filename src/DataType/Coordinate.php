@@ -115,11 +115,16 @@ class Coordinate
     /**
      * Returns the google string of longitude and latitude (string).
      *
+     * @param bool $asDms
      * @return string
      * @throws Exception
      */
-    public function getGoogle(): string
+    public function getGoogle(bool $asDms = false): string
     {
-        return sprintf('https://www.google.de/maps/place/%s+%s', $this->getLongitude()->getDms(), $this->getLatitude()->getDms());
+        if ($asDms) {
+            return sprintf('https://www.google.de/maps/place/%s+%s', $this->getLongitude()->getDms(), $this->getLatitude()->getDms());
+        }
+
+        return sprintf('https://www.google.de/maps/place/%f+%f', $this->getLongitude()->getDecimal(), $this->getLatitude()->getDecimal());
     }
 }

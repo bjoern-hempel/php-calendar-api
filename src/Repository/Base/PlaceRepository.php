@@ -11,9 +11,9 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace App\Repository;
+namespace App\Repository\Base;
 
-use App\Entity\PlaceL;
+use App\Entity\PlaceV;
 use App\Repository\Base\PlaceRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -21,14 +21,14 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * Class PlaceLRepository
+ * Class PlaceRepository
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2022-05-31)
  * @package App\Command
- * @extends ServiceEntityRepository<PlaceL>
+ * @extends ServiceEntityRepository<PlaceV>
  */
-class PlaceLRepository extends ServiceEntityRepository implements PlaceRepositoryInterface
+abstract class PlaceRepository extends ServiceEntityRepository implements PlaceRepositoryInterface
 {
     /**
      * PlaceHRepository constructor.
@@ -37,7 +37,7 @@ class PlaceLRepository extends ServiceEntityRepository implements PlaceRepositor
      */
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, PlaceL::class);
+        parent::__construct($registry, PlaceV::class);
     }
 
     /**

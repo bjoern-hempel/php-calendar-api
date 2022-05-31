@@ -413,7 +413,7 @@ S:
   OPRA: "Opernhaus" # A theater designed chiefly for the performance of operas.
   PAL: "Palast" # a large stately house, often a royal or presidential residence
   PGDA: "pagoda" # a tower-like storied structure, usually a Buddhist shrine
-  PIER: "pier" # a structure built out into navigable water on piles providing berthing for ships and recreation
+  PIER: "Pier" # a structure built out into navigable water on piles providing berthing for ships and recreation
   PKLT: "parking lot" # an area used for parking vehicles
   PMPO: "oil pumping station" # a facility for pumping oil through a pipeline
   PMPW: "water pumping station" # a facility for pumping water from a major well or through a pipeline
@@ -453,7 +453,7 @@ S:
   RSTP: "railroad stop" # a place lacking station facilities where trains stop to pick up and unload passengers and freight
   RSTPQ: "abandoned railroad stop" #
   RUIN: "ruin(s)" # a destroyed or decayed structure which is no longer functional
-  SCH: "school" # building(s) where instruction in one or more branches of knowledge takes place
+  SCH: "Schule" # building(s) where instruction in one or more branches of knowledge takes place
   SCHA: "agricultural school" # a school with a curriculum focused on agriculture
   SCHC: "college" # the grounds and buildings of an institution of higher learning
   SCHL: "language school" # Language Schools & Institutions
@@ -505,7 +505,7 @@ S:
   WRCK: "wreck" # the site of the remains of a wrecked vessel
   WTRW: "waterworks" # a facility for supplying potable water through a water source and a system of pumps and filtration beds
   ZNF: "free trade zone" # an area, usually a section of a port, where goods may be received and shipped free of customs duty and of most customs regulations
-  ZOO: "zoo" # a zoological garden or park where wild animals are kept for exhibition
+  ZOO: "Zoo" # a zoological garden or park where wild animals are kept for exhibition
 T:
   ASPH: "asphalt lake" # a small basin containing naturally occurring asphalt
   ATOL: "atoll(s)" # a ring-shaped coral reef which has closely spaced islands on it encircling a lagoon

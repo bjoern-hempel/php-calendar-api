@@ -15,6 +15,7 @@ namespace App\Command;
 
 use App\Constant\Code;
 use App\DataType\Point;
+use App\Entity\Place;
 use App\Repository\Base\PlaceRepositoryInterface;
 use App\Repository\PlaceARepository;
 use App\Repository\PlaceHRepository;
@@ -127,10 +128,8 @@ class AddPlaceCommand extends Command
             ->setDefinition([
                 new InputArgument('feature-class', InputArgument::REQUIRED, 'The feature class'),
                 new InputArgument('feature-code', InputArgument::REQUIRED, 'The feature code'),
-                new InputArgument('country-code', InputArgument::REQUIRED, 'The country code'),
-                new InputArgument('latitude', InputArgument::REQUIRED, 'The latitude (y position).'),
-                new InputArgument('longitude', InputArgument::REQUIRED, 'The longitude (x position).'),
-                new InputArgument('name', InputArgument::REQUIRED, 'The name'),
+                new InputArgument('google-link', InputArgument::REQUIRED, 'The google link'),
+                new InputArgument('name', InputArgument::OPTIONAL, 'The name', null),
             ])
             ->setHelp(
                 <<<'EOT'
@@ -180,9 +179,7 @@ EOT
         /* Read parameter. */
         $featureClass = strval($input->getArgument('feature-class'));
         $featureCode = strval($input->getArgument('feature-code'));
-        $countryCode = strval($input->getArgument('country-code'));
-        $latitude = floatval($input->getArgument('latitude'));
-        $longitude = floatval($input->getArgument('longitude'));
+        $googleLink = strval($input->getArgument('google-link'));
         $name = strval($input->getArgument('name'));
 
         $translationCode = sprintf('%s.%s', $featureClass, $featureCode);
@@ -193,27 +190,41 @@ EOT
             return Command::INVALID;
         }
 
+        $name = !empty($name) ? $name : GPSConverter::parseNameFromGoogleLinkDirect($googleLink);
+        $result = GPSConverter::parseLatitudeAndLongitudeFromGoogleLinkDirect($googleLink);
+
+        if ($result === false || $name === false) {
+            $output->writeln(sprintf('Unable to parse given google link "%s".', $googleLink));
+            return Command::INVALID;
+        }
+
+        list($latitude, $longitude) = $result;
+
         $placeRepository = $this->getPlaceRepository($featureClass);
 
-        $place = $placeRepository->findOneBy(['name' => $name, 'countryCode' => $countryCode]);
+        /** @var Place[] $places */
+        $places = $placeRepository->findBy(['name' => $name]);
 
-        $additionalQuestion = $place !== null ? ' (already exists)' : '';
-
-        $googleLink = GPSConverter::decimalDegree2google($latitude, $longitude);
-        $question = sprintf('Add this place%s: "%s" (FClass = %s, FCode = %s, CCode = %s, Google = "%s")? ', $additionalQuestion, $name, $featureClass, $featureCode, $countryCode, $googleLink);
-
-        $helper = $this->getHelper('question');
-
-        if (!$helper instanceof QuestionHelper) {
-            throw new Exception(sprintf('Unable to get question (%s:%d).', __FILE__, __LINE__));
+        if (count($places) > 0) {
+            $output->writeln(sprintf('%d records already found:', count($places)));
+            foreach ($places as $place) {
+                $googleLink = GPSConverter::decimalDegree2google($place->getCoordinate()->getLongitude(), $place->getCoordinate()->getLatitude());
+                $output->writeln(
+                    sprintf(
+                        '- %s: (FClass = %s, FCode = %s, CCode = %s, Google = "%s")',
+                        $place->getName(),
+                        $place->getFeatureClass(),
+                        $place->getFeatureCode(),
+                        $place->getCountryCode(),
+                        $googleLink
+                    )
+                );
+            }
+            $output->writeln('');
         }
 
-        $question = new ConfirmationQuestion($question, false);
-
-        /* Cancel task (answer "no" given). */
-        if (!$helper->ask($input, $output, $question)) {
-            return Command::SUCCESS;
-        }
+        $place = count($places) > 0 ? $places[0] : null;
+        $additionalQuestion = $place !== null ? ' (already exists)' : ' (new record)';
 
         $locationPlace = $this->locationDataService->getLocationPlace($latitude, $longitude);
 
@@ -240,8 +251,8 @@ EOT
         $place->setCoordinate($point);
         $place->setFeatureClass($featureClass);
         $place->setFeatureCode($featureCode);
-        $place->setCountryCode($countryCode);
-        $place->setCc2('');
+        $place->setCountryCode($locationPlace->getCountryCode());
+        $place->setCc2($locationPlace->getCc2());
         $place->setAdmin1Code($locationPlace->getAdmin1Code());
         $place->setAdmin2Code($locationPlace->getAdmin2Code());
         $place->setAdmin3Code($locationPlace->getAdmin3Code());
@@ -253,6 +264,33 @@ EOT
         $place->setModificationDate(new DateTime());
         $place->setCreatedAt(new DateTimeImmutable());
         $place->setUpdatedAt(new DateTimeImmutable());
+
+        $googleLink = GPSConverter::decimalDegree2google($latitude, $longitude);
+
+        $output->writeln(sprintf('Add new place%s', $additionalQuestion));
+        $output->writeln(sprintf('Name:          %s', $place->getName()));
+        $output->writeln(sprintf('Latitude:      %f', $place->getCoordinate()->getLongitude()));
+        $output->writeln(sprintf('Longitude:     %f', $place->getCoordinate()->getLatitude()));
+        $output->writeln(sprintf('Feature class: %s', $place->getFeatureClass()));
+        $output->writeln(sprintf('Feature code:  %s', $place->getFeatureCode()));
+        $output->writeln(sprintf('Country code:  %s', $place->getCountryCode()));
+        $output->writeln(sprintf('Google link:   %s', $googleLink));
+        $output->writeln('');
+
+        $question = 'Add this place? [y|n] ';
+
+        $helper = $this->getHelper('question');
+
+        if (!$helper instanceof QuestionHelper) {
+            throw new Exception(sprintf('Unable to get question (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $question = new ConfirmationQuestion($question, false);
+
+        /* Cancel task (answer "no" given). */
+        if (!$helper->ask($input, $output, $question)) {
+            return Command::SUCCESS;
+        }
 
         $this->manager->persist($place);
         $this->manager->flush();

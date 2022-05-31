@@ -77,6 +77,16 @@ class GPSPosition
     }
 
     /**
+     * Returns the decimal of gps position.
+     *
+     * @return float
+     */
+    public function getDecimal(): float
+    {
+        return floatval($this->data['decimal']);
+    }
+
+    /**
      * Returns the degree of gps position.
      *
      * @return int

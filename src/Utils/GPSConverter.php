@@ -177,6 +177,7 @@ class GPSConverter
             'degree' => intval($degree),
             'minutes' => intval($minutes),
             'seconds' => round(floatval($seconds), 6),
+            'decimal' => $decimalDegree,
         ];
 
         if ($direction !== null) {
@@ -332,6 +333,46 @@ class GPSConverter
             default:
                 list($latitude, $longitude) = self::parseLatitudeAndLongitudeFromString($fullLocation);
         }
+
+        return [$latitude, $longitude];
+    }
+
+    /**
+     * Parses Google Link (name; direct; without redirect).
+     *
+     * @param string $googleLink
+     * @return string|false
+     * @throws Exception
+     */
+    public static function parseNameFromGoogleLinkDirect(string $googleLink): string|false
+    {
+        $matchesLocation = [];
+        if (!preg_match('~/maps/place/([^/]+)/~', $googleLink, $matchesLocation)) {
+            return false;
+        }
+
+        $name = urldecode($matchesLocation[1]);
+
+        return str_replace('+', ' ', $name);
+    }
+
+    /**
+     * Parses Google Link (latitude; longitude; direct; without redirect).
+     *
+     * @param string $googleLink
+     * @return float[]|false
+     * @throws Exception
+     */
+    public static function parseLatitudeAndLongitudeFromGoogleLinkDirect(string $googleLink): array|false
+    {
+        $matchesLocation = [];
+        if (!preg_match('~!3d([0-9]+\.[0-9]+)+.+!4d([0-9]+\.[0-9]+)~', $googleLink, $matchesLocation)) {
+            return false;
+        }
+        list(, $latitude, $longitude) = $matchesLocation;
+
+        $latitude = floatval($latitude);
+        $longitude = floatval($longitude);
 
         return [$latitude, $longitude];
     }
