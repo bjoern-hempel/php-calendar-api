@@ -22,6 +22,7 @@ use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
+use function PHPUnit\Framework\isNan;
 
 /**
  * Class LocationDataService
@@ -329,9 +330,13 @@ class LocationDataService
         $theta = $longitudeFrom - $longitudeTo;
 
         /* Calculate distance. */
-        $distance = (sin(deg2rad($latitudeFrom)) * sin(deg2rad($latitudeTo))) + (cos(deg2rad($latitudeFrom)) * cos(deg2rad($latitudeTo)) * cos(deg2rad($theta)));
-        $distance = acos($distance);
-        $distance = rad2deg($distance);
+        if ($latitudeFrom === $latitudeTo && $longitudeFrom === $longitudeTo) {
+            $distance = 0;
+        } else {
+            $distance = (sin(deg2rad($latitudeFrom)) * sin(deg2rad($latitudeTo))) + (cos(deg2rad($latitudeFrom)) * cos(deg2rad($latitudeTo)) * cos(deg2rad($theta)));
+            $distance = acos($distance);
+            $distance = rad2deg($distance);
+        }
 
         /* Convert distances. */
         $miles = $distance * 60 * 1.1515;
