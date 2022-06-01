@@ -269,7 +269,7 @@ S:
   ART: "piece of art" # a piece of art, like a sculpture, painting. In contrast to monument (MNMT) it is not commemorative.
   ASTR: "astronomical station" # a point on the earth whose position has been determined by observations of celestial bodies
   ASYL: "asylum" # a facility where the insane are cared for and protected
-  ATHF: "athletic field" # a tract of land used for playing team sports, and athletic track and field events
+  ATHF: "Sportplatz" # a tract of land used for playing team sports, and athletic track and field events
   ATM: "automatic teller machine" # An unattended electronic machine in a public place, connected to a data system and related equipment and activated by a bank customer to obtain cash withdrawals and other banking services.
   BANK: "bank" # A business establishment in which money is kept for saving or commercial purposes or is invested, supplied for loans, or exchanged.
   BCN: "Leuchtturm" # a fixed artificial navigation mark
@@ -344,7 +344,7 @@ S:
   HERM: "hermitage" # a secluded residence, usually for religious sects
   HLT: "halting place" # a place where caravans stop for rest
   HMSD: "homestead" # a residence, owner's or manager's, on a sheep or cattle station, woolshed, outcamp, or Aboriginal outstation, specific to Australia and New Zealand
-  HSE: "house(s)" # a building used as a human habitation
+  HSE: "Haus / Häuser" # a building used as a human habitation
   HSEC: "country house" # a large house, mansion, or chateau, on a large estate
   HSP: "Krankenhaus" # a building in which sick or injured, especially those confined to bed, are medically treated
   HSPC: "Klinik" # a medical facility associated with a hospital for outpatients

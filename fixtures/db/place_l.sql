@@ -46,7 +46,7 @@ CREATE TABLE `place_l` (
   `admin4_code` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   SPATIAL KEY `coordinate_place_l` (`coordinate`)
-) ENGINE=InnoDB AUTO_INCREMENT=678986 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=678988 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -11279,7 +11279,9 @@ INSERT INTO `place_l` VALUES
 (678830,11746817,'Hoef en Haag','Hoef en Haag','','\0\0\0\0\0\0\0ÏÜmã˛I@Bx¥qƒz@','L','LCTY','NL','',0,0,0,'Europe/Amsterdam','2019-01-20','2022-05-12 19:44:17','2022-05-12 19:44:17','09','1961',NULL,NULL),
 (678854,11808090,'Zevenmanshaven','Zevenmanshaven','','\0\0\0\0\0\0\04øöÛI@Ìª\"¯ﬂJ@','L','INDS','NL','',0,3,2,'Europe/Amsterdam','2018-01-17','2022-05-12 19:44:28','2022-05-12 19:44:28','11','0622',NULL,NULL),
 (678980,12324227,'De Friese Wilp','De Friese Wilp','De Wilp','\0\0\0\0\0\0\0m®ÁoéJ@e6»$@','L','LCTY','NL','',0,0,5,'Europe/Amsterdam','2021-09-20','2022-05-12 19:45:26','2022-05-12 19:45:26','02','0086',NULL,NULL),
-(678982,12358725,'Salland','Salland','','\0\0\0\0\0\0\0ßËH.+J@≥A&9Î@','L','PRK','NL','',0,0,5,'Europe/Amsterdam','2021-11-18','2022-05-12 19:45:27','2022-05-12 19:45:27','15','1773',NULL,NULL);
+(678982,12358725,'Salland','Salland','','\0\0\0\0\0\0\0ßËH.+J@≥A&9Î@','L','PRK','NL','',0,0,5,'Europe/Amsterdam','2021-11-18','2022-05-12 19:45:27','2022-05-12 19:45:27','15','1773',NULL,NULL),
+(678986,100000000,'Park Babelsberg','Park Babelsberg','Park Babelsberg','\0\0\0\0\0\0\0ƒ$\\»3J@¶2{èÈ/*@','L','PRK','DE','',0,0,41,'Europe/Berlin','2022-06-01','2022-06-01 13:55:36','2022-06-01 13:55:36','11','00','12054','12054000'),
+(678987,100000001,'Neuer Garten','Neuer Garten','Neuer Garten','\0\0\0\0\0\0\0IKÂÌ5J@Iﬂˇ\"√!*@','L','PRK','DE','',0,0,41,'Europe/Berlin','2022-06-01','2022-06-01 13:58:06','2022-06-01 13:58:06','11','00','12054','12054000');
 /*!40000 ALTER TABLE `place_l` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
