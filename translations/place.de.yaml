@@ -389,7 +389,7 @@ S:
   MNCR: "chrome mine(s)" # a mine where chrome ore is extracted
   MNCU: "copper mine(s)" # a mine where copper ore is extracted
   MNFE: "iron mine(s)" # a mine where iron ore is extracted
-  MNMT: "monument" # a commemorative structure or statue
+  MNMT: "Denkmal" # a commemorative structure or statue
   MNN: "salt mine(s)" # a mine from which salt is extracted
   MNQ: "abandoned mine" #
   MNQR: "quarry(-ies)" # a surface mine where building stone or gravel and sand, etc. are extracted

@@ -729,10 +729,44 @@ SQL;
     }
 
     /**
+     * Gets the entity class.
+     *
+     * @param string $code
+     * @return string
+     * @throws Exception
+     */
+    protected function getEntityClass(string $code): string
+    {
+        switch ($code) {
+            case Code::FEATURE_CLASS_A:
+                return PlaceA::class;
+            case Code::FEATURE_CLASS_H:
+                return PlaceH::class;
+            case Code::FEATURE_CLASS_L:
+                return PlaceL::class;
+            case Code::FEATURE_CLASS_P:
+                return PlaceP::class;
+            case Code::FEATURE_CLASS_R:
+                return PlaceR::class;
+            case Code::FEATURE_CLASS_S:
+                return PlaceS::class;
+            case Code::FEATURE_CLASS_T:
+                return PlaceT::class;
+            case Code::FEATURE_CLASS_U:
+                return PlaceU::class;
+            case Code::FEATURE_CLASS_V:
+                return PlaceV::class;
+            default:
+                throw new Exception(sprintf('Unexpected code given "%s (%s:%d).', $code, __FILE__, __LINE__));
+        }
+    }
+
+    /**
      * Finds places by name.
      *
      * @param string $name
      * @return PlaceA[]|PlaceH[]|PlaceL[]|PlaceP[]|PlaceR[]|PlaceS[]|PlaceT[]|PlaceU[]|PlaceV[]
+     * @throws Exception
      */
     public function findByName(string $name): array
     {
@@ -740,8 +774,28 @@ SQL;
         $codes = [Code::FEATURE_CLASS_P, Code::FEATURE_CLASS_A, Code::FEATURE_CLASS_S, Code::FEATURE_CLASS_H, Code::FEATURE_CLASS_L, Code::FEATURE_CLASS_R, Code::FEATURE_CLASS_T, Code::FEATURE_CLASS_U, Code::FEATURE_CLASS_V];
 
         foreach ($codes as $code) {
-            $method = sprintf('place%sRepository', $code);
-            foreach ($this->{$method}->findBy(['name' => $name]) as $place) {
+            $records = $this->em->getRepository($this->getEntityClass($code))
+                ->createQueryBuilder('p')
+                ->where('p.name LIKE :name')
+                ->setParameter('name', sprintf('%s', $name))
+                ->getQuery()
+                ->getResult();
+            foreach ($records as $place) {
+                $places[] = $place;
+            }
+            if (count($places) > 0) {
+                return $places;
+            }
+        }
+
+        foreach ($codes as $code) {
+            $records = $this->em->getRepository($this->getEntityClass($code))
+                ->createQueryBuilder('p')
+                ->where('p.name LIKE :name')
+                ->setParameter('name', sprintf('%%%s%%', $name))
+                ->getQuery()
+                ->getResult();
+            foreach ($records as $place) {
                 $places[] = $place;
             }
             if (count($places) > 0) {
