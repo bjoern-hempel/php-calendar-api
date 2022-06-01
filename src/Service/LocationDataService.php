@@ -167,6 +167,23 @@ class LocationDataService
     }
 
     /**
+     * Finds first location by name.
+     *
+     * @param string $name
+     * @return Place|null
+     */
+    public function getLocationByName(string $name): ?Place
+    {
+        $places = $this->placeLoaderService->findByName($name);
+
+        if (count($places) <= 0) {
+            return null;
+        }
+
+        return $places[0];
+    }
+
+    /**
      * Gets full location data.
      *
      * @param float $latitude

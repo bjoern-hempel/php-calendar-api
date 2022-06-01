@@ -198,7 +198,7 @@ L:
   RESA: "agricultural reserve" # a tract of land reserved for agricultural reclamation and/or development
   RESF: "forest reserve" # a forested area set aside for preservation or controlled use
   RESH: "hunting reserve" # a tract of land used primarily for hunting
-  RESN: "nature reserve" # an area reserved for the maintenance of a natural habitat
+  RESN: "Naturschutzgebiet" # an area reserved for the maintenance of a natural habitat
   RESP: "palm tree reserve" # an area of palm trees where use is controlled
   RESV: "reservation" # a tract of land set aside for aboriginal, tribal, or native populations
   RESW: "wildlife reserve" # a tract of public land reserved for the preservation of wildlife

@@ -729,6 +729,30 @@ SQL;
     }
 
     /**
+     * Finds places by name.
+     *
+     * @param string $name
+     * @return PlaceA[]|PlaceH[]|PlaceL[]|PlaceP[]|PlaceR[]|PlaceS[]|PlaceT[]|PlaceU[]|PlaceV[]
+     */
+    public function findByName(string $name): array
+    {
+        $places = [];
+        $codes = [Code::FEATURE_CLASS_P, Code::FEATURE_CLASS_A, Code::FEATURE_CLASS_S, Code::FEATURE_CLASS_H, Code::FEATURE_CLASS_L, Code::FEATURE_CLASS_R, Code::FEATURE_CLASS_T, Code::FEATURE_CLASS_U, Code::FEATURE_CLASS_V];
+
+        foreach ($codes as $code) {
+            $method = sprintf('place%sRepository', $code);
+            foreach ($this->{$method}->findBy(['name' => $name]) as $place) {
+                $places[] = $place;
+            }
+            if (count($places) > 0) {
+                return $places;
+            }
+        }
+
+        return $places;
+    }
+
+    /**
      * Finds the nearest place by coordinate.
      *
      * @param float $latitude

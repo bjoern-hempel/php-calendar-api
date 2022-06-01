@@ -202,7 +202,6 @@ EOT
 
         $placeRepository = $this->getPlaceRepository($featureClass);
 
-        /** @var Place[] $places */
         $places = $placeRepository->findBy(['name' => $name]);
 
         if (count($places) > 0) {
@@ -211,8 +210,9 @@ EOT
                 $googleLink = GPSConverter::decimalDegree2google($place->getCoordinate()->getLongitude(), $place->getCoordinate()->getLatitude());
                 $output->writeln(
                     sprintf(
-                        '- %s: (FClass = %s, FCode = %s, CCode = %s, Google = "%s")',
+                        '- %s: (GeoNameId = %d, FClass = %s, FCode = %s, CCode = %s, Google = "%s")',
                         $place->getName(),
+                        $place->getGeonameId(),
                         $place->getFeatureClass(),
                         $place->getFeatureCode(),
                         $place->getCountryCode(),
@@ -273,8 +273,10 @@ EOT
         $output->writeln(sprintf('Longitude:     %f', $place->getCoordinate()->getLatitude()));
         $output->writeln(sprintf('Feature class: %s', $place->getFeatureClass()));
         $output->writeln(sprintf('Feature code:  %s', $place->getFeatureCode()));
+        $output->writeln(sprintf('Translation:   %s', $this->translator->trans(sprintf('%s.%s', $place->getFeatureClass(), $place->getFeatureCode()), [], 'place')));
         $output->writeln(sprintf('Country code:  %s', $place->getCountryCode()));
         $output->writeln(sprintf('Google link:   %s', $googleLink));
+        $output->writeln(sprintf('Location:      %s', $locationPlace->getName(true)));
         $output->writeln('');
 
         $question = 'Add this place? [y|n] ';

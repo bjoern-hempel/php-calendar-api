@@ -20,6 +20,7 @@ use App\Form\Type\FullLocationType;
 use App\Service\LocationDataService;
 use App\Utils\GPSConverter;
 use Exception;
+use InvalidArgumentException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -86,13 +87,12 @@ class ContentController extends BaseController
     /**
      * Gets the location data.
      *
-     * @param Request $request
      * @param FormInterface $form
      * @param array<string, Place[]> $data
      * @return array<string, mixed>
      * @throws Exception
      */
-    protected function getLocationData(Request $request, FormInterface $form, array &$data = []): array
+    protected function getLocationData(FormInterface $form, array &$data = []): array
     {
         if (!$form->isSubmitted() || !$form->isValid()) {
             return [];
@@ -101,7 +101,20 @@ class ContentController extends BaseController
         /** @var Location $location */
         $location = $form->getData();
 
-        list($latitude, $longitude) = GPSConverter::parseFullLocation2DecimalDegrees($location->getLocationFull());
+        $parsed = GPSConverter::parseFullLocation2DecimalDegrees($location->getLocationFull());
+
+        if ($parsed === false) {
+            $place = $this->locationDataService->getLocationByName($location->getLocationFull());
+
+            if ($place === null) {
+                throw new InvalidArgumentException(sprintf('Unable to find place "%s".', $location->getLocationFull()));
+            }
+
+            $latitude = $place->getCoordinate()->getLongitude();
+            $longitude = $place->getCoordinate()->getLatitude();
+        } else {
+            list($latitude, $longitude) = $parsed;
+        }
 
         return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data);
     }
@@ -129,7 +142,13 @@ class ContentController extends BaseController
 
         $error = null;
         try {
-            $locationData = $this->getLocationData($request, $form, $data);
+            $locationData = $this->getLocationData($form, $data);
+        } catch (InvalidArgumentException $exception) {
+            /** @var Location $location */
+            $location = $form->getData();
+
+            $error = sprintf('Der Ort "%s" konnte nicht gefunden werden.', $location->getLocationFull());
+            $locationData = [];
         } catch (Throwable $throwable) {
             $error = $this->kernel->getEnvironment() !== 'dev' ?
                 $this->translator->trans('general.notAvailable', [], 'location') :

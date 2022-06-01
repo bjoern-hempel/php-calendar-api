@@ -27,6 +27,18 @@ use JetBrains\PhpStorm\ArrayShape;
  */
 class GPSConverter
 {
+    public const REGEXP_ENCRYPTED_LATITUDE_LONGITUDE = '~!3d([0-9]+\.[0-9]+)+.+!4d([0-9]+\.[0-9]+)~';
+
+    public const REGEXP_GOOGLE_REDIRECT = '~(https://maps.app.goo.gl/[a-zA-Z0-9]+)$~';
+
+    public const REGEXP_GOOGLE_LOCATION_REDIRECT = '~^location: .+!3d([0-9]+\.[0-9]+)+.+!4d([0-9]+\.[0-9]+).+~m';
+
+    public const REGEXP_SPLIT_LATITUDE_LONGITUDE = '~[, ]+~';
+
+    public const REGEXP_DECIMAL = '[\-_]?\d+[.]\d+[°]*';
+
+    public const REGEXP_DMS = '[NEWS]?\d+°\d+′\d+.\d+″[NEWS]?';
+
     public const UNIT_DEGREE = [
         '°',
     ];
@@ -318,20 +330,48 @@ class GPSConverter
      * • etc.
      *
      * @param string $fullLocation
-     * @return float[]
+     * @return float[]|false
      * @throws Exception
      */
-    public static function parseFullLocation2DecimalDegrees(string $fullLocation): array
+    public static function parseFullLocation2DecimalDegrees(string $fullLocation): array|false
     {
+        $fullLocation = trim($fullLocation);
+
         $matches = [];
         switch (true) {
-            /* Google Link https://maps.app.goo.gl/PHq5axBaDdgRWj4T6 */
-            case preg_match('~(https://maps.app.goo.gl/[a-zA-Z0-9]+)$~', $fullLocation, $matches):
+            /* Google redirect link https://maps.app.goo.gl/PHq5axBaDdgRWj4T6 */
+            case preg_match(self::REGEXP_GOOGLE_REDIRECT, $fullLocation, $matches):
                 list($latitude, $longitude) = self::parseLatitudeAndLongitudeFromGoogleLink($matches[1]);
                 break;
 
-            default:
+            /* Google spot link https://www.google.de/maps/place/Strandbad+Wannsee+-+Berliner+B%C3%A4der/@52.4286142,13.1557256,13.54z/data=!4m5!3m4!1s0x47a858ffef30e359:0x165816b49cc6929a!8m2!3d52.4381357!4d13.1794242 */
+            case preg_match(self::REGEXP_ENCRYPTED_LATITUDE_LONGITUDE, $fullLocation, $matches):
+                $parsed = self::parseLatitudeAndLongitudeFromGoogleLinkDirect($fullLocation);
+
+                if ($parsed === false) {
+                    throw new Exception(sprintf('Unable to parse google link "%s" (%s:%d).', $fullLocation, __FILE__, __LINE__));
+                }
+
+                list($latitude, $longitude) = $parsed;
+                break;
+
+            /* Given location */
+            case preg_match(
+                sprintf(
+                    '~((%s)|(%s))[, ]+((%s)|(%s))~',
+                    self::REGEXP_DECIMAL,
+                    self::REGEXP_DMS,
+                    self::REGEXP_DECIMAL,
+                    self::REGEXP_DMS
+                ),
+                $fullLocation,
+                $matches
+            ):
                 list($latitude, $longitude) = self::parseLatitudeAndLongitudeFromString($fullLocation);
+                break;
+
+            default:
+                return false;
         }
 
         return [$latitude, $longitude];
@@ -366,7 +406,7 @@ class GPSConverter
     public static function parseLatitudeAndLongitudeFromGoogleLinkDirect(string $googleLink): array|false
     {
         $matchesLocation = [];
-        if (!preg_match('~!3d([0-9]+\.[0-9]+)+.+!4d([0-9]+\.[0-9]+)~', $googleLink, $matchesLocation)) {
+        if (!preg_match(self::REGEXP_ENCRYPTED_LATITUDE_LONGITUDE, $googleLink, $matchesLocation)) {
             return false;
         }
         list(, $latitude, $longitude) = $matchesLocation;
@@ -406,7 +446,7 @@ class GPSConverter
 
         // location: https://www.google.com/maps/place/Malbork,+Polen/data=!4m6!3m5!1s0x46fd5bffa9b675d5:0xb4e2fe366cccb936!7e2!8m2!3d54.073048299999996!4d18.992402?utm_source=mstt_1&entry=gps
         $matchesLocation = [];
-        if (preg_match('~^location: .+!3d([0-9]+\.[0-9]+)+.+!4d([0-9]+\.[0-9]+).+~m', $headerLines, $matchesLocation)) {
+        if (preg_match(self::REGEXP_GOOGLE_LOCATION_REDIRECT, $headerLines, $matchesLocation)) {
             list(, $latitude, $longitude) = $matchesLocation;
 
             $latitude = floatval($latitude);
@@ -428,7 +468,7 @@ class GPSConverter
      */
     protected static function parseLatitudeAndLongitudeFromString(string $fullLocation): array
     {
-        $split = preg_split('~[, ]+~', $fullLocation);
+        $split = preg_split(self::REGEXP_SPLIT_LATITUDE_LONGITUDE, $fullLocation);
 
         if ($split === false) {
             throw new Exception(sprintf('Unable to split given full location string (%s:%d).', __FILE__, __LINE__));
