@@ -205,15 +205,15 @@ abstract class Place
     {
         $name = '';
 
-        if ($this->getDistrict() !== null && !str_contains($name, $this->getDistrict()->getName())) {
+        if ($this->getDistrict() !== null && !$this->strContains($name, $this->getDistrict()->getName())) {
             $name = sprintf($this->templateAddName, $name, $this->getDistrict()->getName($detailed));
         }
 
-        if ($this->getCity() !== null && !str_contains($name, $this->getCity()->getName())) {
+        if ($this->getCity() !== null && !$this->strContains($name, $this->getCity()->getName())) {
             $name = sprintf($this->templateAddName, $name, $this->getCity()->getName($detailed));
         }
 
-        if ($this->getState() !== null && !str_contains($name, $this->getState()->getName())) {
+        if ($this->getState() !== null && !$this->strContains($name, $this->getState()->getName())) {
             $name = sprintf($this->templateAddName, $name, $this->getState()->getName($detailed));
         }
 
@@ -227,25 +227,25 @@ abstract class Place
 
         /* PlaceL */
         $firstPark = $this->getFirstPark(true);
-        if (!is_null($firstPark) && !str_contains($name, $firstPark->getName())) {
+        if (!is_null($firstPark) && !$this->strContains($name, $firstPark->getName())) {
             $name = sprintf($this->templateAddName, $firstPark->getName($detailed), $name);
         }
 
         /* PlaceT */
         $firstMountain = $this->getFirstMountain(true);
-        if (!is_null($firstMountain) && !str_contains($name, $firstMountain->getName())) {
+        if (!is_null($firstMountain) && !$this->strContains($name, $firstMountain->getName())) {
             $name = sprintf($this->templateAddName, $firstMountain->getName($detailed), $name);
         }
 
         /* PlaceS */
         $firstSpot = $this->getFirstSpot(true);
-        if (!is_null($firstSpot) && !str_contains($name, $firstSpot->getName())) {
+        if (!is_null($firstSpot) && !$this->strContains($name, $firstSpot->getName())) {
             $name = sprintf($this->templateAddName, $firstSpot->getName($detailed), $name);
         }
 
         /* PlaceV */
         $firstForest = $this->getFirstForest(true);
-        if (!is_null($firstForest) && !str_contains($name, $firstForest->getName())) {
+        if (!is_null($firstForest) && !$this->strContains($name, $firstForest->getName())) {
             $name = sprintf($this->templateAddName, $firstForest->getName($detailed), $name);
         }
 
@@ -273,7 +273,7 @@ abstract class Place
      */
     public function addNameBefore(string $addName): self
     {
-        if (!str_contains($this->getName(), $addName)) {
+        if (!$this->strContains($this->getName(), $addName)) {
             $this->setName(sprintf($this->templateAddName, ucfirst($addName), $this->getName()));
         }
 
@@ -288,7 +288,7 @@ abstract class Place
      */
     public function addNameAfter(string $addName): self
     {
-        if (!str_contains($this->getName(), $addName)) {
+        if (!$this->strContains($this->getName(), $addName)) {
             $this->setName(sprintf($this->templateAddName, $this->getName(), ucfirst($addName)));
         }
 
@@ -1286,5 +1286,17 @@ abstract class Place
             $coordinateTranslated->getLongitudeDirection(),
             $coordinateTranslated->getLatitudeDirection()
         );
+    }
+
+    /**
+     * Case insensitive $this->strContains.
+     *
+     * @param string $haystack
+     * @param string $needle
+     * @return bool
+     */
+    protected function strContains(string $haystack, string $needle): bool
+    {
+        return str_contains(strtolower($haystack), strtolower($needle));
     }
 }
