@@ -74,6 +74,7 @@ class LocationDataService
     public const KEY_NAME_PLACE_ADMIN2 = 'place-admin2';
     public const KEY_NAME_PLACE_ADMIN3 = 'place-admin3';
     public const KEY_NAME_PLACE_ADMIN4 = 'place-admin4';
+    public const KEY_NAME_CITY_OR_RURAL = 'city-or-rural';
     public const KEY_NAME_PLACE_TIME_TAKEN = 'time-taken';
 
     public const WIDTH_TITLE = 30;
@@ -171,6 +172,7 @@ class LocationDataService
      *
      * @param string $name
      * @return Place|null
+     * @throws Exception
      */
     public function getLocationByName(string $name): ?Place
     {
@@ -284,6 +286,7 @@ class LocationDataService
             self::KEY_NAME_PLACE_ADMIN2 => $this->getData('Admin2 Code', $place->getAdmin2Code(), '%s', null),
             self::KEY_NAME_PLACE_ADMIN3 => $this->getData('Admin3 Code', $place->getAdmin3Code(), '%s', null),
             self::KEY_NAME_PLACE_ADMIN4 => $this->getData('Admin4 Code', $place->getAdmin4Code(), '%s', null),
+            self::KEY_NAME_CITY_OR_RURAL => $this->getData('City or rural', $place->isCity() ? 'Stadt' : 'Ländliche Gegend', '%s', null),
             self::KEY_NAME_PLACE_TIME_TAKEN => $this->getData('Time', $time, '%.3f', ' s'),
         ]);
     }

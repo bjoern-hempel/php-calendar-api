@@ -44,6 +44,8 @@ class ContentController extends BaseController
 
     protected KernelInterface $kernel;
 
+    public const PARAMETER_NAME_QUERY = 'q';
+
     /**
      * ContentController constructor.
      *
@@ -88,26 +90,41 @@ class ContentController extends BaseController
      * Gets the location data.
      *
      * @param FormInterface $form
+     * @param Request $request
      * @param array<string, Place[]> $data
      * @return array<string, mixed>
      * @throws Exception
      */
-    protected function getLocationData(FormInterface $form, array &$data = []): array
+    protected function getLocationData(FormInterface $form, Request $request, array &$data = []): array
     {
-        if (!$form->isSubmitted() || !$form->isValid()) {
+        $locationFull = null;
+
+        if ($locationFull === null && $form->isSubmitted() && $form->isValid()) {
+            /** @var Location $location */
+            $location = $form->getData();
+
+            $locationFull = $location->getLocationFull();
+        }
+
+        if ($locationFull === null && !empty(strval($request->query->get(self::PARAMETER_NAME_QUERY)))) {
+            /** @var Location $location */
+            $location = $form->getData();
+
+            $locationFull = $location->getLocationFull();
+        }
+
+        /* No query given or found. */
+        if ($locationFull === null) {
             return [];
         }
 
-        /** @var Location $location */
-        $location = $form->getData();
-
-        $parsed = GPSConverter::parseFullLocation2DecimalDegrees($location->getLocationFull());
+        $parsed = GPSConverter::parseFullLocation2DecimalDegrees($locationFull);
 
         if ($parsed === false) {
-            $place = $this->locationDataService->getLocationByName($location->getLocationFull());
+            $place = $this->locationDataService->getLocationByName($locationFull);
 
             if ($place === null) {
-                throw new InvalidArgumentException(sprintf('Unable to find place "%s".', $location->getLocationFull()));
+                throw new InvalidArgumentException(sprintf('Unable to find place "%s".', $locationFull));
             }
 
             $latitude = $place->getCoordinate()->getLongitude();
@@ -129,9 +146,15 @@ class ContentController extends BaseController
     #[Route('/location', name: BaseController::ROUTE_NAME_APP_LOCATION)]
     public function location(Request $request): Response
     {
+        $locationFull = strval($request->query->get(self::PARAMETER_NAME_QUERY));
+
+        if (empty($locationFull)) {
+            $locationFull = sprintf('%s %s', Location::DEFAULT_LATITUDE, Location::DEFAULT_LONGITUDE);
+        }
+
         // creates a task object and initializes some data for this example
         $location = new Location();
-        $location->setLocationFull(sprintf('%s %s', Location::DEFAULT_LATITUDE, Location::DEFAULT_LONGITUDE));
+        $location->setLocationFull($locationFull);
 
         $form = $this->createForm(FullLocationType::class, $location, [
             'method' => Request::METHOD_POST,
@@ -142,17 +165,22 @@ class ContentController extends BaseController
 
         $error = null;
         try {
-            $locationData = $this->getLocationData($form, $data);
+            $locationData = $this->getLocationData($form, $request, $data);
         } catch (InvalidArgumentException $exception) {
             /** @var Location $location */
             $location = $form->getData();
 
-            $error = sprintf('Der Ort "%s" konnte nicht gefunden werden.', $location->getLocationFull());
-            $locationData = [];
-        } catch (Throwable $throwable) {
             $error = $this->kernel->getEnvironment() !== 'dev' ?
-                $this->translator->trans('general.notAvailable', [], 'location') :
-                sprintf('%s (%s:%d)', $throwable->getMessage(), $throwable->getFile(), $throwable->getLine());
+                $this->translator->trans('general.notAvailable', ['%place%' => $location->getLocationFull()], 'location') :
+                sprintf('%s (%s:%d)', $exception->getMessage(), $exception->getFile(), $exception->getLine());
+            $locationData = [];
+        } catch (Throwable $exception) {
+            /** @var Location $location */
+            $location = $form->getData();
+
+            $error = $this->kernel->getEnvironment() !== 'dev' ?
+                $this->translator->trans('general.notAvailable', ['%place%' => $location->getLocationFull()], 'location') :
+                sprintf('%s (%s:%d)', $exception->getMessage(), $exception->getFile(), $exception->getLine());
             $locationData = [];
         }
 

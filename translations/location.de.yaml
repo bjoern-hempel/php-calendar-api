@@ -26,6 +26,7 @@ place:
   placeAdmin2: "Schlüssel Admin 2"
   placeAdmin3: "Schlüssel Admin 3"
   placeAdmin4: "Schlüssel Admin 4"
+  cityOrRural: "Stadt oder ländliche Gegend"
   timeTaken: "Benötigte Zeit"
 
 title:
@@ -46,6 +47,6 @@ title:
     nextDetail: "Wälder, Heiden, etc." # V
 
 general:
-  notAvailable: "Leider können wir das noch nicht parsen. Versuche es mit etwas anderem. 😴"
+  notAvailable: "Der Ort \"%place%\" konnte nicht gefunden werden."
   notGiven: "Nicht angegeben"
   tryThis: "Versuche doch einmal Folgendes"

@@ -16,6 +16,7 @@ namespace App\Utils;
 use App\DataType\Coordinate;
 use App\DataType\GPSPosition;
 use Exception;
+use InvalidArgumentException;
 use JetBrains\PhpStorm\ArrayShape;
 
 /**
@@ -446,17 +447,13 @@ class GPSConverter
 
         // location: https://www.google.com/maps/place/Malbork,+Polen/data=!4m6!3m5!1s0x46fd5bffa9b675d5:0xb4e2fe366cccb936!7e2!8m2!3d54.073048299999996!4d18.992402?utm_source=mstt_1&entry=gps
         $matchesLocation = [];
-        if (preg_match(self::REGEXP_GOOGLE_LOCATION_REDIRECT, $headerLines, $matchesLocation)) {
-            list(, $latitude, $longitude) = $matchesLocation;
-
-            $latitude = floatval($latitude);
-            $longitude = floatval($longitude);
-        } else {
-            $latitude = 47.900635;
-            $longitude = 13.601868;
+        if (!preg_match(self::REGEXP_GOOGLE_LOCATION_REDIRECT, $headerLines, $matchesLocation)) {
+            throw new InvalidArgumentException(sprintf('Unable to parse header from google link "%s".', $$googleLink));
         }
 
-        return [$latitude, $longitude];
+        list(, $latitude, $longitude) = $matchesLocation;
+
+        return [floatval($latitude), floatval($longitude)];
     }
 
     /**

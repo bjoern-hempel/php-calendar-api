@@ -57,25 +57,37 @@ class PlaceLoaderService
     protected bool $debug = false;
     protected bool $verbose = false;
 
-    public const MAX_DISTANCE_PARK_METER = 1000;
+    /* L → parks,area */
+    public const MAX_DISTANCE_PARK_METER_TITLE_RURAL = 1000;
+    public const MAX_DISTANCE_PARK_METER_LIST_RURAL = self::MAX_DISTANCE_PARK_METER_TITLE_RURAL * 5;
+    public const MAX_DISTANCE_PARK_METER_TITLE_CITY = 800;
+    public const MAX_DISTANCE_PARK_METER_LIST_CITY = self::MAX_DISTANCE_PARK_METER_LIST_RURAL;
 
-    public const MAX_MAX_DISTANCE_PARK_METER = 5000;
+    /* P → city, village */
+    public const MAX_DISTANCE_PLACE_METER_TITLE_RURAL = 1000;
+    public const MAX_DISTANCE_PLACE_METER_LIST_RURAL = self::MAX_DISTANCE_PLACE_METER_TITLE_RURAL * 5;
+    public const MAX_DISTANCE_PLACE_METER_TITLE_CITY = 1000;
+    public const MAX_DISTANCE_PLACE_METER_LIST_CITY = self::MAX_DISTANCE_PLACE_METER_LIST_RURAL;
 
-    public const MAX_DISTANCE_PLACE_METER = 1000;
+    /* S → spot, building, farm */
+    public const MAX_DISTANCE_SPOT_METER_TITLE_RURAL = 300;
+    public const MAX_DISTANCE_SPOT_METER_LIST_RURAL = self::MAX_DISTANCE_SPOT_METER_TITLE_RURAL * 5;
+    public const MAX_DISTANCE_SPOT_METER_TITLE_CITY = 300;
+    public const MAX_DISTANCE_SPOT_METER_LIST_CITY = self::MAX_DISTANCE_SPOT_METER_LIST_RURAL;
 
-    public const MAX_MAX_DISTANCE_PLACE_METER = 5000;
+    /* T → mountain, hill, rock */
+    public const MAX_DISTANCE_MOUNTAIN_METER_TITLE_RURAL = 2000;
+    public const MAX_DISTANCE_MOUNTAIN_METER_LIST_RURAL = self::MAX_DISTANCE_MOUNTAIN_METER_TITLE_RURAL * 5;
+    public const MAX_DISTANCE_MOUNTAIN_METER_TITLE_CITY = 500;
+    public const MAX_DISTANCE_MOUNTAIN_METER_LIST_CITY = self::MAX_DISTANCE_MOUNTAIN_METER_LIST_RURAL;
 
-    public const MAX_DISTANCE_FOREST_METER = 2000;
+    /* V → forest,heath */
+    public const MAX_DISTANCE_FOREST_METER_TITLE_RURAL = 2000;
+    public const MAX_DISTANCE_FOREST_METER_LIST_RURAL = self::MAX_DISTANCE_FOREST_METER_TITLE_RURAL * 5;
+    public const MAX_DISTANCE_FOREST_METER_TITLE_CITY = 500;
+    public const MAX_DISTANCE_FOREST_METER_LIST_CITY = self::MAX_DISTANCE_FOREST_METER_LIST_RURAL;
 
-    public const MAX_MAX_DISTANCE_FOREST_METER = 10000;
-
-    public const MAX_DISTANCE_MOUNTAIN_METER = 2000;
-
-    public const MAX_MAX_DISTANCE_MOUNTAIN_METER = 10000;
-
-    public const MAX_DISTANCE_SPOT_METER = 300;
-
-    public const MAX_MAX_DISTANCE_SPOT_METER = 1500;
+    public const CITY_POPULATION = 2000;
 
     protected const RAW_SQL_POSITION = <<<SQL
 SELECT
@@ -662,6 +674,14 @@ SQL;
         $place->setState($state);
         $place->setCountry($country);
 
+        if ($city !== null) {
+            $place->setIsCity($city->getPopulation(true) > self::CITY_POPULATION);
+            $place->setPopulationAdmin($city->getPopulation(true));
+        } else {
+            $place->setIsCity(false);
+            $place->setPopulationAdmin(0);
+        }
+
         /* L → Parks, Areas */
         $parkPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_L);
         usort($parkPlaces, function (Place $a, Place $b) {
@@ -732,40 +752,30 @@ SQL;
      * Gets the entity class.
      *
      * @param string $code
-     * @return string
+     * @return class-string<PlaceA>|class-string<PlaceH>|class-string<PlaceL>|class-string<PlaceP>|class-string<PlaceR>|class-string<PlaceS>|class-string<PlaceT>|class-string<PlaceU>|class-string<PlaceV>
      * @throws Exception
      */
     protected function getEntityClass(string $code): string
     {
-        switch ($code) {
-            case Code::FEATURE_CLASS_A:
-                return PlaceA::class;
-            case Code::FEATURE_CLASS_H:
-                return PlaceH::class;
-            case Code::FEATURE_CLASS_L:
-                return PlaceL::class;
-            case Code::FEATURE_CLASS_P:
-                return PlaceP::class;
-            case Code::FEATURE_CLASS_R:
-                return PlaceR::class;
-            case Code::FEATURE_CLASS_S:
-                return PlaceS::class;
-            case Code::FEATURE_CLASS_T:
-                return PlaceT::class;
-            case Code::FEATURE_CLASS_U:
-                return PlaceU::class;
-            case Code::FEATURE_CLASS_V:
-                return PlaceV::class;
-            default:
-                throw new Exception(sprintf('Unexpected code given "%s (%s:%d).', $code, __FILE__, __LINE__));
-        }
+        return match ($code) {
+            Code::FEATURE_CLASS_A => PlaceA::class,
+            Code::FEATURE_CLASS_H => PlaceH::class,
+            Code::FEATURE_CLASS_L => PlaceL::class,
+            Code::FEATURE_CLASS_P => PlaceP::class,
+            Code::FEATURE_CLASS_R => PlaceR::class,
+            Code::FEATURE_CLASS_S => PlaceS::class,
+            Code::FEATURE_CLASS_T => PlaceT::class,
+            Code::FEATURE_CLASS_U => PlaceU::class,
+            Code::FEATURE_CLASS_V => PlaceV::class,
+            default => throw new Exception(sprintf('Unexpected code given "%s (%s:%d).', $code, __FILE__, __LINE__)),
+        };
     }
 
     /**
      * Finds places by name.
      *
      * @param string $name
-     * @return PlaceA[]|PlaceH[]|PlaceL[]|PlaceP[]|PlaceR[]|PlaceS[]|PlaceT[]|PlaceU[]|PlaceV[]
+     * @return Place[]
      * @throws Exception
      */
     public function findByName(string $name): array
@@ -774,9 +784,11 @@ SQL;
         $codes = [Code::FEATURE_CLASS_P, Code::FEATURE_CLASS_A, Code::FEATURE_CLASS_S, Code::FEATURE_CLASS_H, Code::FEATURE_CLASS_L, Code::FEATURE_CLASS_R, Code::FEATURE_CLASS_T, Code::FEATURE_CLASS_U, Code::FEATURE_CLASS_V];
 
         foreach ($codes as $code) {
+            /** @var Place[] $records */
             $records = $this->em->getRepository($this->getEntityClass($code))
                 ->createQueryBuilder('p')
                 ->where('p.name LIKE :name')
+                ->orWhere('p.alternateNames LIKE :name')
                 ->setParameter('name', sprintf('%s', $name))
                 ->getQuery()
                 ->getResult();
@@ -789,6 +801,7 @@ SQL;
         }
 
         foreach ($codes as $code) {
+            /** @var Place[] $records */
             $records = $this->em->getRepository($this->getEntityClass($code))
                 ->createQueryBuilder('p')
                 ->where('p.name LIKE :name')

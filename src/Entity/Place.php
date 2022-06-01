@@ -122,6 +122,10 @@ abstract class Place
 
     protected ?string $country = null;
 
+    protected ?string $populationAdmin = null;
+
+    protected bool $isCity = false;
+
     protected string $templateAddName = '%s, %s';
 
     /**
@@ -735,6 +739,22 @@ abstract class Place
     }
 
     /**
+     * Returns if distance is lower than given.
+     *
+     * @param Place $place
+     * @param int $maxDistanceRural
+     * @param int $maxDistanceCity
+     * @return bool
+     */
+    public function withinTheDistance(Place $place, int $maxDistanceRural, int $maxDistanceCity): bool
+    {
+        return match (true) {
+            $place->isCity() => $this->getDistanceMeter() <= $maxDistanceCity,
+            default => $this->getDistanceMeter() <= $maxDistanceRural,
+        };
+    }
+
+    /**
      * Gets city (P) of this place. Not used for db.
      *
      * @return PlaceP|null
@@ -873,7 +893,7 @@ abstract class Place
 
         $firstPark = $this->parks[0];
 
-        if (!$checkDistance || $firstPark->getDistanceMeter() <= PlaceLoaderService::MAX_DISTANCE_PARK_METER) {
+        if (!$checkDistance || $firstPark->withinTheDistance($this, PlaceLoaderService::MAX_DISTANCE_PARK_METER_TITLE_RURAL, PlaceLoaderService::MAX_DISTANCE_PARK_METER_TITLE_CITY)) {
             return $firstPark;
         }
 
@@ -901,7 +921,7 @@ abstract class Place
      */
     public function addPark(PlaceL $park): self
     {
-        if ($park->getDistanceMeter() > PlaceLoaderService::MAX_MAX_DISTANCE_PARK_METER) {
+        if ($park->getDistanceMeter() > PlaceLoaderService::MAX_DISTANCE_PARK_METER_LIST_RURAL) {
             return $this;
         }
 
@@ -934,7 +954,7 @@ abstract class Place
 
         $firstPlace = $this->places[0];
 
-        if (!$checkDistance || $firstPlace->getDistanceMeter() <= PlaceLoaderService::MAX_DISTANCE_PLACE_METER) {
+        if (!$checkDistance || $firstPlace->withinTheDistance($this, PlaceLoaderService::MAX_DISTANCE_PLACE_METER_TITLE_RURAL, PlaceLoaderService::MAX_DISTANCE_PLACE_METER_TITLE_CITY)) {
             return $firstPlace;
         }
 
@@ -962,7 +982,7 @@ abstract class Place
      */
     public function addPlace(PlaceP $place): self
     {
-        if ($place->getDistanceMeter() > PlaceLoaderService::MAX_MAX_DISTANCE_PLACE_METER) {
+        if ($place->getDistanceMeter() > PlaceLoaderService::MAX_DISTANCE_PLACE_METER_LIST_RURAL) {
             return $this;
         }
 
@@ -995,7 +1015,7 @@ abstract class Place
 
         $firstSpot = $this->spots[0];
 
-        if (!$checkDistance || $firstSpot->getDistanceMeter() <= PlaceLoaderService::MAX_DISTANCE_SPOT_METER) {
+        if (!$checkDistance || $firstSpot->withinTheDistance($this, PlaceLoaderService::MAX_DISTANCE_SPOT_METER_TITLE_RURAL, PlaceLoaderService::MAX_DISTANCE_SPOT_METER_TITLE_CITY)) {
             return $firstSpot;
         }
 
@@ -1022,7 +1042,7 @@ abstract class Place
      */
     public function addSpot(PlaceS $spot): self
     {
-        if ($spot->getDistanceMeter() > PlaceLoaderService::MAX_MAX_DISTANCE_SPOT_METER) {
+        if ($spot->getDistanceMeter() > PlaceLoaderService::MAX_DISTANCE_SPOT_METER_LIST_RURAL) {
             return $this;
         }
 
@@ -1055,7 +1075,7 @@ abstract class Place
 
         $firstMountain = $this->mountains[0];
 
-        if (!$checkDistance || $firstMountain->getDistanceMeter() <= PlaceLoaderService::MAX_DISTANCE_MOUNTAIN_METER) {
+        if (!$checkDistance || $firstMountain->withinTheDistance($this, PlaceLoaderService::MAX_DISTANCE_MOUNTAIN_METER_TITLE_RURAL, PlaceLoaderService::MAX_DISTANCE_MOUNTAIN_METER_TITLE_CITY)) {
             return $firstMountain;
         }
 
@@ -1082,7 +1102,7 @@ abstract class Place
      */
     public function addMountain(PlaceT $mountain): self
     {
-        if ($mountain->getDistanceMeter() > PlaceLoaderService::MAX_MAX_DISTANCE_MOUNTAIN_METER) {
+        if ($mountain->getDistanceMeter() > PlaceLoaderService::MAX_DISTANCE_MOUNTAIN_METER_LIST_RURAL) {
             return $this;
         }
 
@@ -1115,7 +1135,7 @@ abstract class Place
 
         $firstForest = $this->forests[0];
 
-        if (!$checkDistance || $firstForest->getDistanceMeter() <= PlaceLoaderService::MAX_DISTANCE_FOREST_METER) {
+        if (!$checkDistance || $firstForest->withinTheDistance($this, PlaceLoaderService::MAX_DISTANCE_FOREST_METER_TITLE_RURAL, PlaceLoaderService::MAX_DISTANCE_FOREST_METER_TITLE_CITY)) {
             return $firstForest;
         }
 
@@ -1143,7 +1163,7 @@ abstract class Place
      */
     public function addForest(PlaceV $forest): self
     {
-        if ($forest->getDistanceMeter() > PlaceLoaderService::MAX_MAX_DISTANCE_FOREST_METER) {
+        if ($forest->getDistanceMeter() > PlaceLoaderService::MAX_DISTANCE_FOREST_METER_LIST_RURAL) {
             return $this;
         }
 
@@ -1177,6 +1197,52 @@ abstract class Place
     {
         $this->country = $country;
 
+        return $this;
+    }
+
+    /**
+     * Gets the admin (city) population of this place. Not used for db.
+     *
+     * @param bool $intval
+     * @return string|int|null
+     */
+    public function getPopulationAdmin(bool $intval = false): string|int|null
+    {
+        return $intval ? intval($this->populationAdmin) : $this->populationAdmin;
+    }
+
+    /**
+     * Sets the admin (city) population of this place. Not used for db.
+     *
+     * @param string|int|null $populationAdmin
+     * @return $this
+     */
+    public function setPopulationAdmin(string|int|null $populationAdmin): self
+    {
+        $this->populationAdmin = strval($populationAdmin);
+
+        return $this;
+    }
+
+    /**
+     * Returns if this place is a city. Not used for db.
+     *
+     * @return bool
+     */
+    public function isCity(): bool
+    {
+        return $this->isCity;
+    }
+
+    /**
+     * Sets if this place is a city. Not used for db.
+     *
+     * @param bool $isCity
+     * @return Place
+     */
+    public function setIsCity(bool $isCity): Place
+    {
+        $this->isCity = $isCity;
         return $this;
     }
 
