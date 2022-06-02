@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.30.0] - 2022-06-03
+
+# [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/88) - Calendar: Evaluate specified location
+
 ### [0.29.0] - 2022-04-19
 
 * [#88](https://github.com/bjoern-hempel/php-calendar-api/issues/88) - EasyAdmin: Possibility to choose the images directly in the calendar
