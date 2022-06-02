@@ -181,7 +181,7 @@ L:
   GASF: "gasfield" # an area containing a subterranean store of natural gas of economic value
   GRAZ: "grazing area" # an area of grasses and shrubs used for grazing
   GVL: "gravel area" # an area covered with gravel
-  INDS: "industrial area" # an area characterized by industrial activity
+  INDS: "Industriegebiet" # an area characterized by industrial activity
   LAND: "arctic land" # a tract of land in the Arctic
   LCTY: "Ortschaft" # a minor area or place of unspecified or mixed character and indefinite boundaries
   MILB: "military base" # a place used by an army or other armed service for storing arms and supplies, and for accommodating and training troops, a base from which operations can be initiated
@@ -436,7 +436,7 @@ S:
   QUAY: "quay" # a structure of solid construction along a shore or bank which provides berthing for ships and which generally provides cargo handling facilities
   RDCR: "traffic circle" # a road junction formed around a central circle about which traffic moves in one direction only
   RDIN: "intersection" # a junction of two or more highways by a system of separate levels that permit traffic to pass from one to another without the crossing of traffic streams
-  RECG: "golf course" # a recreation field where golf is played
+  RECG: "Golfplatz" # a recreation field where golf is played
   RECR: "racetrack" # a track where races are held
   REST: "Restaurant" # A place where meals are served to the public
   RET: "Geschäft" # a building where goods and/or services are offered for sale
@@ -550,7 +550,7 @@ T:
   ISLET: "islet" # small island, bigger than rock, smaller than island.
   ISLF: "artificial island" # an island created by landfill or diking and filling in a wetland, bay, or lagoon
   ISLM: "mangrove island" # a mangrove swamp surrounded by a waterbody
-  ISLS: "islands" # tracts of land, smaller than a continent, surrounded by water at high water
+  ISLS: "Inselgruppe" # tracts of land, smaller than a continent, surrounded by water at high water
   ISLT: "land-tied island" # a coastal island connected to the mainland by barrier beaches, levees or dikes
   ISLX: "section of island" #
   ISTH: "isthmus" # a narrow strip of land connecting two larger land masses and bordered by water
@@ -578,9 +578,9 @@ T:
   PLN: "plain(s)" # an extensive area of comparatively level to gently undulating land, lacking surface irregularities, and usually adjacent to a higher area
   PLNX: "section of plain" #
   PROM: "promontory(-ies)" # a bluff or prominent hill overlooking or projecting into a lowland
-  PT: "point" # a tapering piece of land projecting into a body of water, less prominent than a cape
-  PTS: "points" # tapering pieces of land projecting into a body of water, less prominent than a cape
-  RDGB: "beach ridge" # a ridge of sand just inland and parallel to the beach, usually in series
+  PT: "Landspitze" # a tapering piece of land projecting into a body of water, less prominent than a cape
+  PTS: "Landspitzen" # tapering pieces of land projecting into a body of water, less prominent than a cape
+  RDGB: "Strandkamm" # a ridge of sand just inland and parallel to the beach, usually in series
   RDGE: "Bergzug / Bergzüge" # a long narrow elevation with steep sides, and a more or less continuous crest
   REG: "stony desert" # a desert plain characterized by a surface veneer of gravel and stones
   RK: "rock" # a conspicuous, isolated rocky mass

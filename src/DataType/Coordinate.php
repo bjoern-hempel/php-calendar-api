@@ -125,6 +125,6 @@ class Coordinate
             return sprintf('https://www.google.de/maps/place/%s+%s', $this->getLongitude()->getDms(), $this->getLatitude()->getDms());
         }
 
-        return sprintf('https://www.google.de/maps/place/%f+%f', $this->getLongitude()->getDecimal(), $this->getLatitude()->getDecimal());
+        return sprintf('https://www.google.de/maps/place/%f+%f', $this->getLongitude()->getDecimalDegree(), $this->getLatitude()->getDecimalDegree());
     }
 }
