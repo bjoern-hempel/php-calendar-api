@@ -586,12 +586,13 @@ SQL;
      * @param float $longitude
      * @param string|string[]|null $featureCodes
      * @param array<string, Place[]> $data
+     * @param Place|null $placeSource
      * @return ?PlaceP
      * @throws DoctrineDBALException
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function findPlacePByPosition(float $latitude, float $longitude, string|array|null $featureCodes = null, array &$data = []): ?PlaceP
+    public function findPlacePByPosition(float $latitude, float $longitude, string|array|null $featureCodes = null, array &$data = [], ?Place $placeSource = null): ?PlaceP
     {
         if ($this->placeARepository === null) {
             return null;
@@ -669,9 +670,31 @@ SQL;
         $state = $this->getStateFromPlaceP($place);
         $country = $this->getCountryByPlaceP($place);
 
-        $place->setDistrict($district);
-        $place->setCity($city);
-        $place->setState($state);
+        switch (true) {
+            case $placeSource !== null && $placeSource->getName() === $country:
+                $place->setDistrict(null);
+                $place->setCity(null);
+                $place->setState(null);
+                break;
+
+            case $placeSource !== null && $state !== null && $placeSource->getName() === $state->getName():
+                $place->setDistrict(null);
+                $place->setCity(null);
+                $place->setState($state);
+                break;
+
+            case $placeSource !== null && $city !== null && $placeSource->getName() === $city->getName():
+                $place->setDistrict(null);
+                $place->setCity($city);
+                $place->setState($state);
+                break;
+
+            default:
+                $place->setDistrict($district);
+                $place->setCity($city);
+                $place->setState($state);
+                break;
+        }
         $place->setCountry($country);
 
         if ($city !== null) {

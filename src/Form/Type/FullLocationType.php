@@ -51,7 +51,11 @@ class FullLocationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('locationFull', TextType::class)
+            ->add('locationFull', TextType::class, [
+                'attr' => [
+                    'autofocus' => true
+                ]
+            ])
         ;
     }
 }

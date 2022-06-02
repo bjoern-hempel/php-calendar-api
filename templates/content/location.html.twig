@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}TwelvePics / Impressum{% endblock %}
+{% block title %}TwelvePics / Location{% endblock %}
 
 {% block body_class %}content content-location bg-light{% endblock %}
 
@@ -85,7 +85,7 @@
                                 <table class="table">
                                     {% for place in value %}
                                         <tr>
-                                            <td class="table-name"><small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name }}</b><br /><small>{{ (key ~ '.' ~ place.featureCode)|trans([], 'place') }}</small></td>
+                                            <td class="table-name"><small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name }}{{ locationData['place-country-code'] is same as(place.countryCode) ? '' : (', ' ~ ('country.alpha2.' ~ place.countryCode|lower)|trans([], 'countries', place.countryCode)) }}</b><br /><small>{{ (key ~ '.' ~ place.featureCode)|trans([], 'place') }}</small></td>
                                             <td class="table-value">
                                                 <a href="{{ place.googleLink }}" target="_blank" class="btn btn-primary" style="width: 100px;">{{ place.distanceMeter(3, 'km', 1000) }}</a>
                                             </td>
@@ -95,6 +95,10 @@
                             {% endif %}
                         {% endfor %}
                     {% endif %}
+
+                    <p class="legal">
+                        Alle Daten werden bereitgestellt von: <a href="https://www.geonames.org/" target="_blank">GeoNames</a>. Benutzerdefinierte Daten und Übersetzungen von <a href="https://www.twelvepics.com">twelvepics.com</a>. Version {{ version }}
+                    </p>
                 </div>
             {% endblock %}
         {% endembed %}

@@ -14,7 +14,11 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Place;
+use App\Entity\PlaceL;
 use App\Entity\PlaceP;
+use App\Entity\PlaceS;
+use App\Entity\PlaceT;
+use App\Entity\PlaceV;
 use App\Service\Entity\PlaceLoaderService;
 use App\Utils\GPSConverter;
 use App\Utils\Timer;
@@ -191,15 +195,16 @@ class LocationDataService
      * @param float $latitude
      * @param float $longitude
      * @param array<string, Place[]> $data
+     * @param Place|null $placeSource
      * @return array<string, array<string, mixed>>
      * @throws DoctrineDBALException
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function getLocationDataFull(float $latitude, float $longitude, array &$data = []): array
+    public function getLocationDataFull(float $latitude, float $longitude, array &$data = [], ?Place $placeSource = null): array
     {
         $timer = Timer::start();
-        $place = $this->placeLoaderService->findPlacePByPosition($latitude, $longitude, null, $data);
+        $place = $this->placeLoaderService->findPlacePByPosition($latitude, $longitude, null, $data, $placeSource);
         $time = Timer::stop($timer);
 
         if ($place === null) {
@@ -236,7 +241,7 @@ class LocationDataService
         }
 
         /* PlaceL */
-        $firstPark = $place->getFirstPark(true);
+        $firstPark = $place->getFirstPark(true, $placeSource);
         if (!is_null($firstPark)) {
             $dataReturn = array_merge($dataReturn, [
                 self::KEY_NAME_PLACE_PARK => $this->getData('Place Park', $firstPark->getName($this->verbose), '%s', null),
@@ -244,7 +249,7 @@ class LocationDataService
         }
 
         /* PlaceT */
-        $firstMountain = $place->getFirstMountain(true);
+        $firstMountain = $place->getFirstMountain(true, $placeSource);
         if (!is_null($firstMountain)) {
             $dataReturn = array_merge($dataReturn, [
                 self::KEY_NAME_PLACE_MOUNTAIN => $this->getData('Place Mountain', $firstMountain->getName($this->verbose), '%s', null),
@@ -252,7 +257,7 @@ class LocationDataService
         }
 
         /* PlaceS */
-        $firstSpot = $place->getFirstSpot(true);
+        $firstSpot = $place->getFirstSpot(true, $placeSource);
         if (!is_null($firstSpot)) {
             $dataReturn = array_merge($dataReturn, [
                 self::KEY_NAME_PLACE_SPOT => $this->getData('Place Spot', $firstSpot->getName($this->verbose), '%s', null),
@@ -260,7 +265,7 @@ class LocationDataService
         }
 
         /* PlaceV */
-        $firstForest = $place->getFirstForest(true);
+        $firstForest = $place->getFirstForest(true, $placeSource);
         if (!is_null($firstForest)) {
             $dataReturn = array_merge($dataReturn, [
                 self::KEY_NAME_PLACE_FOREST => $this->getData('Place Forest', $firstForest->getName($this->verbose), '%s', null),
@@ -268,7 +273,7 @@ class LocationDataService
         }
 
         $dataReturn = array_merge($dataReturn, [
-            self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->verbose), '%s', null),
+            self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->verbose, $placeSource), '%s', null),
         ]);
 
         return array_merge($dataReturn, [
@@ -297,12 +302,13 @@ class LocationDataService
      * @param float $latitude
      * @param float $longitude
      * @param array<string, Place[]> $data
+     * @param Place|null $placeSource
      * @return array<string, mixed>
      * @throws Exception
      */
-    public function getLocationDataFormatted(float $latitude, float $longitude, array &$data = []): array
+    public function getLocationDataFormatted(float $latitude, float $longitude, array &$data = [], ?Place $placeSource = null): array
     {
-        $locationData = $this->getLocationDataFull($latitude, $longitude, $data);
+        $locationData = $this->getLocationDataFull($latitude, $longitude, $data, $placeSource);
 
         $array = [];
 

@@ -198,10 +198,11 @@ abstract class Place
      * Gets the full name of this place.
      *
      * @param bool $detailed
+     * @param Place|null $placeSource
      * @return string
      * @throws Exception
      */
-    public function getNameFull(bool $detailed = false): string
+    public function getNameFull(bool $detailed = false, ?Place $placeSource = null): string
     {
         $name = '';
 
@@ -226,25 +227,25 @@ abstract class Place
         }
 
         /* PlaceL */
-        $firstPark = $this->getFirstPark(true);
+        $firstPark = $this->getFirstPark(true, $placeSource);
         if (!is_null($firstPark) && !$this->strContains($name, $firstPark->getName())) {
             $name = sprintf($this->templateAddName, $firstPark->getName($detailed), $name);
         }
 
         /* PlaceT */
-        $firstMountain = $this->getFirstMountain(true);
+        $firstMountain = $this->getFirstMountain(true, $placeSource);
         if (!is_null($firstMountain) && !$this->strContains($name, $firstMountain->getName())) {
             $name = sprintf($this->templateAddName, $firstMountain->getName($detailed), $name);
         }
 
         /* PlaceS */
-        $firstSpot = $this->getFirstSpot(true);
+        $firstSpot = $this->getFirstSpot(true, $placeSource);
         if (!is_null($firstSpot) && !$this->strContains($name, $firstSpot->getName())) {
             $name = sprintf($this->templateAddName, $firstSpot->getName($detailed), $name);
         }
 
         /* PlaceV */
-        $firstForest = $this->getFirstForest(true);
+        $firstForest = $this->getFirstForest(true, $placeSource);
         if (!is_null($firstForest) && !$this->strContains($name, $firstForest->getName())) {
             $name = sprintf($this->templateAddName, $firstForest->getName($detailed), $name);
         }
@@ -883,10 +884,19 @@ abstract class Place
      * Gets first park of this place. Not used for db.
      *
      * @param bool $checkDistance
+     * @param Place|null $placeSource
      * @return PlaceL|null
      */
-    public function getFirstPark(bool $checkDistance = false): ?PlaceL
+    public function getFirstPark(bool $checkDistance = false, ?Place $placeSource = null): ?PlaceL
     {
+        if ($placeSource instanceof PlaceL) {
+            return $placeSource;
+        }
+
+        if ($placeSource !== null) {
+            return null;
+        }
+
         if (count($this->parks) <= 0) {
             return null;
         }
@@ -1005,10 +1015,19 @@ abstract class Place
      * Gets first spot of this place. Not used for db.
      *
      * @param bool $checkDistance
+     * @param Place|null $placeSource
      * @return PlaceS|null
      */
-    public function getFirstSpot(bool $checkDistance = false): ?PlaceS
+    public function getFirstSpot(bool $checkDistance = false, ?Place $placeSource = null): ?PlaceS
     {
+        if ($placeSource instanceof PlaceS) {
+            return $placeSource;
+        }
+
+        if ($placeSource !== null) {
+            return null;
+        }
+
         if (count($this->spots) <= 0) {
             return null;
         }
@@ -1065,10 +1084,19 @@ abstract class Place
      * Gets first mountain of this place. Not used for db.
      *
      * @param bool $checkDistance
+     * @param Place|null $placeSource
      * @return PlaceT|null
      */
-    public function getFirstMountain(bool $checkDistance = false): ?PlaceT
+    public function getFirstMountain(bool $checkDistance = false, ?Place $placeSource = null): ?PlaceT
     {
+        if ($placeSource instanceof PlaceT) {
+            return $placeSource;
+        }
+
+        if ($placeSource !== null) {
+            return null;
+        }
+
         if (count($this->mountains) <= 0) {
             return null;
         }
@@ -1125,10 +1153,19 @@ abstract class Place
      * Gets first forest of this place. Not used for db.
      *
      * @param bool $checkDistance
+     * @param Place|null $placeSource
      * @return PlaceV|null
      */
-    public function getFirstForest(bool $checkDistance = false): ?PlaceV
+    public function getFirstForest(bool $checkDistance = false, ?Place $placeSource = null): ?PlaceV
     {
+        if ($placeSource instanceof PlaceV) {
+            return $placeSource;
+        }
+
+        if ($placeSource !== null) {
+            return null;
+        }
+
         if (count($this->forests) <= 0) {
             return null;
         }

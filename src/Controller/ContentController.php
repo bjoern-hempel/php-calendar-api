@@ -18,6 +18,7 @@ use App\Entity\Location;
 use App\Entity\Place;
 use App\Form\Type\FullLocationType;
 use App\Service\LocationDataService;
+use App\Service\VersionService;
 use App\Utils\GPSConverter;
 use Exception;
 use InvalidArgumentException;
@@ -44,6 +45,8 @@ class ContentController extends BaseController
 
     protected KernelInterface $kernel;
 
+    protected VersionService $versionService;
+
     public const PARAMETER_NAME_QUERY = 'q';
 
     /**
@@ -52,14 +55,17 @@ class ContentController extends BaseController
      * @param LocationDataService $locationDataService
      * @param TranslatorInterface $translator
      * @param KernelInterface $kernel
+     * @param VersionService $versionService
      */
-    public function __construct(LocationDataService $locationDataService, TranslatorInterface $translator, KernelInterface $kernel)
+    public function __construct(LocationDataService $locationDataService, TranslatorInterface $translator, KernelInterface $kernel, VersionService $versionService)
     {
         $this->locationDataService = $locationDataService;
 
         $this->translator = $translator;
 
         $this->kernel = $kernel;
+
+        $this->versionService = $versionService;
     }
 
     /**
@@ -121,19 +127,20 @@ class ContentController extends BaseController
         $parsed = GPSConverter::parseFullLocation2DecimalDegrees($locationFull);
 
         if ($parsed === false) {
-            $place = $this->locationDataService->getLocationByName($locationFull);
+            $placeSource = $this->locationDataService->getLocationByName($locationFull);
 
-            if ($place === null) {
+            if ($placeSource === null) {
                 throw new InvalidArgumentException(sprintf('Unable to find place "%s".', $locationFull));
             }
 
-            $latitude = $place->getCoordinate()->getLongitude();
-            $longitude = $place->getCoordinate()->getLatitude();
+            $latitude = $placeSource->getCoordinate()->getLongitude();
+            $longitude = $placeSource->getCoordinate()->getLatitude();
         } else {
+            $placeSource = null;
             list($latitude, $longitude) = $parsed;
         }
 
-        return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data);
+        return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data, $placeSource);
     }
 
     /**
@@ -147,10 +154,6 @@ class ContentController extends BaseController
     public function location(Request $request): Response
     {
         $locationFull = strval($request->query->get(self::PARAMETER_NAME_QUERY));
-
-        if (empty($locationFull)) {
-            $locationFull = sprintf('%s %s', Location::DEFAULT_LATITUDE, Location::DEFAULT_LONGITUDE);
-        }
 
         // creates a task object and initializes some data for this example
         $location = new Location();
@@ -189,6 +192,7 @@ class ContentController extends BaseController
             'error' => $error,
             'locationData' => $locationData,
             'data' => $data,
+            'version' => $this->versionService->getVersion(),
         ]);
     }
 }
