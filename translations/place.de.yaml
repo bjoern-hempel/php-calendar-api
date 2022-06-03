@@ -254,19 +254,19 @@ R:
   TRL: "trail" # a path, track, or route used by pedestrians, animals, or off-road vehicles
 S:
   ADMF: "Verwaltungseinrichtung" # a government building
-  AGRF: "agricultural facility" # a building and/or tract of land used for improving agriculture
-  AIRB: "airbase" # an area used to store supplies, provide barracks for air force personnel, hangars and runways for aircraft, and from which operations are initiated
-  AIRF: "airfield" # a place on land where aircraft land and take off; no facilities provided for the commercial handling of passengers and cargo
-  AIRH: "heliport" # a place where helicopters land and take off
-  AIRP: "airport" # a place where aircraft regularly land and take off, with runways, navigational aids, and major facilities for the commercial handling of passengers and cargo
-  AIRQ: "abandoned airfield" #
-  AIRT: "terminal" # airport facilities for the handling of freight and passengers
-  AMTH: "amphitheater" # an oval or circular structure with rising tiers of seats about a stage or open space
+  AGRF: "Landwirtschaftliche Anlage" # a building and/or tract of land used for improving agriculture
+  AIRB: "Militärflugplatz" # an area used to store supplies, provide barracks for air force personnel, hangars and runways for aircraft, and from which operations are initiated
+  AIRF: "Flugplatz" # a place on land where aircraft land and take off; no facilities provided for the commercial handling of passengers and cargo
+  AIRH: "Hubschrauberlandeplatz" # a place where helicopters land and take off
+  AIRP: "Flughafen" # a place where aircraft regularly land and take off, with runways, navigational aids, and major facilities for the commercial handling of passengers and cargo
+  AIRQ: "Verlassener Flugplatz" #
+  AIRT: "Flughafenterminal" # airport facilities for the handling of freight and passengers
+  AMTH: "Amphitheater" # an oval or circular structure with rising tiers of seats about a stage or open space
   ANS: "archaeological/prehistoric site" # a place where archeological remains, old structures, or cultural artifacts are located
   AQC: "aquaculture facility" # facility or area for the cultivation of aquatic animals and plants, especially fish, shellfish, and seaweed, in natural or controlled marine or freshwater environments; underwater agriculture
   ARCH: "arch" # a natural or man-made structure in the form of an arch
-  ARCHV: "archive" # a place or institution where documents are preserved
-  ART: "piece of art" # a piece of art, like a sculpture, painting. In contrast to monument (MNMT) it is not commemorative.
+  ARCHV: "Archiv" # a place or institution where documents are preserved
+  ART: "Kunstwerk" # a piece of art, like a sculpture, painting. In contrast to monument (MNMT) it is not commemorative.
   ASTR: "astronomical station" # a point on the earth whose position has been determined by observations of celestial bodies
   ASYL: "asylum" # a facility where the insane are cared for and protected
   ATHF: "Sportplatz" # a tract of land used for playing team sports, and athletic track and field events
@@ -274,10 +274,10 @@ S:
   BANK: "bank" # A business establishment in which money is kept for saving or commercial purposes or is invested, supplied for loans, or exchanged.
   BCN: "Leuchtturm" # a fixed artificial navigation mark
   BDG: "Brücke" # a structure erected across an obstacle such as a stream, road, etc., in order to carry roads, railroads, and pedestrians across
-  BDGQ: "ruined bridge" # a destroyed or decayed bridge which is no longer functional
+  BDGQ: "Zerstörte Brücke" # a destroyed or decayed bridge which is no longer functional
   BLDA: "apartment building" # a building containing several individual apartments
   BLDG: "Gebäude" # a structure built for permanent use, as a house, factory, etc.
-  BLDO: "office building" # commercial building where business and/or services are conducted
+  BLDO: "Bürogebäude" # commercial building where business and/or services are conducted
   BP: "boundary marker" # a fixture marking a point along a boundary
   BRKS: "barracks" # a building for lodging military personnel
   BRKW: "breakwater" # a structure erected to break the force of waves at the entrance to a harbor or port
@@ -289,7 +289,7 @@ S:
   CARN: "cairn" # a heap of stones erected as a landmark or for other purposes
   CAVE: "cave(s)" # an underground passageway or chamber, or cavity on the side of a cliff
   CH: "Kirche" # a building for public Christian worship
-  CMP: "camp(s)" # a site occupied by tents, huts, or other shelters for temporary use
+  CMP: "Zeltlager" # a site occupied by tents, huts, or other shelters for temporary use
   CMPL: "logging camp" # a camp used by loggers
   CMPLA: "labor camp" # a camp used by migrant or temporary laborers
   CMPMN: "mining camp" # a camp used by miners
@@ -299,10 +299,10 @@ S:
   CMTY: "cemetery" # a burial place or ground
   COMC: "communication center" # a facility, including buildings, antennae, towers and electronic equipment for receiving and transmitting information
   CRRL: "corral(s)" # a pen or enclosure for confining or capturing animals
-  CSNO: "casino" # a building used for entertainment, especially gambling
-  CSTL: "castle" # a large fortified building or set of buildings
-  CSTM: "customs house" # a building in a port where customs and duties are paid, and where vessels are entered and cleared
-  CTHSE: "courthouse" # a building in which courts of law are held
+  CSNO: "Spielbank" # a building used for entertainment, especially gambling
+  CSTL: "Burg / Schloß" # a large fortified building or set of buildings
+  CSTM: "Zollhaus" # a building in a port where customs and duties are paid, and where vessels are entered and cleared
+  CTHSE: "Gerichtsgebäude" # a building in which courts of law are held
   CTRA: "atomic center" # a facility where atomic research is carried out
   CTRCM: "community center" # a facility for community recreation and other activities
   CTRF: "facility center" # a place where more than one facility is situated
