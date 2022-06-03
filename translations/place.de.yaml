@@ -222,17 +222,17 @@ P:
   PPLF: "Bauerndorf" # a populated place where the population is largely engaged in agricultural activities
   PPLG: "Sitz der Regierung einer politischen Einheit" #
   PPLH: "Historisch besiedelter Ort" # a populated place that no longer exists
-  PPLL: "populated locality" # an area similar to a locality but with a small group of dwellings or other buildings
-  PPLQ: "abandoned populated place" #
-  PPLR: "religious populated place" # a populated place whose population is largely engaged in religious occupations
-  PPLS: "populated places" # cities, towns, villages, or other agglomerations of buildings where people live and work
-  PPLW: "destroyed populated place" # a village, town or city destroyed by a natural disaster, or by war
+  PPLL: "Besiedelte Ortschaft" # an area similar to a locality but with a small group of dwellings or other buildings
+  PPLQ: "Verlassener bewohnter Ort" #
+  PPLR: "Religiös bevölkerter Ort" # a populated place whose population is largely engaged in religious occupations
+  PPLS: "Besiedelte Gebiete" # cities, towns, villages, or other agglomerations of buildings where people live and work
+  PPLW: "Zerstörter bewohnter Ort" # a village, town or city destroyed by a natural disaster, or by war
   PPLX: "Ausschnitt eines besiedelten Ortes (Stadtteil)" #
-  STLMT: "israeli settlement" #
+  STLMT: "Israelische Siedlung" #
 R:
-  CSWY: "causeway" # a raised roadway across wet ground or shallow water
-  OILP: "oil pipeline" # a pipeline used for transporting oil
-  PRMN: "promenade" # a place for public walking, usually along a beach front
+  CSWY: "Dammweg" # a raised roadway across wet ground or shallow water
+  OILP: "Ölpipeline" # a pipeline used for transporting oil
+  PRMN: "Promenade" # a place for public walking, usually along a beach front
   PTGE: "portage" # a place where boats, goods, etc., are carried overland between navigable waters
   RD: "road" # an open way with improved surface for transportation of animals, people and vehicles
   RDA: "ancient road" # the remains of a road used by ancient cultures
