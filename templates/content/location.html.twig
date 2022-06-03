@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}TwelvePics / Location{% endblock %}
+{% block title %}{{ locationData|length > 0 ? attribute(locationData, 'place-full') : 'TwelvePics / Location' }}{% endblock %}
 
 {% block body_class %}content content-location bg-light{% endblock %}
 
@@ -8,7 +8,7 @@
     {% apply spaceless %}
 
         {% include 'content/header.html.twig' with {
-            'title': 'Suche nach Standort',
+            'title': locationData|length > 0 ? attribute(locationData, 'place-full') : 'Suche nach Standort',
         } %}
 
         {% embed 'main_layout_without_header.html.twig' %}

@@ -447,6 +447,9 @@ body.content-location
                     border-width: 1px
                     outline: 0
 
+                    &:after
+                        content: ' \00270e '
+
                     &:focus
                         outline: 0
 
@@ -463,7 +466,7 @@ body.content-location
             display: none
 
             @include media-breakpoint-up(md)
-                display: block
+                display: none
 
         a
             cursor: pointer

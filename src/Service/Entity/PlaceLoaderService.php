@@ -795,6 +795,60 @@ SQL;
     }
 
     /**
+     * Trim function.
+     *
+     * @param string $string
+     * @return string
+     * @throws Exception
+     */
+    protected function trim(string $string): string
+    {
+        $string = trim($string);
+
+        $string = preg_replace('~[ ]{2,}~', ' ', $string);
+
+        if (!is_string($string)) {
+            throw new Exception(sprintf('Unable to replace given string "%s (%s:%d).', $string, __FILE__, __LINE__));
+        }
+
+        return $string;
+    }
+
+    /**
+     * Get codes according to given name.
+     *
+     * @param string $name
+     * @return string[]
+     * @throws Exception
+     */
+    protected function getCodes(string &$name): array
+    {
+        $names = preg_split('~[ ,]+~', $name);
+
+        if ($names === false) {
+            throw new Exception(sprintf('Unable to split given name "%s (%s:%d).', $name, __FILE__, __LINE__));
+        }
+
+        $name = implode(' ', $names);
+
+        switch (true) {
+            case preg_match('~(^| )(Insel)( |$)~', $name):
+                $name = preg_replace('~(^| )(Insel)( |$)~', '$1$3', $name);
+
+                if (!is_string($name)) {
+                    throw new Exception(sprintf('Unable to replace given name (%s:%d).', __FILE__, __LINE__));
+                }
+
+                $name = $this->trim($name);
+
+                return [Code::FEATURE_CLASS_T];
+
+            default:
+                return [Code::FEATURE_CLASS_P, Code::FEATURE_CLASS_A, Code::FEATURE_CLASS_S, Code::FEATURE_CLASS_H, Code::FEATURE_CLASS_L, Code::FEATURE_CLASS_R, Code::FEATURE_CLASS_T, Code::FEATURE_CLASS_U, Code::FEATURE_CLASS_V];
+        }
+    }
+
+    /**
      * Finds places by name.
      *
      * @param string $name
@@ -804,13 +858,13 @@ SQL;
     public function findByName(string $name): array
     {
         $places = [];
-        $codes = [Code::FEATURE_CLASS_P, Code::FEATURE_CLASS_A, Code::FEATURE_CLASS_S, Code::FEATURE_CLASS_H, Code::FEATURE_CLASS_L, Code::FEATURE_CLASS_R, Code::FEATURE_CLASS_T, Code::FEATURE_CLASS_U, Code::FEATURE_CLASS_V];
+        $codes = $this->getCodes($name);
 
         foreach ($codes as $code) {
             /** @var Place[] $records */
             $records = $this->em->getRepository($this->getEntityClass($code))
                 ->createQueryBuilder('p')
-                ->where('p.name LIKE :name')
+                ->where('p.name = :name')
                 ->orWhere('p.alternateNames LIKE :name')
                 ->setParameter('name', sprintf('%s', $name))
                 ->getQuery()
