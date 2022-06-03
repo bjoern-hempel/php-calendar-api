@@ -271,7 +271,7 @@ S:
   ASYL: "asylum" # a facility where the insane are cared for and protected
   ATHF: "Sportplatz" # a tract of land used for playing team sports, and athletic track and field events
   ATM: "automatic teller machine" # An unattended electronic machine in a public place, connected to a data system and related equipment and activated by a bank customer to obtain cash withdrawals and other banking services.
-  BANK: "bank" # A business establishment in which money is kept for saving or commercial purposes or is invested, supplied for loans, or exchanged.
+  BANK: "Bank / Bankinstitut" # A business establishment in which money is kept for saving or commercial purposes or is invested, supplied for loans, or exchanged.
   BCN: "Leuchtturm" # a fixed artificial navigation mark
   BDG: "Brücke" # a structure erected across an obstacle such as a stream, road, etc., in order to carry roads, railroads, and pedestrians across
   BDGQ: "Zerstörte Brücke" # a destroyed or decayed bridge which is no longer functional
@@ -302,7 +302,7 @@ S:
   CSNO: "Spielbank" # a building used for entertainment, especially gambling
   CSTL: "Burg / Schloß" # a large fortified building or set of buildings
   CSTM: "Zollhaus" # a building in a port where customs and duties are paid, and where vessels are entered and cleared
-  CTHSE: "Gerichtsgebäude" # a building in which courts of law are held
+  CTHSE: "Gerichtsgebäude / Amtsgericht" # a building in which courts of law are held
   CTRA: "atomic center" # a facility where atomic research is carried out
   CTRCM: "community center" # a facility for community recreation and other activities
   CTRF: "facility center" # a place where more than one facility is situated
@@ -397,7 +397,7 @@ S:
   MSQE: "mosque" # a building for public Islamic worship
   MSSN: "mission" # a place characterized by dwellings, school, church, hospital and other facilities operated by a religious group for the purpose of providing charitable services and to propagate religion
   MSSNQ: "abandoned mission" #
-  MSTY: "monastery" # a building and grounds where a community of monks lives in seclusion
+  MSTY: "Kloster" # a building and grounds where a community of monks lives in seclusion
   MTRO: "U-Bahn-Station" # metro station (Underground, Tube, or Metro)
   MUS: "Museum" # a building where objects of permanent interest in one or more of the arts and sciences are preserved and exhibited
   NOV: "novitiate" # a religious house or school where novices are trained
@@ -411,7 +411,7 @@ S:
   OILT: "tank farm" # a tract of land occupied by large, cylindrical, metal tanks in which oil or liquid petrochemicals are stored
   OILW: "oil well" # a well from which oil may be pumped
   OPRA: "Opernhaus" # A theater designed chiefly for the performance of operas.
-  PAL: "Palast" # a large stately house, often a royal or presidential residence
+  PAL: "Palast / Schloß" # a large stately house, often a royal or presidential residence
   PGDA: "pagoda" # a tower-like storied structure, usually a Buddhist shrine
   PIER: "Pier" # a structure built out into navigable water on piles providing berthing for ships and recreation
   PKLT: "parking lot" # an area used for parking vehicles
