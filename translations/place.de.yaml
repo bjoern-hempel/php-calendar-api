@@ -201,7 +201,7 @@ L:
   RESN: "Naturschutzgebiet" # an area reserved for the maintenance of a natural habitat
   RESP: "palm tree reserve" # an area of palm trees where use is controlled
   RESV: "reservation" # a tract of land set aside for aboriginal, tribal, or native populations
-  RESW: "wildlife reserve" # a tract of public land reserved for the preservation of wildlife
+  RESW: "Wildschutzgebiet" # a tract of public land reserved for the preservation of wildlife
   RGN: "region" # an area distinguished by one or more observable physical or cultural characteristics
   RGNE: "economic region" # a region of a country established for economic development or for statistical purposes
   RGNH: "historical region" # a former historic area distinguished by one or more observable physical or cultural characteristics
@@ -561,13 +561,13 @@ T:
   MND: "mound(s)" # a low, isolated, rounded hill
   MRN: "moraine" # a mound, ridge, or other accumulation of glacial till
   MT: "Berg" # an elevation standing high above the surrounding area with small summit area, steep slopes and local relief of 300m or more
-  MTS: "mountains" # a mountain range or a group of mountains or high ridges
+  MTS: "Berggruppe" # a mountain range or a group of mountains or high ridges
   NKM: "meander neck" # a narrow strip of land between the two limbs of a meander loop at its narrowest point
   NTK: "nunatak" # a rock or mountain peak protruding through glacial ice
   NTKS: "nunataks" # rocks or mountain peaks protruding through glacial ice
   PAN: "pan" # a near-level shallow, natural depression or basin, usually containing an intermittent lake, pond, or pool
   PANS: "pans" # a near-level shallow, natural depression or basin, usually containing an intermittent lake, pond, or pool
-  PASS: "pass" # a break in a mountain range or other high obstruction, used for transportation from one side to the other [See also gap]
+  PASS: "Pass" # a break in a mountain range or other high obstruction, used for transportation from one side to the other [See also gap]
   PEN: "Halbinsel" # an elongate area of land projecting into a body of water and nearly surrounded by water
   PENX: "section of peninsula" #
   PK: "Gipfel" # a pointed elevation atop a mountain, ridge, or other hypsographic feature
@@ -593,16 +593,16 @@ T:
   SHOR: "Ufer / Strand" # a narrow zone bordering a waterbody which covers and uncovers at high and low water, respectively
   SINK: "Krater" # a small crater-shape depression in a karst area
   SLID: "slide" # a mound of earth material, at the base of a slope and the associated scoured area
-  SLP: "slope(s)" # a surface with a relatively uniform slope angle
+  SLP: "Hang/Hänge" # a surface with a relatively uniform slope angle
   SPIT: "spit" # a narrow, straight or curved continuation of a beach into a waterbody
-  SPUR: "spur(s)" # a subordinate ridge projecting outward from a hill, mountain or other elevation
+  SPUR: "Bergsporn(e)" # a subordinate ridge projecting outward from a hill, mountain or other elevation
   TAL: "talus slope" # a steep concave slope formed by an accumulation of loose rock fragments at the base of a cliff or steep slope
   TRGD: "interdune trough(s)" # a long wind-swept trough between parallel longitudinal dunes
   TRR: "terrace" # a long, narrow alluvial platform bounded by steeper slopes above and below, usually overlooking a waterbody
   UPLD: "upland" # an extensive interior region of high land with low to moderate surface relief
-  VAL: "valley" # an elongated depression usually traversed by a stream
+  VAL: "Tal" # an elongated depression usually traversed by a stream
   VALG: "hanging valley" # a valley the floor of which is notably higher than the valley or shore to which it leads; most common in areas that have been glaciated
-  VALS: "valleys" # elongated depressions usually traversed by a stream
+  VALS: "Täler" # elongated depressions usually traversed by a stream
   VALX: "section of valley" #
   VLC: "volcano" # a conical elevation composed of volcanic materials with a crater at the top
 U:

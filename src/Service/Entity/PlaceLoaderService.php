@@ -39,6 +39,7 @@ use App\Service\LocationDataService;
 use App\Utils\StringConverter;
 use App\Utils\Timer;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
@@ -867,14 +868,21 @@ SQL;
                 ->where('p.name = :name')
                 ->orWhere('p.alternateNames LIKE :name')
                 ->setParameter('name', sprintf('%s', $name))
+                ->orderBy('p.population', Criteria::DESC)
                 ->getQuery()
                 ->getResult();
             foreach ($records as $place) {
                 $places[] = $place;
             }
-            if (count($places) > 0) {
-                return $places;
-            }
+        }
+        if (count($places) > 0) {
+
+            /* Sort placesP */
+            usort($places, function (Place $a, Place $b) {
+                return $a->getPopulation() < $b->getPopulation() ? 1 : -1;
+            });
+
+            return $places;
         }
 
         foreach ($codes as $code) {
@@ -883,14 +891,21 @@ SQL;
                 ->createQueryBuilder('p')
                 ->where('p.name LIKE :name')
                 ->setParameter('name', sprintf('%%%s%%', $name))
+                ->orderBy('p.population', Criteria::DESC)
                 ->getQuery()
                 ->getResult();
             foreach ($records as $place) {
                 $places[] = $place;
             }
-            if (count($places) > 0) {
-                return $places;
-            }
+        }
+        if (count($places) > 0) {
+
+            /* Sort placesP */
+            usort($places, function (Place $a, Place $b) {
+                return $a->getPopulation() < $b->getPopulation() ? 1 : -1;
+            });
+
+            return $places;
         }
 
         return $places;
