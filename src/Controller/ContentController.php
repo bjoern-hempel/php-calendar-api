@@ -49,6 +49,14 @@ class ContentController extends BaseController
 
     public const PARAMETER_NAME_QUERY = 'q';
 
+    public const PARAMETER_NAME_ID = 'id';
+
+    public const SUBMIT_TYPE_FORM = 'form';
+
+    public const SUBMIT_TYPE_QUERY = 'query';
+
+    public const SUBMIT_TYPE_ID = 'id';
+
     /**
      * ContentController constructor.
      *
@@ -93,6 +101,69 @@ class ContentController extends BaseController
     }
 
     /**
+     * Returns the submit type.
+     *
+     * @param FormInterface $form
+     * @param Request $request
+     * @return string|null
+     */
+    protected function getSubmitType(FormInterface $form, Request $request): ?string
+    {
+        return match (true) {
+            $form->isSubmitted() && $form->isValid() => self::SUBMIT_TYPE_FORM,
+            !empty(strval($request->query->get(self::PARAMETER_NAME_QUERY))) => self::SUBMIT_TYPE_QUERY,
+            !empty(strval($request->query->get(self::PARAMETER_NAME_ID))) => self::SUBMIT_TYPE_ID,
+            default => null,
+        };
+    }
+
+    /**
+     * Get position from string submit.
+     *
+     * @param string $locationFull
+     * @param Place|null $placeSource
+     * @return float[]
+     * @throws Exception
+     */
+    protected function getPositionFromStringSubmit(string $locationFull, ?Place &$placeSource = null): array
+    {
+        $parsed = GPSConverter::parseFullLocation2DecimalDegrees($locationFull);
+
+        if ($parsed !== false) {
+            $placeSource = null;
+
+            return $parsed;
+        }
+
+        $placeSource = $this->locationDataService->getLocationByName($locationFull);
+
+        if ($placeSource === null) {
+            throw new InvalidArgumentException(sprintf('Unable to find place "%s".', $locationFull));
+        }
+
+        return [$placeSource->getCoordinate()->getLongitude(), $placeSource->getCoordinate()->getLatitude()];
+    }
+
+    /**
+     * Get position from code:id submit.
+     *
+     * @param string $codeId
+     * @param Place|null $placeSource
+     * @return float[]
+     * @throws Exception
+     */
+    protected function getPositionFromCodeIdSubmit(string $codeId, ?Place &$placeSource = null): array
+    {
+        $placeSource = $this->locationDataService->getLocationByCodeId($codeId);
+
+        if ($placeSource === null) {
+            throw new InvalidArgumentException(sprintf('Unable to find place with id "%d".', $codeId));
+        }
+
+        return [$placeSource->getCoordinate()->getLongitude(), $placeSource->getCoordinate()->getLatitude()];
+    }
+
+    /**
      * Gets the location data.
      *
      * @param FormInterface $form
@@ -103,41 +174,26 @@ class ContentController extends BaseController
      */
     protected function getLocationData(FormInterface $form, Request $request, array &$data = []): array
     {
-        $locationFull = null;
+        $placeSource = null;
 
-        if ($locationFull === null && $form->isSubmitted() && $form->isValid()) {
-            /** @var Location $location */
-            $location = $form->getData();
+        $formData = $form->getData();
 
-            $locationFull = $location->getLocationFull();
+        if (!$formData instanceof Location) {
+            throw new Exception(sprintf('Unable to get data (%s:%d).', __FILE__, __LINE__));
         }
 
-        if ($locationFull === null && !empty(strval($request->query->get(self::PARAMETER_NAME_QUERY)))) {
-            /** @var Location $location */
-            $location = $form->getData();
+        switch ($this->getSubmitType($form, $request)) {
+            case self::SUBMIT_TYPE_FORM:
+            case self::SUBMIT_TYPE_QUERY:
+                list($latitude, $longitude) = $this->getPositionFromStringSubmit($formData->getLocationFull(), $placeSource);
+                break;
 
-            $locationFull = $location->getLocationFull();
-        }
+            case self::SUBMIT_TYPE_ID:
+                list($latitude, $longitude) = $this->getPositionFromCodeIdSubmit($formData->getLocationFull(), $placeSource);
+                break;
 
-        /* No query given or found. */
-        if ($locationFull === null) {
-            return [];
-        }
-
-        $parsed = GPSConverter::parseFullLocation2DecimalDegrees($locationFull);
-
-        if ($parsed === false) {
-            $placeSource = $this->locationDataService->getLocationByName($locationFull);
-
-            if ($placeSource === null) {
-                throw new InvalidArgumentException(sprintf('Unable to find place "%s".', $locationFull));
-            }
-
-            $latitude = $placeSource->getCoordinate()->getLongitude();
-            $longitude = $placeSource->getCoordinate()->getLatitude();
-        } else {
-            $placeSource = null;
-            list($latitude, $longitude) = $parsed;
+            default:
+                return [];
         }
 
         return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data, $placeSource);
@@ -153,7 +209,11 @@ class ContentController extends BaseController
     #[Route('/location', name: BaseController::ROUTE_NAME_APP_LOCATION)]
     public function location(Request $request): Response
     {
-        $locationFull = strval($request->query->get(self::PARAMETER_NAME_QUERY));
+        $locationFull = match (true) {
+            $request->query->has(self::PARAMETER_NAME_QUERY) => strval($request->query->get(self::PARAMETER_NAME_QUERY)),
+            $request->query->has(self::PARAMETER_NAME_ID) => strval($request->query->get(self::PARAMETER_NAME_ID)),
+            default => '',
+        };
 
         // creates a task object and initializes some data for this example
         $location = new Location();

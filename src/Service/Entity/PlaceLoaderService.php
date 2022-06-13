@@ -850,6 +850,70 @@ SQL;
     }
 
     /**
+     * Finds place by id.
+     *
+     * @param int $id
+     * @param string $code
+     * @return Place|null
+     * @throws Exception
+     */
+    public function findById(int $id, string $code): ?Place
+    {
+        $place = $this->em->getRepository($this->getEntityClass($code))
+            ->createQueryBuilder('p')
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($place === null) {
+            return null;
+        }
+
+        if (!$place instanceof Place) {
+            throw new Exception(sprintf('Unsupported result (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $place;
+    }
+
+    /**
+     * Finds place by code:id.
+     *
+     * @param string $codeId
+     * @return Place|null
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function findByCodeId(string $codeId): ?Place
+    {
+        $matches = [];
+        if (!preg_match('~^([ahlprstuv]):(\d+)$~', $codeId, $matches)) {
+            throw new Exception(sprintf('Unsupported format "%s" (%s:%d).', $codeId, __FILE__, __LINE__));
+        }
+
+        $code = strtoupper(strval($matches[1]));
+        $id = strval($matches[2]);
+
+        $place = $this->em->getRepository($this->getEntityClass($code))
+            ->createQueryBuilder('p')
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($place === null) {
+            return null;
+        }
+
+        if (!$place instanceof Place) {
+            throw new Exception(sprintf('Unsupported result (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $place;
+    }
+
+    /**
      * Finds places by name.
      *
      * @param string $name

@@ -190,6 +190,18 @@ class LocationDataService
     }
 
     /**
+     * Finds first location by code:id.
+     *
+     * @param string $codeId
+     * @return Place|null
+     * @throws Exception
+     */
+    public function getLocationByCodeId(string $codeId): ?Place
+    {
+        return $this->placeLoaderService->findByCodeId($codeId);
+    }
+
+    /**
      * Gets full location data.
      *
      * @param float $latitude
