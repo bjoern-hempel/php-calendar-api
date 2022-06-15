@@ -174,6 +174,22 @@ document.querySelectorAll('.location-position').forEach(
 
         let position = latitude + ' ' + longitude;
 
-        submitPosition(position);
+        let url = window.location.protocol + '//' + window.location.host + window.location.pathname + '?q=' + latitude + ',' + longitude;
+
+        window.location.href = url;
+        //submitPosition(position);
+    })
+);
+
+document.querySelectorAll('.location-id').forEach(
+    (e) => e.addEventListener('click', (e) => {
+        let target = e.target;
+
+        let featureClass = target.getAttribute('data-feature-class');
+        let id = target.getAttribute('data-id');
+
+        let url = window.location.protocol + '//' + window.location.host + window.location.pathname + '?id=' + featureClass + ':' + id;
+
+        window.location.href = url;
     })
 );

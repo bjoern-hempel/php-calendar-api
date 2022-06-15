@@ -122,10 +122,11 @@ class ContentController extends BaseController
      *
      * @param string $locationFull
      * @param Place|null $placeSource
-     * @return float[]
+     * @param Place[] $placesSource
+     * @return float[]|null
      * @throws Exception
      */
-    protected function getPositionFromStringSubmit(string $locationFull, ?Place &$placeSource = null): array
+    protected function getPositionFromStringSubmit(string $locationFull, ?Place &$placeSource = null, array &$placesSource = []): ?array
     {
         $parsed = GPSConverter::parseFullLocation2DecimalDegrees($locationFull);
 
@@ -135,13 +136,19 @@ class ContentController extends BaseController
             return $parsed;
         }
 
-        $placeSource = $this->locationDataService->getLocationByName($locationFull);
+        $placesSource = $this->locationDataService->getLocationsByName($locationFull);
 
-        if ($placeSource === null) {
-            throw new InvalidArgumentException(sprintf('Unable to find place "%s".', $locationFull));
+        switch (true) {
+            case count($placesSource) <= 0:
+                throw new InvalidArgumentException(sprintf('Unable to find place "%s".', $locationFull));
+
+            case count($placesSource) == 1:
+                $placeSource = $placesSource[0];
+                return [$placeSource->getCoordinate()->getLongitude(), $placeSource->getCoordinate()->getLatitude()];
+
+            default:
+                return null;
         }
-
-        return [$placeSource->getCoordinate()->getLongitude(), $placeSource->getCoordinate()->getLatitude()];
     }
 
     /**
@@ -164,15 +171,16 @@ class ContentController extends BaseController
     }
 
     /**
-     * Gets the location data.
+     * Gets the location data as an array.
      *
      * @param FormInterface $form
      * @param Request $request
      * @param array<string, Place[]> $data
+     * @param Place[] $results
      * @return array<string, mixed>
      * @throws Exception
      */
-    protected function getLocationData(FormInterface $form, Request $request, array &$data = []): array
+    protected function getLocationData(FormInterface $form, Request $request, array &$data = [], array &$results = []): array
     {
         $placeSource = null;
 
@@ -185,18 +193,23 @@ class ContentController extends BaseController
         switch ($this->getSubmitType($form, $request)) {
             case self::SUBMIT_TYPE_FORM:
             case self::SUBMIT_TYPE_QUERY:
-                list($latitude, $longitude) = $this->getPositionFromStringSubmit($formData->getLocationFull(), $placeSource);
-                break;
+                $position = $this->getPositionFromStringSubmit($formData->getLocationFull(), $placeSource, $results);
 
+                if ($position === null) {
+                    return [];
+                } else {
+                    list($latitude, $longitude) = $position;
+                    return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data, $placeSource);
+                }
+
+                // no break
             case self::SUBMIT_TYPE_ID:
                 list($latitude, $longitude) = $this->getPositionFromCodeIdSubmit($formData->getLocationFull(), $placeSource);
-                break;
+                return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data, $placeSource);
 
             default:
                 return [];
         }
-
-        return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data, $placeSource);
     }
 
     /**
@@ -225,10 +238,17 @@ class ContentController extends BaseController
 
         $form->handleRequest($request);
         $data = [];
+        $results = [];
+        $search = '';
 
         $error = null;
         try {
-            $locationData = $this->getLocationData($form, $request, $data);
+            $locationData = $this->getLocationData($form, $request, $data, $results);
+
+            /** @var Location $location */
+            $location = $form->getData();
+
+            $search = $location->getLocationFull();
         } catch (InvalidArgumentException $exception) {
             /** @var Location $location */
             $location = $form->getData();
@@ -250,8 +270,10 @@ class ContentController extends BaseController
         return $this->renderForm('content/location.html.twig', [
             'form' => $form,
             'error' => $error,
+            'search' => $search,
             'locationData' => $locationData,
             'data' => $data,
+            'results' => $results,
             'version' => $this->versionService->getVersion(),
         ]);
     }

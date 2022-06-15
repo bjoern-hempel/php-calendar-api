@@ -31,7 +31,7 @@
                         </div>
                     {{ form_end(form) }}
 
-                    <div class="{{ locationData|length > 0 ? 'verbose' : '' }}">
+                    <div class="{{ (locationData|length > 0 or results|length > 0) ? 'verbose' : '' }}">
                         <p class="description">
                             {{ 'general.tryThis'|trans([], 'location') }}:
                         </p>
@@ -46,6 +46,25 @@
                             <li class="list-group-item"><a class="link-primary location-position" data-latitude="54.4067051" data-longitude="18.6620502">Westerplatte in Danzig</a></li>
                         </ul>
                     </div>
+
+                    {# (key ~ '.' ~ place.featureCode)|trans([], 'place') #}
+
+                    {% if results|length > 0 %}
+                        <p class="description">
+                            {{ 'general.results'|trans({'%search%': search}, 'location') }}:
+                        </p>
+
+                        <table class="table">
+                            {% for place in results %}
+                                <tr>
+                                    <td class="table-name"><small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name }}</b><br /><small>{{ (place.featureClass ~ '.' ~ place.featureCode)|trans([], 'place') }}</small></td>
+                                    <td class="table-value">
+                                        <a class="btn btn-primary location-id" data-feature-class="{{ place.featureClass|lower }}" data-id="{{ place.id }}">Öffnen</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% endif %}
 
                     {% if locationData|length > 0 %}
 

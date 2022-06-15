@@ -50,3 +50,4 @@ general:
   notAvailable: "Der Ort \"%place%\" konnte nicht gefunden werden."
   notGiven: "Nicht angegeben"
   tryThis: "Versuche doch einmal Folgendes"
+  results: "Folgende Ergebnisse wurden mit dem Suchbegriff \"%search%\" gefunden"

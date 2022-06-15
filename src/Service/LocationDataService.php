@@ -190,6 +190,18 @@ class LocationDataService
     }
 
     /**
+     * Finds all locations by name.
+     *
+     * @param string $name
+     * @return Place[]
+     * @throws Exception
+     */
+    public function getLocationsByName(string $name): array
+    {
+        return $this->placeLoaderService->findByName($name);
+    }
+
+    /**
      * Finds first location by code:id.
      *
      * @param string $codeId
