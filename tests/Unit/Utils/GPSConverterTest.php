@@ -228,10 +228,14 @@ final class GPSConverterTest extends TestCase
             [++$number, 'parseFullLocation2DecimalDegrees', '47.900635°,-13.601868°', null, [47.900635, -13.601868]],
             [++$number, 'parseFullLocation2DecimalDegrees', '47.900635°,_13.601868°', null, [47.900635, -13.601868]],
             [++$number, 'parseFullLocation2DecimalDegrees', '47°54′2.286″E 13°36′6.7248″N', null, [47.900635, 13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47°54′2.286″E 13°36′6.7248″N', null, [47.900635, 13.601868]],
             [++$number, 'parseFullLocation2DecimalDegrees', '47°54′2.286″E, 13°36′6.7248″N', null, [47.900635, 13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', '47° 54′ 2.286″ E, 13° 36′ 6.7248″ N', null, [47.900635, 13.601868]],
             [++$number, 'parseFullLocation2DecimalDegrees', 'E47°54′2.286″ N13°36′6.7248″', null, [47.900635, 13.601868]],
             [++$number, 'parseFullLocation2DecimalDegrees', '47°54′2.286″W 13°36′6.7248″N', null, [-47.900635, 13.601868]],
             [++$number, 'parseFullLocation2DecimalDegrees', 'W47°54′2.286″ S13°36′6.7248″', null, [-47.900635, -13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', 'W 47° 54′ 2.286″ S13° 36′ 6.7248″', null, [-47.900635, -13.601868]],
+            [++$number, 'parseFullLocation2DecimalDegrees', 'W 47° 54′ 2.286″,S 13° 36′ 6.7248″', null, [-47.900635, -13.601868]],
             [++$number, 'parseFullLocation2DecimalDegrees', '47.900635 13°36′6.7248″N', null, [47.900635, 13.601868]],
         ];
     }

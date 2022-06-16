@@ -624,12 +624,12 @@ SQL;
 
             $placesP[] = $placeP;
         }
-        $data['P'] = array_slice($placesP, 0, 10);
 
         /* Sort placesP */
         usort($placesP, function (PlaceP $a, PlaceP $b) {
             return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
         });
+        $data['P'] = array_slice($placesP, 0, 10);
 
         /* No result was found. */
         if (count($placesP) === 0) {

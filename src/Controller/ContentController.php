@@ -51,12 +51,6 @@ class ContentController extends BaseController
 
     public const PARAMETER_NAME_ID = 'id';
 
-    public const SUBMIT_TYPE_FORM = 'form';
-
-    public const SUBMIT_TYPE_QUERY = 'query';
-
-    public const SUBMIT_TYPE_ID = 'id';
-
     /**
      * ContentController constructor.
      *
@@ -98,23 +92,6 @@ class ContentController extends BaseController
     public function impress(): Response
     {
         return $this->render('content/impress.html.twig');
-    }
-
-    /**
-     * Returns the submit type.
-     *
-     * @param FormInterface $form
-     * @param Request $request
-     * @return string|null
-     */
-    protected function getSubmitType(FormInterface $form, Request $request): ?string
-    {
-        return match (true) {
-            $form->isSubmitted() && $form->isValid() => self::SUBMIT_TYPE_FORM,
-            !empty(strval($request->query->get(self::PARAMETER_NAME_QUERY))) => self::SUBMIT_TYPE_QUERY,
-            !empty(strval($request->query->get(self::PARAMETER_NAME_ID))) => self::SUBMIT_TYPE_ID,
-            default => null,
-        };
     }
 
     /**
@@ -173,27 +150,22 @@ class ContentController extends BaseController
     /**
      * Gets the location data as an array.
      *
-     * @param FormInterface $form
      * @param Request $request
+     * @param string $search
      * @param array<string, Place[]> $data
      * @param Place[] $results
      * @return array<string, mixed>
      * @throws Exception
      */
-    protected function getLocationData(FormInterface $form, Request $request, array &$data = [], array &$results = []): array
+    protected function getLocationData(Request $request, string &$search, array &$data = [], array &$results = []): array
     {
         $placeSource = null;
 
-        $formData = $form->getData();
-
-        if (!$formData instanceof Location) {
-            throw new Exception(sprintf('Unable to get data (%s:%d).', __FILE__, __LINE__));
-        }
-
-        switch ($this->getSubmitType($form, $request)) {
-            case self::SUBMIT_TYPE_FORM:
-            case self::SUBMIT_TYPE_QUERY:
-                $position = $this->getPositionFromStringSubmit($formData->getLocationFull(), $placeSource, $results);
+        switch (true) {
+            /* Parameter q given */
+            case $request->query->has(self::PARAMETER_NAME_QUERY):
+                $search = strval($request->query->get(self::PARAMETER_NAME_QUERY));
+                $position = $this->getPositionFromStringSubmit($search, $placeSource, $results);
 
                 if ($position === null) {
                     return [];
@@ -202,11 +174,14 @@ class ContentController extends BaseController
                     return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data, $placeSource);
                 }
 
-                // no break
-            case self::SUBMIT_TYPE_ID:
-                list($latitude, $longitude) = $this->getPositionFromCodeIdSubmit($formData->getLocationFull(), $placeSource);
+            /* Parameter id given */
+            // no break
+            case $request->query->has(self::PARAMETER_NAME_ID):
+                $search = strval($request->query->get(self::PARAMETER_NAME_ID));
+                list($latitude, $longitude) = $this->getPositionFromCodeIdSubmit($search, $placeSource);
                 return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data, $placeSource);
 
+            /* No parameter given */
             default:
                 return [];
         }
@@ -222,57 +197,28 @@ class ContentController extends BaseController
     #[Route('/location', name: BaseController::ROUTE_NAME_APP_LOCATION)]
     public function location(Request $request): Response
     {
-        $locationFull = match (true) {
-            $request->query->has(self::PARAMETER_NAME_QUERY) => strval($request->query->get(self::PARAMETER_NAME_QUERY)),
-            $request->query->has(self::PARAMETER_NAME_ID) => strval($request->query->get(self::PARAMETER_NAME_ID)),
-            default => '',
-        };
-
-        // creates a task object and initializes some data for this example
-        $location = new Location();
-        $location->setLocationFull($locationFull);
-
-        $form = $this->createForm(FullLocationType::class, $location, [
-            'method' => Request::METHOD_POST,
-        ]);
-
-        $form->handleRequest($request);
-        $data = [];
+        $places = [];
         $results = [];
         $search = '';
-
         $error = null;
+
         try {
-            $locationData = $this->getLocationData($form, $request, $data, $results);
+            $locationData = $this->getLocationData($request, $search, $places, $results);
+        } catch (InvalidArgumentException|Throwable $exception) {
+            $error = $this->translator->trans('general.notAvailable', ['%place%' => $search], 'location');
 
-            /** @var Location $location */
-            $location = $form->getData();
+            if ($this->kernel->getEnvironment() === 'dev') {
+                $error = sprintf('%s (%s:%d)', $error, __FILE__, __LINE__);
+            }
 
-            $search = $location->getLocationFull();
-        } catch (InvalidArgumentException $exception) {
-            /** @var Location $location */
-            $location = $form->getData();
-
-            $error = $this->kernel->getEnvironment() !== 'dev' ?
-                $this->translator->trans('general.notAvailable', ['%place%' => $location->getLocationFull()], 'location') :
-                sprintf('%s (%s:%d)', $exception->getMessage(), $exception->getFile(), $exception->getLine());
-            $locationData = [];
-        } catch (Throwable $exception) {
-            /** @var Location $location */
-            $location = $form->getData();
-
-            $error = $this->kernel->getEnvironment() !== 'dev' ?
-                $this->translator->trans('general.notAvailable', ['%place%' => $location->getLocationFull()], 'location') :
-                sprintf('%s (%s:%d)', $exception->getMessage(), $exception->getFile(), $exception->getLine());
             $locationData = [];
         }
 
         return $this->renderForm('content/location.html.twig', [
-            'form' => $form,
             'error' => $error,
             'search' => $search,
             'locationData' => $locationData,
-            'data' => $data,
+            'places' => $places,
             'results' => $results,
             'version' => $this->versionService->getVersion(),
         ]);

@@ -38,7 +38,9 @@ class GPSConverter
 
     public const REGEXP_DECIMAL = '[\-_]?\d+[.]\d+[°]*';
 
-    public const REGEXP_DMS = '[NEWS]?\d+°\d+′\d+.\d+″[NEWS]?';
+    public const REGEXP_DMS = '(?:[NEOWS]?)[ ]?(?:\d+°)[ ]?(?:\d+′)[ ]?\d+(?:(?:.\d+)?″)[ ]?(?:[NEOWS]?)';
+
+    public const REGEXP_DMS_2 = '([NEOWS]?)[ ]?(\d+°)[ ]?(\d+′)[ ]?(\d+(?:.\d+)?″)[ ]?([NEOWS]?)';
 
     public const UNIT_DEGREE = [
         '°',
@@ -359,7 +361,7 @@ class GPSConverter
             /* Given location */
             case preg_match(
                 sprintf(
-                    '~((%s)|(%s))[, ]+((%s)|(%s))~',
+                    '~((?:%s)|(?:%s))[, ]+((?:%s)|(?:%s))~',
                     self::REGEXP_DECIMAL,
                     self::REGEXP_DMS,
                     self::REGEXP_DECIMAL,
@@ -368,6 +370,23 @@ class GPSConverter
                 $fullLocation,
                 $matches
             ):
+                $fullLocation = sprintf('%s,%s', $matches[1], $matches[2]);
+
+                if (preg_match(
+                    sprintf(
+                        '~%s,%s~',
+                        self::REGEXP_DMS_2,
+                        self::REGEXP_DMS_2
+                    ),
+                    $fullLocation,
+                    $matches
+                )) {
+                    $fullLocation = sprintf('%s%s%s%s%s,%s%s%s%s%s', $matches[1], $matches[2], $matches[3], $matches[4], $matches[5], $matches[6], $matches[7], $matches[8], $matches[9], $matches[10]);
+
+                    /* Replace german O to english E */
+                    $fullLocation = str_replace('O', 'E', $fullLocation);
+                }
+
                 list($latitude, $longitude) = self::parseLatitudeAndLongitudeFromString($fullLocation);
                 break;
 

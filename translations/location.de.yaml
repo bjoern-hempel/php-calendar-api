@@ -1,8 +1,9 @@
 place:
   placeLatitude:	"Latitude"
   placeLongitude: "Longitude"
-  placeLatitudeDms:	"Latitude"
-  placeLongitudeDms: "Longitude"
+  placeLatitudeDms:	"Latitude DMS"
+  placeLongitudeDms: "Longitude DMS"
+  placePoint: "Point"
   placeGoogleLink: "Google Maps"
   placeDistrict:	"Stadtteil / Ortschaft" # P
   placeCity:	"Stadt / Gemeinde" # A

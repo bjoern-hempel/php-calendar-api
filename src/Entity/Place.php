@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Constant\Code;
 use App\DataType\Point;
 use App\Service\Entity\PlaceLoaderService;
 use App\Utils\GPSConverter;
@@ -488,6 +489,24 @@ abstract class Place
      */
     public function getElevation(): ?int
     {
+        return $this->elevation;
+    }
+
+    /**
+     * Gets the elevation of this place if this is a hill, mountain, etc.
+     *
+     * @return int|false|null
+     */
+    public function getElevationHill(): int|false|null
+    {
+        if (!in_array($this->getFeatureCode(), Code::FEATURE_CODES_T_HILLS)) {
+            return null;
+        }
+
+        if ($this->elevation <= 0) {
+            return false;
+        }
+
         return $this->elevation;
     }
 

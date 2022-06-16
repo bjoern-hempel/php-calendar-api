@@ -814,4 +814,11 @@ class Code
         self::FEATURE_CODE_P_PPL,
         self::FEATURE_CODE_P_PPLX
     ];
+
+    public const FEATURE_CODES_T_HILLS = [
+        self::FEATURE_CODE_T_HLL,
+        self::FEATURE_CODE_T_MT,
+        self::FEATURE_CODE_T_MTS,
+        self::FEATURE_CODE_T_PK,
+    ];
 }

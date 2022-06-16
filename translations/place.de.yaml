@@ -352,8 +352,8 @@ S:
   HSPL: "Leprosorium" # an asylum or hospital for lepers
   HSTS: "Historische Stätte" # a place of historical importance
   HTL: "Hotel" # a building providing lodging and/or meals for the public
-  HUT: "hut" # a small primitive house
-  HUTS: "huts" # small primitive houses
+  HUT: "Hütte" # a small primitive house
+  HUTS: "Hütten" # small primitive houses
   INSM: "military installation" # a facility for use of and control by armed forces
   ITTR: "research institute" # a facility where research is carried out
   JTY: "jetty" # a structure built out into the water at a river mouth or harbor entrance to regulate currents and silting
@@ -488,8 +488,8 @@ S:
   TMPL: "temple(s)" # an edifice dedicated to religious worship
   TNKD: "cattle dipping tank" # a small artificial pond used for immersing cattle in chemically treated water for disease control
   TOLL: "toll gate/barrier" # highway toll collection station
-  TOWR: "tower" # a high conspicuous structure, typically much higher than its diameter
-  TRAM: "tram" # rail vehicle along urban streets (also known as streetcar or trolley)
+  TOWR: "Turm" # a high conspicuous structure, typically much higher than its diameter
+  TRAM: "Straßenbahn" # rail vehicle along urban streets (also known as streetcar or trolley)
   TRANT: "transit terminal" # facilities for the handling of vehicular freight and passengers
   TRIG: "triangulation station" # a point on the earth whose position has been determined by triangulation
   TRMO: "oil pipeline terminal" # a tank farm or loading facility at the end of an oil pipeline
@@ -539,7 +539,7 @@ T:
   FORD: "ford" # a shallow part of a stream which can be crossed on foot or by land vehicle
   FSR: "fissure" # a crack associated with volcanism
   GAP: "gap" # a low place in a ridge, not used for transportation
-  GRGE: "gorge(s)" # a short, narrow, steep-sided section of a stream valley
+  GRGE: "Schlucht(en)" # a short, narrow, steep-sided section of a stream valley
   HDLD: "headland" # a high projection of land extending into a large body of water beyond the line of the coast
   HLL: "Hügel" # a rounded elevation of limited extent rising above the surrounding land with local relief of less than 300m
   HLLS: "Hügel" # rounded elevations of limited extent rising above the surrounding land with local relief of less than 300m

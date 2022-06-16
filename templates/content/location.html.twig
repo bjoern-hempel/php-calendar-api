@@ -14,23 +14,28 @@
         {% embed 'main_layout_without_header.html.twig' %}
             {% block main_content %}
                 <div id="content-location">
+
+                    {# Title #}
                     <h2 class="first">Suche nach Standort</h2>
 
+                    {# Search hints and errors #}
                     {% if error is not null %}
                         <p class="error">
                             {{ error }}
                         </p>
                     {% endif %}
 
-                    {{ form_start(form) }}
+                    {# Search Form #}
+                    <form name="full_location" method="get">
                         <div>
-                            {{ form_widget(form.locationFull) }}
+                            <input type="search" id="q" name="q" required="required" autofocus="autofocus" value="{{ search }}">
                         </div>
                         <div>
                             <button type="submit" class="btn btn-primary" id="content-location-submit">Standortsuche</button>
                         </div>
-                    {{ form_end(form) }}
+                    </form>
 
+                    {# Search examples #}
                     <div class="{{ (locationData|length > 0 or results|length > 0) ? 'verbose' : '' }}">
                         <p class="description">
                             {{ 'general.tryThis'|trans([], 'location') }}:
@@ -47,18 +52,27 @@
                         </ul>
                     </div>
 
-                    {# (key ~ '.' ~ place.featureCode)|trans([], 'place') #}
-
-                    {% if results|length > 0 %}
+                    {# Show multiple results #}
+                    {% if results|length > 1 %}
                         <p class="description">
                             {{ 'general.results'|trans({'%search%': search}, 'location') }}:
                         </p>
 
+                        {# List every result #}
                         <table class="table">
                             {% for place in results %}
                                 <tr>
-                                    <td class="table-name"><small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name }}</b><br /><small>{{ (place.featureClass ~ '.' ~ place.featureCode)|trans([], 'place') }}</small></td>
-                                    <td class="table-value">
+                                    <td class="table-name" style="width: 100%!important;">
+                                        <small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name ~ ', ' ~ ('country.alpha2.' ~ place.countryCode|lower)|trans([], 'countries', place.countryCode) }}</b><br />
+                                        <small>{{ (place.featureClass ~ '.' ~ place.featureCode)|trans([], 'place') }}</small>
+                                        {% set elevationHill = place.elevationHill %}
+                                        {% if elevationHill is same as(false) %}
+                                            <small>, Höhe nicht angegeben</small>
+                                        {% elseif elevationHill is not null %}
+                                            <small>, {{ elevationHill }} m</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="table-value" style="width: 0%!important;">
                                         <a class="btn btn-primary location-id" data-feature-class="{{ place.featureClass|lower }}" data-id="{{ place.id }}">Öffnen</a>
                                     </td>
                                 </tr>
@@ -66,8 +80,10 @@
                         </table>
                     {% endif %}
 
+                    {# Show search detail #}
                     {% if locationData|length > 0 %}
 
+                        {# Stage of detail #}
                         {% if attribute(locationData, 'place-full') is defined %}
                             <div class="cite">
                                 <p>Sieht so aus, als ob du nach Folgendem suchst. {{ constant('App\\Utils\\Icon::ICON_HEART') }}</p>
@@ -77,6 +93,7 @@
 
                         <h3>Detailliert</h3>
 
+                        {# Show place details #}
                         <table class="table">
                         {% for key,value in locationData %}
                             <tr>
@@ -96,7 +113,7 @@
                         {% endfor %}
                         </table>
 
-                        {% for key,value in data %}
+                        {% for key,value in places %}
                             {% if value|length > 0 %}
                                 <h3>{{ ('title.' ~ key ~ '.next')|trans([], 'location') }} ({{ key }})</h3>
                                 <p>{{ ('title.' ~ key ~ '.nextDetail')|trans([], 'location') }}</p>
@@ -104,7 +121,17 @@
                                 <table class="table">
                                     {% for place in value %}
                                         <tr>
-                                            <td class="table-name"><small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name }}{{ locationData['place-country-code'] is same as(place.countryCode) ? '' : (', ' ~ ('country.alpha2.' ~ place.countryCode|lower)|trans([], 'countries', place.countryCode)) }}</b><br /><small>{{ (key ~ '.' ~ place.featureCode)|trans([], 'place') }}</small></td>
+                                            <td class="table-name">
+                                                <small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name }}{{ locationData['place-country-code'] is same as(place.countryCode) ? '' : (', ' ~ ('country.alpha2.' ~ place.countryCode|lower)|trans([], 'countries', place.countryCode)) }}</b>
+                                                <br />
+                                                <small>{{ (key ~ '.' ~ place.featureCode)|trans([], 'place') }}</small>
+                                                {% set elevationHill = place.elevationHill %}
+                                                {% if elevationHill is same as(false) %}
+                                                    <small>, Höhe nicht angegeben</small>
+                                                {% elseif elevationHill is not null %}
+                                                    <small>, {{ elevationHill }} m</small>
+                                                {% endif %}
+                                            </td>
                                             <td class="table-value">
                                                 <a href="{{ place.googleLink }}" target="_blank" class="btn btn-primary" style="width: 100px;">{{ place.distanceMeter(3, 'km', 1000) }}</a>
                                             </td>
