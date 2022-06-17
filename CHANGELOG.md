@@ -7,17 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.30.3] - 2022-06-18
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add elevation to search result
+
 ### [0.30.2] - 2022-06-17
 
-# [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add location parser
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add location parser
 
 ### [0.30.1] - 2022-06-03
 
-# [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Change twelvepics link
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Change twelvepics link
 
 ### [0.30.0] - 2022-06-03
 
-# [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location
 
 ### [0.29.0] - 2022-04-19
 
