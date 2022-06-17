@@ -299,7 +299,7 @@ class LocationDataService
         }
 
         $dataReturn = array_merge($dataReturn, [
-            self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->verbose, $placeSource), '%s', null),
+            self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->verbose, $placeSource, true), '%s', null),
         ]);
 
         return array_merge($dataReturn, [

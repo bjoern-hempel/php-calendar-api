@@ -179,9 +179,10 @@ abstract class Place
      * Gets the name of this place.
      *
      * @param bool $withFeature
+     * @param bool $withProperties
      * @return string
      */
-    public function getName(bool $withFeature = false): string
+    public function getName(bool $withFeature = false, bool $withProperties = false): string
     {
         /* Remove some special strings */
         $name = str_replace(
@@ -192,8 +193,10 @@ abstract class Place
             $this->name
         );
 
-        if (in_array($this->getFeatureCode(), Code::FEATURE_CODES_T_HILLS)) {
-            $name = sprintf('%s (%d m)', $name, $this->getElevationHill());
+        if ($withProperties) {
+            if (in_array($this->getFeatureCode(), Code::FEATURE_CODES_T_HILLS)) {
+                $name = sprintf('%s (%d m)', $name, $this->getElevationHill());
+            }
         }
 
         return $withFeature ? sprintf('%s (%s/%s)', $name, $this->getFeatureClass(), $this->getFeatureCode()) : $name;
@@ -204,10 +207,11 @@ abstract class Place
      *
      * @param bool $detailed
      * @param Place|null $placeSource
+     * @param bool $withProperties
      * @return string
      * @throws Exception
      */
-    public function getNameFull(bool $detailed = false, ?Place $placeSource = null): string
+    public function getNameFull(bool $detailed = false, ?Place $placeSource = null, bool $withProperties = false): string
     {
         $name = '';
 
@@ -240,7 +244,7 @@ abstract class Place
         /* PlaceT */
         $firstMountain = $this->getFirstMountain(true, $placeSource);
         if (!is_null($firstMountain) && !$this->strContains($name, $firstMountain->getName())) {
-            $name = sprintf($this->templateAddName, $firstMountain->getName($detailed), $name);
+            $name = sprintf($this->templateAddName, $firstMountain->getName($detailed, $withProperties), $name);
         }
 
         /* PlaceS */
