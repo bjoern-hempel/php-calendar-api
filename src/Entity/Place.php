@@ -192,6 +192,10 @@ abstract class Place
             $this->name
         );
 
+        if (in_array($this->getFeatureCode(), Code::FEATURE_CODES_T_HILLS)) {
+            $name = sprintf('%s (%d m)', $name, $this->getElevationHill());
+        }
+
         return $withFeature ? sprintf('%s (%s/%s)', $name, $this->getFeatureClass(), $this->getFeatureCode()) : $name;
     }
 
