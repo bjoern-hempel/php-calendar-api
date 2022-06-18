@@ -73,6 +73,8 @@ final class GPSConverterTest extends TestCase
             case 'dms2DecimalDegrees':
             case 'decimalDegree2dmss':
             case 'decimalDegree2google':
+            case 'getDegreeString':
+            case 'getDirectionFromPositionsString':
                 match (true) {
                     $parameter3 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $given2, $parameter1, $parameter2, $parameter3)), /** @phpstan-ignore-line → PHPStan does not detect $callback as valid */
                     $parameter2 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $given2, $parameter1, $parameter2)), /** @phpstan-ignore-line → PHPStan does not detect $callback as valid */
@@ -237,6 +239,32 @@ final class GPSConverterTest extends TestCase
             [++$number, 'parseFullLocation2DecimalDegrees', 'W 47° 54′ 2.286″ S13° 36′ 6.7248″', null, [-47.900635, -13.601868]],
             [++$number, 'parseFullLocation2DecimalDegrees', 'W 47° 54′ 2.286″,S 13° 36′ 6.7248″', null, [-47.900635, -13.601868]],
             [++$number, 'parseFullLocation2DecimalDegrees', '47.900635 13°36′6.7248″N', null, [47.900635, 13.601868]],
+
+            /**
+             * Degree calculations (Latitude Longitude)
+             */
+            [++$number, 'getDegreeString', '47.900635 13.601868', '47.900635 13.601868', .0],
+            [++$number, 'getDegreeString', '47.900635 13.601868', '48.900635 13.601868', .0], // N: 0.0°
+            [++$number, 'getDegreeString', '47.900635 13.601868', '48.900635 14.601868', 45.0], // NE: 45.0°
+            [++$number, 'getDegreeString', '47.900635 13.601868', '47.900635 14.601868', 90.0], // E: 90.0°
+            [++$number, 'getDegreeString', '47.900635 13.601868', '46.900635 14.601868', 135.0], // SE: 135.0°
+            [++$number, 'getDegreeString', '47.900635 13.601868', '46.900635 13.601868', 180.0], // S: 180.0°
+            [++$number, 'getDegreeString', '47.900635 13.601868', '46.900635 12.601868', -135.0], // SW: -135.0°
+            [++$number, 'getDegreeString', '47.900635 13.601868', '47.900635 12.601868', -90.0], // W: -90.0°
+            [++$number, 'getDegreeString', '47.900635 13.601868', '48.900635 12.601868', -45.0], // NW: -45.0°
+
+            /**
+             * Degree directions (Latitude Longitude)
+             */
+            [++$number, 'getDirectionFromPositionsString', '47.900635 13.601868', '47.900635 13.601868', 'N'], // N: 0.0° (same position)
+            [++$number, 'getDirectionFromPositionsString', '47.900635 13.601868', '48.900635 13.601868', 'N'], // N: 0.0°
+            [++$number, 'getDirectionFromPositionsString', '47.900635 13.601868', '48.900635 14.601868', 'NE'], // NE: 45.0°
+            [++$number, 'getDirectionFromPositionsString', '47.900635 13.601868', '47.900635 14.601868', 'E'], // E: 90.0°
+            [++$number, 'getDirectionFromPositionsString', '47.900635 13.601868', '46.900635 14.601868', 'SE'], // SE: 135.0°
+            [++$number, 'getDirectionFromPositionsString', '47.900635 13.601868', '46.900635 13.601868', 'S'], // S: 180.0°
+            [++$number, 'getDirectionFromPositionsString', '47.900635 13.601868', '46.900635 12.601868', 'SW'], // SW: -135.0°
+            [++$number, 'getDirectionFromPositionsString', '47.900635 13.601868', '47.900635 12.601868', 'W'], // W: -90.0°
+            [++$number, 'getDirectionFromPositionsString', '47.900635 13.601868', '48.900635 12.601868', 'NW'], // NW: -45.0°
         ];
     }
 }

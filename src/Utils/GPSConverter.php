@@ -316,6 +316,144 @@ class GPSConverter
     }
 
     /**
+     * self::getDegree helper. To split given string.
+     *
+     * @param string $decimalDegreeFrom
+     * @param string $decimalDegreeTo
+     * @param int $decimals
+     * @return float
+     * @throws Exception
+     */
+    public static function getDegreeString(string $decimalDegreeFrom, string $decimalDegreeTo, int $decimals = 2): float
+    {
+        $decimalDegreeFromExploded = preg_split('~[, ]~', $decimalDegreeFrom);
+
+        if ($decimalDegreeFromExploded === false) {
+            throw new Exception(sprintf('Unable to split given string "%s" (%s:%d).', $decimalDegreeFrom, __FILE__, __LINE__));
+        }
+
+        list($decimalDegreeFromLongitude, $decimalDegreeFromLatitude) = $decimalDegreeFromExploded;
+
+        $decimalDegreeToExploded = preg_split('~[, ]~', $decimalDegreeTo);
+
+        if ($decimalDegreeToExploded === false) {
+            throw new Exception(sprintf('Unable to split given string "%s" (%s:%d).', $decimalDegreeTo, __FILE__, __LINE__));
+        }
+
+        list($decimalDegreeToLongitude, $decimalDegreeToLatitude) = $decimalDegreeToExploded;
+
+        return self::getDegree(
+            floatval($decimalDegreeFromLongitude),
+            floatval($decimalDegreeFromLatitude),
+            floatval($decimalDegreeToLongitude),
+            floatval($decimalDegreeToLatitude),
+            $decimals
+        );
+    }
+
+    /**
+     * Calculates the degree from given source coordinate to target coordinate.
+     * Attention! Expects the right sign! No direction within the parameters.
+     * - Longitude W must be -Longitude
+     * - Latitude S must be -Latitude
+     * - Direction N: 0°
+     * - Direction E: 90°
+     * - Direction S: 180°
+     * - Direction W: -90°
+     *
+     * @param float $decimalDegreeLatitudeFrom (yFrom)
+     * @param float $decimalDegreeLongitudeFrom (xFrom)
+     * @param float $decimalDegreeLatitudeTo (yTo)
+     * @param float $decimalDegreeLongitudeTo (xTo)
+     * @param int $decimals
+     * @return float
+     */
+    public static function getDegree(float $decimalDegreeLatitudeFrom, float $decimalDegreeLongitudeFrom, float $decimalDegreeLatitudeTo, float $decimalDegreeLongitudeTo, int $decimals = 2): float
+    {
+        if ($decimalDegreeLatitudeFrom === $decimalDegreeLatitudeTo && $decimalDegreeLongitudeFrom === $decimalDegreeLongitudeTo) {
+            return round(.0, $decimals);
+        }
+
+        $deltaX = $decimalDegreeLongitudeTo - $decimalDegreeLongitudeFrom;
+        $deltaY = $decimalDegreeLatitudeTo - $decimalDegreeLatitudeFrom;
+
+        $rad = atan2($deltaY, $deltaX);
+
+        $degree = -1 * $rad * (180 / pi());
+
+        $degree += 90.0;
+
+        $degree -= $degree > 180 ? 360 : 0;
+
+        return round($degree, $decimals);
+    }
+
+    /**
+     * self::getDirectionFromDegreeString helper. To split given string.
+     *
+     * @param string $decimalDegreeFrom
+     * @param string $decimalDegreeTo
+     * @return string
+     * @throws Exception
+     */
+    public static function getDirectionFromPositionsString(string $decimalDegreeFrom, string $decimalDegreeTo): string
+    {
+        $degree = self::getDegreeString($decimalDegreeFrom, $decimalDegreeTo);
+
+        return self::getDirectionFromDegree($degree);
+    }
+
+    /**
+     * Calculates the direction from given source coordinate to target coordinate.
+     * Attention! Expects the right sign! No direction within the parameters.
+     * - Longitude W must be -Longitude
+     * - Latitude S must be -Latitude
+     *
+     * @param float $decimalDegreeLatitudeFrom
+     * @param float $decimalDegreeLongitudeFrom
+     * @param float $decimalDegreeLatitudeTo
+     * @param float $decimalDegreeLongitudeTo
+     * @return string
+     * @throws Exception
+     */
+    public static function getDirectionFromPositions(float $decimalDegreeLatitudeFrom, float $decimalDegreeLongitudeFrom, float $decimalDegreeLatitudeTo, float $decimalDegreeLongitudeTo): string
+    {
+        $degree = self::getDegree($decimalDegreeLatitudeFrom, $decimalDegreeLongitudeFrom, $decimalDegreeLatitudeTo, $decimalDegreeLongitudeTo);
+
+        return self::getDirectionFromDegree($degree);
+    }
+
+    /**
+     * Gets direction from degree.
+     *
+     * @param float $degree
+     * @return string
+     * @throws Exception
+     */
+    public static function getDirectionFromDegree(float $degree): string
+    {
+        if ($degree > 180.0) {
+            throw new Exception(sprintf('Unexpected angle given 1 "%.2f" (%s:%d).', $degree, __FILE__, __LINE__));
+        }
+
+        if ($degree < -180.0) {
+            throw new Exception(sprintf('Unexpected angle given 2 "%.2f" (%s:%d).', $degree, __FILE__, __LINE__));
+        }
+
+        return match (true) {
+            $degree >= -22.5 && $degree < 22.5 => 'N',
+            $degree >= 22.5 && $degree < 67.5 => 'NE',
+            $degree >= 67.5 && $degree < 112.5 => 'E',
+            $degree >= 112.5 && $degree < 157.5 => 'SE',
+            $degree >= 157.5 || $degree < -157.5 => 'S',
+            $degree >= -157.5 && $degree < -112.5 => 'SW',
+            $degree >= -112.5 && $degree < -67.5 => 'W',
+            $degree >= -67.5 && $degree < -22.5 => 'NW',
+            default => throw new Exception(sprintf('Unexpected angle given 3 "%.2f" (%s:%d).', $degree, __FILE__, __LINE__)),
+        };
+    }
+
+    /**
      * Parse full location string and converts it to a float array.
      *
      * Allowed formats:

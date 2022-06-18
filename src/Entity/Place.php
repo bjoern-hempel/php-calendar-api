@@ -96,6 +96,8 @@ abstract class Place
 
     protected float $distanceMeter = .0;
 
+    protected ?string $direction = null;
+
     protected ?PlaceP $cityP = null;
 
     protected ?PlaceA $cityA = null;
@@ -707,15 +709,22 @@ abstract class Place
      *
      * @param int $decimal
      * @param bool $withUnit
+     * @param bool $withDirection
      * @return float|string
      */
-    public function getDistanceDbInMeter(int $decimal = 1, bool $withUnit = true): float|string
+    public function getDistanceDbInMeter(int $decimal = 1, bool $withUnit = true, bool $withDirection = false): float|string
     {
         $mDegree = 42000000 / 360;
 
         $distance = round($mDegree * $this->getDistanceDb(), $decimal);
 
-        return $withUnit ? sprintf(sprintf('%%.%df m', $decimal), $distance) : $distance;
+        $distanceFormatted = $withUnit ? sprintf(sprintf('%%.%df m', $decimal), $distance) : $distance;
+
+        if ($withDirection) {
+            $distanceFormatted = sprintf('%s (%s)', $distanceFormatted, 'NE');
+        }
+
+        return $distanceFormatted;
     }
 
     /**
@@ -737,9 +746,10 @@ abstract class Place
      * @param int|null $decimal
      * @param string|null $unit
      * @param int $divider
+     * @param bool $withDirection
      * @return float|string
      */
-    public function getDistanceMeter(?int $decimal = null, ?string $unit = null, int $divider = 1): float|string
+    public function getDistanceMeter(?int $decimal = null, ?string $unit = null, int $divider = 1, bool $withDirection = false): float|string
     {
         $distanceMeter = $this->distanceMeter / $divider;
 
@@ -751,6 +761,10 @@ abstract class Place
             $distanceMeter = str_replace('.', ',', sprintf('%s %s', $distanceMeter, $unit));
         }
 
+        if ($withDirection && $this->getDirection() !== null && $this->distanceMeter !== .0) {
+            $distanceMeter = sprintf('%s (%s)', $distanceMeter, $this->getDirection());
+        }
+
         return $distanceMeter;
     }
 
@@ -758,11 +772,35 @@ abstract class Place
      * Sets distance in m of this place (if given from select query to a given place). Not used for db.
      *
      * @param float $distanceMeter
-     * @return Place
+     * @return $this
      */
-    public function setDistanceMeter(float $distanceMeter): Place
+    public function setDistanceMeter(float $distanceMeter): self
     {
         $this->distanceMeter = $distanceMeter;
+
+        return $this;
+    }
+
+    /**
+     * Gets direction this place (if given). Not used for db.
+     *
+     * @return string|null
+     */
+    public function getDirection(): ?string
+    {
+        return $this->direction;
+    }
+
+    /**
+     * Sets direction of this place (if given). Not used for db.
+     *
+     * @param string|null $direction
+     * @return $this
+     */
+    public function setDirection(?string $direction): self
+    {
+        $this->direction = $direction;
+
         return $this;
     }
 
