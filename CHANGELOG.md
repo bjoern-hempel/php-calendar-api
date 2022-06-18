@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.30.6] - 2022-06-18
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add direction to place
+
 ### [0.30.5] - 2022-06-18
 
 * [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Remove distance from direct search (one result, id search, always 0)
