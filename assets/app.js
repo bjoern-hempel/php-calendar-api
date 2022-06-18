@@ -154,12 +154,23 @@ let submitPosition = (position) => {
     document.getElementById('content-location-submit').click();
 };
 
+/**
+ * Round given value with given decimals.
+ *
+ * @param value
+ * @param decimals
+ * @returns {number}
+ */
+let round = (value, decimals) => {
+    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+};
+
 document.querySelectorAll('.location-own-position').forEach(
     (e) => e.addEventListener('click', () => {
             navigator.geolocation.getCurrentPosition((position) => {
-                let positionFull = position.coords.latitude + ' ' + position.coords.longitude;
-
-                submitPosition(positionFull);
+                window.location.href = window.location.protocol + '//' + window.location.host + window.location.pathname + '?q=' +
+                    round(position.coords.latitude, 6) + ',' +
+                    round(position.coords.longitude, 6);
             })
         }
     )
@@ -172,12 +183,9 @@ document.querySelectorAll('.location-position').forEach(
         let latitude = target.getAttribute('data-latitude');
         let longitude = target.getAttribute('data-longitude');
 
-        let position = latitude + ' ' + longitude;
-
-        let url = window.location.protocol + '//' + window.location.host + window.location.pathname + '?q=' + latitude + ',' + longitude;
-
-        window.location.href = url;
-        //submitPosition(position);
+        window.location.href = window.location.protocol + '//' + window.location.host + window.location.pathname + '?q=' +
+            latitude + ',' +
+            longitude;
     })
 );
 
