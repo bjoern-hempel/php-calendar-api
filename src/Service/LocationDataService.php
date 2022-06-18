@@ -215,6 +215,40 @@ class LocationDataService
     }
 
     /**
+     * Sets place informations.
+     *
+     * @param array<string, array<string, mixed>> $dataReturn
+     * @param Place $place
+     * @param bool $addDistance
+     * @return void
+     */
+    public function setPlaceInformation(array &$dataReturn, Place $place, bool $addDistance = false): void
+    {
+        $dataReturn = array_merge($dataReturn, [
+            self::KEY_NAME_PLACE_COUNTRY => $this->getData('Place Country (translated)', $place->getCountry(), '%s', null),
+            self::KEY_NAME_PLACE_COUNTRY_CODE => $this->getData('Place Country Code', $place->getCountryCode(), '%s', null),
+            self::KEY_NAME_PLACE_TIMEZONE => $this->getData('Place Timezone', $place->getTimezone(), '%s', null),
+            self::KEY_NAME_PLACE_POPULATION => $this->getData('Place Population', $place->getPopulation(), '%s', null),
+            self::KEY_NAME_PLACE_ELEVATION => $this->getData('Place Elevation', $place->getElevation(), '%s', ' m'),
+            self::KEY_NAME_PLACE_FEATURE_CLASS => $this->getData('Place Feature Class', $place->getFeatureClass(), '%s', null),
+            self::KEY_NAME_PLACE_FEATURE_CODE => $this->getData('Place Feature Code', $place->getFeatureCode(), '%s', null),
+            self::KEY_NAME_PLACE_DEM => $this->getData('Digital Elevation Model', $place->getDem(), '%s', ' m'),
+            self::KEY_NAME_PLACE_ADMIN1 => $this->getData('Admin1 Code', $place->getAdmin1Code(), '%s', null),
+            self::KEY_NAME_PLACE_ADMIN2 => $this->getData('Admin2 Code', $place->getAdmin2Code(), '%s', null),
+            self::KEY_NAME_PLACE_ADMIN3 => $this->getData('Admin3 Code', $place->getAdmin3Code(), '%s', null),
+            self::KEY_NAME_PLACE_ADMIN4 => $this->getData('Admin4 Code', $place->getAdmin4Code(), '%s', null),
+            self::KEY_NAME_CITY_OR_RURAL => $this->getData('City or rural', $place->isCity() ? 'Stadt' : 'Ländliche Gegend', '%s', null),
+        ]);
+
+        if ($addDistance) {
+            $dataReturn = array_merge($dataReturn, [
+                self::KEY_NAME_PLACE_DISTANCE_DB => $this->getData('Place Distance DB', sprintf('%.6f', $place->getDistanceDb()), '%s', null),
+                self::KEY_NAME_PLACE_DISTANCE_METER => $this->getData('Place Distance Meters', sprintf('%.2f', $place->getDistanceMeter()), '%.2f', ' m'),
+            ]);
+        }
+    }
+
+    /**
      * Gets full location data.
      *
      * @param float $latitude
@@ -302,22 +336,19 @@ class LocationDataService
             self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->verbose, $placeSource, true), '%s', null),
         ]);
 
+        if ($placeSource !== null) {
+
+            /* Set country to place source. */
+            if ($place->getCountry() !== null) {
+                $placeSource->setCountry($place->getCountry());
+            }
+
+            $this->setPlaceInformation($dataReturn, $placeSource);
+        } else {
+            $this->setPlaceInformation($dataReturn, $place, true);
+        }
+
         return array_merge($dataReturn, [
-            self::KEY_NAME_PLACE_COUNTRY => $this->getData('Place Country (translated)', $place->getCountry(), '%s', null),
-            self::KEY_NAME_PLACE_COUNTRY_CODE => $this->getData('Place Country Code', $place->getCountryCode(), '%s', null),
-            self::KEY_NAME_PLACE_TIMEZONE => $this->getData('Place Timezone', $place->getTimezone(), '%s', null),
-            self::KEY_NAME_PLACE_POPULATION => $this->getData('Place Population', $place->getPopulation(), '%s', null),
-            self::KEY_NAME_PLACE_ELEVATION => $this->getData('Place Elevation', $place->getElevation(), '%s', ' m'),
-            self::KEY_NAME_PLACE_FEATURE_CLASS => $this->getData('Place Feature Class', $place->getFeatureClass(), '%s', null),
-            self::KEY_NAME_PLACE_FEATURE_CODE => $this->getData('Place Feature Code', $place->getFeatureCode(), '%s', null),
-            self::KEY_NAME_PLACE_DISTANCE_DB => $this->getData('Place Distance DB', sprintf('%.6f', $place->getDistanceDb()), '%s', null),
-            self::KEY_NAME_PLACE_DISTANCE_METER => $this->getData('Place Distance Meters', sprintf('%.2f', $place->getDistanceMeter()), '%.2f', ' m'),
-            self::KEY_NAME_PLACE_DEM => $this->getData('Digital Elevation Model', $place->getDem(), '%s', ' m'),
-            self::KEY_NAME_PLACE_ADMIN1 => $this->getData('Admin1 Code', $place->getAdmin1Code(), '%s', null),
-            self::KEY_NAME_PLACE_ADMIN2 => $this->getData('Admin2 Code', $place->getAdmin2Code(), '%s', null),
-            self::KEY_NAME_PLACE_ADMIN3 => $this->getData('Admin3 Code', $place->getAdmin3Code(), '%s', null),
-            self::KEY_NAME_PLACE_ADMIN4 => $this->getData('Admin4 Code', $place->getAdmin4Code(), '%s', null),
-            self::KEY_NAME_CITY_OR_RURAL => $this->getData('City or rural', $place->isCity() ? 'Stadt' : 'Ländliche Gegend', '%s', null),
             self::KEY_NAME_PLACE_TIME_TAKEN => $this->getData('Time', $time, '%.3f', ' s'),
         ]);
     }
