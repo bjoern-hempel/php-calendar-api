@@ -762,7 +762,7 @@ abstract class Place
         }
 
         if ($withDirection && $this->getDirection() !== null && $this->distanceMeter !== .0) {
-            $distanceMeter = sprintf('%s (%s)', $distanceMeter, $this->getDirection());
+            $distanceMeter = sprintf('<div style="line-height: .875em;">%s</div><div style="font-size: .75em; line-height: .75em; padding-top: .5em;">- %s -</div>', $distanceMeter, $this->getDirection());
         }
 
         return $distanceMeter;
