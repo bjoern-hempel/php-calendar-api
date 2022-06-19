@@ -238,7 +238,9 @@ document.addEventListener('DOMContentLoaded', function(event) {
         setDirection(0);
 
         window.addEventListener('deviceorientation', (eventData) => {
-            setDirection(eventData.alpha);
+            let dir = eventData.webkitCompassHeading || Math.abs(eventData.alpha - 360);
+
+            setDirection(dir);
         }, true);
     }
 });
