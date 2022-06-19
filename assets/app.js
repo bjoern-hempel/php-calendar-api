@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
         window.addEventListener('deviceorientation', (eventData) => {
             let dir = eventData.webkitCompassHeading || Math.abs(eventData.alpha - 360);
 
-            document.getElementById('alpha').innerText = dir;
+            document.getElementById('alpha').innerText = eventData.alpha;
 
             setDirection(dir);
         }, true);
