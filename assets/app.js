@@ -203,7 +203,11 @@ document.querySelectorAll('.location-id').forEach(
 );
 
 document.addEventListener('DOMContentLoaded', function(event) {
-    if (window.DeviceOrientationEvent) {
+    if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
+        const compass = document.getElementById('compass');
+
+        compass.style.display = 'block';
+
         window.addEventListener('deviceorientation', (eventData) => {
             const dir = eventData.alpha
             const compassDisc = document.getElementById('compassDisc');
