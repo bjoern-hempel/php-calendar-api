@@ -239,6 +239,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
         window.addEventListener('deviceorientation', (eventData) => {
             setDirection(eventData.alpha);
-        }, false);
+        }, true);
     }
 });
