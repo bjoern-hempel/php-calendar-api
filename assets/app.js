@@ -231,52 +231,14 @@ let displayCompass = () => {
     }
 }
 
-let locationHandler = (position) => {
-    const { latitude, longitude } = position.coords;
-    let pointDegree = calcDegreeToPoint(latitude, longitude);
-
-    if (pointDegree < 0) {
-        pointDegree = pointDegree + 360;
-    }
-}
-
-let calcDegreeToPoint = (latitude, longitude) => {
-    // Qibla geolocation
-    const point = {
-        lat: 21.422487,
-        lng: 39.826206
-    };
-
-    const phiK = (point.lat * Math.PI) / 180.0;
-    const lambdaK = (point.lng * Math.PI) / 180.0;
-    const phi = (latitude * Math.PI) / 180.0;
-    const lambda = (longitude * Math.PI) / 180.0;
-
-    const psi =
-        (180.0 / Math.PI) *
-        Math.atan2(
-            Math.sin(lambdaK - lambda),
-            Math.cos(phi) * Math.tan(phiK) -
-            Math.sin(phi) * Math.cos(lambdaK - lambda)
-        );
-
-    return Math.round(psi);
-}
-
 document.addEventListener('DOMContentLoaded', function(event) {
-    //if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
-    if (window.DeviceOrientationEvent) {
+    if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
+    //if (window.DeviceOrientationEvent) {
         displayCompass();
         setDirection(0);
 
-        navigator.geolocation.getCurrentPosition(locationHandler);
-
-        window.addEventListener('deviceorientation', (eventData) => {
-            let dir = eventData.webkitCompassHeading || Math.abs(eventData.alpha - 360);
-
-            document.getElementById('alpha').innerText = eventData.alpha;
-
-            setDirection(dir);
+        window.addEventListener('deviceorientationabsolute', (eventData) => {
+            setDirection(eventData.alpha);
         }, true);
     }
 });

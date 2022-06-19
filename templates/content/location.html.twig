@@ -97,7 +97,6 @@
                             <div class="arrow"></div>
                             <div class="disc" id="compassDisc"></div>
                         </div>
-                        <div id="alpha"></div>
 
                         {# Show place details #}
                         <table class="table">
@@ -127,6 +126,11 @@
                                 <table class="table">
                                     {% for place in value %}
                                         <tr>
+                                            <td class="table-compass">
+                                                <div class="compass compass-direction">
+                                                    <div class="arrow arrow-direction" data-degree="{{ place.degree }}"></div>
+                                                </div>
+                                            </td>
                                             <td class="table-name">
                                                 <small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name }}{{ locationData['place-country-code'] is same as(place.countryCode) ? '' : (', ' ~ ('country.alpha2.' ~ place.countryCode|lower)|trans([], 'countries', place.countryCode)) }}</b>
                                                 <br />
@@ -140,9 +144,6 @@
                                             </td>
                                             <td class="table-value">
                                                 <a href="{{ place.googleLink }}" target="_blank" class="btn btn-primary" style="width: 100px;">{{ place.distanceMeter(3, 'km', 1000, true)|raw }}</a>
-                                                <div class="compass compass-direction">
-                                                    <div class="arrow arrow-direction" data-degree="{{ place.degree }}"></div>
-                                                </div>
                                             </td>
                                         </tr>
                                     {% endfor %}
