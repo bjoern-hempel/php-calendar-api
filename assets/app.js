@@ -264,8 +264,8 @@ let calcDegreeToPoint = (latitude, longitude) => {
 }
 
 document.addEventListener('DOMContentLoaded', function(event) {
-    if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
-    //if (window.DeviceOrientationEvent) {
+    //if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
+    if (window.DeviceOrientationEvent) {
         displayCompass();
         setDirection(0);
 
@@ -273,6 +273,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
         window.addEventListener('deviceorientation', (eventData) => {
             let dir = eventData.webkitCompassHeading || Math.abs(eventData.alpha - 360);
+
+            document.getElementById('alpha').innerText = dir;
 
             setDirection(dir);
         }, true);
