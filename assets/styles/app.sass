@@ -554,17 +554,30 @@ body.content-location
                 height: 32px
 
     table
+        .table-tr-first
+            border-color: transparent
         .table-name
             width: auto!important
         .table-value
             width: auto!important
             text-align: right
+
+            &.table-value-mobile
+                display: table-cell
+            &.table-value-desktop
+                display: none
         .table-compass
             width: 0
             padding: .5rem 0
 
         @include media-breakpoint-up(md)
+            .table-tr-first
+                border-color: #dee2e6
             .table-name
                 width: 33%
             .table-value
                 width: 67%
+                &.table-value-mobile
+                    display: none
+                &.table-value-desktop
+                    display: table-cell

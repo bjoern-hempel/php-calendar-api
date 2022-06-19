@@ -125,7 +125,7 @@
 
                                 <table class="table">
                                     {% for place in value %}
-                                        <tr>
+                                        <tr class="table-tr-first">
                                             <td class="table-compass">
                                                 <div class="compass compass-direction">
                                                     <div class="arrow arrow-direction" data-degree="{{ place.degree }}"></div>
@@ -142,7 +142,12 @@
                                                     <small>, {{ elevationHill }} m</small>
                                                 {% endif %}
                                             </td>
-                                            <td class="table-value">
+                                            <td class="table-value table-value-desktop">
+                                                <a href="{{ place.googleLink }}" target="_blank" class="btn btn-primary" style="width: 100px;">{{ place.distanceMeter(3, 'km', 1000, true)|raw }}</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" class="table-value table-value-mobile">
                                                 <a href="{{ place.googleLink }}" target="_blank" class="btn btn-primary" style="width: 100px;">{{ place.distanceMeter(3, 'km', 1000, true)|raw }}</a>
                                             </td>
                                         </tr>

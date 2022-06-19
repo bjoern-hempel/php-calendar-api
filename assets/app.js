@@ -233,7 +233,6 @@ let displayCompass = () => {
 
 document.addEventListener('DOMContentLoaded', function(event) {
     if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
-    //if (window.DeviceOrientationEvent) {
         displayCompass();
         setDirection(0);
 
