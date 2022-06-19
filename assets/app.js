@@ -201,3 +201,15 @@ document.querySelectorAll('.location-id').forEach(
         window.location.href = url;
     })
 );
+
+document.addEventListener('DOMContentLoaded', function(event) {
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', (eventData) => {
+            const dir = eventData.alpha
+            const compassDisc = document.getElementById('compassDisc');
+            compassDisc.style.transform = `rotate(${dir}deg)`;
+            compassDisc.style.webkitTransform = `rotate(${dir}deg)`;
+            compassDisc.style.MozTransform = `rotate(${dir}deg)`;
+        }, false);
+    }
+});
