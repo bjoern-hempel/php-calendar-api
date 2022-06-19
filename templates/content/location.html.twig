@@ -139,6 +139,9 @@
                                             </td>
                                             <td class="table-value">
                                                 <a href="{{ place.googleLink }}" target="_blank" class="btn btn-primary" style="width: 100px;">{{ place.distanceMeter(3, 'km', 1000, true)|raw }}</a>
+                                                <div class="compass compass-direction">
+                                                    <div class="arrow arrow-direction" data-degree="{{ place.degree }}"></div>
+                                                </div>
                                             </td>
                                         </tr>
                                     {% endfor %}

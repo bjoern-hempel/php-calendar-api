@@ -203,17 +203,47 @@ document.querySelectorAll('.location-id').forEach(
 );
 
 document.addEventListener('DOMContentLoaded', function(event) {
-    if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
-        const compass = document.getElementById('compass');
 
+    const arrowDirection = document.getElementsByClassName('arrow-direction');
+    for (let i = 0; i < arrowDirection.length; i++) {
+        let item = arrowDirection.item(i);
+        let dataDegree = parseFloat(item.getAttribute('data-degree'));
+        let dirArrow = dataDegree;
+
+        item.style.transform = `rotate(${dirArrow}deg)`;
+        item.style.webkitTransform = `rotate(${dirArrow}deg)`;
+        item.style.MozTransform = `rotate(${dirArrow}deg)`;
+    }
+
+    if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
+    //if (window.DeviceOrientationEvent) {
+        const compass = document.getElementById('compass');
         compass.style.display = 'block';
 
+        const compassDirection = document.getElementsByClassName('compass-direction');
+        for (let i = 0; i < compassDirection.length; i++) {
+            compassDirection.item(i).style.display = 'block';
+        }
+
         window.addEventListener('deviceorientation', (eventData) => {
-            const dir = eventData.alpha
+            const dir = eventData.alpha;
+
             const compassDisc = document.getElementById('compassDisc');
             compassDisc.style.transform = `rotate(${dir}deg)`;
             compassDisc.style.webkitTransform = `rotate(${dir}deg)`;
             compassDisc.style.MozTransform = `rotate(${dir}deg)`;
+
+            const arrowDirection = document.getElementsByClassName('arrow-direction');
+            for (let i = 0; i < arrowDirection.length; i++) {
+                let item = arrowDirection.item(i);
+                let dataDegree = parseFloat(item.getAttribute('data-degree'));
+                let dirArrow = dataDegree + dir;
+
+                item.style.transform = `rotate(${dirArrow}deg)`;
+                item.style.webkitTransform = `rotate(${dirArrow}deg)`;
+                item.style.MozTransform = `rotate(${dirArrow}deg)`;
+            }
+
         }, false);
     }
 });

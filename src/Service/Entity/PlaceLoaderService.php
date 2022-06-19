@@ -272,6 +272,7 @@ SQL;
         $place->setDistanceDb(floatval($row['distance']));
         $place->setDistanceMeter(LocationDataService::getDistanceBetweenTwoPointsInMeter($latitude, $longitude, floatval($row['latitude']), floatval($row['longitude'])));
         $place->setDirection(GPSConverter::getDirectionFromPositions($latitude, $longitude, floatval($row['latitude']), floatval($row['longitude'])));
+        $place->setDegree(GPSConverter::getDegree($latitude, $longitude, floatval($row['latitude']), floatval($row['longitude'])));
         $place->setAdmin1Code(!empty($row['admin1_code']) ? strval($row['admin1_code']) : null);
         $place->setAdmin2Code(!empty($row['admin2_code']) ? strval($row['admin2_code']) : null);
         $place->setAdmin3Code(!empty($row['admin3_code']) ? strval($row['admin3_code']) : null);

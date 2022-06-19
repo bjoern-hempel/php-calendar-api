@@ -98,6 +98,8 @@ abstract class Place
 
     protected ?string $direction = null;
 
+    protected ?float $degree = null;
+
     protected ?PlaceP $cityP = null;
 
     protected ?PlaceA $cityA = null;
@@ -801,6 +803,24 @@ abstract class Place
     {
         $this->direction = $direction;
 
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getDegree(): ?float
+    {
+        return $this->degree;
+    }
+
+    /**
+     * @param float|null $degree
+     * @return Place
+     */
+    public function setDegree(?float $degree): Place
+    {
+        $this->degree = $degree;
         return $this;
     }
 
