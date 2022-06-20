@@ -504,7 +504,8 @@ SQL;
     {
         foreach ($placesP as $placeP) {
             switch (true) {
-                case in_array($placeP->getFeatureCode(), Code::FEATURE_CODES_P_ADMIN_PLACES) && $district->getAdmin4Code() == $placeP->getAdmin4Code():
+                case in_array($placeP->getFeatureCode(), Code::FEATURE_CODES_P_ADMIN_PLACES) &&
+                    $district->getAdmin4Code() == $placeP->getAdmin4Code():
                     return $placeP;
             }
         }

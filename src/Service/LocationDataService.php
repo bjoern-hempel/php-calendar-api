@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Constant\Code;
 use App\Entity\Place;
 use App\Entity\PlaceL;
 use App\Entity\PlaceP;
@@ -169,7 +170,7 @@ class LocationDataService
      */
     public function getLocationPlace(float $latitude, float $longitude, array &$data = []): ?PlaceP
     {
-        return $this->placeLoaderService->findPlacePByPosition($latitude, $longitude, null, $data);
+        return $this->placeLoaderService->findPlacePByPosition($latitude, $longitude, Code::FEATURE_CODES_P_ADMIN_PLACES, $data);
     }
 
     /**
@@ -263,7 +264,7 @@ class LocationDataService
     public function getLocationDataFull(float $latitude, float $longitude, array &$data = [], ?Place $placeSource = null): array
     {
         $timer = Timer::start();
-        $place = $this->placeLoaderService->findPlacePByPosition($latitude, $longitude, null, $data, $placeSource);
+        $place = $this->placeLoaderService->findPlacePByPosition($latitude, $longitude, Code::FEATURE_CODES_P_ADMIN_PLACES, $data, $placeSource);
         $time = Timer::stop($timer);
 
         if ($place === null) {

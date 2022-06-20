@@ -802,12 +802,24 @@ class Code
     ];
 
     public const FEATURE_CODES_P_ADMIN_PLACES = [
-        self::FEATURE_CODE_P_PPLA,
-        self::FEATURE_CODE_P_PPLA2,
-        self::FEATURE_CODE_P_PPLA3,
-        self::FEATURE_CODE_P_PPLA4,
-        self::FEATURE_CODE_P_PPLA5,
-        self::FEATURE_CODE_P_PPLC
+        self::FEATURE_CODE_P_PPL,
+        self::FEATURE_CODE_P_PPLA, // default
+        self::FEATURE_CODE_P_PPLA2, // default
+        self::FEATURE_CODE_P_PPLA3, // default
+        self::FEATURE_CODE_P_PPLA4, // default
+        self::FEATURE_CODE_P_PPLA5, // default
+        self::FEATURE_CODE_P_PPLC, // default
+        //self::FEATURE_CODE_P_PPLCH,
+        self::FEATURE_CODE_P_PPLF,
+        self::FEATURE_CODE_P_PPLG,
+        //self::FEATURE_CODE_P_PPLH,
+        self::FEATURE_CODE_P_PPLL,
+        self::FEATURE_CODE_P_PPLQ,
+        self::FEATURE_CODE_P_PPLR,
+        self::FEATURE_CODE_P_PPLS,
+        self::FEATURE_CODE_P_PPLW,
+        self::FEATURE_CODE_P_PPLX,
+        self::FEATURE_CODE_P_STLMT,
     ];
 
     public const FEATURE_CODES_P_DISTRICT_PLACES = [
