@@ -157,7 +157,7 @@ H:
   WLL: "well" # a cylindrical hole, pit, or tunnel drilled or dug down to a depth from which water, oil, or gas can be pumped or brought to the surface
   WLLQ: "abandoned well" #
   WLLS: "wells" # cylindrical holes, pits, or tunnels drilled or dug down to a depth from which water, oil, or gas can be pumped or brought to the surface
-  WTLD: "wetland" # an area subject to inundation, usually characterized by bog, marsh, or swamp vegetation
+  WTLD: "Moorland" # an area subject to inundation, usually characterized by bog, marsh, or swamp vegetation
   WTLDI: "intermittent wetland" #
   WTRC: "watercourse" # a natural, well-defined channel produced by flowing water, or an artificial channel designed to carry flowing water
   WTRH: "waterhole(s)" # a natural hole, hollow, or small depression that contains water, used by man and animals, especially in arid areas
@@ -176,10 +176,10 @@ L:
   CST: "coast" # a zone of variable width straddling the shoreline
   CTRB: "business center" # a place where a number of businesses are located
   DEVH: "housing development" # a tract of land on which many houses of similar design are built according to a development plan
-  FLD: "field(s)" # an open as opposed to wooded area
+  FLD: "Feld(er)" # an open as opposed to wooded area
   FLDI: "irrigated field(s)" # a tract of level or terraced land which is irrigated
   GASF: "gasfield" # an area containing a subterranean store of natural gas of economic value
-  GRAZ: "grazing area" # an area of grasses and shrubs used for grazing
+  GRAZ: "Weidefläche" # an area of grasses and shrubs used for grazing
   GVL: "gravel area" # an area covered with gravel
   INDS: "Industriegebiet" # an area characterized by industrial activity
   LAND: "arctic land" # a tract of land in the Arctic

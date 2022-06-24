@@ -17,14 +17,9 @@ use App\Repository\PlaceRepository;
 use App\Service\Entity\PlaceLoaderService;
 use App\Service\ImageDataService;
 use App\Service\LocationDataService;
-use App\Utils\Image\Color;
-use App\Utils\Image\ColorDetectorCiede2000;
-use App\Utils\Image\ColorDetectorSimple;
-use App\Utils\Image\Palette;
 use App\Utils\Timer;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Exception;
-use GdImage;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,15 +40,6 @@ class ShowLocationCommand extends Command
     protected static $defaultName = 'app:location:show';
 
     protected const REGEXP_OUTPUT = '%%-%ds %%-%ds %%s';
-
-    protected const NAME_TRANSPARENT = 'transparent';
-
-    protected const DEFAULT_IMAGE_WIDTH = 120;
-
-    protected const DEFAULT_COLOR_COUNT = 5;
-
-    /* @see https://www.php.net/manual/de/function.imagesetinterpolation.php */
-    protected const DEFAULT_IMAGE_MODE = IMG_GAUSSIAN;
 
     protected const LINE_BREAK = "\n";
 

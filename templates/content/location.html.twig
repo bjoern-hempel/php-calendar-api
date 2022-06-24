@@ -31,7 +31,9 @@
                             <input type="search" id="q" name="q" required="required" autofocus="autofocus" value="{{ search }}">
                         </div>
                         <div>
-                            <button type="submit" class="btn btn-primary" id="content-location-submit">Standortsuche</button>
+                            <button type="submit" class="btn btn-primary" id="content-location-submit">Suche Standort</button>
+                            &nbsp;
+                            <button type="submit" class="btn btn-primary with-position">Suche mit aktueller Position</button>
                         </div>
                     </form>
 
@@ -63,7 +65,8 @@
                             {% for place in results %}
                                 <tr>
                                     <td class="table-name" style="width: 100%!important;">
-                                        <small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name ~ ', ' ~ ('country.alpha2.' ~ place.countryCode|lower)|trans([], 'countries', place.countryCode) }}</b><br />
+                                        <small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name ~ ', ' ~ ('country.alpha2.' ~ place.countryCode|lower)|trans([], 'countries', place.countryCode) }}{% if place.distanceMeter is not same as(0.0) %}, {{ place.distanceMeter(1, 'km', 1000, true)|raw }}{% endif %}
+                                        </b><br />
                                         <small>{{ (place.featureClass ~ '.' ~ place.featureCode)|trans([], 'place') }}</small>
                                         {% set elevationHill = place.elevationHill %}
                                         {% if elevationHill is same as(false) %}

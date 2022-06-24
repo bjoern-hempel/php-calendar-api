@@ -189,6 +189,30 @@ document.querySelectorAll('.location-position').forEach(
     })
 );
 
+document.querySelectorAll('.with-position').forEach(
+    (e) => e.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        let target = e.target;
+
+        navigator.geolocation.getCurrentPosition((position) => {
+
+            /* Create hidden element */
+            let inputHidden = document.createElement('input');
+            inputHidden.type = 'hidden';
+            inputHidden.name = 'l';
+            inputHidden.value = round(position.coords.latitude, 6) + ',' + round(position.coords.longitude, 6);
+
+            /* Append hidden element */
+            target.parentElement.appendChild(inputHidden);
+
+            /* Submit form */
+            document.getElementById('content-location-submit').click();
+        });
+    })
+);
+
 document.querySelectorAll('.location-id').forEach(
     (e) => e.addEventListener('click', (e) => {
         let target = e.target;

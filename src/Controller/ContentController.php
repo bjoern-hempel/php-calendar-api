@@ -49,6 +49,8 @@ class ContentController extends BaseController
 
     public const PARAMETER_NAME_QUERY = 'q';
 
+    public const PARAMETER_NAME_LOCATION = 'l';
+
     public const PARAMETER_NAME_ID = 'id';
 
     /**
@@ -100,10 +102,11 @@ class ContentController extends BaseController
      * @param string $locationFull
      * @param Place|null $placeSource
      * @param Place[] $placesSource
+     * @param string|null $location
      * @return float[]|null
      * @throws Exception
      */
-    protected function getPositionFromStringSubmit(string $locationFull, ?Place &$placeSource = null, array &$placesSource = []): ?array
+    protected function getPositionFromStringSubmit(string $locationFull, ?Place &$placeSource = null, array &$placesSource = [], string $location = null): ?array
     {
         $parsed = GPSConverter::parseFullLocation2DecimalDegrees($locationFull);
 
@@ -114,6 +117,27 @@ class ContentController extends BaseController
         }
 
         $placesSource = $this->locationDataService->getLocationsByName($locationFull);
+
+        if (count($placesSource) > 1 && $location !== null) {
+            $locationSplit = preg_split('~,~', $location);
+
+            if ($locationSplit === false) {
+                throw new Exception(sprintf('Unable to split string (%s:%d).', __FILE__, __LINE__));
+            }
+
+            list($latitude, $longitude) = $locationSplit;
+
+            foreach ($placesSource as $placeSource) {
+                $distanceMeter = LocationDataService::getDistanceBetweenTwoPointsInMeter(
+                    floatval($latitude),
+                    floatval($longitude),
+                    $placeSource->getCoordinate()->getLongitude(),
+                    $placeSource->getCoordinate()->getLatitude()
+                );
+
+                $placeSource->setDistanceMeter($distanceMeter);
+            }
+        }
 
         switch (true) {
             case count($placesSource) <= 0:
@@ -165,7 +189,13 @@ class ContentController extends BaseController
             /* Parameter q given */
             case $request->query->has(self::PARAMETER_NAME_QUERY):
                 $search = strval($request->query->get(self::PARAMETER_NAME_QUERY));
-                $position = $this->getPositionFromStringSubmit($search, $placeSource, $results);
+                $location = null;
+
+                if ($request->query->has(self::PARAMETER_NAME_LOCATION)) {
+                    $location = strval($request->query->get(self::PARAMETER_NAME_LOCATION));
+                }
+
+                $position = $this->getPositionFromStringSubmit($search, $placeSource, $results, $location);
 
                 if ($position === null) {
                     return [];
