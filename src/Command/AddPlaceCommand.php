@@ -207,7 +207,7 @@ EOT
         if (count($places) > 0) {
             $output->writeln(sprintf('%d records already found:', count($places)));
             foreach ($places as $place) {
-                $googleLink = GPSConverter::decimalDegree2google($place->getCoordinate()->getLongitude(), $place->getCoordinate()->getLatitude());
+                $googleLink = GPSConverter::decimalDegree2GoogleLink($place->getLatitude(), $place->getLongitude());
                 $output->writeln(
                     sprintf(
                         '- %s: (GeoNameId = %d, FClass = %s, FCode = %s, CCode = %s, Google = "%s")',
@@ -265,12 +265,12 @@ EOT
         $place->setCreatedAt(new DateTimeImmutable());
         $place->setUpdatedAt(new DateTimeImmutable());
 
-        $googleLink = GPSConverter::decimalDegree2google($latitude, $longitude);
+        $googleLink = GPSConverter::decimalDegree2GoogleLink($latitude, $longitude);
 
         $output->writeln(sprintf('Add new place%s', $additionalQuestion));
         $output->writeln(sprintf('Name:          %s', $place->getName()));
-        $output->writeln(sprintf('Latitude:      %f', $place->getCoordinate()->getLongitude()));
-        $output->writeln(sprintf('Longitude:     %f', $place->getCoordinate()->getLatitude()));
+        $output->writeln(sprintf('Latitude:      %f', $place->getLatitude()));
+        $output->writeln(sprintf('Longitude:     %f', $place->getLongitude()));
         $output->writeln(sprintf('Feature class: %s', $place->getFeatureClass()));
         $output->writeln(sprintf('Feature code:  %s', $place->getFeatureCode()));
         $output->writeln(sprintf('Translation:   %s', $this->translator->trans(sprintf('%s.%s', $place->getFeatureClass(), $place->getFeatureCode()), [], 'place')));

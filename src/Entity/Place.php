@@ -217,7 +217,7 @@ abstract class Place
      */
     public function getNameFull(bool $detailed = false, ?Place $placeSource = null, bool $withProperties = false): string
     {
-        $name = $this->getName($withProperties);
+        $name = $this->getName($detailed, $withProperties);
 
         if ($this->getDistrict() !== null && !$this->strContains($name, $this->getDistrict()->getName())) {
             $name = sprintf($this->templateAddName, $name, $this->getDistrict()->getName($detailed));
@@ -382,6 +382,30 @@ abstract class Place
         $this->coordinate = $coordinate;
 
         return $this;
+    }
+
+    /**
+     * Helper function: Returns the latitude position (y position) of this place.
+     *
+     * TODO: Change latitude and longitude within db. It is reversed.
+     *
+     * @return float
+     */
+    public function getLatitude(): float
+    {
+        return $this->getCoordinate()->getLongitude();
+    }
+
+    /**
+     * Helper function: Returns the longitude position (x position) of this place.
+     *
+     * TODO: Change latitude and longitude within db. It is reversed.
+     *
+     * @return float
+     */
+    public function getLongitude(): float
+    {
+        return $this->getCoordinate()->getLatitude();
     }
 
     /**
@@ -1408,7 +1432,7 @@ abstract class Place
     {
         $coordinateTranslated = new Point($this->coordinate->getX(), $this->coordinate->getY(), $this->coordinate->getSrid());
 
-        return GPSConverter::decimalDegree2google(
+        return GPSConverter::decimalDegree2GoogleLink(
             $coordinateTranslated->getLongitude(),
             $coordinateTranslated->getLatitude(),
             $coordinateTranslated->getLongitudeDirection(),

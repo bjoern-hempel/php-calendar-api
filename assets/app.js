@@ -140,6 +140,9 @@ let buildLightbox = (e) => {
     modal.find('.carousel-control-prev').click(() => { addLightboxClasses(); });
 }
 
+/**
+ * Starts the lightbox.
+ */
 document.querySelectorAll('.lightbox-own').forEach(
     (e) => e.addEventListener('click', buildLightbox)
 );
@@ -165,31 +168,99 @@ let round = (value, decimals) => {
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
 };
 
+/**
+ * Shows the main and detail compasses.
+ */
+let displayCompass = () => {
+    let compass = document.getElementById('compass');
+    if (compass !== null) {
+        compass.style.display = 'block';
+    }
+
+    let compassDirection = document.getElementsByClassName('compass-direction');
+    for (let i = 0; i < compassDirection.length; i++) {
+        compassDirection.item(i).style.display = 'block';
+    }
+}
+
+/**
+ * Set direction to main compass and detail compasses.
+ *
+ * @param dir
+ */
+let setDirection = (dir) => {
+
+    let compassDisc = document.getElementById('compassDisc');
+    if (compassDisc) {
+        compassDisc.style.transform = `rotate(${dir}deg)`;
+        compassDisc.style.webkitTransform = `rotate(${dir}deg)`;
+        compassDisc.style.MozTransform = `rotate(${dir}deg)`;
+    }
+
+    let arrowDirection = document.getElementsByClassName('arrow-direction');
+    for (let i = 0; i < arrowDirection.length; i++) {
+        let item = arrowDirection.item(i);
+        let dataDegree = parseFloat(item.getAttribute('data-degree'));
+        let dirArrow = dataDegree + dir;
+
+        item.style.transform = `rotate(${dirArrow}deg)`;
+        item.style.webkitTransform = `rotate(${dirArrow}deg)`;
+        item.style.MozTransform = `rotate(${dirArrow}deg)`;
+    }
+}
+
+/**
+ * Returns the full location from position.
+ *
+ * @param GeolocationPosition position
+ * @returns {string}
+ */
+let getPosition = (position) => {
+    return round(position.coords.latitude, 6) + ',' + round(position.coords.longitude, 6);
+}
+
+/**
+ * Example link list: Search for current location.
+ */
 document.querySelectorAll('.location-own-position').forEach(
     (e) => e.addEventListener('click', () => {
             navigator.geolocation.getCurrentPosition((position) => {
-                window.location.href = window.location.protocol + '//' + window.location.host + window.location.pathname + '?q=' +
-                    round(position.coords.latitude, 6) + ',' +
-                    round(position.coords.longitude, 6);
+
+                /* Write location. */
+                document.getElementById('q').value = getPosition(position);
+
+                /* Submit form. */
+                document.getElementById('content-location-submit').click();
             })
         }
     )
 );
 
+/**
+ * Example link list: Search location examples.
+ */
 document.querySelectorAll('.location-position').forEach(
     (e) => e.addEventListener('click', (e) => {
+
+        /* Get clicked element. */
         let target = e.target;
 
+        /* Get latitude and longitude. */
         let latitude = target.getAttribute('data-latitude');
         let longitude = target.getAttribute('data-longitude');
 
-        window.location.href = window.location.protocol + '//' + window.location.host + window.location.pathname + '?q=' +
-            latitude + ',' +
-            longitude;
+        /* Write location. */
+        document.getElementById('q').value = latitude + ',' + longitude;
+
+        /* Submit form. */
+        document.getElementById('content-location-submit').click();
     })
 );
 
-document.querySelectorAll('.with-position').forEach(
+/**
+ * Search form: Add current position to search request.
+ */
+document.querySelectorAll('.search-with-position').forEach(
     (e) => e.addEventListener('click', (e) => {
         e.stopPropagation();
         e.preventDefault();
@@ -223,6 +294,28 @@ document.querySelectorAll('.with-position').forEach(
     })
 );
 
+/**
+ * Search form: Search for current location.
+ */
+document.querySelectorAll('.search-current-position').forEach(
+    (e) => e.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        navigator.geolocation.getCurrentPosition((position) => {
+
+            /* Write location. */
+            document.getElementById('q').value = getPosition(position);
+
+            /* Submit form. */
+            document.getElementById('content-location-submit').click();
+        });
+    })
+);
+
+/**
+ * Location result list: Open direct element (via id).
+ */
 document.querySelectorAll('.location-id').forEach(
     (e) => e.addEventListener('click', (e) => {
         let target = e.target;
@@ -236,35 +329,9 @@ document.querySelectorAll('.location-id').forEach(
     })
 );
 
-let setDirection = (dir) => {
-
-    let compassDisc = document.getElementById('compassDisc');
-    compassDisc.style.transform = `rotate(${dir}deg)`;
-    compassDisc.style.webkitTransform = `rotate(${dir}deg)`;
-    compassDisc.style.MozTransform = `rotate(${dir}deg)`;
-
-    let arrowDirection = document.getElementsByClassName('arrow-direction');
-    for (let i = 0; i < arrowDirection.length; i++) {
-        let item = arrowDirection.item(i);
-        let dataDegree = parseFloat(item.getAttribute('data-degree'));
-        let dirArrow = dataDegree + dir;
-
-        item.style.transform = `rotate(${dirArrow}deg)`;
-        item.style.webkitTransform = `rotate(${dirArrow}deg)`;
-        item.style.MozTransform = `rotate(${dirArrow}deg)`;
-    }
-}
-
-let displayCompass = () => {
-    let compass = document.getElementById('compass');
-    compass.style.display = 'block';
-
-    let compassDirection = document.getElementsByClassName('compass-direction');
-    for (let i = 0; i < compassDirection.length; i++) {
-        compassDirection.item(i).style.display = 'block';
-    }
-}
-
+/**
+ * Start/Page Init.
+ */
 document.addEventListener('DOMContentLoaded', function(event) {
     if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
         displayCompass();

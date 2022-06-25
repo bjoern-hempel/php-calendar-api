@@ -289,30 +289,66 @@ class GPSConverter
     }
 
     /**
-     * Converts given decimal degree into dms.
+     * Converts given decimal degree into coordinate.
      *
-     * @param float $decimalDegreeLongitude
      * @param float $decimalDegreeLatitude
-     * @param string|null $directionLongitude
+     * @param float $decimalDegreeLongitude
      * @param string|null $directionLatitude
+     * @param string|null $directionLongitude
+     * @return Coordinate
+     * @throws Exception
+     */
+    public static function decimalDegree2Coordinate(float $decimalDegreeLatitude, float $decimalDegreeLongitude, ?string $directionLatitude = null, ?string $directionLongitude = null): Coordinate
+    {
+        if ($directionLatitude === null) {
+            $directionLatitude = $decimalDegreeLatitude < 0 ? Coordinate::DIRECTION_SOUTH : Coordinate::DIRECTION_NORTH;
+        }
+
+        if ($directionLongitude === null) {
+            $directionLongitude = $decimalDegreeLongitude < 0 ? Coordinate::DIRECTION_WEST : Coordinate::DIRECTION_EAST;
+        }
+
+        $decimalDegreeLatitude = abs($decimalDegreeLatitude);
+        $decimalDegreeLongitude = abs($decimalDegreeLongitude);
+
+        return new Coordinate(
+            new GPSPosition(self::parseDecimalDegree($decimalDegreeLatitude, $directionLatitude)),
+            new GPSPosition(self::parseDecimalDegree($decimalDegreeLongitude, $directionLongitude))
+        );
+    }
+
+    /**
+     * Converts given decimal degree into google link.
+     *
+     * @param float $decimalDegreeLatitude
+     * @param float $decimalDegreeLongitude
+     * @param string|null $directionLatitude
+     * @param string|null $directionLongitude
      * @return string
      * @throws Exception
      */
-    #[ArrayShape(['longitude' => "string", 'latitude' => "string"])]
-    public static function decimalDegree2google(float $decimalDegreeLongitude, float $decimalDegreeLatitude, ?string $directionLongitude = null, ?string $directionLatitude = null): string
+    public static function decimalDegree2GoogleLink(float $decimalDegreeLatitude, float $decimalDegreeLongitude, ?string $directionLatitude = null, ?string $directionLongitude = null): string
     {
-        if ($directionLatitude !== null) {
-            $decimalDegreeLongitude = $decimalDegreeLongitude < 0 ? -$decimalDegreeLongitude : $decimalDegreeLongitude;
-        }
+        $coordinate = self::decimalDegree2Coordinate($decimalDegreeLatitude, $decimalDegreeLongitude, $directionLatitude, $directionLongitude);
 
-        if ($directionLatitude !== null) {
-            $decimalDegreeLatitude = $decimalDegreeLatitude < 0 ? -$decimalDegreeLatitude : $decimalDegreeLatitude;
-        }
+        return $coordinate->getGoogle();
+    }
 
-        return (new Coordinate(
-            new GPSPosition(self::parseDecimalDegree($decimalDegreeLongitude, $directionLongitude)),
-            new GPSPosition(self::parseDecimalDegree($decimalDegreeLatitude, $directionLatitude))
-        ))->getGoogle();
+    /**
+     * Converts given decimal degree into openstreetmap link.
+     *
+     * @param float $decimalDegreeLatitude
+     * @param float $decimalDegreeLongitude
+     * @param string|null $directionLatitude
+     * @param string|null $directionLongitude
+     * @return string
+     * @throws Exception
+     */
+    public static function decimalDegree2OpenstreetmapLink(float $decimalDegreeLatitude, float $decimalDegreeLongitude, ?string $directionLatitude = null, ?string $directionLongitude = null): string
+    {
+        $coordinate = self::decimalDegree2Coordinate($decimalDegreeLatitude, $decimalDegreeLongitude, $directionLatitude, $directionLongitude);
+
+        return $coordinate->getOpenstreetmap();
     }
 
     /**

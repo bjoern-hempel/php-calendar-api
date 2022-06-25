@@ -72,7 +72,8 @@ final class GPSConverterTest extends TestCase
         switch ($method) {
             case 'dms2DecimalDegrees':
             case 'decimalDegree2dmss':
-            case 'decimalDegree2google':
+            case 'decimalDegree2GoogleLink':
+            case 'decimalDegree2OpenstreetmapLink':
             case 'getDegreeString':
             case 'getDirectionFromPositionsString':
                 match (true) {
@@ -215,8 +216,14 @@ final class GPSConverterTest extends TestCase
             /**
              * [X, Y], Longitude, Latitude, Decimal Degree → Google URL
              */
-            [++$number, 'decimalDegree2google', 79.857622, 6.932500, 'https://www.google.de/maps/place/79.857622+6.932500'],
-            [++$number, 'decimalDegree2google', 79.857622, 6.932500, 'https://www.google.de/maps/place/79.857622+6.932500', Coordinate::DIRECTION_EAST, Coordinate::DIRECTION_NORTH],
+            [++$number, 'decimalDegree2GoogleLink', 79.857622, 6.932500, 'https://www.google.de/maps/place/79.857622+6.932500'],
+            [++$number, 'decimalDegree2GoogleLink', 79.857622, 6.932500, 'https://www.google.de/maps/place/79.857622+6.932500', Coordinate::DIRECTION_EAST, Coordinate::DIRECTION_NORTH],
+
+            /**
+             * [X, Y], Longitude, Latitude, Decimal Degree → Openstreetmap URL
+             */
+            [++$number, 'decimalDegree2OpenstreetmapLink', 79.857622, 6.932500, 'https://www.openstreetmap.org/?lat=79.857622&lon=6.932500&mlat=79.857622&mlon=6.932500&zoom=14&layers=M'],
+            [++$number, 'decimalDegree2OpenstreetmapLink', 79.857622, 6.932500, 'https://www.openstreetmap.org/?lat=79.857622&lon=6.932500&mlat=79.857622&mlon=6.932500&zoom=14&layers=M', Coordinate::DIRECTION_EAST, Coordinate::DIRECTION_NORTH],
 
             /**
              * Full location

@@ -20,7 +20,7 @@
                         Title
 
                     #}
-                    <h2 class="first">Suche nach Standort</h2>
+                    <h2 class="first">{{ 'general.locationSearchTitle'|trans([], 'location') }}</h2>
 
                     {#
 
@@ -48,8 +48,8 @@
                         </div>
                         <div>
                             <button type="submit" class="btn btn-primary" id="content-location-submit">{{ 'general.locationSearch'|trans([], 'location') }}</button>
-                            &nbsp;
-                            <button type="submit" class="btn btn-primary with-position">{{ 'general.locationSearchPosition'|trans([], 'location') }}</button>
+                            <button type="submit" class="btn btn-outline-secondary search-with-position">{{ 'general.locationSearchWithPosition'|trans([], 'location') }}</button>
+                            <button type="submit" class="btn btn-outline-secondary search-current-position">{{ 'general.locationSearchCurrentPosition'|trans([], 'location') }}</button>
                         </div>
                     </form>
 
@@ -95,12 +95,10 @@
 
                                         <br /><small>{{ (place.featureClass ~ '.' ~ place.featureCode)|trans([], 'place') }}</small>
 
-                                        {% set elevationHill = place.elevationHill %}
-
-                                        {% if elevationHill is same as(false) %}
-                                            <small>, {{ 'general.elevationNotGiven'|trans([], 'location') }}</small>
-                                        {% elseif elevationHill is not null %}
-                                            <small>, {{ elevationHill }} m</small>
+                                        {% if place.elevationHill is same as(false) %}
+                                            <small>, <nobr>{{ 'general.elevationNotGiven'|trans([], 'location') }}</nobr></small>
+                                        {% elseif place.elevationHill is not null %}
+                                            <small>, <nobr>{{ place.elevationHill }} m</nobr></small>
                                         {% endif %}
                                     </td>
                                     <td class="table-value" style="width: 0%!important;">
@@ -140,8 +138,8 @@
                                 <td class="table-name" style="width: 33%;"><b>{{ ('place.' ~ key|camel_case)|trans([], 'location') }}</b></td>
                                 <td class="table-value" style="width: 67%;">
                                     {% if value is not empty %}
-                                        {% if key == 'place-google-link' %}
-                                            <a href="{{ value }}" target="_blank" class="btn btn-primary">Google Maps</a>
+                                        {% if key == 'place-google-link' or key == 'place-openstreetmap-link' %}
+                                            <a href="{{ value }}" target="_blank" class="btn btn-primary">{{ ('place.' ~ key|camel_case)|trans([], 'location') }}</a>
                                         {% else %}
                                             {{ value }}
                                         {% endif %}

@@ -1145,7 +1145,7 @@ SQL;
         print str_repeat('-', strlen($caption))."\n";
         foreach ($placesP as $placeP) {
             /* TODO: Change latitude and longitude within db. It is reversed. */
-            $distance = LocationDataService::getDistanceBetweenTwoPoints($latitude, $longitude, $placeP->getCoordinate()->getLongitude(), $placeP->getCoordinate()->getLatitude());
+            $distance = LocationDataService::getDistanceBetweenTwoPoints($latitude, $longitude, $placeP->getLatitude(), $placeP->getLongitude());
 
             print $this->mbSprintf(
                 $format,
@@ -1156,8 +1156,8 @@ SQL;
                 $placeP->getAdmin3Code(),
                 $placeP->getAdmin4Code(),
                 $placeP->getPopulation(),
-                sprintf('%.4f°', $placeP->getCoordinate()->getLongitude()), /* TODO: Change latitude and longitude within db. It is reversed. */
-                sprintf('%.4f°', $placeP->getCoordinate()->getLatitude()), /* TODO: Change latitude and longitude within db. It is reversed. */
+                sprintf('%.4f°', $placeP->getLatitude()),
+                sprintf('%.4f°', $placeP->getLongitude()),
                 sprintf('%.1f m', $distance['meters'])
             )."\n";
         }

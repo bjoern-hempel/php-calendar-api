@@ -126,8 +126,8 @@ class ContentController extends BaseController
                 $distanceMeter = LocationDataService::getDistanceBetweenTwoPointsInMeter(
                     floatval($latitude),
                     floatval($longitude),
-                    $placeSource->getCoordinate()->getLongitude(),
-                    $placeSource->getCoordinate()->getLatitude()
+                    $placeSource->getLatitude(),
+                    $placeSource->getLongitude()
                 );
 
                 $placeSource->setDistanceMeter($distanceMeter);
@@ -180,7 +180,7 @@ class ContentController extends BaseController
 
             case count($placesSource) == 1:
                 $placeSource = $placesSource[0];
-                return [$placeSource->getCoordinate()->getLongitude(), $placeSource->getCoordinate()->getLatitude()];
+                return [$placeSource->getLatitude(), $placeSource->getLongitude()];
 
             default:
                 return null;
@@ -203,7 +203,7 @@ class ContentController extends BaseController
             throw new InvalidArgumentException(sprintf('Unable to find place with id "%d".', $codeId));
         }
 
-        return [$placeSource->getCoordinate()->getLongitude(), $placeSource->getCoordinate()->getLatitude()];
+        return [$placeSource->getLatitude(), $placeSource->getLongitude()];
     }
 
     /**

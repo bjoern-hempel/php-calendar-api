@@ -127,4 +127,24 @@ class Coordinate
 
         return sprintf('https://www.google.de/maps/place/%f+%f', $this->getLongitude()->getDecimalDegree(), $this->getLatitude()->getDecimalDegree());
     }
+
+    /**
+     * Returns the openstreetmap link of longitude and latitude (string).
+     *
+     * @param int $zoom
+     * @param string $layers
+     * @return string
+     */
+    public function getOpenstreetmap(int $zoom = 14, string $layers = 'M'): string
+    {
+        return sprintf(
+            'https://www.openstreetmap.org/?lat=%f&lon=%f&mlat=%f&mlon=%f&zoom=%d&layers=%s',
+            $this->getLongitude()->getDecimalDegree(),
+            $this->getLatitude()->getDecimalDegree(),
+            $this->getLongitude()->getDecimalDegree(),
+            $this->getLatitude()->getDecimalDegree(),
+            $zoom,
+            $layers
+        );
+    }
 }

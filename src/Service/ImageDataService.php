@@ -205,7 +205,7 @@ class ImageDataService
             $dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DECIMAL_DEGREE] = $this->getData('GPS Longitude Decimal Degree', GPSConverter::dms2DecimalDegree(strval($dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DMS]['value']), $longitudeDirection), '%s', '°');
             $dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DIRECTION] = $this->getData('GPS Longitude Direction', $longitudeDirection, '%s', null);
 
-            $dataExifReturn[self::KEY_NAME_GPS_GOOGLE_LINK] = $this->getData('GPS Google', GPSConverter::decimalDegree2google(
+            $dataExifReturn[self::KEY_NAME_GPS_GOOGLE_LINK] = $this->getData('GPS Google', GPSConverter::decimalDegree2GoogleLink(
                 floatval($dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DECIMAL_DEGREE]['value']),
                 floatval($dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DECIMAL_DEGREE]['value']),
                 strval($dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DIRECTION]['value']),

@@ -5,6 +5,7 @@ place:
   placeLongitudeDms: "Longitude DMS"
   placePoint: "Point"
   placeGoogleLink: "Google Maps"
+  placeOpenstreetmapLink: "OpenStreetMap"
   placeDistrict:	"Stadtteil / Ortschaft" # P
   placeCity:	"Stadt / Gemeinde" # A
   placeState: "Bundesland" # A
@@ -50,8 +51,10 @@ title:
 general:
   detailed: "Detailliert"
   elevationNotGiven: "Höhe nicht angegeben"
-  locationSearch: "Standortsuche"
-  locationSearchPosition: "Suche mit aktueller Position"
+  locationSearchTitle: "Suche nach Standort"
+  locationSearch: "Suche"
+  locationSearchWithPosition: "Mit aktueller Position"
+  locationSearchCurrentPosition: "Informationen über aktuelle Position"
   notAvailable: "Der Ort \"%place%\" konnte nicht gefunden werden."
   notGiven: "Nicht angegeben"
   results: "Folgende Ergebnisse wurden mit dem Suchbegriff \"%search%\" gefunden"
