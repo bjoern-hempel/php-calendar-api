@@ -8,7 +8,11 @@
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.sass';
 
+/* Include jquery */
 const $ = require('jquery');
+Window.prototype.$ = $;
+
+/* Include bootstrap */
 require('bootstrap');
 
 /**

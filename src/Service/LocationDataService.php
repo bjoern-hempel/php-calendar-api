@@ -160,13 +160,13 @@ class LocationDataService
      * @param float $latitude
      * @param float $longitude
      * @param array<string, Place[]> $data
-     * @return PlaceP|null
+     * @return Place|null
      * @throws DoctrineDBALException
      * @throws NonUniqueResultException
      */
-    public function getLocationPlace(float $latitude, float $longitude, array &$data = []): ?PlaceP
+    public function getLocationPlace(float $latitude, float $longitude, array &$data = []): ?Place
     {
-        return $this->placeLoaderService->findPlacePByPosition($latitude, $longitude, Code::FEATURE_CODES_P_ADMIN_PLACES, $data);
+        return $this->placeLoaderService->findPlaceByPositionOrPlaceSource($latitude, $longitude, Code::FEATURE_CODES_P_ADMIN_PLACES, $data);
     }
 
     /**
@@ -260,7 +260,7 @@ class LocationDataService
     public function getLocationDataFull(float $latitude, float $longitude, array &$data = [], ?Place $placeSource = null): array
     {
         $timer = Timer::start();
-        $place = $this->placeLoaderService->findPlacePByPosition($latitude, $longitude, Code::FEATURE_CODES_P_ADMIN_PLACES, $data, $placeSource);
+        $place = $this->placeLoaderService->findPlaceByPositionOrPlaceSource($latitude, $longitude, Code::FEATURE_CODES_P_ADMIN_PLACES, $data, $placeSource);
         $time = Timer::stop($timer);
 
         if ($place === null) {
@@ -362,6 +362,24 @@ class LocationDataService
     }
 
     /**
+     * Returns flattened data from given data (we only need value-formatted).
+     *
+     * @param array<string, array<string, mixed>> $data
+     * @param string $field
+     * @return array<string, mixed>
+     */
+    protected function getFlattenedData(array $data, string $field = self::KEY_NAME_VALUE_FORMATTED): array
+    {
+        $flattenedData = [];
+
+        foreach ($data as $key => $value) {
+            $flattenedData[$key] = $value[$field];
+        }
+
+        return $flattenedData;
+    }
+
+    /**
      * Gets location data.
      *
      * @param float $latitude
@@ -373,15 +391,7 @@ class LocationDataService
      */
     public function getLocationDataFormatted(float $latitude, float $longitude, array &$data = [], ?Place $placeSource = null): array
     {
-        $locationData = $this->getLocationDataFull($latitude, $longitude, $data, $placeSource);
-
-        $array = [];
-
-        foreach ($locationData as $key => $value) {
-            $array[$key] = $value[self::KEY_NAME_VALUE_FORMATTED];
-        }
-
-        return $array;
+        return $this->getFlattenedData($this->getLocationDataFull($latitude, $longitude, $data, $placeSource));
     }
 
     /**

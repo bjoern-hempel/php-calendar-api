@@ -16,16 +16,12 @@
                 <div id="content-location">
 
                     {#
-
                         Title
-
                     #}
                     <h2 class="first">{{ 'general.locationSearchTitle'|trans([], 'location') }}</h2>
 
                     {#
-
                         Search hints and errors
-
                     #}
                     {% if error is not null %}
                         <p class="error">
@@ -34,9 +30,7 @@
                     {% endif %}
 
                     {#
-
                         Search Form
-
                     #}
                     <form name="full_location" method="get">
                         <div>
@@ -54,9 +48,7 @@
                     </form>
 
                     {#
-
                         Search examples
-
                     #}
                     <div class="{{ (locationData|length > 0 or results|length > 0) ? 'verbose' : '' }}">
                         <p class="description">
@@ -75,9 +67,7 @@
                     </div>
 
                     {#
-
                         Show multiple results
-
                     #}
                     {% if results|length > 1 %}
                         <p class="description">
@@ -110,9 +100,7 @@
                     {% endif %}
 
                     {#
-
                         Show search detail
-
                     #}
                     {% if locationData|length > 0 %}
 

@@ -498,15 +498,15 @@ SQL;
      * Finds next admin place.
      *
      * @param PlaceP[] $placesP
-     * @param PlaceP $district
+     * @param Place $place
      * @return PlaceP|null
      */
-    protected function findNextAdminCity(array $placesP, PlaceP $district): ?PlaceP
+    protected function findNextAdminCity(array $placesP, Place $place): ?PlaceP
     {
         foreach ($placesP as $placeP) {
             switch (true) {
                 case in_array($placeP->getFeatureCode(), Code::FEATURE_CODES_P_ADMIN_PLACES) &&
-                    $district->getAdmin4Code() == $placeP->getAdmin4Code():
+                    $place->getAdmin4Code() == $placeP->getAdmin4Code():
                     return $placeP;
             }
         }
@@ -518,19 +518,19 @@ SQL;
      * Finds next place with more than 0 population.
      *
      * @param PlaceP[] $placesP
-     * @param PlaceP $district
+     * @param Place $place
      * @return PlaceP|null
      */
-    protected function findNextCityPopulation(array $placesP, PlaceP $district): ?PlaceP
+    protected function findNextCityPopulation(array $placesP, Place $place): ?PlaceP
     {
-        if ($district->getPopulation(true) > 0) {
+        if ($place->getPopulation(true) > 0) {
             return null;
         }
 
         foreach ($placesP as $placeP) {
             switch (true) {
-                case $placeP->getPopulation(true) > 0 && $district->getAdmin4Code() == $placeP->getAdmin4Code():
-                    $district->setPopulation($placeP->getPopulation());
+                case $placeP->getPopulation(true) > 0 && $place->getAdmin4Code() == $placeP->getAdmin4Code():
+                    $place->setPopulation($placeP->getPopulation());
                     return $placeP;
             }
         }
@@ -630,6 +630,15 @@ SQL;
                 $city = $place;
                 $district = $this->findNextDistrict($placesP, $city);
                 break;
+
+            /* Places P given. Extract city from any Place type. */
+            case $placesP !== null:
+                $city2 = $this->findNextAdminCity($placesP, $place);
+                $city3 = $this->findNextCityPopulation($placesP, $place);
+
+                $city = $city2 !== null && $city2->getPopulation(true) > 0 ? $city2 : $city3;
+
+                break;
         }
 
         /* Disable district. */
@@ -684,12 +693,12 @@ SQL;
      * @param string|string[]|null $featureCodes
      * @param array<string, Place[]> $data
      * @param Place|null $placeSource
-     * @return ?PlaceP
+     * @return ?Place
      * @throws DoctrineDBALException
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function findPlacePByPosition(float $latitude, float $longitude, string|array|null $featureCodes = null, array &$data = [], ?Place $placeSource = null): ?PlaceP
+    public function findPlaceByPositionOrPlaceSource(float $latitude, float $longitude, string|array|null $featureCodes = null, array &$data = [], ?Place $placeSource = null): ?Place
     {
         if ($this->placeARepository === null) {
             return null;
@@ -735,8 +744,12 @@ SQL;
         /* Verbose information */
         $this->printPlaces($placesP, $latitude, $longitude);
 
-        /* Gets first place. */
-        $place = array_shift($placesP);
+        /* Gets first place or placeSource. */
+        if ($placeSource !== null) {
+            $place = $placeSource;
+        } else {
+            $place = array_shift($placesP);
+        }
 
         /* Add district, city, etc. */
         $this->addAdministrationInformationToPlace($place, $placesP, $placeSource);
@@ -1168,11 +1181,11 @@ SQL;
     /**
      * Prints district, city, state and country.
      *
-     * @param PlaceP $place
+     * @param Place $place
      * @return void
      * @throws Exception
      */
-    protected function printPlaceInformation(PlaceP $place): void
+    protected function printPlaceInformation(Place $place): void
     {
         if (!$this->verbose) {
             return;
