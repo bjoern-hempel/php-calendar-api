@@ -1,19 +1,19 @@
 place:
-  placeLatitude:	"Latitude"
+  placeLatitude: "Latitude"
   placeLongitude: "Longitude"
-  placeLatitudeDms:	"Latitude DMS"
+  placeLatitudeDms: "Latitude DMS"
   placeLongitudeDms: "Longitude DMS"
   placePoint: "Point"
   placeGoogleLink: "Google Maps"
   placeOpenstreetmapLink: "OpenStreetMap"
-  placeDistrict:	"Stadtteil / Ortschaft" # P
-  placeCity:	"Stadt / Gemeinde" # A
+  placeDistrict: "Stadtteil / Ortschaft" # P
+  placeCity: "Stadt / Gemeinde" # A
   placeState: "Bundesland" # A
   placeMountain: "Berg, Hügel, Fels, Strand" # T
   placePark: "Parks, Flächen" # L
   placeSpot: "Ort, Gebäude, Farm" # S
   placeForest: "Wald, Heide" # V
-  placeFull:	"Ort"
+  placeFull: "Vollständiger Ortsname"
   placeCountry: "Land"
   placeCountryCode: "Ländercode"
   placeTimezone: "Zeitzone"

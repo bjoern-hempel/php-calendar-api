@@ -221,6 +221,16 @@ class ContentController extends BaseController
     {
         $placeSource = null;
 
+        /* Move given name query with id content to id query. */
+        if ($request->query->has(self::PARAMETER_NAME_QUERY)) {
+            $query = strval($request->query->get(self::PARAMETER_NAME_QUERY));
+
+            if (preg_match('~^[ahlprstuv]:\d+$~', $query)) {
+                $request->query->set(self::PARAMETER_NAME_ID, $query);
+                $request->query->remove(self::PARAMETER_NAME_QUERY);
+            }
+        }
+
         switch (true) {
             /* Parameter q given. */
             case $request->query->has(self::PARAMETER_NAME_QUERY):
@@ -243,7 +253,6 @@ class ContentController extends BaseController
                 }
 
             /* Parameter id given (direct place given) */
-            // no break
             case $request->query->has(self::PARAMETER_NAME_ID):
                 $search = strval($request->query->get(self::PARAMETER_NAME_ID));
                 list($latitude, $longitude) = $this->getPositionFromCodeIdSubmit($search, $placeSource);
