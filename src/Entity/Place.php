@@ -217,7 +217,7 @@ abstract class Place
      */
     public function getNameFull(bool $detailed = false, ?Place $placeSource = null, bool $withProperties = false): string
     {
-        $name = '';
+        $name = $this->getName($withProperties);
 
         if ($this->getDistrict() !== null && !$this->strContains($name, $this->getDistrict()->getName())) {
             $name = sprintf($this->templateAddName, $name, $this->getDistrict()->getName($detailed));
@@ -234,6 +234,12 @@ abstract class Place
         $name = sprintf($this->templateAddName, $name, $this->getCountry($detailed));
 
         $name = preg_replace('~^, ~', '', $name);
+
+        if ($name === null) {
+            throw new Exception(sprintf('Unable to replace comma (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $name = preg_replace('~, $~', '', $name);
 
         if ($name === null) {
             throw new Exception(sprintf('Unable to replace comma (%s:%d).', __FILE__, __LINE__));

@@ -15,29 +15,49 @@
             {% block main_content %}
                 <div id="content-location">
 
-                    {# Title #}
+                    {#
+
+                        Title
+
+                    #}
                     <h2 class="first">Suche nach Standort</h2>
 
-                    {# Search hints and errors #}
+                    {#
+
+                        Search hints and errors
+
+                    #}
                     {% if error is not null %}
                         <p class="error">
                             {{ error }}
                         </p>
                     {% endif %}
 
-                    {# Search Form #}
+                    {#
+
+                        Search Form
+
+                    #}
                     <form name="full_location" method="get">
                         <div>
                             <input type="search" id="q" name="q" required="required" autofocus="autofocus" value="{{ search }}">
+
+                            {% if location is not null %}
+                                <input type="hidden" id="l" name="l" value="{{ location }}">
+                            {% endif %}
                         </div>
                         <div>
-                            <button type="submit" class="btn btn-primary" id="content-location-submit">Suche Standort</button>
+                            <button type="submit" class="btn btn-primary" id="content-location-submit">{{ 'general.locationSearch'|trans([], 'location') }}</button>
                             &nbsp;
-                            <button type="submit" class="btn btn-primary with-position">Suche mit aktueller Position</button>
+                            <button type="submit" class="btn btn-primary with-position">{{ 'general.locationSearchPosition'|trans([], 'location') }}</button>
                         </div>
                     </form>
 
-                    {# Search examples #}
+                    {#
+
+                        Search examples
+
+                    #}
                     <div class="{{ (locationData|length > 0 or results|length > 0) ? 'verbose' : '' }}">
                         <p class="description">
                             {{ 'general.tryThis'|trans([], 'location') }}:
@@ -54,7 +74,11 @@
                         </ul>
                     </div>
 
-                    {# Show multiple results #}
+                    {#
+
+                        Show multiple results
+
+                    #}
                     {% if results|length > 1 %}
                         <p class="description">
                             {{ 'general.results'|trans({'%search%': search}, 'location') }}:
@@ -65,12 +89,16 @@
                             {% for place in results %}
                                 <tr>
                                     <td class="table-name" style="width: 100%!important;">
-                                        <small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name ~ ', ' ~ ('country.alpha2.' ~ place.countryCode|lower)|trans([], 'countries', place.countryCode) }}{% if place.distanceMeter is not same as(0.0) %}, {{ place.distanceMeter(1, 'km', 1000, true)|raw }}{% endif %}
-                                        </b><br />
-                                        <small>{{ (place.featureClass ~ '.' ~ place.featureCode)|trans([], 'place') }}</small>
+                                        <small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;
+                                        <b>{{ place.nameFull(false) }}</b>
+                                        {% if place.distanceMeter is not same as(0.0) %}<b> - </b><span>{{ place.distanceMeter(1, 'km', 1000, true)|raw }}</span>{% endif %}
+
+                                        <br /><small>{{ (place.featureClass ~ '.' ~ place.featureCode)|trans([], 'place') }}</small>
+
                                         {% set elevationHill = place.elevationHill %}
+
                                         {% if elevationHill is same as(false) %}
-                                            <small>, Höhe nicht angegeben</small>
+                                            <small>, {{ 'general.elevationNotGiven'|trans([], 'location') }}</small>
                                         {% elseif elevationHill is not null %}
                                             <small>, {{ elevationHill }} m</small>
                                         {% endif %}
@@ -83,18 +111,22 @@
                         </table>
                     {% endif %}
 
-                    {# Show search detail #}
+                    {#
+
+                        Show search detail
+
+                    #}
                     {% if locationData|length > 0 %}
 
                         {# Stage of detail #}
                         {% if attribute(locationData, 'place-full') is defined %}
                             <div class="cite">
-                                <p>Sieht so aus, als ob du nach Folgendem suchst. {{ constant('App\\Utils\\Icon::ICON_HEART') }}</p>
+                                <p>{{ 'general.successMessage'|trans([], 'location') }}</p>
                                 <q>{{ attribute(locationData, 'place-full') }}</q>
                             </div>
                         {% endif %}
 
-                        <h3>Detailliert</h3>
+                        <h3>{{ 'general.detailed'|trans([], 'location') }}</h3>
 
                         <div class="compass" id="compass">
                             <div class="arrow"></div>

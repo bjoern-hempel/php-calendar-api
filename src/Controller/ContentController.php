@@ -14,15 +14,13 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Controller\Base\BaseController;
-use App\Entity\Location;
 use App\Entity\Place;
-use App\Form\Type\FullLocationType;
+use App\Service\Entity\PlaceLoaderService;
 use App\Service\LocationDataService;
 use App\Service\VersionService;
 use App\Utils\GPSConverter;
 use Exception;
 use InvalidArgumentException;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -47,6 +45,8 @@ class ContentController extends BaseController
 
     protected VersionService $versionService;
 
+    protected PlaceLoaderService $placeLoaderService;
+
     public const PARAMETER_NAME_QUERY = 'q';
 
     public const PARAMETER_NAME_LOCATION = 'l';
@@ -60,8 +60,9 @@ class ContentController extends BaseController
      * @param TranslatorInterface $translator
      * @param KernelInterface $kernel
      * @param VersionService $versionService
+     * @param PlaceLoaderService $placeLoaderService
      */
-    public function __construct(LocationDataService $locationDataService, TranslatorInterface $translator, KernelInterface $kernel, VersionService $versionService)
+    public function __construct(LocationDataService $locationDataService, TranslatorInterface $translator, KernelInterface $kernel, VersionService $versionService, PlaceLoaderService $placeLoaderService)
     {
         $this->locationDataService = $locationDataService;
 
@@ -70,6 +71,8 @@ class ContentController extends BaseController
         $this->kernel = $kernel;
 
         $this->versionService = $versionService;
+
+        $this->placeLoaderService = $placeLoaderService;
     }
 
     /**
@@ -97,6 +100,57 @@ class ContentController extends BaseController
     }
 
     /**
+     * Adds additional information to given places.
+     *
+     * @param Place[] $placesSource
+     * @param string|null $location
+     * @return void
+     * @throws Exception
+     */
+    protected function addAdditionalInformationToPlaces(array &$placesSource, string $location = null): void
+    {
+        if (count($placesSource) <= 0) {
+            return;
+        }
+
+        if ($location !== null) {
+            $locationSplit = preg_split('~,~', $location);
+
+            if ($locationSplit === false) {
+                throw new Exception(sprintf('Unable to split string (%s:%d).', __FILE__, __LINE__));
+            }
+
+            list($latitude, $longitude) = $locationSplit;
+
+            foreach ($placesSource as $placeSource) {
+                $distanceMeter = LocationDataService::getDistanceBetweenTwoPointsInMeter(
+                    floatval($latitude),
+                    floatval($longitude),
+                    $placeSource->getCoordinate()->getLongitude(),
+                    $placeSource->getCoordinate()->getLatitude()
+                );
+
+                $placeSource->setDistanceMeter($distanceMeter);
+            }
+
+            /* Sort by distance */
+            usort($placesSource, function (Place $a, Place $b) {
+                return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
+            });
+        } else {
+            /* Sort by name */
+            usort($placesSource, function (Place $a, Place $b) {
+                return $a->getName() > $b->getName() ? 1 : -1;
+            });
+        }
+
+        /* Add administration information */
+        foreach ($placesSource as $placeSource) {
+            $this->placeLoaderService->addAdministrationInformationToPlace($placeSource);
+        }
+    }
+
+    /**
      * Get position from string submit.
      *
      * @param string $locationFull
@@ -118,26 +172,7 @@ class ContentController extends BaseController
 
         $placesSource = $this->locationDataService->getLocationsByName($locationFull);
 
-        if (count($placesSource) > 1 && $location !== null) {
-            $locationSplit = preg_split('~,~', $location);
-
-            if ($locationSplit === false) {
-                throw new Exception(sprintf('Unable to split string (%s:%d).', __FILE__, __LINE__));
-            }
-
-            list($latitude, $longitude) = $locationSplit;
-
-            foreach ($placesSource as $placeSource) {
-                $distanceMeter = LocationDataService::getDistanceBetweenTwoPointsInMeter(
-                    floatval($latitude),
-                    floatval($longitude),
-                    $placeSource->getCoordinate()->getLongitude(),
-                    $placeSource->getCoordinate()->getLatitude()
-                );
-
-                $placeSource->setDistanceMeter($distanceMeter);
-            }
-        }
+        $this->addAdditionalInformationToPlaces($placesSource, $location);
 
         switch (true) {
             case count($placesSource) <= 0:
@@ -176,12 +211,13 @@ class ContentController extends BaseController
      *
      * @param Request $request
      * @param string $search
+     * @param string|null $location
      * @param array<string, Place[]> $data
      * @param Place[] $results
      * @return array<string, mixed>
      * @throws Exception
      */
-    protected function getLocationData(Request $request, string &$search, array &$data = [], array &$results = []): array
+    protected function getLocationData(Request $request, string &$search, ?string &$location, array &$data = [], array &$results = []): array
     {
         $placeSource = null;
 
@@ -230,10 +266,11 @@ class ContentController extends BaseController
         $places = [];
         $results = [];
         $search = '';
+        $location = null;
         $error = null;
 
         try {
-            $locationData = $this->getLocationData($request, $search, $places, $results);
+            $locationData = $this->getLocationData($request, $search, $location, $places, $results);
         } catch (InvalidArgumentException|Throwable $exception) {
             $error = $this->translator->trans('general.notAvailable', ['%place%' => $search], 'location');
 
@@ -247,9 +284,10 @@ class ContentController extends BaseController
         return $this->renderForm('content/location.html.twig', [
             'error' => $error,
             'search' => $search,
-            'locationData' => $locationData,
+            'location' => $location,
+            'locationData' => $locationData, /* Show search detail */
             'places' => $places,
-            'results' => $results,
+            'results' => $results, /* Show multiple results */
             'version' => $this->versionService->getVersion(),
         ]);
     }

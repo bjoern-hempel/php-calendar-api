@@ -411,12 +411,12 @@ SQL;
     /**
      * Returns country name by given place.
      *
-     * @param PlaceP $placeP
+     * @param Place $place
      * @return string
      */
-    public function getCountryByPlaceP(PlaceP $placeP): string
+    public function getCountryByPlace(Place $place): string
     {
-        $countryCode = strtolower($placeP->getCountryCode());
+        $countryCode = strtolower($place->getCountryCode());
 
         return $this->translator->trans(sprintf('country.alpha2.%s', $countryCode), [], 'countries', $countryCode);
     }
@@ -469,15 +469,16 @@ SQL;
     }
 
     /**
-     * Gets the state from cityA.
+     * Gets the state from place.
      *
-     * @param PlaceP|null $placeP
+     * @param Place|null $place
      * @return PlaceA|null
      * @throws NonUniqueResultException
+     * @throws Exception
      */
-    public function getStateFromPlaceP(PlaceP|null $placeP): ?PlaceA
+    public function getStateFromPlace(Place|null $place): ?PlaceA
     {
-        if ($placeP === null) {
+        if ($place === null) {
             return null;
         }
 
@@ -486,7 +487,7 @@ SQL;
         }
 
         $stateTimer = Timer::start();
-        $state = $this->placeARepository->findStateByPlaceP($placeP);
+        $state = $this->placeARepository->findStateByPlaceP($place);
         $stateTime = Timer::stop($stateTimer);
         $this->printRawQuery('state', $this->placeARepository->getLastSQL(), $stateTime);
 
@@ -585,6 +586,97 @@ SQL;
     }
 
     /**
+     * Adds administration information to given place.
+     *
+     * @param Place $place
+     * @param PlaceP[] $placesP
+     * @param Place|null $placeSource
+     * @return void
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function addAdministrationInformationToPlace(Place $place, ?array &$placesP = null, ?Place $placeSource = null): void
+    {
+        $city = null;
+        $district = null;
+        switch (true) {
+
+            /* PlaceP: Add administrative information */
+            case in_array($place->getFeatureCode(), Code::FEATURE_CODES_P_DISTRICT_PLACES) && $placesP !== null:
+                if (!$place instanceof PlaceP) {
+                    throw new Exception(sprintf('Unexpected type of Place (%s:%d).', __FILE__, __LINE__));
+                }
+
+                $district = $place;
+
+                $city1 = $this->getCityByPlacePFromAdmin($district);
+                $city2 = $this->findNextAdminCity($placesP, $district);
+                $city3 = $this->findNextCityPopulation($placesP, $district);
+
+                $city = match (true) {
+                    $city1 === null => $city2 !== null && $city2->getPopulation(true) > 0 ? $city2 : $city3,
+                    // no break
+                    default => $city1,
+                };
+
+                break;
+
+            /* PlaceP: Add administrative information (Admin place) */
+            case in_array($place->getFeatureCode(), Code::FEATURE_CODES_P_ADMIN_PLACES) && $placesP !== null:
+                if (!$place instanceof PlaceP) {
+                    throw new Exception(sprintf('Unexpected type of Place (%s:%d).', __FILE__, __LINE__));
+                }
+
+                $city = $place;
+                $district = $this->findNextDistrict($placesP, $city);
+                break;
+        }
+
+        /* Disable district. */
+        if ($district !== null && $city !== null && $district->getName() === $city->getName()) {
+            $district = null;
+        }
+
+        $state = $this->getStateFromPlace($place);
+        $country = $this->getCountryByPlace($place);
+
+        switch (true) {
+            case $placeSource !== null && $placeSource->getName() === $country:
+                $place->setDistrict(null);
+                $place->setCity(null);
+                $place->setState(null);
+                break;
+
+            case $placeSource !== null && $state !== null && $placeSource->getName() === $state->getName():
+                $place->setDistrict(null);
+                $place->setCity(null);
+                $place->setState($state);
+                break;
+
+            case $placeSource !== null && $city !== null && $placeSource->getName() === $city->getName():
+                $place->setDistrict(null);
+                $place->setCity($city);
+                $place->setState($state);
+                break;
+
+            default:
+                $place->setDistrict($district);
+                $place->setCity($city);
+                $place->setState($state);
+                break;
+        }
+        $place->setCountry($country);
+
+        if ($city !== null) {
+            $place->setIsCity($city->getPopulation(true) > self::CITY_POPULATION);
+            $place->setPopulationAdmin($city->getPopulation(true));
+        } else {
+            $place->setIsCity(false);
+            $place->setPopulationAdmin(0);
+        }
+    }
+
+    /**
      * Finds the nearest place by coordinate.
      *
      * @param float $latitude
@@ -643,72 +735,11 @@ SQL;
         /* Verbose information */
         $this->printPlaces($placesP, $latitude, $longitude);
 
-        $place = $placesP[0];
-        $city = null;
-        $district = null;
-        switch (true) {
-            case in_array($place->getFeatureCode(), Code::FEATURE_CODES_P_DISTRICT_PLACES):
-                $district = array_shift($placesP);
-                $city1 = $this->getCityByPlacePFromAdmin($district);
-                $city2 = $this->findNextAdminCity($placesP, $district);
-                $city3 = $this->findNextCityPopulation($placesP, $district);
+        /* Gets first place. */
+        $place = array_shift($placesP);
 
-                $city = match (true) {
-                    $city1 === null => $city2 !== null && $city2->getPopulation(true) > 0 ? $city2 : $city3,
-                    // no break
-                    default => $city1,
-                };
-
-                break;
-
-            case in_array($place->getFeatureCode(), Code::FEATURE_CODES_P_ADMIN_PLACES):
-                $city = array_shift($placesP);
-                $district = $this->findNextDistrict($placesP, $city);
-                break;
-        }
-
-        /* Disable district. */
-        if ($district !== null && $city !== null && $district->getName() === $city->getName()) {
-            $district = null;
-        }
-
-        $state = $this->getStateFromPlaceP($place);
-        $country = $this->getCountryByPlaceP($place);
-
-        switch (true) {
-            case $placeSource !== null && $placeSource->getName() === $country:
-                $place->setDistrict(null);
-                $place->setCity(null);
-                $place->setState(null);
-                break;
-
-            case $placeSource !== null && $state !== null && $placeSource->getName() === $state->getName():
-                $place->setDistrict(null);
-                $place->setCity(null);
-                $place->setState($state);
-                break;
-
-            case $placeSource !== null && $city !== null && $placeSource->getName() === $city->getName():
-                $place->setDistrict(null);
-                $place->setCity($city);
-                $place->setState($state);
-                break;
-
-            default:
-                $place->setDistrict($district);
-                $place->setCity($city);
-                $place->setState($state);
-                break;
-        }
-        $place->setCountry($country);
-
-        if ($city !== null) {
-            $place->setIsCity($city->getPopulation(true) > self::CITY_POPULATION);
-            $place->setPopulationAdmin($city->getPopulation(true));
-        } else {
-            $place->setIsCity(false);
-            $place->setPopulationAdmin(0);
-        }
+        /* Add district, city, etc. */
+        $this->addAdministrationInformationToPlace($place, $placesP, $placeSource);
 
         /* L → Parks, Areas */
         $parkPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_L);

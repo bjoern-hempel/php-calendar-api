@@ -15,11 +15,7 @@ namespace App\Service;
 
 use App\Constant\Code;
 use App\Entity\Place;
-use App\Entity\PlaceL;
 use App\Entity\PlaceP;
-use App\Entity\PlaceS;
-use App\Entity\PlaceT;
-use App\Entity\PlaceV;
 use App\Service\Entity\PlaceLoaderService;
 use App\Utils\GPSConverter;
 use App\Utils\Timer;
@@ -27,7 +23,6 @@ use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
-use function PHPUnit\Framework\isNan;
 
 /**
  * Class LocationDataService

@@ -198,10 +198,20 @@ document.querySelectorAll('.with-position').forEach(
 
         navigator.geolocation.getCurrentPosition((position) => {
 
+            /* Name of  */
+            let name = 'l';
+
+            /* Remove existing element */
+            let element = document.getElementById(name);
+            if (element !== null) {
+                element.remove();
+            }
+
             /* Create hidden element */
             let inputHidden = document.createElement('input');
             inputHidden.type = 'hidden';
-            inputHidden.name = 'l';
+            inputHidden.name = name;
+            inputHidden.id = name;
             inputHidden.value = round(position.coords.latitude, 6) + ',' + round(position.coords.longitude, 6);
 
             /* Append hidden element */

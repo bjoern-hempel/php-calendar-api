@@ -48,7 +48,12 @@ title:
     nextDetail: "Wälder, Heiden, etc." # V
 
 general:
+  detailed: "Detailliert"
+  elevationNotGiven: "Höhe nicht angegeben"
+  locationSearch: "Standortsuche"
+  locationSearchPosition: "Suche mit aktueller Position"
   notAvailable: "Der Ort \"%place%\" konnte nicht gefunden werden."
   notGiven: "Nicht angegeben"
-  tryThis: "Versuche doch einmal Folgendes"
   results: "Folgende Ergebnisse wurden mit dem Suchbegriff \"%search%\" gefunden"
+  successMessage: "Sieht so aus, als ob du nach Folgendem suchst:"
+  tryThis: "Versuche doch einmal Folgendes"

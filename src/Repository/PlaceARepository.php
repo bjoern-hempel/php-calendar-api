@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Constant\Code;
+use App\Entity\Place;
 use App\Entity\PlaceA;
 use App\Entity\PlaceP;
 use App\Repository\Base\PlaceRepositoryInterface;
-use App\Service\Entity\PlaceLoaderService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -163,14 +163,14 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
     /**
      * Find state by given city.
      *
-     * @param PlaceP $city
+     * @param Place $place
      * @return PlaceA|null
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function findStateByPlaceP(PlaceP $city): ?PlaceA
+    public function findStateByPlaceP(Place $place): ?PlaceA
     {
-        $countryCode = $city->getCountryCode();
+        $countryCode = $place->getCountryCode();
 
         $queryBuilder = $this->createQueryBuilder('a');
 
@@ -188,7 +188,7 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
                 $queryBuilder->andWhere('a.featureCode = :fco')
                     ->setParameter('fco', Code::FEATURE_CODE_A_ADM1);
                 $queryBuilder->andWhere('a.admin1Code = :ac')
-                    ->setParameter('ac', $city->getAdmin1Code());
+                    ->setParameter('ac', $place->getAdmin1Code());
         }
 
         $this->setLastSQL($queryBuilder);
