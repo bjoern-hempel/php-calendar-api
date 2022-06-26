@@ -327,9 +327,11 @@ document.querySelectorAll('.location-id').forEach(
         let featureClass = target.getAttribute('data-feature-class');
         let id = target.getAttribute('data-id');
 
-        let url = window.location.protocol + '//' + window.location.host + window.location.pathname + '?id=' + featureClass + ':' + id;
+        /* Write location. */
+        document.getElementById('q').value = featureClass + ':' + id;
 
-        window.location.href = url;
+        /* Submit form. */
+        document.getElementById('content-location-submit').click();
     })
 );
 

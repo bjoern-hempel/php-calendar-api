@@ -231,17 +231,17 @@ class ContentController extends BaseController
             }
         }
 
+        /* Also parameter l (location) given. */
+        if ($request->query->has(self::PARAMETER_NAME_LOCATION)) {
+            $location = strval($request->query->get(self::PARAMETER_NAME_LOCATION));
+        } else {
+            $location = null;
+        }
+
         switch (true) {
             /* Parameter q given. */
             case $request->query->has(self::PARAMETER_NAME_QUERY):
                 $search = strval($request->query->get(self::PARAMETER_NAME_QUERY));
-
-                /* Also parameter l (location) given. */
-                if ($request->query->has(self::PARAMETER_NAME_LOCATION)) {
-                    $location = strval($request->query->get(self::PARAMETER_NAME_LOCATION));
-                } else {
-                    $location = null;
-                }
 
                 $position = $this->getPositionFromStringSubmit($search, $placeSource, $results, $location);
 
@@ -253,6 +253,7 @@ class ContentController extends BaseController
                 }
 
             /* Parameter id given (direct place given) */
+            // no break
             case $request->query->has(self::PARAMETER_NAME_ID):
                 $search = strval($request->query->get(self::PARAMETER_NAME_ID));
                 list($latitude, $longitude) = $this->getPositionFromCodeIdSubmit($search, $placeSource);

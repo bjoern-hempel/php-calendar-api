@@ -15,7 +15,6 @@ namespace App\Service;
 
 use App\Constant\Code;
 use App\Entity\Place;
-use App\Entity\PlaceP;
 use App\Service\Entity\PlaceLoaderService;
 use App\Utils\GPSConverter;
 use App\Utils\Timer;

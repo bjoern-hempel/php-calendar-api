@@ -91,6 +91,48 @@ class PlaceLoaderService
 
     public const CITY_POPULATION = 2000;
 
+    public const MAX_NUMBER_PLACES = 10;
+
+    public const CONFIG_ENTITY_CODES = [
+        [
+            'tags' => ['brücke', 'brücken', ],
+            'featureClasses' => [Code::FEATURE_CLASS_S, ],
+            'featureCodes' => [Code::FEATURE_CODE_S_BDG, ],
+        ],
+        [
+            'tags' => ['hotel', 'hotels', ],
+            'featureClasses' => [Code::FEATURE_CLASS_S, ],
+            'featureCodes' => [Code::FEATURE_CODE_S_HTL, ],
+        ],
+        [
+            'tags' => ['insel', 'inseln', ],
+            'featureClasses' => [Code::FEATURE_CLASS_T, ],
+            'featureCodes' => [Code::FEATURE_CODE_T_ISL, Code::FEATURE_CODE_T_ISLS, ],
+        ],
+        [
+            'tags' => ['ort', ],
+            'featureClasses' => [Code::FEATURE_CLASS_P, ],
+            'featureCodes' => [],
+        ],
+        [
+            'tags' => ['schloss', 'schlösser', 'burg', 'burgen', ],
+            'featureClasses' => [Code::FEATURE_CLASS_S, ],
+            'featureCodes' => [Code::FEATURE_CODE_S_CSTL, ],
+        ],
+    ];
+
+    public const FEATURE_CLASSES_ALL = [
+        Code::FEATURE_CLASS_P,
+        Code::FEATURE_CLASS_A,
+        Code::FEATURE_CLASS_S,
+        Code::FEATURE_CLASS_H,
+        Code::FEATURE_CLASS_L,
+        Code::FEATURE_CLASS_R,
+        Code::FEATURE_CLASS_T,
+        Code::FEATURE_CLASS_U,
+        Code::FEATURE_CLASS_V,
+    ];
+
     protected const RAW_SQL_POSITION = <<<SQL
 SELECT
   p.*,
@@ -730,19 +772,15 @@ SQL;
             $placesP[] = $placeP;
         }
 
-        /* Sort placesP */
-        usort($placesP, function (PlaceP $a, PlaceP $b) {
-            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
-        });
-        $data['P'] = array_slice($placesP, 0, 10);
-
         /* No result was found. */
         if (count($placesP) === 0) {
             return null;
         }
 
-        /* Verbose information */
-        $this->printPlaces($placesP, $latitude, $longitude);
+        /* Sort placesP */
+        usort($placesP, function (PlaceP $a, PlaceP $b) {
+            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
+        });
 
         /* Gets first place or placeSource. */
         if ($placeSource !== null) {
@@ -750,6 +788,20 @@ SQL;
         } else {
             $place = array_shift($placesP);
         }
+
+        foreach ($placesP as $placeP) {
+            if (!$placeP instanceof PlaceP) {
+                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeP), __FILE__, __LINE__));
+            }
+
+            $this->translateFeatureCode($placeP);
+            $place->addPlace($placeP);
+        }
+
+        $data['P'] = $place->getPlaces(self::MAX_NUMBER_PLACES, $placeSource?->getId());
+
+        /* Verbose information */
+        $this->printPlaces($placesP, $latitude, $longitude);
 
         /* Add district, city, etc. */
         $this->addAdministrationInformationToPlace($place, $placesP, $placeSource);
@@ -767,7 +819,7 @@ SQL;
             $this->translateFeatureCode($parkPlace);
             $place->addPark($parkPlace);
         }
-        $data['L'] = $place->getParks();
+        $data['L'] = $place->getParks(self::MAX_NUMBER_PLACES, $placeSource?->getId());
 
         /* S → Add point of interest (Hotel, Rail station) */
         $spotPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_S);
@@ -782,7 +834,7 @@ SQL;
             $this->translateFeatureCode($spotPlace);
             $place->addSpot($spotPlace);
         }
-        $data['S'] = $place->getSpots();
+        $data['S'] = $place->getSpots(self::MAX_NUMBER_PLACES, $placeSource?->getId());
 
         /* T → Mountain */
         $mountainPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_T);
@@ -797,7 +849,7 @@ SQL;
             $this->translateFeatureCode($mountainPlace);
             $place->addMountain($mountainPlace);
         }
-        $data['T'] = $place->getMountains();
+        $data['T'] = $place->getMountains(self::MAX_NUMBER_PLACES, $placeSource?->getId());
 
         /* V → Forest */
         $forestPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_V);
@@ -812,7 +864,7 @@ SQL;
             $this->translateFeatureCode($forestPlace);
             $place->addForest($forestPlace);
         }
-        $data['V'] = $place->getForests();
+        $data['V'] = $place->getForests(self::MAX_NUMBER_PLACES, $placeSource?->getId());
 
         /* Verbose information */
         $this->printPlaceInformation($place);
@@ -864,25 +916,40 @@ SQL;
     }
 
     /**
-     * Get codes according to given name.
+     * Prepares given search string.
      *
-     * @param string $name
-     * @return string[]
+     * @param string $search
+     * @return string
      * @throws Exception
      */
-    protected function getCodes(string &$name): array
+    protected function prepareSearchString(string $search): string
     {
-        $names = preg_split('~[ ,]+~', $name);
-
-        if ($names === false) {
-            throw new Exception(sprintf('Unable to split given name "%s (%s:%d).', $name, __FILE__, __LINE__));
+        /* Remove "," from search. */
+        $words = preg_split('~[ ,]+~', $search);
+        if ($words === false) {
+            throw new Exception(sprintf('Unable to split given name "%s (%s:%d).', $search, __FILE__, __LINE__));
         }
 
-        $name = implode(' ', $names);
+        return implode(' ', $words);
+    }
 
-        switch (true) {
-            case preg_match('~(^| )(Insel)( |$)~', $name):
-                $name = preg_replace('~(^| )(Insel)( |$)~', '$1$3', $name);
+    /**
+     * Get entity codes (feature classes and feature codes) according to given name.
+     *
+     * @param string $name
+     * @return array<string, array<string>>
+     * @throws Exception
+     */
+    protected function getEntityCodes(string &$name): array
+    {
+        $name = $this->prepareSearchString($name);
+
+        foreach (self::CONFIG_ENTITY_CODES as $configEntityCodes) {
+            $tags = implode('|', $configEntityCodes['tags']);
+            $regexp = sprintf('~(^| )(%s)( |$)~i', $tags);
+
+            if (preg_match($regexp, $name)) {
+                $name = preg_replace($regexp, '$1$3', $name);
 
                 if (!is_string($name)) {
                     throw new Exception(sprintf('Unable to replace given name (%s:%d).', __FILE__, __LINE__));
@@ -890,11 +957,19 @@ SQL;
 
                 $name = $this->trim($name);
 
-                return [Code::FEATURE_CLASS_T];
-
-            default:
-                return [Code::FEATURE_CLASS_P, Code::FEATURE_CLASS_A, Code::FEATURE_CLASS_S, Code::FEATURE_CLASS_H, Code::FEATURE_CLASS_L, Code::FEATURE_CLASS_R, Code::FEATURE_CLASS_T, Code::FEATURE_CLASS_U, Code::FEATURE_CLASS_V];
+                return [
+                    'featureClasses' => $configEntityCodes['featureClasses'],
+                    'featureCodes' => $configEntityCodes['featureCodes'],
+                    'names' => !empty($name) ? explode(' ', $name) : [],
+                ];
+            }
         }
+
+        return [
+            'featureClasses' => self::FEATURE_CLASSES_ALL,
+            'featureCodes' => [],
+            'names' => !empty($name) ? explode(' ', $name) : [],
+        ];
     }
 
     /**
@@ -971,45 +1046,43 @@ SQL;
     public function findByName(string $name): array
     {
         $places = [];
-        $codes = $this->getCodes($name);
+        $entityCodes = $this->getEntityCodes($name);
 
-        foreach ($codes as $code) {
+        $featureClasses = $entityCodes['featureClasses'];
+        $featureCodes = $entityCodes['featureCodes'];
+        $names = $entityCodes['names'];
+
+        foreach ($featureClasses as $featureClass) {
+            $queryBuilder = $this->em->getRepository($this->getEntityClass($featureClass))
+                ->createQueryBuilder('p');
+
+            $queryBuilder->where('p.id > 0');
+
+            if (count($featureCodes) > 0) {
+                $queryBuilder
+                    ->andWhere('p.featureCode IN(:featureCodes)')
+                    ->setParameter('featureCodes', $featureCodes);
+            }
+
+            foreach ($names as $number => $name) {
+                $nameParameter = sprintf('name%d', $number);
+
+                $queryBuilder
+                    ->andWhere(sprintf('p.name LIKE :%s', $nameParameter))
+                    ->setParameter($nameParameter, sprintf('%%%s%%', $name));
+            }
+
+            $queryBuilder
+                ->orderBy('p.population', Criteria::DESC);
+
             /** @var Place[] $records */
-            $records = $this->em->getRepository($this->getEntityClass($code))
-                ->createQueryBuilder('p')
-                ->where('p.name = :name')
-                ->orWhere('p.alternateNames LIKE :name')
-                ->setParameter('name', sprintf('%s', $name))
-                ->orderBy('p.population', Criteria::DESC)
-                ->getQuery()
-                ->getResult();
+            $records = $queryBuilder->getQuery()->getResult();
+
             foreach ($records as $place) {
                 $places[] = $place;
             }
         }
-        if (count($places) > 0) {
 
-            /* Sort placesP */
-            usort($places, function (Place $a, Place $b) {
-                return $a->getPopulation() < $b->getPopulation() ? 1 : -1;
-            });
-
-            return $places;
-        }
-
-        foreach ($codes as $code) {
-            /** @var Place[] $records */
-            $records = $this->em->getRepository($this->getEntityClass($code))
-                ->createQueryBuilder('p')
-                ->where('p.name LIKE :name')
-                ->setParameter('name', sprintf('%%%s%%', $name))
-                ->orderBy('p.population', Criteria::DESC)
-                ->getQuery()
-                ->getResult();
-            foreach ($records as $place) {
-                $places[] = $place;
-            }
-        }
         if (count($places) > 0) {
 
             /* Sort placesP */

@@ -988,11 +988,14 @@ abstract class Place
     /**
      * Gets parks of this place. Not used for db.
      *
+     * @param int|null $max
+     * @param int[]|int|null $filterIds
      * @return PlaceL[]
      */
-    public function getParks(): array
+    public function getParks(?int $max = null, array|int|null $filterIds = null): array
     {
-        return $this->parks;
+        /** @phpstan-ignore-next-line → Filter result depends to given $this->parks. */
+        return $this->filter($this->parks, $max, $filterIds);
     }
 
     /**
@@ -1058,11 +1061,14 @@ abstract class Place
     /**
      * Gets places of this place. Not used for db.
      *
+     * @param int|null $max
+     * @param int[]|int|null $filterIds
      * @return PlaceP[]
      */
-    public function getPlaces(): array
+    public function getPlaces(?int $max = null, array|int|null $filterIds = null): array
     {
-        return $this->places;
+        /** @phpstan-ignore-next-line → Filter result depends to given $this->places. */
+        return $this->filter($this->places, $max, $filterIds);
     }
 
     /**
@@ -1119,11 +1125,14 @@ abstract class Place
     /**
      * Gets spots of this place. Not used for db.
      *
+     * @param int|null $max
+     * @param int[]|int|null $filterIds
      * @return PlaceS[]
      */
-    public function getSpots(): array
+    public function getSpots(?int $max = null, array|int|null $filterIds = null): array
     {
-        return $this->spots;
+        /** @phpstan-ignore-next-line → Filter result depends to given $this->spots. */
+        return $this->filter($this->spots, $max, $filterIds);
     }
 
     /**
@@ -1188,11 +1197,14 @@ abstract class Place
     /**
      * Gets mountains of this place. Not used for db.
      *
+     * @param int|null $max
+     * @param int[]|int|null $filterIds
      * @return PlaceT[]
      */
-    public function getMountains(): array
+    public function getMountains(?int $max = null, array|int|null $filterIds = null): array
     {
-        return $this->mountains;
+        /** @phpstan-ignore-next-line → Filter result depends to given $this->mountains. */
+        return $this->filter($this->mountains, $max, $filterIds);
     }
 
     /**
@@ -1257,11 +1269,14 @@ abstract class Place
     /**
      * Gets forests of this place. Not used for db.
      *
+     * @param int|null $max
+     * @param int[]|int|null $filterIds
      * @return PlaceV[]
      */
-    public function getForests(): array
+    public function getForests(?int $max = null, array|int|null $filterIds = null): array
     {
-        return $this->forests;
+        /** @phpstan-ignore-next-line → Filter result depends to given $this->forests. */
+        return $this->filter($this->forests, $max, $filterIds);
     }
 
     /**
@@ -1443,12 +1458,48 @@ abstract class Place
     /**
      * Case insensitive $this->strContains.
      *
+     * Replacement for: str_contains(strtolower($haystack), strtolower($needle));
+     *
      * @param string $haystack
      * @param string $needle
      * @return bool
+     * @throws Exception
      */
     protected function strContains(string $haystack, string $needle): bool
     {
-        return str_contains(strtolower($haystack), strtolower($needle));
+        $return = preg_match(sprintf('~(^|,[ ]*)%s(,[ ]*|$)~i', strtolower($needle)), strtolower($haystack));
+
+        if ($return === false) {
+            throw new Exception(sprintf('Unable to search with preg_match (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $return > 0;
+    }
+
+    /**
+     * Filter function
+     *
+     * @param Place[] $data
+     * @param int|null $max
+     * @param int[]|int|null $filterIds
+     * @return Place[]
+     */
+    protected function filter(array $data, ?int $max = null, array|int|null $filterIds = null): array
+    {
+        if ($filterIds !== null) {
+            if (!is_array($filterIds)) {
+                $filterIds = [$filterIds];
+            }
+
+            $data = array_filter($data, function (Place $place) use ($filterIds) {
+                return !in_array($place->getId(), $filterIds);
+            });
+        }
+
+        if ($max !== null) {
+            $data = array_slice($data, 0, $max);
+        }
+
+        return $data;
     }
 }

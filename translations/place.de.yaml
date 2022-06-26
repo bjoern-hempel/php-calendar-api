@@ -424,15 +424,15 @@ S:
   PRKHQ: "park headquarters" # a park administrative facility
   PRN: "prison" # a facility for confining prisoners
   PRNJ: "reformatory" # a facility for confining, training, and reforming young law offenders
-  PRNQ: "abandoned prison" #
-  PS: "power station" # a facility for generating electric power
-  PSH: "hydroelectric power station" # a building where electricity is generated from water power
-  PSN: "nuclear power station" # nuclear power station
-  PSTB: "border post" # a post or station at an international boundary for the regulation of movement of people and goods
-  PSTC: "customs post" # a building at an international boundary where customs and duties are paid on goods
-  PSTP: "patrol post" # a post from which patrols are sent out
-  PYR: "pyramid" # an ancient massive structure of square ground plan with four triangular faces meeting at a point and used for enclosing tombs
-  PYRS: "pyramids" # ancient massive structures of square ground plan with four triangular faces meeting at a point and used for enclosing tombs
+  PRNQ: "Verlassenes Gefängnis" #
+  PS: "Kraftwerk" # a facility for generating electric power
+  PSH: "Wasserkraftwerk" # a building where electricity is generated from water power
+  PSN: "Kernkraftwerk" # nuclear power station
+  PSTB: "Grenzposten" # a post or station at an international boundary for the regulation of movement of people and goods
+  PSTC: "Zollstelle" # a building at an international boundary where customs and duties are paid on goods
+  PSTP: "Patrouillenposten" # a post from which patrols are sent out
+  PYR: "Pyramide" # an ancient massive structure of square ground plan with four triangular faces meeting at a point and used for enclosing tombs
+  PYRS: "Pyramiden" # ancient massive structures of square ground plan with four triangular faces meeting at a point and used for enclosing tombs
   QUAY: "quay" # a structure of solid construction along a shore or bank which provides berthing for ships and which generally provides cargo handling facilities
   RDCR: "traffic circle" # a road junction formed around a central circle about which traffic moves in one direction only
   RDIN: "intersection" # a junction of two or more highways by a system of separate levels that permit traffic to pass from one to another without the crossing of traffic streams
@@ -472,15 +472,15 @@ S:
   STBL: "stable" # a building for the shelter and feeding of farm animals, especially horses
   STDM: "stadium" # a structure with an enclosure for athletic games with tiers of seats for spectators
   STNB: "scientific research base" # a scientific facility used as a base from which research is carried out or monitored
-  STNC: "coast guard station" # a facility from which the coast is guarded by armed vessels
-  STNE: "experiment station" # a facility for carrying out experiments
-  STNF: "forest station" # a collection of buildings and facilities for carrying out forest management
-  STNI: "inspection station" # a station at which vehicles, goods, and people are inspected
-  STNM: "meteorological station" # a station at which weather elements are recorded
-  STNR: "radio station" # a facility for producing and transmitting information by radio waves
-  STNS: "satellite station" # a facility for tracking and communicating with orbiting satellites
-  STNW: "whaling station" # a facility for butchering whales and processing train oil
-  STPS: "steps" # stones or slabs placed for ease in ascending or descending a steep slope
+  STNC: "Küstenwachenstation" # a facility from which the coast is guarded by armed vessels
+  STNE: "Versuchsstation" # a facility for carrying out experiments
+  STNF: "Forststation" # a collection of buildings and facilities for carrying out forest management
+  STNI: "Prüfplatz" # a station at which vehicles, goods, and people are inspected
+  STNM: "Meteorologische Station" # a station at which weather elements are recorded
+  STNR: "Rundfunkanstalt" # a facility for producing and transmitting information by radio waves
+  STNS: "Satellitenstation" # a facility for tracking and communicating with orbiting satellites
+  STNW: "Walfangstation" # a facility for butchering whales and processing train oil
+  STPS: "Treppen" # stones or slabs placed for ease in ascending or descending a steep slope
   SWT: "sewage treatment plant" # facility for the processing of sewage and/or wastewater
   SYG: "synagogue" # a place for Jewish worship and religious instruction
   THTR: "theater" # A building, room, or outdoor structure for the presentation of plays, films, or other dramatic performances
@@ -492,7 +492,7 @@ S:
   TRAM: "Straßenbahn" # rail vehicle along urban streets (also known as streetcar or trolley)
   TRANT: "transit terminal" # facilities for the handling of vehicular freight and passengers
   TRIG: "triangulation station" # a point on the earth whose position has been determined by triangulation
-  TRMO: "oil pipeline terminal" # a tank farm or loading facility at the end of an oil pipeline
+  TRMO: "Ölpipeline-Terminal" # a tank farm or loading facility at the end of an oil pipeline
   TWO: "temp work office" # Temporary Work Offices
   UNIP: "university prep school" # University Preparation Schools & Institutions
   UNIV: "university" # An institution for higher learning with teaching and research facilities constituting a graduate school and professional schools that award master's degrees and doctorates and an undergraduate division that awards bachelor's degrees.
@@ -521,9 +521,9 @@ T:
   CAPE: "cape" # a land area, more prominent than a point, projecting into the sea and marking a notable change in coastal direction
   CFT: "cleft(s)" # a deep narrow slot, notch, or groove in a coastal cliff
   CLDA: "caldera" # a depression measuring kilometers across formed by the collapse of a volcanic mountain
-  CLF: "cliff(s)" # a high, steep to perpendicular slope overlooking a waterbody or lower area
-  CNYN: "canyon" # a deep, narrow valley with steep sides cutting into a plateau or mountainous area
-  CONE: "cone(s)" # a conical landform composed of mud or volcanic material
+  CLF: "Klippe(n)" # a high, steep to perpendicular slope overlooking a waterbody or lower area
+  CNYN: "Schlucht" # a deep, narrow valley with steep sides cutting into a plateau or mountainous area
+  CONE: "Kegel(n)" # a conical landform composed of mud or volcanic material
   CRDR: "corridor" # a strip or area of land having significance as an access way
   CRQ: "cirque" # a bowl-like hollow partially surrounded by cliffs or steep slopes at the head of a glaciated valley
   CRQS: "cirques" # bowl-like hollows partially surrounded by cliffs or steep slopes at the head of a glaciated valley

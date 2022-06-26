@@ -79,7 +79,7 @@
                             {% for place in results %}
                                 <tr>
                                     <td class="table-name" style="width: 100%!important;">
-                                        <small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;
+                                        <small><kbd>{{ place.featureClass }}:{{ place.featureCode }}</kbd></small>&nbsp;
                                         <b>{{ place.nameFull(false) }}</b>
                                         {% if place.distanceMeter is not same as(0.0) %}<b> - </b><span>{{ place.distanceMeter(1, 'km', 1000, true)|raw }}</span>{% endif %}
 
