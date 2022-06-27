@@ -22,6 +22,7 @@ use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class LocationDataService
@@ -33,6 +34,8 @@ use JetBrains\PhpStorm\ArrayShape;
 class LocationDataService
 {
     protected PlaceLoaderService $placeLoaderService;
+
+    protected TranslatorInterface $translator;
 
     protected bool $debug = false;
 
@@ -68,6 +71,7 @@ class LocationDataService
     public const KEY_NAME_PLACE_ELEVATION = 'place-elevation';
     public const KEY_NAME_PLACE_FEATURE_CLASS = 'place-feature-class';
     public const KEY_NAME_PLACE_FEATURE_CODE = 'place-feature-code';
+    public const KEY_NAME_PLACE_FEATURE_NAME = 'place-feature-name';
     public const KEY_NAME_PLACE_DISTANCE_DB = 'place-distance-db';
     public const KEY_NAME_PLACE_DISTANCE_METER = 'place-distance-meter';
     public const KEY_NAME_PLACE_DEM = 'place-dem';
@@ -84,10 +88,13 @@ class LocationDataService
      * LocationDataService constructor.
      *
      * @param PlaceLoaderService $placeLoaderService
+     * @param TranslatorInterface $translator
      */
-    public function __construct(PlaceLoaderService $placeLoaderService)
+    public function __construct(PlaceLoaderService $placeLoaderService, TranslatorInterface $translator)
     {
         $this->placeLoaderService = $placeLoaderService;
+
+        $this->translator = $translator;
     }
 
     /**
@@ -228,6 +235,7 @@ class LocationDataService
             self::KEY_NAME_PLACE_ELEVATION => $this->getData('Place Elevation', $place->getElevation(), '%s', ' m'),
             self::KEY_NAME_PLACE_FEATURE_CLASS => $this->getData('Place Feature Class', $place->getFeatureClass(), '%s', null),
             self::KEY_NAME_PLACE_FEATURE_CODE => $this->getData('Place Feature Code', $place->getFeatureCode(), '%s', null),
+            self::KEY_NAME_PLACE_FEATURE_NAME => $this->getData('Place Feature Name', $this->translator->trans(sprintf('%s.%s', $place->getFeatureClass(), $place->getFeatureCode()), [], 'place'), '%s', null),
             self::KEY_NAME_PLACE_DEM => $this->getData('Digital Elevation Model', $place->getDem(), '%s', ' m'),
             self::KEY_NAME_PLACE_ADMIN1 => $this->getData('Admin1 Code', $place->getAdmin1Code(), '%s', null),
             self::KEY_NAME_PLACE_ADMIN2 => $this->getData('Admin2 Code', $place->getAdmin2Code(), '%s', null),
@@ -471,5 +479,25 @@ class LocationDataService
         $distance = self::getDistanceBetweenTwoPoints($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $decimals);
 
         return $distance['meters'];
+    }
+
+    /**
+     * Get relevance of given place
+     *
+     * @param string $name
+     * @param Place|null $placeSource
+     * @return int
+     */
+    public static function getRelevance(string $name, ?Place $placeSource = null): int
+    {
+        $relevance = 0;
+
+        if ($placeSource !== null) {
+            if (strtolower($placeSource->getName()) === strtolower($name)) {
+                $relevance = 100;
+            }
+        }
+
+        return $relevance;
     }
 }

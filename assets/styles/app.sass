@@ -17,6 +17,45 @@ html, body
     width: 100%
 
 /**
+ * Loader
+ */
+body
+    .app-loader
+        position: fixed
+        top: 0
+        left: 0
+        right: 0
+        bottom: 0
+        z-index: 1000
+        display: none
+
+        .app-loader-background
+            position: absolute
+            top: 0
+            left: 0
+            right: 0
+            bottom: 0
+            background: rgb(255,255,255,0.8)
+
+        .app-loader-text
+            position: absolute
+            top: 0
+            left: 0
+            right: 0
+            bottom: 0
+            display: flex
+            display: -webkit-flex
+            margin: 0
+
+            p
+                margin: auto
+                text-align: center
+
+                img
+                    width: 30px
+                    height: 30px
+
+/**
  * Content page
  */
 body.content

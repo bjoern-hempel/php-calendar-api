@@ -21,6 +21,7 @@ place:
   placeElevation: "Höhe"
   placeFeatureClass: "Oberschlüssel"
   placeFeatureCode:	"Schlüssel"
+  placeFeatureName: "Feature Name"
   placeDistanceDb: "Abstand (DB)"
   placeDistanceMeter: "Abstand in Meter"
   placeDem: "Digitales Höhenmodell"
@@ -49,14 +50,15 @@ title:
     nextDetail: "Wälder, Heiden, etc." # V
 
 general:
+  detectPosition: "Aktuelle Position wird ermittelt..."
   detailed: "Detailliert"
   elevationNotGiven: "Höhe nicht angegeben"
   locationSearchTitle: "Suche nach Standort"
   locationSearch: "Suche"
-  locationSearchWithPosition: "Mit aktueller Position"
-  locationSearchCurrentPosition: "Informationen über aktuelle Position"
+  locationSearchCurrentPosition: "Aktuelle Position"
   notAvailable: "Der Ort \"%place%\" konnte nicht gefunden werden."
   notGiven: "Nicht angegeben"
+  pleaseWait: "Bitte warten"
   results: "Folgende Ergebnisse wurden mit dem Suchbegriff \"%search%\" gefunden"
   successMessage: "Sieht so aus, als ob du nach Folgendem suchst:"
   tryThis: "Versuche doch einmal Folgendes"

@@ -110,6 +110,11 @@ class PlaceLoaderService
             'featureCodes' => [Code::FEATURE_CODE_T_ISL, Code::FEATURE_CODE_T_ISLS, ],
         ],
         [
+            'tags' => ['kirche', 'kirchen', ],
+            'featureClasses' => [Code::FEATURE_CLASS_S, ],
+            'featureCodes' => [Code::FEATURE_CODE_S_CH, ],
+        ],
+        [
             'tags' => ['ort', ],
             'featureClasses' => [Code::FEATURE_CLASS_P, ],
             'featureCodes' => [],
@@ -287,10 +292,11 @@ SQL;
      * @param float $latitude
      * @param float $longitude
      * @param string $featureClass
+     * @param Place|null $placeSource
      * @return PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
      * @throws Exception
      */
-    protected function buildPlaceFromRow(array $row, float $latitude, float $longitude, string $featureClass = Code::FEATURE_CLASS_A): PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
+    protected function buildPlaceFromRow(array $row, float $latitude, float $longitude, string $featureClass = Code::FEATURE_CLASS_A, ?Place $placeSource = null): PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
     {
         $place = self::getPlace($featureClass);
 
@@ -319,6 +325,7 @@ SQL;
         $place->setAdmin2Code(!empty($row['admin2_code']) ? strval($row['admin2_code']) : null);
         $place->setAdmin3Code(!empty($row['admin3_code']) ? strval($row['admin3_code']) : null);
         $place->setAdmin4Code(!empty($row['admin4_code']) ? strval($row['admin4_code']) : null);
+        $place->setRelevance(LocationDataService::getRelevance(strval($row['name']), $placeSource));
 
         return $place;
     }
@@ -600,7 +607,7 @@ SQL;
     }
 
     /**
-     * Translate given place.
+     * Translate given place. Add feature name to name.
      *
      * @param Place $place
      * @return void
@@ -621,7 +628,7 @@ SQL;
             $value = $this->translator->trans(sprintf('%s.%s', $place->getFeatureClass(), $place->getFeatureCode()), [], 'place', strtolower($place->getCountryCode()));
             $name = $place->getName();
 
-            if (!str_contains($name, $value)) {
+            if (!str_contains(strtolower($name), strtolower($value))) {
                 $place->setName(sprintf('%s %s', $value, $name));
             }
         }
@@ -763,7 +770,7 @@ SQL;
         while (($row = $result->fetchAssociative()) !== false) {
 
             /* Build and add place. */
-            $placeP = $this->buildPlaceFromRow($row, $latitude, $longitude, $featureClass);
+            $placeP = $this->buildPlaceFromRow($row, $latitude, $longitude, $featureClass, $placeSource);
 
             if (!$placeP instanceof PlaceP) {
                 throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeP), __FILE__, __LINE__));

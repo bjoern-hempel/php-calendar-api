@@ -100,6 +100,8 @@ abstract class Place
 
     protected ?float $degree = null;
 
+    protected int $relevance = 0;
+
     protected ?PlaceP $cityP = null;
 
     protected ?PlaceA $cityA = null;
@@ -290,6 +292,7 @@ abstract class Place
      *
      * @param string $addName
      * @return $this
+     * @throws Exception
      */
     public function addNameBefore(string $addName): self
     {
@@ -305,6 +308,7 @@ abstract class Place
      *
      * @param string $addName
      * @return $this
+     * @throws Exception
      */
     public function addNameAfter(string $addName): self
     {
@@ -837,6 +841,8 @@ abstract class Place
     }
 
     /**
+     * Get relevance of this place (if given). Not used for db.
+     *
      * @return float|null
      */
     public function getDegree(): ?float
@@ -845,12 +851,38 @@ abstract class Place
     }
 
     /**
+     * Set relevance of this place (if given). Not used for db.
+     *
      * @param float|null $degree
      * @return Place
      */
     public function setDegree(?float $degree): Place
     {
         $this->degree = $degree;
+
+        return $this;
+    }
+
+    /**
+     * Get relevance of this place. Not used for db.
+     *
+     * @return int
+     */
+    public function getRelevance(): int
+    {
+        return $this->relevance;
+    }
+
+    /**
+     * Set relevance of this place. Not used for db.
+     *
+     * @param int $relevance
+     * @return Place
+     */
+    public function setRelevance(int $relevance): Place
+    {
+        $this->relevance = $relevance;
+
         return $this;
     }
 

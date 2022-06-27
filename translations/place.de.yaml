@@ -262,25 +262,25 @@ S:
   AIRQ: "Verlassener Flugplatz" #
   AIRT: "Flughafenterminal" # airport facilities for the handling of freight and passengers
   AMTH: "Amphitheater" # an oval or circular structure with rising tiers of seats about a stage or open space
-  ANS: "archaeological/prehistoric site" # a place where archeological remains, old structures, or cultural artifacts are located
-  AQC: "aquaculture facility" # facility or area for the cultivation of aquatic animals and plants, especially fish, shellfish, and seaweed, in natural or controlled marine or freshwater environments; underwater agriculture
-  ARCH: "arch" # a natural or man-made structure in the form of an arch
+  ANS: "Archäologische oder vorgeschichtliche Stätte" # a place where archeological remains, old structures, or cultural artifacts are located
+  AQC: "Aquakulturanlage" # facility or area for the cultivation of aquatic animals and plants, especially fish, shellfish, and seaweed, in natural or controlled marine or freshwater environments; underwater agriculture
+  ARCH: "Gewölbe" # a natural or man-made structure in the form of an arch
   ARCHV: "Archiv" # a place or institution where documents are preserved
   ART: "Kunstwerk" # a piece of art, like a sculpture, painting. In contrast to monument (MNMT) it is not commemorative.
-  ASTR: "astronomical station" # a point on the earth whose position has been determined by observations of celestial bodies
-  ASYL: "asylum" # a facility where the insane are cared for and protected
+  ASTR: "Astronomische Station" # a point on the earth whose position has been determined by observations of celestial bodies
+  ASYL: "Asyl" # a facility where the insane are cared for and protected
   ATHF: "Sportplatz" # a tract of land used for playing team sports, and athletic track and field events
-  ATM: "automatic teller machine" # An unattended electronic machine in a public place, connected to a data system and related equipment and activated by a bank customer to obtain cash withdrawals and other banking services.
+  ATM: "Geldausgabeautomat" # An unattended electronic machine in a public place, connected to a data system and related equipment and activated by a bank customer to obtain cash withdrawals and other banking services.
   BANK: "Bank / Bankinstitut" # A business establishment in which money is kept for saving or commercial purposes or is invested, supplied for loans, or exchanged.
   BCN: "Leuchtturm" # a fixed artificial navigation mark
   BDG: "Brücke" # a structure erected across an obstacle such as a stream, road, etc., in order to carry roads, railroads, and pedestrians across
   BDGQ: "Zerstörte Brücke" # a destroyed or decayed bridge which is no longer functional
-  BLDA: "apartment building" # a building containing several individual apartments
+  BLDA: "Mehrfamilienhaus" # a building containing several individual apartments
   BLDG: "Gebäude" # a structure built for permanent use, as a house, factory, etc.
   BLDO: "Bürogebäude" # commercial building where business and/or services are conducted
-  BP: "boundary marker" # a fixture marking a point along a boundary
-  BRKS: "barracks" # a building for lodging military personnel
-  BRKW: "breakwater" # a structure erected to break the force of waves at the entrance to a harbor or port
+  BP: "Grenzmarkierung" # a fixture marking a point along a boundary
+  BRKS: "Kaserne" # a building for lodging military personnel
+  BRKW: "Wellenbrecher" # a structure erected to break the force of waves at the entrance to a harbor or port
   BSTN: "baling station" # a facility for baling agricultural products
   BTYD: "boatyard" # a waterside facility for servicing, repairing, and building small vessels
   BUR: "burial cave(s)" # a cave used for human burials
@@ -450,11 +450,11 @@ S:
   RSRT: "resort" # a specialized facility for vacation, health, or participation sports activities
   RSTN: "Bahnhof" # a facility comprising ticket office, platforms, etc. for loading and unloading train passengers and freight
   RSTNQ: "Verlassener Bahnhof" #
-  RSTP: "railroad stop" # a place lacking station facilities where trains stop to pick up and unload passengers and freight
-  RSTPQ: "abandoned railroad stop" #
-  RUIN: "ruin(s)" # a destroyed or decayed structure which is no longer functional
+  RSTP: "Bahnstation" # a place lacking station facilities where trains stop to pick up and unload passengers and freight
+  RSTPQ: "Stillgelegte Eisenbahnstation" #
+  RUIN: "Ruine(n)" # a destroyed or decayed structure which is no longer functional
   SCH: "Schule" # building(s) where instruction in one or more branches of knowledge takes place
-  SCHA: "agricultural school" # a school with a curriculum focused on agriculture
+  SCHA: "Landwirtschaftsschule" # a school with a curriculum focused on agriculture
   SCHC: "college" # the grounds and buildings of an institution of higher learning
   SCHL: "language school" # Language Schools & Institutions
   SCHM: "military school" # a school at which military science forms the core of the curriculum
@@ -481,11 +481,11 @@ S:
   STNS: "Satellitenstation" # a facility for tracking and communicating with orbiting satellites
   STNW: "Walfangstation" # a facility for butchering whales and processing train oil
   STPS: "Treppen" # stones or slabs placed for ease in ascending or descending a steep slope
-  SWT: "sewage treatment plant" # facility for the processing of sewage and/or wastewater
-  SYG: "synagogue" # a place for Jewish worship and religious instruction
-  THTR: "theater" # A building, room, or outdoor structure for the presentation of plays, films, or other dramatic performances
-  TMB: "tomb(s)" # a structure for interring bodies
-  TMPL: "temple(s)" # an edifice dedicated to religious worship
+  SWT: "Kläranlage" # facility for the processing of sewage and/or wastewater
+  SYG: "Synagoge" # a place for Jewish worship and religious instruction
+  THTR: "Kino" # A building, room, or outdoor structure for the presentation of plays, films, or other dramatic performances
+  TMB: "Grabmal(e)" # a structure for interring bodies
+  TMPL: "Tempel(s)" # an edifice dedicated to religious worship
   TNKD: "cattle dipping tank" # a small artificial pond used for immersing cattle in chemically treated water for disease control
   TOLL: "toll gate/barrier" # highway toll collection station
   TOWR: "Turm" # a high conspicuous structure, typically much higher than its diameter

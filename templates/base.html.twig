@@ -22,5 +22,16 @@
     </head>
     <body class="{% block body_class %}base{% endblock %} d-flex flex-column min-vh-100">
         {% block body %}{% endblock %}
+
+        <div class="app-loader" id="app-loader">
+            <div class="app-loader-background"></div>
+            <div class="app-loader-text">
+                <p>
+                    <img src="build/images/{{ asset('icons/search.gif') }}" />
+                    <b>{{ 'general.pleaseWait'|trans([], 'location') }}</b><br>
+                    <span id="app-loader-message">{{ 'general.detectPosition'|trans([], 'location') }}</span>
+                </p>
+            </div>
+        </div>
     </body>
 </html>

@@ -51,7 +51,15 @@ class ContentController extends BaseController
 
     public const PARAMETER_NAME_LOCATION = 'l';
 
+    public const PARAMETER_NAME_SORT = 's';
+
     public const PARAMETER_NAME_ID = 'id';
+
+    public const ORDER_BY_LOCATION = 'l';
+
+    public const ORDER_BY_NAME = 'n';
+
+    public const ORDER_BY_RELEVANCE = 'r';
 
     /**
      * ContentController constructor.
@@ -103,11 +111,13 @@ class ContentController extends BaseController
      * Adds additional information to given places.
      *
      * @param Place[] $placesSource
+     * @param string $locationFull
      * @param string|null $location
+     * @param string $sort
      * @return void
      * @throws Exception
      */
-    protected function addAdditionalInformationToPlaces(array &$placesSource, string $location = null): void
+    protected function addAdditionalInformationToPlaces(array &$placesSource, string $locationFull, ?string $location = null, string $sort = self::ORDER_BY_RELEVANCE): void
     {
         if (count($placesSource) <= 0) {
             return;
@@ -132,16 +142,36 @@ class ContentController extends BaseController
 
                 $placeSource->setDistanceMeter($distanceMeter);
             }
+        }
+
+        foreach ($placesSource as $placeSource) {
+            $relevance = LocationDataService::getRelevance($locationFull, $placeSource);
+            $placeSource->setRelevance($relevance);
+        }
+
+        /* Sort by given $sort. */
+        switch ($sort) {
 
             /* Sort by distance */
-            usort($placesSource, function (Place $a, Place $b) {
-                return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
-            });
-        } else {
+            case self::ORDER_BY_LOCATION:
+                usort($placesSource, function (Place $a, Place $b) {
+                    return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
+                });
+                break;
+
             /* Sort by name */
-            usort($placesSource, function (Place $a, Place $b) {
-                return $a->getName() > $b->getName() ? 1 : -1;
-            });
+            case self::ORDER_BY_NAME:
+                usort($placesSource, function (Place $a, Place $b) {
+                    return $a->getName() > $b->getName() ? 1 : -1;
+                });
+                break;
+
+            /* Sort by relevance */
+            case self::ORDER_BY_RELEVANCE:
+                usort($placesSource, function (Place $a, Place $b) {
+                    return $a->getRelevance() > $b->getRelevance() ? -1 : 1;
+                });
+                break;
         }
 
         /* Add administration information */
@@ -157,10 +187,11 @@ class ContentController extends BaseController
      * @param Place|null $placeSource
      * @param Place[] $placesSource
      * @param string|null $location
+     * @param string $sort
      * @return float[]|null
      * @throws Exception
      */
-    protected function getPositionFromStringSubmit(string $locationFull, ?Place &$placeSource = null, array &$placesSource = [], string $location = null): ?array
+    protected function getPositionFromStringSubmit(string $locationFull, ?Place &$placeSource = null, array &$placesSource = [], string $location = null, string $sort = self::ORDER_BY_RELEVANCE): ?array
     {
         $parsed = GPSConverter::parseFullLocation2DecimalDegrees($locationFull);
 
@@ -172,7 +203,7 @@ class ContentController extends BaseController
 
         $placesSource = $this->locationDataService->getLocationsByName($locationFull);
 
-        $this->addAdditionalInformationToPlaces($placesSource, $location);
+        $this->addAdditionalInformationToPlaces($placesSource, $locationFull, $location, $sort);
 
         switch (true) {
             case count($placesSource) <= 0:
@@ -211,13 +242,14 @@ class ContentController extends BaseController
      *
      * @param Request $request
      * @param string $search
+     * @param string $sort
      * @param string|null $location
      * @param array<string, Place[]> $data
      * @param Place[] $results
      * @return array<string, mixed>
      * @throws Exception
      */
-    protected function getLocationData(Request $request, string &$search, ?string &$location, array &$data = [], array &$results = []): array
+    protected function getLocationData(Request $request, string &$search, string &$sort, ?string &$location, array &$data = [], array &$results = []): array
     {
         $placeSource = null;
 
@@ -238,12 +270,17 @@ class ContentController extends BaseController
             $location = null;
         }
 
+        /* Also parameter s (sort) given. */
+        if ($request->query->has(self::PARAMETER_NAME_SORT)) {
+            $sort = strval($request->query->get(self::PARAMETER_NAME_SORT));
+        }
+
         switch (true) {
             /* Parameter q given. */
             case $request->query->has(self::PARAMETER_NAME_QUERY):
                 $search = strval($request->query->get(self::PARAMETER_NAME_QUERY));
 
-                $position = $this->getPositionFromStringSubmit($search, $placeSource, $results, $location);
+                $position = $this->getPositionFromStringSubmit($search, $placeSource, $results, $location, $sort);
 
                 if ($position === null) {
                     return [];
@@ -279,10 +316,11 @@ class ContentController extends BaseController
         $results = [];
         $search = '';
         $location = null;
+        $sort = 'r'; /* r - relevance, n - name, l - location (needs $location !== 0) */
         $error = null;
 
         try {
-            $locationData = $this->getLocationData($request, $search, $location, $places, $results);
+            $locationData = $this->getLocationData($request, $search, $sort, $location, $places, $results);
         } catch (InvalidArgumentException|Throwable $exception) {
             $error = $this->translator->trans('general.notAvailable', ['%place%' => $search], 'location');
 
@@ -296,6 +334,7 @@ class ContentController extends BaseController
         return $this->renderForm('content/location.html.twig', [
             'error' => $error,
             'search' => $search,
+            'sort' => $sort,
             'location' => $location,
             'locationData' => $locationData, /* Show search detail */
             'places' => $places,

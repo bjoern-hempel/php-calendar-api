@@ -54,7 +54,7 @@ let modalAddedClasses = null;
 let lightboxQuery = 'div.modal.lightbox';
 
 /**
- * Adds classes to modal of lightbox.
+ * Function: Adds classes to modal of lightbox.
  *
  */
 let addLightboxClasses = () => {
@@ -90,7 +90,7 @@ let addLightboxClasses = () => {
 }
 
 /**
- * Builds the lightbox.
+ * Function: Builds the lightbox.
  *
  * @param e
  */
@@ -145,35 +145,18 @@ let buildLightbox = (e) => {
 }
 
 /**
- * Starts the lightbox.
- */
-document.querySelectorAll('.lightbox-own').forEach(
-    (e) => e.addEventListener('click', buildLightbox)
-);
-
-/**
- * Submits given position.
- *
- * @param position
- */
-let submitPosition = (position) => {
-    document.getElementById('full_location_locationFull').value = position;
-    document.getElementById('content-location-submit').click();
-};
-
-/**
- * Round given value with given decimals.
+ * Function: Round given value with given decimals.
  *
  * @param value
  * @param decimals
  * @returns {number}
  */
 let round = (value, decimals) => {
-    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
-};
+        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+    };
 
 /**
- * Shows the main and detail compasses.
+ * Function: Shows the main and detail compasses.
  */
 let displayCompass = () => {
     let compass = document.getElementById('compass');
@@ -188,7 +171,7 @@ let displayCompass = () => {
 }
 
 /**
- * Set direction to main compass and detail compasses.
+ * Function: Set direction to main compass and detail compasses.
  *
  * @param dir
  */
@@ -214,7 +197,53 @@ let setDirection = (dir) => {
 }
 
 /**
- * Returns the full location from position.
+ * Function: Sets hidden field value.
+ *
+ * @param id
+ * @param value
+ */
+let setHiddenFieldValue = (id, value) => {
+    document.getElementById(id).value = value;
+}
+
+/**
+ * Function: Adds hidden field to form.
+ *
+ * @param name
+ * @param value
+ */
+let addHiddenFieldToSearchForm = (name, value) => {
+
+    let form = document.getElementsByName('full_location')[0];
+
+    /* Remove existing element */
+    let element = document.getElementById(name);
+    if (element !== null) {
+        element.remove();
+    }
+
+    /* Create hidden element */
+    let inputHidden = document.createElement('input');
+    inputHidden.type = 'hidden';
+    inputHidden.name = name;
+    inputHidden.id = name;
+    inputHidden.value = value;
+
+    /* Append hidden element */
+    form.appendChild(inputHidden);
+}
+
+/**
+ * Function: Submits the search form.
+ */
+let submitSearchForm = () => {
+
+    /* Submit form */
+    document.getElementById('content-location-submit').click();
+}
+
+/**
+ * Function: Returns the full location from position.
  *
  * @param GeolocationPosition position
  * @returns {string}
@@ -224,17 +253,60 @@ let getPosition = (position) => {
 }
 
 /**
+ * Shows app loader.
+ *
+ * @param message
+ */
+let showAppLoader = (message) => {
+    let appLoader = document.getElementById('app-loader');
+    let appLoaderMessage = document.getElementById('app-loader-message');
+
+    appLoader.style.display = 'block';
+    appLoaderMessage.innerText = message;
+}
+
+/**
+ * Function: Stops button or link propagation.
+ *
+ * @param triggeredEvent
+ */
+let stopPropagation = (triggeredEvent) => {
+    triggeredEvent.stopPropagation();
+    triggeredEvent.preventDefault();
+}
+
+/**
+ * Images: Starts the lightbox.
+ */
+document.querySelectorAll('.lightbox-own').forEach(
+    (e) => e.addEventListener('click', buildLightbox)
+);
+
+/**
  * Example link list: Search for current location.
  */
 document.querySelectorAll('.location-own-position').forEach(
-    (e) => e.addEventListener('click', () => {
+    (e) => e.addEventListener('click', (e) => {
+
+            /* Stop propagation */
+            stopPropagation(e);
+
+            /* Get clicked element. */
+            let target = e.target;
+
+            /* Get message. */
+            let message = target.getAttribute('data-app-loader-message');
+
+            /* Show app loader */
+            showAppLoader(message);
+
             navigator.geolocation.getCurrentPosition((position) => {
 
                 /* Write location. */
-                document.getElementById('q').value = getPosition(position);
+                setHiddenFieldValue('q', getPosition(position));
 
                 /* Submit form. */
-                document.getElementById('content-location-submit').click();
+                submitSearchForm();
             })
         }
     )
@@ -254,10 +326,10 @@ document.querySelectorAll('.location-position').forEach(
         let longitude = target.getAttribute('data-longitude');
 
         /* Write location. */
-        document.getElementById('q').value = latitude + ',' + longitude;
+        setHiddenFieldValue('q', latitude + ',' + longitude);
 
         /* Submit form. */
-        document.getElementById('content-location-submit').click();
+        submitSearchForm();
     })
 );
 
@@ -266,34 +338,30 @@ document.querySelectorAll('.location-position').forEach(
  */
 document.querySelectorAll('.search-with-position').forEach(
     (e) => e.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
 
+        /* Stop propagation */
+        stopPropagation(e);
+
+        /* Get clicked element. */
         let target = e.target;
+
+        /* Get message. */
+        let message = target.getAttribute('data-app-loader-message');
+
+        /* Show app loader */
+        showAppLoader(message);
 
         navigator.geolocation.getCurrentPosition((position) => {
 
-            /* Name of  */
+            /* Name and value of hidden field. */
             let name = 'l';
+            let value = getPosition(position);
 
-            /* Remove existing element */
-            let element = document.getElementById(name);
-            if (element !== null) {
-                element.remove();
-            }
-
-            /* Create hidden element */
-            let inputHidden = document.createElement('input');
-            inputHidden.type = 'hidden';
-            inputHidden.name = name;
-            inputHidden.id = name;
-            inputHidden.value = round(position.coords.latitude, 6) + ',' + round(position.coords.longitude, 6);
-
-            /* Append hidden element */
-            target.parentElement.appendChild(inputHidden);
+            /* Add hidden field. */
+            addHiddenFieldToSearchForm(name, value);
 
             /* Submit form */
-            document.getElementById('content-location-submit').click();
+            submitSearchForm();
         });
     })
 );
@@ -303,16 +371,26 @@ document.querySelectorAll('.search-with-position').forEach(
  */
 document.querySelectorAll('.search-current-position').forEach(
     (e) => e.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
+
+        /* Stop propagation */
+        stopPropagation(e);
+
+        /* Get clicked element. */
+        let target = e.target;
+
+        /* Get message. */
+        let message = target.getAttribute('data-app-loader-message');
+
+        /* Show app loader */
+        showAppLoader(message);
 
         navigator.geolocation.getCurrentPosition((position) => {
 
             /* Write location. */
-            document.getElementById('q').value = getPosition(position);
+            setHiddenFieldValue('q', getPosition(position));
 
             /* Submit form. */
-            document.getElementById('content-location-submit').click();
+            submitSearchForm();
         });
     })
 );
@@ -328,10 +406,74 @@ document.querySelectorAll('.location-id').forEach(
         let id = target.getAttribute('data-id');
 
         /* Write location. */
-        document.getElementById('q').value = featureClass + ':' + id;
+        setHiddenFieldValue('q', featureClass + ':' + id);
 
         /* Submit form. */
-        document.getElementById('content-location-submit').click();
+        submitSearchForm();
+    })
+);
+
+/**
+ * Location result list: Order list (via class).
+ */
+document.querySelectorAll('p.sort-area .sort-by').forEach(
+    (e) => e.addEventListener('click', (e) => {
+
+        /* Get the target. */
+        let target = e.target;
+
+        /* Name and value for hidden input field. */
+        let name = 's';
+        let value = 'r';
+
+        /* Get the value depending on the clicked sort link. */
+        switch (true) {
+            case target.classList.contains('sort-by-current-location'):
+                value = 'l';
+                break;
+            case target.classList.contains('sort-by-name'):
+                value = 'n';
+                break;
+            case target.classList.contains('sort-by-relevance'):
+                value = 'r';
+                break;
+        }
+
+        /* Add hidden field. */
+        addHiddenFieldToSearchForm(name, value);
+
+        if (value === 'l') {
+
+            /* Stop propagation */
+            stopPropagation(e);
+
+            /* Get clicked element. */
+            let target = e.target;
+
+            /* Get message. */
+            let message = target.getAttribute('data-app-loader-message');
+
+            /* Show app loader */
+            showAppLoader(message);
+
+            /* Request position. */
+            navigator.geolocation.getCurrentPosition((position) => {
+
+                /* Name and value of hidden field. */
+                let name = 'l';
+                let value = getPosition(position);
+
+                /* Add hidden field. */
+                addHiddenFieldToSearchForm(name, value);
+
+                /* Submit form */
+                submitSearchForm();
+            });
+        } else {
+
+            /* Submit form. */
+            submitSearchForm();
+        }
     })
 );
 
