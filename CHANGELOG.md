@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.30.11] - 2022-06-28
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add app loader
+
 ### [0.30.10] - 2022-06-26
 
 * [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add tag search
