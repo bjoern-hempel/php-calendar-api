@@ -496,6 +496,10 @@ class LocationDataService
             if (strtolower($placeSource->getName()) === strtolower($name)) {
                 $relevance = 100;
             }
+
+            if ($placeSource->getDistanceMeter() !== null) {
+                $relevance -= intval(round($placeSource->getDistanceMeter() * 0.01, 0));
+            }
         }
 
         return $relevance;
