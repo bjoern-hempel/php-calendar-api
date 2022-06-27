@@ -494,7 +494,7 @@ class LocationDataService
 
         if ($placeSource !== null) {
             if (strtolower($placeSource->getName()) === strtolower($name)) {
-                $relevance = 100;
+                $relevance = 10000;
             }
 
             if ($placeSource->getDistanceMeter() !== null) {
