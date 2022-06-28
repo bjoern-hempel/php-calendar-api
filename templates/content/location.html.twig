@@ -138,7 +138,7 @@
                         </table>
 
                         {# Pager #}
-                        {% if nextPage is not same as(false) %}
+                        {% if nextPage is not same as(null) %}
                             <a class="next-page" data-next-page="{{ nextPage }}" href="#">Nächste Seite</a>
                         {% endif %}
                     {% endif %}

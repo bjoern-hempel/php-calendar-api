@@ -357,7 +357,7 @@ class ContentController extends BaseController
         }
 
         $nextPage = null;
-        $numberLastElement = $page * $numberPerPage;
+        $numberLastElement = min($page * $numberPerPage, $numberResults);
 
         if ($numberResults > $numberLastElement) {
             $nextPage = $page + 1;
