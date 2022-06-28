@@ -239,6 +239,15 @@ let addHiddenFieldToSearchForm = (name, value) => {
 let submitSearchForm = () => {
 
     /* Submit form */
+    document.getElementById('content-location-submit-hidden').click();
+}
+
+/**
+ * Function: Submits the search form.
+ */
+let submitSearchFormReset = () => {
+
+    /* Submit form */
     document.getElementById('content-location-submit').click();
 }
 
@@ -283,6 +292,21 @@ document.querySelectorAll('.lightbox-own').forEach(
 );
 
 /**
+ * Search form: Reset page and search.
+ */
+document.getElementById('content-location-submit').addEventListener('click', (e) => {
+
+    /* Stop propagation */
+    stopPropagation(e);
+
+    /* Write location. */
+    setHiddenFieldValue('p', 1);
+
+    /* Submit form. */
+    submitSearchForm();
+});
+
+/**
  * Example link list: Search for current location.
  */
 document.querySelectorAll('.location-own-position').forEach(
@@ -306,7 +330,7 @@ document.querySelectorAll('.location-own-position').forEach(
                 setHiddenFieldValue('q', getPosition(position));
 
                 /* Submit form. */
-                submitSearchForm();
+                submitSearchFormReset();
             })
         }
     )
@@ -329,7 +353,7 @@ document.querySelectorAll('.location-position').forEach(
         setHiddenFieldValue('q', latitude + ',' + longitude);
 
         /* Submit form. */
-        submitSearchForm();
+        submitSearchFormReset();
     })
 );
 
@@ -361,7 +385,7 @@ document.querySelectorAll('.search-with-position').forEach(
             addHiddenFieldToSearchForm(name, value);
 
             /* Submit form */
-            submitSearchForm();
+            submitSearchFormReset();
         });
     })
 );
@@ -390,7 +414,7 @@ document.querySelectorAll('.search-current-position').forEach(
             setHiddenFieldValue('q', getPosition(position));
 
             /* Submit form. */
-            submitSearchForm();
+            submitSearchFormReset();
         });
     })
 );
@@ -409,7 +433,7 @@ document.querySelectorAll('.location-id').forEach(
         setHiddenFieldValue('q', featureClass + ':' + id);
 
         /* Submit form. */
-        submitSearchForm();
+        submitSearchFormReset();
     })
 );
 
@@ -492,12 +516,12 @@ document.querySelectorAll('p.sort-area .sort-by').forEach(
                 addHiddenFieldToSearchForm(name, value);
 
                 /* Submit form */
-                submitSearchForm();
+                submitSearchFormReset();
             });
         } else {
 
             /* Submit form. */
-            submitSearchForm();
+            submitSearchFormReset();
         }
     })
 );
