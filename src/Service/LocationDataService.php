@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Constant\Code;
+use App\Controller\ContentController;
 use App\Entity\Place;
+use App\Entity\PlaceA;
 use App\Service\Entity\PlaceLoaderService;
 use App\Utils\GPSConverter;
 use App\Utils\Timer;
@@ -484,22 +486,59 @@ class LocationDataService
     /**
      * Get relevance of given place
      *
-     * @param string $name
-     * @param Place|null $placeSource
+     * @param string $search
+     * @param string $sortBy
+     * @param Place|null $place
      * @return int
      */
-    public static function getRelevance(string $name, ?Place $placeSource = null): int
+    public static function getRelevance(string $search, string $sortBy = ContentController::ORDER_BY_RELEVANCE, ?Place $place = null): int
     {
-        $relevance = 0;
+        $relevance = 200000; /* 20.000 km (half earth circulation), to avoid relevance's < 0 */
 
-        if ($placeSource !== null) {
-            if (strtolower($placeSource->getName()) === strtolower($name)) {
-                $relevance = 10000;
-            }
+        if ($place === null) {
+            return $relevance;
+        }
 
-            if ($placeSource->getDistanceMeter() !== null) {
-                $relevance -= intval(round($placeSource->getDistanceMeter() * 0.01, 0));
-            }
+        /* The given place is equal to search name. */
+        if (strtolower($place->getName()) === strtolower($search)) {
+            $relevance += 10000;
+        }
+
+        /* The given place starts with search name. */
+        if (str_starts_with(strtolower($place->getName()), strtolower($search))) {
+            $relevance += 7500;
+        }
+
+        /* The search name is a word within the given place */
+        if (preg_match(sprintf('~(^| )(%s)( |$)~i', $search), $place->getName())) {
+            $relevance += 7500;
+        }
+
+        /* Admin Place */
+        if ($place instanceof PlaceA) {
+            $relevance += match ($place->getFeatureCode()) {
+                Code::FEATURE_CODE_A_ADM1, Code::FEATURE_CODE_A_ADM1H => 5000,
+                Code::FEATURE_CODE_A_ADM2, Code::FEATURE_CODE_A_ADM2H => 4500,
+                Code::FEATURE_CODE_A_ADM3, Code::FEATURE_CODE_A_ADM3H => 4000,
+                Code::FEATURE_CODE_A_ADM4, Code::FEATURE_CODE_A_ADM4H => 3500,
+                Code::FEATURE_CODE_A_ADM5, Code::FEATURE_CODE_A_ADM5H => 3000,
+                default => 2500,
+            };
+        }
+
+        /* If this is not a hotel: +2000 */
+        if ($place->getFeatureCode() !== Code::FEATURE_CODE_S_HTL) {
+            $relevance += 2000;
+        }
+
+        /* Remove relevance:
+         * 1 km:     -10
+         * 10 km:    -100
+         * 100 km:   -1000
+         * 20000 km: -200000
+         */
+        if ($place->getDistanceMeter() !== null && $sortBy === ContentController::ORDER_BY_RELEVANCE_LOCATION) {
+            $relevance -= intval(round($place->getDistanceMeter() * 0.01, 0));
         }
 
         return $relevance;

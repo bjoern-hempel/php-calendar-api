@@ -47,9 +47,13 @@ class ContentController extends BaseController
 
     protected PlaceLoaderService $placeLoaderService;
 
+    public const PARAMETER_NAME_VERBOSE = 'v';
+
     public const PARAMETER_NAME_QUERY = 'q';
 
     public const PARAMETER_NAME_LOCATION = 'l';
+
+    public const PARAMETER_NAME_PAGE = 'p';
 
     public const PARAMETER_NAME_SORT = 's';
 
@@ -60,6 +64,10 @@ class ContentController extends BaseController
     public const ORDER_BY_NAME = 'n';
 
     public const ORDER_BY_RELEVANCE = 'r';
+
+    public const ORDER_BY_RELEVANCE_LOCATION = 'rl';
+
+    public const NUMBER_PER_PAGE = 10;
 
     /**
      * ContentController constructor.
@@ -110,19 +118,22 @@ class ContentController extends BaseController
     /**
      * Adds additional information to given places.
      *
-     * @param Place[] $placesSource
      * @param string $locationFull
      * @param string|null $location
-     * @param string $sort
+     * @param string $sortBy
+     * @param Place[] $placeResults
+     * @param int $page
      * @return void
      * @throws Exception
      */
-    protected function addAdditionalInformationToPlaces(array &$placesSource, string $locationFull, ?string $location = null, string $sort = self::ORDER_BY_RELEVANCE): void
+    protected function addAdditionalInformationToPlaces(string $locationFull, ?string $location = null, string $sortBy = self::ORDER_BY_RELEVANCE, array &$placeResults = [], int $page = 1): void
     {
-        if (count($placesSource) <= 0) {
+        /* No places given. */
+        if (count($placeResults) <= 0) {
             return;
         }
 
+        /* Add distance. */
         if ($location !== null) {
             $locationSplit = preg_split('~,~', $location);
 
@@ -132,86 +143,94 @@ class ContentController extends BaseController
 
             list($latitude, $longitude) = $locationSplit;
 
-            foreach ($placesSource as $placeSource) {
+            foreach ($placeResults as $placeResult) {
                 $distanceMeter = LocationDataService::getDistanceBetweenTwoPointsInMeter(
                     floatval($latitude),
                     floatval($longitude),
-                    $placeSource->getLatitude(),
-                    $placeSource->getLongitude()
+                    $placeResult->getLatitude(),
+                    $placeResult->getLongitude()
                 );
 
-                $placeSource->setDistanceMeter($distanceMeter);
+                $placeResult->setDistanceMeter($distanceMeter);
             }
         }
 
-        foreach ($placesSource as $placeSource) {
-            $relevance = LocationDataService::getRelevance($locationFull, $placeSource);
+        /* Add relevance. */
+        foreach ($placeResults as $placeSource) {
+            $relevance = LocationDataService::getRelevance($locationFull, $sortBy, $placeSource);
             $placeSource->setRelevance($relevance);
         }
 
         /* Sort by given $sort. */
-        switch ($sort) {
+        switch ($sortBy) {
 
             /* Sort by distance */
             case self::ORDER_BY_LOCATION:
-                usort($placesSource, function (Place $a, Place $b) {
+                usort($placeResults, function (Place $a, Place $b) {
                     return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
                 });
                 break;
 
             /* Sort by name */
             case self::ORDER_BY_NAME:
-                usort($placesSource, function (Place $a, Place $b) {
+                usort($placeResults, function (Place $a, Place $b) {
                     return $a->getName() > $b->getName() ? 1 : -1;
                 });
                 break;
 
             /* Sort by relevance */
             case self::ORDER_BY_RELEVANCE:
-                usort($placesSource, function (Place $a, Place $b) {
+            case self::ORDER_BY_RELEVANCE_LOCATION:
+                usort($placeResults, function (Place $a, Place $b) {
                     return $a->getRelevance() > $b->getRelevance() ? -1 : 1;
                 });
                 break;
         }
 
+        $placeResults = array_slice($placeResults, ($page - 1) * self::NUMBER_PER_PAGE, self::NUMBER_PER_PAGE);
+
         /* Add administration information */
-        foreach ($placesSource as $placeSource) {
-            $this->placeLoaderService->addAdministrationInformationToPlace($placeSource);
+        foreach ($placeResults as $placeResult) {
+            $this->placeLoaderService->addAdministrationInformationToPlace($placeResult);
         }
     }
 
     /**
      * Get position from string submit.
      *
-     * @param string $locationFull
-     * @param Place|null $placeSource
-     * @param Place[] $placesSource
-     * @param string|null $location
-     * @param string $sort
+     * @param string $search
+     * @param string|null $currentLocation
+     * @param string $sortBy
+     * @param Place|null $placeMatch
+     * @param Place[] $placeResults
+     * @param int $numberResults
+     * @param int $page
      * @return float[]|null
      * @throws Exception
      */
-    protected function getPositionFromStringSubmit(string $locationFull, ?Place &$placeSource = null, array &$placesSource = [], string $location = null, string $sort = self::ORDER_BY_RELEVANCE): ?array
+    protected function getPositionFromStringSubmit(string $search, string $currentLocation = null, string $sortBy = self::ORDER_BY_RELEVANCE, ?Place &$placeMatch = null, array &$placeResults = [], int &$numberResults = 0, int $page = 1): ?array
     {
-        $parsed = GPSConverter::parseFullLocation2DecimalDegrees($locationFull);
+        $parsed = GPSConverter::parseFullLocation2DecimalDegrees($search);
 
         if ($parsed !== false) {
-            $placeSource = null;
+            $placeMatch = null;
 
             return $parsed;
         }
 
-        $placesSource = $this->locationDataService->getLocationsByName($locationFull);
+        $placeResults = $this->locationDataService->getLocationsByName($search);
 
-        $this->addAdditionalInformationToPlaces($placesSource, $locationFull, $location, $sort);
+        $numberResults = count($placeResults);
+
+        $this->addAdditionalInformationToPlaces($search, $currentLocation, $sortBy, $placeResults, $page);
 
         switch (true) {
-            case count($placesSource) <= 0:
-                throw new InvalidArgumentException(sprintf('Unable to find place "%s".', $locationFull));
+            case count($placeResults) <= 0:
+                throw new InvalidArgumentException(sprintf('Unable to find place "%s".', $search));
 
-            case count($placesSource) == 1:
-                $placeSource = $placesSource[0];
-                return [$placeSource->getLatitude(), $placeSource->getLongitude()];
+            case count($placeResults) == 1:
+                $placeMatch = $placeResults[0];
+                return [$placeMatch->getLatitude(), $placeMatch->getLongitude()];
 
             default:
                 return null;
@@ -242,16 +261,18 @@ class ContentController extends BaseController
      *
      * @param Request $request
      * @param string $search
-     * @param string $sort
-     * @param string|null $location
+     * @param string $sortBy
+     * @param string|null $currentLocation
      * @param array<string, Place[]> $data
-     * @param Place[] $results
+     * @param Place[] $placeResults
+     * @param int $numberResults
+     * @param int $page
      * @return array<string, mixed>
      * @throws Exception
      */
-    protected function getLocationData(Request $request, string &$search, string &$sort, ?string &$location, array &$data = [], array &$results = []): array
+    protected function getLocationData(Request $request, string &$search, string &$sortBy, ?string &$currentLocation, array &$data = [], array &$placeResults = [], int &$numberResults = 0, int $page = 1): array
     {
-        $placeSource = null;
+        $placeMatch = null;
 
         /* Move given name query with id content to id query. */
         if ($request->query->has(self::PARAMETER_NAME_QUERY)) {
@@ -265,14 +286,14 @@ class ContentController extends BaseController
 
         /* Also parameter l (location) given. */
         if ($request->query->has(self::PARAMETER_NAME_LOCATION)) {
-            $location = strval($request->query->get(self::PARAMETER_NAME_LOCATION));
+            $currentLocation = strval($request->query->get(self::PARAMETER_NAME_LOCATION));
         } else {
-            $location = null;
+            $currentLocation = null;
         }
 
         /* Also parameter s (sort) given. */
         if ($request->query->has(self::PARAMETER_NAME_SORT)) {
-            $sort = strval($request->query->get(self::PARAMETER_NAME_SORT));
+            $sortBy = strval($request->query->get(self::PARAMETER_NAME_SORT));
         }
 
         switch (true) {
@@ -280,21 +301,21 @@ class ContentController extends BaseController
             case $request->query->has(self::PARAMETER_NAME_QUERY):
                 $search = strval($request->query->get(self::PARAMETER_NAME_QUERY));
 
-                $position = $this->getPositionFromStringSubmit($search, $placeSource, $results, $location, $sort);
+                $position = $this->getPositionFromStringSubmit($search, $currentLocation, $sortBy, $placeMatch, $placeResults, $numberResults, $page);
 
                 if ($position === null) {
                     return [];
                 } else {
                     list($latitude, $longitude) = $position;
-                    return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data, $placeSource);
+                    return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data, $placeMatch);
                 }
 
             /* Parameter id given (direct place given) */
             // no break
             case $request->query->has(self::PARAMETER_NAME_ID):
                 $search = strval($request->query->get(self::PARAMETER_NAME_ID));
-                list($latitude, $longitude) = $this->getPositionFromCodeIdSubmit($search, $placeSource);
-                return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data, $placeSource);
+                list($latitude, $longitude) = $this->getPositionFromCodeIdSubmit($search, $placeMatch);
+                return $this->locationDataService->getLocationDataFormatted($latitude, $longitude, $data, $placeMatch);
 
             /* No parameter given */
             default:
@@ -312,15 +333,19 @@ class ContentController extends BaseController
     #[Route('/location', name: BaseController::ROUTE_NAME_APP_LOCATION)]
     public function location(Request $request): Response
     {
+        $verbose = $request->query->has(self::PARAMETER_NAME_VERBOSE);
         $places = [];
         $results = [];
+        $numberResults = 0;
         $search = '';
-        $location = null;
-        $sort = 'r'; /* r - relevance, n - name, l - location (needs $location !== 0) */
+        $currentLocation = null;
+        $sortBy = 'r'; /* r - relevance, n - name, l - location (needs $location !== 0), rl - relevance and location (needs $location !== 0) */
         $error = null;
+        $page = $request->query->has(self::PARAMETER_NAME_PAGE) ? intval($request->query->get(self::PARAMETER_NAME_PAGE)) : 1;
+        $numberPerPage = self::NUMBER_PER_PAGE;
 
         try {
-            $locationData = $this->getLocationData($request, $search, $sort, $location, $places, $results);
+            $locationData = $this->getLocationData($request, $search, $sortBy, $currentLocation, $places, $results, $numberResults, $page);
         } catch (InvalidArgumentException|Throwable $exception) {
             $error = $this->translator->trans('general.notAvailable', ['%place%' => $search], 'location');
 
@@ -331,14 +356,28 @@ class ContentController extends BaseController
             $locationData = [];
         }
 
+        $nextPage = null;
+        $numberLastElement = $page * $numberPerPage;
+
+        if ($numberResults > $numberLastElement) {
+            $nextPage = $page + 1;
+        }
+
         return $this->renderForm('content/location.html.twig', [
             'error' => $error,
             'search' => $search,
-            'sort' => $sort,
-            'location' => $location,
+            'sort' => $sortBy,
+            'currentLocation' => $currentLocation,
             'locationData' => $locationData, /* Show search detail */
+            'verbose' => $verbose,
             'places' => $places,
             'results' => $results, /* Show multiple results */
+
+            'page' => $page,
+            'numberResults' => $numberResults,
+            'numberPerPage' => $numberPerPage,
+            'nextPage' => $nextPage,
+
             'version' => $this->versionService->getVersion(),
         ]);
     }

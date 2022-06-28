@@ -15,6 +15,7 @@ namespace App\Service\Entity;
 
 use App\Constant\Code;
 use App\Constant\Country;
+use App\Controller\ContentController;
 use App\DataType\Point;
 use App\Entity\Place;
 use App\Entity\PlaceA;
@@ -293,10 +294,11 @@ SQL;
      * @param float $longitude
      * @param string $featureClass
      * @param Place|null $placeSource
+     * @param string $sortBy
      * @return PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
      * @throws Exception
      */
-    protected function buildPlaceFromRow(array $row, float $latitude, float $longitude, string $featureClass = Code::FEATURE_CLASS_A, ?Place $placeSource = null): PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
+    protected function buildPlaceFromRow(array $row, float $latitude, float $longitude, string $featureClass = Code::FEATURE_CLASS_A, ?Place $placeSource = null, string $sortBy = ContentController::ORDER_BY_RELEVANCE): PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
     {
         $place = self::getPlace($featureClass);
 
@@ -325,7 +327,7 @@ SQL;
         $place->setAdmin2Code(!empty($row['admin2_code']) ? strval($row['admin2_code']) : null);
         $place->setAdmin3Code(!empty($row['admin3_code']) ? strval($row['admin3_code']) : null);
         $place->setAdmin4Code(!empty($row['admin4_code']) ? strval($row['admin4_code']) : null);
-        $place->setRelevance(LocationDataService::getRelevance(strval($row['name']), $placeSource));
+        $place->setRelevance(LocationDataService::getRelevance(strval($row['name']), $sortBy, $placeSource));
 
         return $place;
     }

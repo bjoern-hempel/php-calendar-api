@@ -414,6 +414,28 @@ document.querySelectorAll('.location-id').forEach(
 );
 
 /**
+ * Location result list: Next page.
+ */
+document.querySelectorAll('a.next-page').forEach(
+    (e) => e.addEventListener('click', (e) => {
+
+        /* Stop propagation */
+        stopPropagation(e);
+
+        let target = e.target;
+
+        let nextPage = target.getAttribute('data-next-page');
+
+        /* Write location. */
+        setHiddenFieldValue('p', nextPage);
+
+        /* Submit form. */
+        submitSearchForm();
+    })
+);
+
+
+/**
  * Location result list: Order list (via class).
  */
 document.querySelectorAll('p.sort-area .sort-by').forEach(
@@ -434,6 +456,9 @@ document.querySelectorAll('p.sort-area .sort-by').forEach(
             case target.classList.contains('sort-by-name'):
                 value = 'n';
                 break;
+            case target.classList.contains('sort-by-relevance-current-location'):
+                value = 'rl';
+                break;
             case target.classList.contains('sort-by-relevance'):
                 value = 'r';
                 break;
@@ -442,7 +467,7 @@ document.querySelectorAll('p.sort-area .sort-by').forEach(
         /* Add hidden field. */
         addHiddenFieldToSearchForm(name, value);
 
-        if (value === 'l') {
+        if (value === 'l' || value === 'rl') {
 
             /* Stop propagation */
             stopPropagation(e);

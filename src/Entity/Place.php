@@ -200,7 +200,7 @@ abstract class Place
         );
 
         if ($withProperties) {
-            if (in_array($this->getFeatureCode(), Code::FEATURE_CODES_T_HILLS)) {
+            if (in_array($this->getFeatureCode(), Code::FEATURE_CODES_T_HILLS) && $this->getElevationHill() > 0) {
                 $name = sprintf('%s (%d m)', $name, $this->getElevationHill());
             }
         }

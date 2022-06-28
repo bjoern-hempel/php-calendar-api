@@ -832,5 +832,6 @@ class Code
         self::FEATURE_CODE_T_MT,
         self::FEATURE_CODE_T_MTS,
         self::FEATURE_CODE_T_PK,
+        self::FEATURE_CODE_T_RK,
     ];
 }

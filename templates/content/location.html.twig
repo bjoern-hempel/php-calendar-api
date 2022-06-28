@@ -35,9 +35,15 @@
                     <form name="full_location" method="get">
                         <div>
                             <input type="search" id="q" name="q" required="required" autofocus="autofocus" value="{{ search }}">
+                            <input type="hidden" id="s" name="s" value="{{ sort }}">
+                            <input type="hidden" id="p" name="p" value="{{ page }}">
 
-                            {% if location is not null %}
-                                <input type="hidden" id="l" name="l" value="{{ location }}">
+                            {% if currentLocation is not null %}
+                                <input type="hidden" id="l" name="l" value="{{ currentLocation }}">
+                            {% endif %}
+
+                            {% if verbose is same as(true) %}
+                                <input type="hidden" id="v" name="v" value="1">
                             {% endif %}
                         </div>
                         <div>
@@ -70,25 +76,30 @@
                     #}
                     {% if results|length > 1 %}
                         <p class="description">
-                            {{ 'general.results'|trans({'%search%': search}, 'location') }}:
+                            {{ 'general.results'|trans({'%search%': search, '%numberResults%': numberResults}, 'location') }}
                         </p>
 
                         <p class="sort-area">
                             <b>Sortieren nach</b>:
                             {% if sort is not same as('r') %}
-                                <a class="link-primary sort-by sort-by-relevance" href="#">Relevanz</a>
+                                <nobr><a class="link-primary sort-by sort-by-relevance" href="#">{{ 'general.links.sort.relevance'|trans([], 'location') }}</a></nobr>
                             {% else %}
-                                Relevanz
+                                <nobr>{{ 'general.links.sort.relevance'|trans([], 'location') }}</nobr>
+                            {% endif %} |
+                            {% if sort is not same as('rl') %}
+                                <nobr><a class="link-primary sort-by sort-by-relevance-current-location" data-app-loader-message="{{ 'general.detectPosition'|trans([], 'location') }}" href="#">{{ 'general.links.sort.relevanceAndPosition'|trans([], 'location') }}</a></nobr>
+                            {% else %}
+                                <nobr>{{ 'general.links.sort.relevanceAndPosition'|trans([], 'location') }}</nobr>
                             {% endif %} |
                             {% if sort is not same as('n') %}
-                                <a class="link-primary sort-by sort-by-name" href="#">Name</a>
+                                <nobr><a class="link-primary sort-by sort-by-name" href="#">{{ 'general.links.sort.name'|trans([], 'location') }}</a></nobr>
                             {% else %}
-                                Name
+                                <nobr>{{ 'general.links.sort.name'|trans([], 'location') }}</nobr>
                             {% endif %} |
                             {% if sort is not same as('l') %}
-                                <a class="link-primary sort-by sort-by-current-location" data-app-loader-message="{{ 'general.detectPosition'|trans([], 'location') }}" href="#">Aktueller Position</a>
+                                <nobr><a class="link-primary sort-by sort-by-current-location" data-app-loader-message="{{ 'general.detectPosition'|trans([], 'location') }}" href="#">{{ 'general.links.sort.position'|trans([], 'location') }}</a></nobr>
                             {% else %}
-                                Aktueller Position
+                                <nobr>{{ 'general.links.sort.position'|trans([], 'location') }}</nobr>
                             {% endif %}
                         </p>
 
@@ -98,8 +109,16 @@
                                 <tr>
                                     <td class="table-name" style="width: 100%!important;">
                                         <small><kbd>{{ place.featureClass }}:{{ place.featureCode }}</kbd></small>&nbsp;
+                                        {% if place.distanceMeter is not same as(0.0) %}
+                                            <small><kbd style="background-color: #008000;">{{ place.distanceMeter(1, 'km', 1000, true)|raw }}</kbd></small>&nbsp;
+                                        {% endif %}
+                                        {% if verbose %}
+                                            {% if sort is same as('rl') or sort is same as('r') %}
+                                                <small><kbd style="background-color: #800000;">{{ place.relevance }}</kbd></small>&nbsp;
+                                            {% endif %}
+                                        {% endif %}
                                         <b>{{ place.nameFull(false) }}</b>
-                                        {% if place.distanceMeter is not same as(0.0) %}<b> - </b><span>{{ place.distanceMeter(1, 'km', 1000, true)|raw }}</span>{% endif %}
+
 
                                         <br /><small>{{ (place.featureClass ~ '.' ~ place.featureCode)|trans([], 'place') }}</small>
 
@@ -115,6 +134,11 @@
                                 </tr>
                             {% endfor %}
                         </table>
+
+                        {# Pager #}
+                        {% if nextPage is not same as(false) %}
+                            <a class="next-page" data-next-page="{{ nextPage }}" href="#">Nächste Seite</a>
+                        {% endif %}
                     {% endif %}
 
                     {#
