@@ -108,6 +108,7 @@
                             {% for place in results %}
                                 <tr>
                                     <td class="table-name" style="width: 100%!important;">
+                                        <small><kbd style="background-color: #000080;">{{ loop.index + (page - 1) * numberPerPage }}</kbd></small>&nbsp;
                                         <small><kbd>{{ place.featureClass }}:{{ place.featureCode }}</kbd></small>&nbsp;
                                         {% if place.distanceMeter is not same as(0.0) %}
                                             <small><kbd style="background-color: #008000;">{{ place.distanceMeter(1, 'km', 1000, true)|raw }}</kbd></small>&nbsp;
