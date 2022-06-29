@@ -21,7 +21,7 @@ place:
   placeElevation: "Höhe"
   placeFeatureClass: "Oberschlüssel"
   placeFeatureCode:	"Schlüssel"
-  placeFeatureName: "Feature Name"
+  placeFeatureName: "Merkmalname"
   placeDistanceDb: "Abstand (DB)"
   placeDistanceMeter: "Abstand in Meter"
   placeDem: "Digitales Höhenmodell"

@@ -276,7 +276,7 @@ class ContentController extends BaseController
 
         /* Move given name query with id content to id query. */
         if ($request->query->has(self::PARAMETER_NAME_QUERY)) {
-            $query = strval($request->query->get(self::PARAMETER_NAME_QUERY));
+            $query = trim(strval($request->query->get(self::PARAMETER_NAME_QUERY)));
 
             if (preg_match('~^[ahlprstuv]:\d+$~', $query)) {
                 $request->query->set(self::PARAMETER_NAME_ID, $query);
@@ -343,6 +343,8 @@ class ContentController extends BaseController
         $error = null;
         $page = $request->query->has(self::PARAMETER_NAME_PAGE) ? intval($request->query->get(self::PARAMETER_NAME_PAGE)) : 1;
         $numberPerPage = self::NUMBER_PER_PAGE;
+
+        $this->locationDataService->setVerbose($verbose, false);
 
         try {
             $locationData = $this->getLocationData($request, $search, $sortBy, $currentLocation, $places, $results, $numberResults, $page);

@@ -205,7 +205,7 @@ abstract class Place
             }
         }
 
-        return $withFeature ? sprintf('%s (%s/%s)', $name, $this->getFeatureClass(), $this->getFeatureCode()) : $name;
+        return $withFeature ? sprintf('%s [%s:%s]', $name, $this->getFeatureClass(), $this->getFeatureCode()) : $name;
     }
 
     /**
@@ -219,59 +219,34 @@ abstract class Place
      */
     public function getNameFull(bool $detailed = false, ?Place $placeSource = null, bool $withProperties = false): string
     {
+        /* Add current name (Place[AHLPRSTUV]). */
         $name = $this->getName($detailed, $withProperties);
 
-        if ($this->getDistrict() !== null && !$this->strContains($name, $this->getDistrict()->getName())) {
-            $name = sprintf($this->templateAddName, $name, $this->getDistrict()->getName($detailed));
-        }
+        /* Add district name. */
+        $this->addNameAfter($name, $this->getDistrict(), $detailed, $withProperties);
 
-        if ($this->getCity() !== null && !$this->strContains($name, $this->getCity()->getName())) {
-            $name = sprintf($this->templateAddName, $name, $this->getCity()->getName($detailed));
-        }
+        /* Add city name. */
+        $this->addNameAfter($name, $this->getCity(), $detailed, $withProperties);
 
-        if ($this->getState() !== null && !$this->strContains($name, $this->getState()->getName())) {
-            $name = sprintf($this->templateAddName, $name, $this->getState()->getName($detailed));
-        }
+        /* Add state name. */
+        $this->addNameAfter($name, $this->getState(), $detailed, $withProperties);
 
-        $name = sprintf($this->templateAddName, $name, $this->getCountry($detailed));
+        /* Add country. */
+        $this->addNameAfter($name, $this->getCountry($detailed), $detailed, $withProperties);
 
-        $name = preg_replace('~^, ~', '', $name);
+        /* Add PlaceL. */
+        $this->addNameBefore($name, $this->getFirstPark(true, $placeSource), $detailed, $withProperties);
 
-        if ($name === null) {
-            throw new Exception(sprintf('Unable to replace comma (%s:%d).', __FILE__, __LINE__));
-        }
+        /* Add PlaceT. */
+        $this->addNameBefore($name, $this->getFirstMountain(true, $placeSource), $detailed, $withProperties);
 
-        $name = preg_replace('~, $~', '', $name);
+        /* Add PlaceS. */
+        $this->addNameBefore($name, $this->getFirstSpot(true, $placeSource), $detailed, $withProperties);
 
-        if ($name === null) {
-            throw new Exception(sprintf('Unable to replace comma (%s:%d).', __FILE__, __LINE__));
-        }
+        /* Add PlaceV. */
+        $this->addNameBefore($name, $this->getFirstForest(true, $placeSource), $detailed, $withProperties);
 
-        /* PlaceL */
-        $firstPark = $this->getFirstPark(true, $placeSource);
-        if (!is_null($firstPark) && !$this->strContains($name, $firstPark->getName())) {
-            $name = sprintf($this->templateAddName, $firstPark->getName($detailed), $name);
-        }
-
-        /* PlaceT */
-        $firstMountain = $this->getFirstMountain(true, $placeSource);
-        if (!is_null($firstMountain) && !$this->strContains($name, $firstMountain->getName())) {
-            $name = sprintf($this->templateAddName, $firstMountain->getName($detailed, $withProperties), $name);
-        }
-
-        /* PlaceS */
-        $firstSpot = $this->getFirstSpot(true, $placeSource);
-        if (!is_null($firstSpot) && !$this->strContains($name, $firstSpot->getName())) {
-            $name = sprintf($this->templateAddName, $firstSpot->getName($detailed), $name);
-        }
-
-        /* PlaceV */
-        $firstForest = $this->getFirstForest(true, $placeSource);
-        if (!is_null($firstForest) && !$this->strContains($name, $firstForest->getName())) {
-            $name = sprintf($this->templateAddName, $firstForest->getName($detailed), $name);
-        }
-
-        return $name;
+        return $this->trim($name);
     }
 
     /**
@@ -290,33 +265,51 @@ abstract class Place
     /**
      * Adds a new name before the existing name of this place (Spot, Mountain, Area, etc.).
      *
-     * @param string $addName
-     * @return $this
+     * @param string $name
+     * @param Place|string|null $place
+     * @param bool $detailed
+     * @param bool $withProperties
+     * @return void
      * @throws Exception
      */
-    public function addNameBefore(string $addName): self
+    protected function addNameBefore(string &$name, Place|string|null $place, bool $detailed = false, bool $withProperties = false): void
     {
-        if (!$this->strContains($this->getName(), $addName)) {
-            $this->setName(sprintf($this->templateAddName, ucfirst($addName), $this->getName()));
+        if (is_null($place)) {
+            return;
         }
 
-        return $this;
+        $addName = $place instanceof Place ? $place->getName($detailed, $withProperties) : $place;
+
+        if ($this->strContains($name, $addName)) {
+            return;
+        }
+
+        $name = sprintf($this->templateAddName, $addName, $name);
     }
 
     /**
      * Adds a new name after the existing name of this place (state, country, etc.).
      *
-     * @param string $addName
-     * @return $this
+     * @param string $name
+     * @param Place|string|null $place
+     * @param bool $detailed
+     * @param bool $withProperties
+     * @return void
      * @throws Exception
      */
-    public function addNameAfter(string $addName): self
+    protected function addNameAfter(string &$name, Place|string|null $place, bool $detailed = false, bool $withProperties = false): void
     {
-        if (!$this->strContains($this->getName(), $addName)) {
-            $this->setName(sprintf($this->templateAddName, $this->getName(), ucfirst($addName)));
+        if (is_null($place)) {
+            return;
         }
 
-        return $this;
+        $addName = $place instanceof Place ? $place->getName($detailed, $withProperties) : $place;
+
+        if ($this->strContains($name, $addName)) {
+            return;
+        }
+
+        $name = sprintf($this->templateAddName, $name, $addName);
     }
 
     /**
@@ -1499,7 +1492,7 @@ abstract class Place
      */
     protected function strContains(string $haystack, string $needle): bool
     {
-        $return = preg_match(sprintf('~(^|,[ ]*)%s(,[ ]*|$)~i', strtolower($needle)), strtolower($haystack));
+        $return = preg_match(sprintf('~(^|,[ ]*)%s(,[ ]*|$)~i', preg_quote(strtolower($needle))), strtolower($haystack));
 
         if ($return === false) {
             throw new Exception(sprintf('Unable to search with preg_match (%s:%d).', __FILE__, __LINE__));
@@ -1533,5 +1526,29 @@ abstract class Place
         }
 
         return $data;
+    }
+
+    /**
+     * Trims given string.
+     *
+     * @param string $string
+     * @return string
+     * @throws Exception
+     */
+    protected function trim(string $string): string
+    {
+        $string = trim($string);
+
+        $string = preg_replace('~^, ~', '', $string);
+        if ($string === null) {
+            throw new Exception(sprintf('Unable to replace comma (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $string = preg_replace('~, $~', '', $string);
+        if ($string === null) {
+            throw new Exception(sprintf('Unable to replace comma (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $string;
     }
 }

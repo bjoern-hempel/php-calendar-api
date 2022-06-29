@@ -25,4 +25,5 @@ class Icon
     public const ICON_SLEEP = '😴';
     public const ICON_HALO = '😇';
     public const ICON_HEART = '😍';
+    public const ICON_WORLD = '🌐';
 }

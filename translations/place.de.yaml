@@ -574,7 +574,7 @@ T:
   PKS: "Gipfel" # pointed elevations atop a mountain, ridge, or other hypsographic features
   PLAT: "Plateau" # an elevated plain with steep slopes on one or more sides, and often with incised streams
   PLATX: "section of plateau" #
-  PLDR: "polder" # an area reclaimed from the sea by diking and draining
+  PLDR: "Polder" # an area reclaimed from the sea by diking and draining
   PLN: "plain(s)" # an extensive area of comparatively level to gently undulating land, lacking surface irregularities, and usually adjacent to a higher area
   PLNX: "section of plain" #
   PROM: "promontory(-ies)" # a bluff or prominent hill overlooking or projecting into a lowland
@@ -582,10 +582,10 @@ T:
   PTS: "Landspitzen" # tapering pieces of land projecting into a body of water, less prominent than a cape
   RDGB: "Strandkamm" # a ridge of sand just inland and parallel to the beach, usually in series
   RDGE: "Bergzug / Bergzüge" # a long narrow elevation with steep sides, and a more or less continuous crest
-  REG: "stony desert" # a desert plain characterized by a surface veneer of gravel and stones
+  REG: "Steinwüste" # a desert plain characterized by a surface veneer of gravel and stones
   RK: "Felsmassiv / Felsen" # a conspicuous, isolated rocky mass
-  RKFL: "rockfall" # an irregular mass of fallen rock at the base of a cliff or steep slope
-  RKS: "rocks" # conspicuous, isolated rocky masses
+  RKFL: "Felssturz" # an irregular mass of fallen rock at the base of a cliff or steep slope
+  RKS: "Felsmassive / Felsen" # conspicuous, isolated rocky masses
   SAND: "sand area" # a tract of land covered with sand
   SBED: "dry stream bed" # a channel formerly containing the water of a stream
   SCRP: "escarpment" # a long line of cliffs or steep slopes separating level surfaces above and below

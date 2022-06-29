@@ -103,13 +103,16 @@ class LocationDataService
      * Sets debug mode.
      *
      * @param bool $debug
+     * @param bool $withPlaceLoaderService
      * @return $this
      */
-    public function setDebug(bool $debug): self
+    public function setDebug(bool $debug, bool $withPlaceLoaderService = true): self
     {
         $this->debug = $debug;
 
-        $this->placeLoaderService->setDebug($debug);
+        if ($withPlaceLoaderService) {
+            $this->placeLoaderService->setDebug($debug);
+        }
 
         return $this;
     }
@@ -118,13 +121,16 @@ class LocationDataService
      * Sets verbose mode.
      *
      * @param bool $verbose
+     * @param bool $withPlaceLoaderService
      * @return $this
      */
-    public function setVerbose(bool $verbose): self
+    public function setVerbose(bool $verbose, bool $withPlaceLoaderService = true): self
     {
         $this->verbose = $verbose;
 
-        $this->placeLoaderService->setVerbose($verbose);
+        if ($withPlaceLoaderService) {
+            $this->placeLoaderService->setVerbose($verbose);
+        }
 
         return $this;
     }
@@ -220,7 +226,7 @@ class LocationDataService
     }
 
     /**
-     * Sets place informations.
+     * Sets place information.
      *
      * @param array<string, array<string, mixed>> $dataReturn
      * @param Place $place
@@ -230,8 +236,6 @@ class LocationDataService
     public function setPlaceInformation(array &$dataReturn, Place $place, bool $addDistance = false): void
     {
         $dataReturn = array_merge($dataReturn, [
-            self::KEY_NAME_PLACE_COUNTRY => $this->getData('Place Country (translated)', $place->getCountry(), '%s', null),
-            self::KEY_NAME_PLACE_COUNTRY_CODE => $this->getData('Place Country Code', $place->getCountryCode(), '%s', null),
             self::KEY_NAME_PLACE_TIMEZONE => $this->getData('Place Timezone', $place->getTimezone(), '%s', null),
             self::KEY_NAME_PLACE_POPULATION => $this->getData('Place Population', $place->getPopulation(), '%s', null),
             self::KEY_NAME_PLACE_ELEVATION => $this->getData('Place Elevation', $place->getElevation(), '%s', ' m'),
@@ -272,11 +276,84 @@ class LocationDataService
         $place = $this->placeLoaderService->findPlaceByPositionOrPlaceSource($latitude, $longitude, Code::FEATURE_CODES_P_ADMIN_PLACES, $data, $placeSource);
         $time = Timer::stop($timer);
 
+        $dataReturn = [];
+
         if ($place === null) {
-            return [];
+            return $dataReturn;
         }
 
-        $dataReturn = [
+        /* PlaceP */
+        if ($place->getDistrict() !== null) {
+            $dataReturn = array_merge($dataReturn, [
+                self::KEY_NAME_PLACE_DISTRICT => $this->getData('District', $place->getDistrict()->getName($this->verbose, true), '%s', null),
+            ]);
+        }
+
+        /* PlaceA */
+        if ($place->getCity() !== null) {
+            $dataReturn = array_merge($dataReturn, [
+                self::KEY_NAME_PLACE_CITY => $this->getData('City', $place->getCity()->getName($this->verbose, true), '%s', null),
+            ]);
+        }
+
+        /* PlaceA */
+        if ($place->getState() !== null) {
+            $dataReturn = array_merge($dataReturn, [
+                self::KEY_NAME_PLACE_STATE => $this->getData('Place State', $place->getState()->getName($this->verbose, true), '%s', null),
+            ]);
+        }
+
+        /* PlaceL */
+        $firstPark = $place->getFirstPark(true, $placeSource);
+        if (!is_null($firstPark)) {
+            $dataReturn = array_merge($dataReturn, [
+                self::KEY_NAME_PLACE_PARK => $this->getData('Place Park', $firstPark->getName($this->verbose, true), '%s', null),
+            ]);
+        }
+
+        /* PlaceT */
+        $firstMountain = $place->getFirstMountain(true, $placeSource);
+        if (!is_null($firstMountain)) {
+            $dataReturn = array_merge($dataReturn, [
+                self::KEY_NAME_PLACE_MOUNTAIN => $this->getData('Place Mountain', $firstMountain->getName($this->verbose, true), '%s', null),
+            ]);
+        }
+
+        /* PlaceS */
+        $firstSpot = $place->getFirstSpot(true, $placeSource);
+        if (!is_null($firstSpot)) {
+            $dataReturn = array_merge($dataReturn, [
+                self::KEY_NAME_PLACE_SPOT => $this->getData('Place Spot', $firstSpot->getName($this->verbose, true), '%s', null),
+            ]);
+        }
+
+        /* PlaceV */
+        $firstForest = $place->getFirstForest(true, $placeSource);
+        if (!is_null($firstForest)) {
+            $dataReturn = array_merge($dataReturn, [
+                self::KEY_NAME_PLACE_FOREST => $this->getData('Place Forest', $firstForest->getName($this->verbose, true), '%s', null),
+            ]);
+        }
+
+        /* Add country */
+        $dataReturn = array_merge($dataReturn, [
+            self::KEY_NAME_PLACE_COUNTRY => $this->getData('Place Country (translated)', $place->getCountry(), '%s', null),
+            self::KEY_NAME_PLACE_COUNTRY_CODE => $this->getData('Place Country Code', $place->getCountryCode(), '%s', null),
+        ]);
+
+        /* Add full name */
+        $dataReturn = array_merge($dataReturn, [
+            self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->verbose, $placeSource, true), '%s', null),
+        ]);
+
+        /* Add place information */
+        if ($placeSource !== null) {
+            $this->setPlaceInformation($dataReturn, $placeSource);
+        } else {
+            $this->setPlaceInformation($dataReturn, $place, true);
+        }
+
+        $dataReturn = array_merge($dataReturn, [
             self::KEY_NAME_PLACE_LATITUDE => $this->getData('Latitude', $latitude, '%.5f', '°'),
             self::KEY_NAME_PLACE_LONGITUDE => $this->getData('Longitude', $longitude, '%.5f', '°'),
             self::KEY_NAME_PLACE_LATITUDE_DMS => $this->getData('Latitude DMS', GPSConverter::decimalDegree2dms($latitude, $latitude < 0 ? GPSConverter::DIRECTION_SOUTH : GPSConverter::DIRECTION_NORTH), '%s', null),
@@ -294,76 +371,7 @@ class LocationDataService
                 '%s',
                 null
             ),
-        ];
-
-        /* PlaceP */
-        if ($place->getDistrict() !== null) {
-            $dataReturn = array_merge($dataReturn, [
-                self::KEY_NAME_PLACE_DISTRICT => $this->getData('District', $place->getDistrict()->getName($this->verbose), '%s', null),
-            ]);
-        }
-
-        /* PlaceA */
-        if ($place->getCity() !== null) {
-            $dataReturn = array_merge($dataReturn, [
-                self::KEY_NAME_PLACE_CITY => $this->getData('City', $place->getCity()->getName($this->verbose), '%s', null),
-            ]);
-        }
-
-        /* PlaceA */
-        if ($place->getState() !== null) {
-            $dataReturn = array_merge($dataReturn, [
-                self::KEY_NAME_PLACE_STATE => $this->getData('Place State', $place->getState()->getName($this->verbose), '%s', null),
-            ]);
-        }
-
-        /* PlaceL */
-        $firstPark = $place->getFirstPark(true, $placeSource);
-        if (!is_null($firstPark)) {
-            $dataReturn = array_merge($dataReturn, [
-                self::KEY_NAME_PLACE_PARK => $this->getData('Place Park', $firstPark->getName($this->verbose), '%s', null),
-            ]);
-        }
-
-        /* PlaceT */
-        $firstMountain = $place->getFirstMountain(true, $placeSource);
-        if (!is_null($firstMountain)) {
-            $dataReturn = array_merge($dataReturn, [
-                self::KEY_NAME_PLACE_MOUNTAIN => $this->getData('Place Mountain', $firstMountain->getName($this->verbose), '%s', null),
-            ]);
-        }
-
-        /* PlaceS */
-        $firstSpot = $place->getFirstSpot(true, $placeSource);
-        if (!is_null($firstSpot)) {
-            $dataReturn = array_merge($dataReturn, [
-                self::KEY_NAME_PLACE_SPOT => $this->getData('Place Spot', $firstSpot->getName($this->verbose), '%s', null),
-            ]);
-        }
-
-        /* PlaceV */
-        $firstForest = $place->getFirstForest(true, $placeSource);
-        if (!is_null($firstForest)) {
-            $dataReturn = array_merge($dataReturn, [
-                self::KEY_NAME_PLACE_FOREST => $this->getData('Place Forest', $firstForest->getName($this->verbose), '%s', null),
-            ]);
-        }
-
-        $dataReturn = array_merge($dataReturn, [
-            self::KEY_NAME_PLACE_FULL => $this->getData('Place Full', $place->getNameFull($this->verbose, $placeSource, true), '%s', null),
         ]);
-
-        if ($placeSource !== null) {
-
-            /* Set country to place source. */
-            if ($place->getCountry() !== null) {
-                $placeSource->setCountry($place->getCountry());
-            }
-
-            $this->setPlaceInformation($dataReturn, $placeSource);
-        } else {
-            $this->setPlaceInformation($dataReturn, $place, true);
-        }
 
         return array_merge($dataReturn, [
             self::KEY_NAME_PLACE_TIME_TAKEN => $this->getData('Time', $time, '%.3f', ' s'),
