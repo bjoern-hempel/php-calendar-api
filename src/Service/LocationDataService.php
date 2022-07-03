@@ -689,10 +689,10 @@ class LocationDataService
         $placeResults = array_slice($placeResults, ($page - 1) * $this->searchConfig->getNumberPerPage(), $this->searchConfig->getNumberPerPage());
 
         /* Add administration information */
-        foreach ($placeResults as $number => $placeResult) {
+        foreach ($placeResults as $placeResult) {
 
             /* Get placeP entities from given latitude and longitude. */
-            if ($withAdminPlaces) {
+            if ($withAdminPlaces && !$placeResult->isAdminPlace()) {
                 $placesP = $this->placeLoaderService->getPlacesPFromPosition($placeResult->getLatitude(), $placeResult->getLongitude(), Code::FEATURE_CODES_P_ADMIN_PLACES, $placeResult, 3);
             } else {
                 $placesP = null;

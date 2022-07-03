@@ -1439,6 +1439,27 @@ abstract class Place
     }
 
     /**
+     * Returns if this place is an admin place. Not used for db.
+     *
+     * @return bool
+     */
+    public function isAdminPlace(): bool
+    {
+        if ($this->getFeatureClass() === Code::FEATURE_CLASS_A) {
+            return true;
+        }
+
+        if (
+            $this->getFeatureClass() === Code::FEATURE_CLASS_P &&
+            !in_array($this->getFeatureCode(), Code::FEATURE_CODES_P_DISTRICT_PLACES)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Gets the template add name. Not used for db.
      *
      * @return string

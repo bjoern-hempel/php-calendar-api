@@ -8,7 +8,7 @@
     {% apply spaceless %}
 
         {% include 'content/header.html.twig' with {
-            'title': attribute(locationData, 'place-full') ~ ' (Detail Template)',
+            'title': attribute(locationData, 'place-full'),
         } %}
 
         {% embed 'main_layout_without_header.html.twig' %}
