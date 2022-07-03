@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Config\SearchConfig;
 use App\Constant\Code;
-use App\Controller\ContentController;
 use App\Entity\Place;
 use App\Entity\PlaceA;
 use App\Service\Entity\PlaceLoaderService;
@@ -38,6 +38,8 @@ class LocationDataService
     protected PlaceLoaderService $placeLoaderService;
 
     protected TranslatorInterface $translator;
+
+    protected SearchConfig $searchConfig;
 
     protected bool $debug = false;
 
@@ -82,6 +84,7 @@ class LocationDataService
     public const KEY_NAME_PLACE_ADMIN3 = 'place-admin3';
     public const KEY_NAME_PLACE_ADMIN4 = 'place-admin4';
     public const KEY_NAME_CITY_OR_RURAL = 'city-or-rural';
+    public const KEY_NAME_PLACES_NEAR = 'places-near';
     public const KEY_NAME_PLACE_TIME_TAKEN = 'time-taken';
 
     public const WIDTH_TITLE = 30;
@@ -91,12 +94,18 @@ class LocationDataService
      *
      * @param PlaceLoaderService $placeLoaderService
      * @param TranslatorInterface $translator
+     * @param SearchConfig $searchConfig
      */
-    public function __construct(PlaceLoaderService $placeLoaderService, TranslatorInterface $translator)
+    public function __construct(PlaceLoaderService $placeLoaderService, TranslatorInterface $translator, SearchConfig $searchConfig)
     {
         $this->placeLoaderService = $placeLoaderService;
 
         $this->translator = $translator;
+
+        $this->searchConfig = $searchConfig;
+
+        /* Set verbose if given */
+        $this->setVerbose($this->searchConfig->isVerbose(), false);
     }
 
     /**
@@ -220,7 +229,7 @@ class LocationDataService
      * @return Place|null
      * @throws Exception
      */
-    public function getLocationByCodeId(string $codeId): ?Place
+    public function getPlaceByCodeId(string $codeId): ?Place
     {
         return $this->placeLoaderService->findByCodeId($codeId);
     }
@@ -263,17 +272,17 @@ class LocationDataService
      *
      * @param float $latitude
      * @param float $longitude
-     * @param array<string, Place[]> $data
+     * @param array<string, Place[]> $placesNear
      * @param Place|null $placeSource
      * @return array<string, array<string, mixed>>
      * @throws DoctrineDBALException
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function getLocationDataFull(float $latitude, float $longitude, array &$data = [], ?Place $placeSource = null): array
+    public function getLocationDataFull(float $latitude, float $longitude, array &$placesNear = [], ?Place $placeSource = null): array
     {
         $timer = Timer::start();
-        $place = $this->placeLoaderService->findPlaceByPositionOrPlaceSource($latitude, $longitude, Code::FEATURE_CODES_P_ADMIN_PLACES, $data, $placeSource);
+        $place = $this->placeLoaderService->findPlaceByPositionOrPlaceSource($latitude, $longitude, Code::FEATURE_CODES_P_ADMIN_PLACES, $placesNear, $placeSource);
         $time = Timer::stop($timer);
 
         $dataReturn = [];
@@ -402,21 +411,6 @@ class LocationDataService
      * @param float $latitude
      * @param float $longitude
      * @param array<string, Place[]> $data
-     * @param Place|null $placeSource
-     * @return array<string, mixed>
-     * @throws Exception
-     */
-    public function getLocationDataFormatted(float $latitude, float $longitude, array &$data = [], ?Place $placeSource = null): array
-    {
-        return $this->getFlattenedData($this->getLocationDataFull($latitude, $longitude, $data, $placeSource));
-    }
-
-    /**
-     * Gets location data.
-     *
-     * @param float $latitude
-     * @param float $longitude
-     * @param array<string, Place[]> $data
      * @return array<string, mixed>
      * @throws Exception
      */
@@ -499,7 +493,7 @@ class LocationDataService
      * @param Place|null $place
      * @return int
      */
-    public static function getRelevance(string $search, string $sortBy = ContentController::ORDER_BY_RELEVANCE, ?Place $place = null): int
+    public static function getRelevance(string $search, string $sortBy = SearchConfig::ORDER_BY_RELEVANCE, ?Place $place = null): int
     {
         $relevance = 200000; /* 20.000 km (half earth circulation), to avoid relevance's < 0 */
 
@@ -545,10 +539,207 @@ class LocationDataService
          * 100 km:   -1000
          * 20000 km: -200000
          */
-        if ($place->getDistanceMeter() !== null && $sortBy === ContentController::ORDER_BY_RELEVANCE_LOCATION) {
+        if ($place->getDistanceMeter() !== null && $sortBy === SearchConfig::ORDER_BY_RELEVANCE_LOCATION) {
             $relevance -= intval(round($place->getDistanceMeter() * 0.01, 0));
         }
 
         return $relevance;
+    }
+
+    /**
+     * Gets the location data as an array from given id string and search config.
+     *
+     * @param string $idString
+     * @return array{locationData: array<string, mixed>, error: string|null}
+     * @throws Exception
+     */
+    #[ArrayShape(['locationData' => "array", 'error' => "null|string"])]
+    public function getLocationDetailDataFromIdString(string $idString): array
+    {
+        $place = $this->getPlaceByCodeId($idString);
+
+        /* Unable to find place with given id string. */
+        if ($place === null) {
+            return [
+                'locationData' => [],
+                'error' => $this->translator->trans('general.notAvailableId', ['%idString%' => $this->searchConfig->getIdString()], 'location'),
+            ];
+        }
+
+        $placesNear = [];
+
+        return [
+            'locationData' => array_merge(
+                $this->getFlattenedData($this->getLocationDataFull($place->getLatitude(), $place->getLongitude(), $placesNear, $place)),
+                [LocationDataService::KEY_NAME_PLACES_NEAR => $placesNear, ]
+            ),
+            'error' => null,
+        ];
+    }
+
+    /**
+     * Gets the location data as an array from given location/position.
+     *
+     * @param string $location
+     * @return array{locationData: array<string, mixed>, error: string|null}
+     * @throws Exception
+     */
+    #[ArrayShape(['locationData' => "array", 'error' => "null|string"])]
+    public function getLocationDetailDataFromLocation(string $location): array
+    {
+        /* Detect position. */
+        $position = GPSConverter::parseFullLocation2DecimalDegrees($location);
+
+        /* Unable to find place with given position/location. */
+        if ($position === false) {
+            return [
+                'locationData' => [],
+                'error' => $this->translator->trans('general.notAvailableLocation', ['%%location%' => $this->searchConfig->getLocationString()], 'location'),
+            ];
+        }
+
+        /* Split position. */
+        list($latitude, $longitude) = $position;
+
+        $placesNear = [];
+
+        return [
+            'locationData' => array_merge(
+                $this->getFlattenedData($this->getLocationDataFull($latitude, $longitude, $placesNear)),
+                [LocationDataService::KEY_NAME_PLACES_NEAR => $placesNear, ]
+            ),
+            'error' => null,
+        ];
+    }
+
+    /**
+     * Adds additional information to given places.
+     *
+     * @param Place[] $placeResults
+     * @param bool $withAdminPlaces
+     * @return void
+     * @throws Exception
+     */
+    public function addAdditionalInformationToPlaces(array &$placeResults = [], bool $withAdminPlaces = false): void
+    {
+        /* No places given. */
+        if (count($placeResults) <= 0) {
+            return;
+        }
+
+        $search = $this->searchConfig->getSearchQuery();
+        $location = $this->searchConfig->getLocationString();
+        $sort = $this->searchConfig->getSort();
+        $page =  $this->searchConfig->getPage();
+
+        /* Add distance. */
+        if ($location !== null) {
+            $locationSplit = preg_split('~,~', $location);
+
+            if ($locationSplit === false) {
+                throw new Exception(sprintf('Unable to split string (%s:%d).', __FILE__, __LINE__));
+            }
+
+            list($latitude, $longitude) = $locationSplit;
+
+            foreach ($placeResults as $placeResult) {
+                $distanceMeter = self::getDistanceBetweenTwoPointsInMeter(
+                    floatval($latitude),
+                    floatval($longitude),
+                    $placeResult->getLatitude(),
+                    $placeResult->getLongitude()
+                );
+
+                $placeResult->setDistanceMeter($distanceMeter);
+            }
+        }
+
+        /* Add relevance. */
+        foreach ($placeResults as $placeSource) {
+            $relevance = LocationDataService::getRelevance(!is_null($search) ? $search : '', $sort, $placeSource);
+            $placeSource->setRelevance($relevance);
+        }
+
+        /* Sort by given $sort. */
+        switch ($sort) {
+
+            /* Sort by distance */
+            case SearchConfig::ORDER_BY_LOCATION:
+                usort($placeResults, function (Place $a, Place $b) {
+                    return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
+                });
+                break;
+
+            /* Sort by name */
+            case SearchConfig::ORDER_BY_NAME:
+                usort($placeResults, function (Place $a, Place $b) {
+                    return $a->getName() > $b->getName() ? 1 : -1;
+                });
+                break;
+
+            /* Sort by relevance */
+            case SearchConfig::ORDER_BY_RELEVANCE:
+            case SearchConfig::ORDER_BY_RELEVANCE_LOCATION:
+                usort($placeResults, function (Place $a, Place $b) {
+                    return $a->getRelevance() > $b->getRelevance() ? -1 : 1;
+                });
+                break;
+        }
+
+        $placeResults = array_slice($placeResults, ($page - 1) * $this->searchConfig->getNumberPerPage(), $this->searchConfig->getNumberPerPage());
+
+        /* Add administration information */
+        foreach ($placeResults as $number => $placeResult) {
+
+            /* Get placeP entities from given latitude and longitude. */
+            if ($withAdminPlaces) {
+                $placesP = $this->placeLoaderService->getPlacesPFromPosition($placeResult->getLatitude(), $placeResult->getLongitude(), Code::FEATURE_CODES_P_ADMIN_PLACES, $placeResult, 3);
+            } else {
+                $placesP = null;
+            }
+
+            $this->placeLoaderService->addAdministrationInformationToPlace($placeResult, $placesP);
+        }
+    }
+
+    /**
+     * Gets the location list results.
+     *
+     * @param string $search
+     * @param bool $withAdminPlaces
+     * @return array{results: Place[], numberResults: int, error: string|null}
+     * @throws Exception
+     */
+    #[ArrayShape(['results' => "array", 'numberResults' => "int", 'error' => "null|string"])]
+    public function getLocationListResults(string $search, bool $withAdminPlaces = false): array
+    {
+        if ($this->searchConfig->getViewMode() !== SearchConfig::VIEW_MODE_LIST) {
+            throw new Exception(sprintf('Unsupported view mode (%s:%d).', __FILE__, __LINE__));
+        }
+
+        /* Search places. */
+        $placeResults = $this->getLocationsByName($search);
+
+        /* No place was found. */
+        if (count($placeResults) <= 0) {
+            return [
+                'results' => [],
+                'numberResults' => 0,
+                'error' => $this->translator->trans('general.notAvailable', ['%place%' => $this->searchConfig->getSearchQuery()], 'location'),
+            ];
+        }
+
+        /* Save number of results. */
+        $numberResults = count($placeResults);
+
+        /* Add additional information. */
+        /* PERFORMANCE */
+        $this->addAdditionalInformationToPlaces($placeResults, $withAdminPlaces);
+
+        return [
+            'results' => $placeResults,
+            'numberResults' => $numberResults,
+            'error' => null,
+        ];
     }
 }

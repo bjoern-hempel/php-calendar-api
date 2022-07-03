@@ -63,6 +63,8 @@ general:
   locationSearch: "Suche"
   locationSearchCurrentPosition: "Aktuelle Position"
   notAvailable: "Der Ort \"%place%\" konnte nicht gefunden werden."
+  notAvailableId: "Die angegebene ID \"%idString%\" konnte nicht gefunden werden."
+  notAvailableLocation: "Die angegebene Position \"%location%\" konnte nicht gefunden werden."
   notGiven: "Nicht angegeben"
   pleaseWait: "Bitte warten"
   results: "%numberResults% Ergebnisse wurden mit dem Suchbegriff \"%search%\" gefunden:"

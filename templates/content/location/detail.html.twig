@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ attribute(locationData, 'place-full') }}{% endblock %}
+
+{% block body_class %}content content-location bg-light{% endblock %}
+
+{% block body %}
+    {% apply spaceless %}
+
+        {% include 'content/header.html.twig' with {
+            'title': attribute(locationData, 'place-full') ~ ' (Detail Template)',
+        } %}
+
+        {% embed 'main_layout_without_header.html.twig' %}
+            {% block main_content %}
+                <div id="content-location">
+
+                    {% include 'content/location/elements/searchForm.html.twig' with {
+                        'searchConfig': searchConfig,
+                    } %}
+
+                    {# Stage of detail #}
+                    {% if attribute(locationData, 'place-full') is defined %}
+                        <div class="cite">
+                            <p>{{ 'general.successMessage'|trans([], 'location') }}</p>
+                            <q>{{ attribute(locationData, 'place-full') }}</q>
+
+                            {# Add google link. #}
+                            <p style="padding: 0.5rem; text-align: center;">
+                                <span style="font-size: large;">{{ constant('App\\Utils\\Icon::ICON_WORLD') }}</span>&nbsp;
+                                {% set counter = 0 %}
+                                {% for key,value in locationData %}
+                                    {% if key == 'place-google-link' or key == 'place-openstreetmap-link' %}
+                                        {% if counter > 0 %} | {% endif %}
+                                        <a href="{{ value }}" target="_blank">{{ ('place.' ~ key|camel_case)|trans([], 'location') }}</a>
+                                        {% set counter = counter + 1 %}
+                                    {% endif %}
+                                {% endfor %}
+                            </p>
+                        </div>
+                    {% endif %}
+
+                    <h3>{{ 'general.detailed'|trans([], 'location') }}</h3>
+
+                    <div class="compass" id="compass">
+                        <div class="arrow"></div>
+                        <div class="disc" id="compassDisc"></div>
+                    </div>
+
+                    {# Show place details #}
+                    <table class="table">
+                    {% for key,value in locationData %}
+                        {% if key != 'place-google-link' and key != 'place-openstreetmap-link' %}
+                            <tr>
+                                <td class="table-name" style="width: 33%;"><b>{{ ('place.' ~ key|camel_case)|trans([], 'location') }}</b></td>
+                                <td class="table-value" style="width: 67%;">
+                                    {% if value is not empty %}
+                                        {{ value }}
+                                    {% else %}
+                                        <i>{{ 'general.notGiven'|trans([], 'location') }}</i>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </table>
+
+                    {% for key,value in placesNear %}
+                        {% if value|length > 0 %}
+                            <h3>{{ ('title.' ~ key ~ '.next')|trans([], 'location') }} ({{ key }})</h3>
+                            <p>{{ ('title.' ~ key ~ '.nextDetail')|trans([], 'location') }}</p>
+
+                            <table class="table">
+                                {% for place in value %}
+                                    <tr class="table-tr-first">
+                                        <td class="table-compass">
+                                            <div class="compass compass-direction">
+                                                <div class="arrow arrow-direction" data-degree="{{ place.degree }}"></div>
+                                            </div>
+                                        </td>
+                                        <td class="table-name">
+                                            <small><kbd>{{ place.featureCode }}</kbd></small>&nbsp;<b>{{ place.name }}{{ locationData['place-country-code'] is same as(place.countryCode) ? '' : (', ' ~ ('country.alpha2.' ~ place.countryCode|lower)|trans([], 'countries', place.countryCode)) }}</b>
+                                            <br />
+                                            <small>{{ (key ~ '.' ~ place.featureCode)|trans([], 'place') }}</small>
+                                            {% set elevationHill = place.elevationHill %}
+                                            {% if elevationHill is same as(false) %}
+                                                <small>, Höhe nicht angegeben</small>
+                                            {% elseif elevationHill is not null %}
+                                                <small>, {{ elevationHill }} m</small>
+                                            {% endif %}
+                                        </td>
+                                        <td class="table-value table-value-desktop">
+                                            <a href="{{ place.googleLink }}" target="_blank" class="btn btn-primary" style="width: 100px;">{{ place.distanceMeter(3, 'km', 1000, true)|raw }}</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="table-value table-value-mobile">
+                                            <a href="{{ place.googleLink }}" target="_blank" class="btn btn-primary" style="width: 100px;">{{ place.distanceMeter(3, 'km', 1000, true)|raw }}</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% include 'content/location/elements/legal.html.twig' with {
+                        'version': version,
+                        'time': time
+                    } %}
+                </div>
+            {% endblock %}
+        {% endembed %}
+
+        {% include 'content/footer.html.twig' %}
+    {% endapply %}
+{% endblock %}

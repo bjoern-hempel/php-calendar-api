@@ -1,0 +1,21 @@
+{# Title #}
+<h2 class="first">{{ 'general.locationSearchTitle'|trans([], 'location') }}</h2>
+
+{# Search hints and errors #}
+{% if searchConfig.error is not null %}
+    <p class="error">
+        {{ searchConfig.error }}
+    </p>
+{% endif %}
+
+{# Search Form #}
+<form name="full_location" method="get">
+    <div>
+        {{ searchConfig.inputs|raw }}
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary" id="content-location-submit">{{ 'general.locationSearch'|trans([], 'location') }}</button>
+        <button type="submit" class="btn btn-primary" id="content-location-submit-hidden" style="display: none;">{{ 'general.locationSearch'|trans([], 'location') }}</button>
+        <button type="submit" class="btn btn-outline-secondary search-current-position" data-app-loader-message="{{ 'general.detectPosition'|trans([], 'location') }}">{{ 'general.locationSearchCurrentPosition'|trans([], 'location') }}</button>
+    </div>
+</form>

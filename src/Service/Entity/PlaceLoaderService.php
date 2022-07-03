@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Service\Entity;
 
+use App\Config\SearchConfig;
 use App\Constant\Code;
 use App\Constant\Country;
 use App\Controller\ContentController;
@@ -298,7 +299,7 @@ SQL;
      * @return PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
      * @throws Exception
      */
-    protected function buildPlaceFromRow(array $row, float $latitude, float $longitude, string $featureClass = Code::FEATURE_CLASS_A, ?Place $placeSource = null, string $sortBy = ContentController::ORDER_BY_RELEVANCE): PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
+    protected function buildPlaceFromRow(array $row, float $latitude, float $longitude, string $featureClass = Code::FEATURE_CLASS_A, ?Place $placeSource = null, string $sortBy = SearchConfig::ORDER_BY_RELEVANCE): PlaceA|PlaceH|PlaceL|PlaceP|PlaceR|PlaceS|PlaceT|PlaceU|PlaceV
     {
         $place = self::getPlace($featureClass);
 
@@ -646,7 +647,7 @@ SQL;
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function addAdministrationInformationToPlace(Place $place, ?array &$placesP = null, ?Place $placeSource = null): void
+    public function addAdministrationInformationToPlace(Place $place, ?array $placesP = null, ?Place $placeSource = null): void
     {
         $city = null;
         $district = null;
@@ -737,30 +738,21 @@ SQL;
     }
 
     /**
-     * Finds the nearest place by coordinate.
+     * Returns PlaceP entities from given latitude and longitude.
      *
-     * @param float $latitude
-     * @param float $longitude
      * @param string|string[]|null $featureCodes
-     * @param array<string, Place[]> $data
-     * @param Place|null $placeSource
-     * @return ?Place
+     * @return PlaceP[]|null
      * @throws DoctrineDBALException
-     * @throws NonUniqueResultException
      * @throws Exception
      */
-    public function findPlaceByPositionOrPlaceSource(float $latitude, float $longitude, string|array|null $featureCodes = null, array &$data = [], ?Place $placeSource = null): ?Place
+    public function getPlacesPFromPosition(float $latitude, float $longitude, string|array|null $featureCodes = null, ?Place $placeSource = null, int $limit = 50): ?array
     {
-        if ($this->placeARepository === null) {
-            return null;
-        }
-
         $connection = $this->getEntityManager()->getConnection();
         $featureClass = Code::FEATURE_CLASS_P;
 
         /* Find feature class P */
         $cityPTimer = Timer::start();
-        $sqlRaw = $this->getRawSqlPosition($latitude, $longitude, 50, $featureClass, $featureCodes);
+        $sqlRaw = $this->getRawSqlPosition($latitude, $longitude, $limit, $featureClass, $featureCodes);
         $statement = $connection->prepare($sqlRaw);
         $result = $statement->executeQuery();
         $cityPTime = Timer::stop($cityPTimer);
@@ -791,22 +783,99 @@ SQL;
             return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
         });
 
-        /* Gets first place or placeSource. */
+        return $placesP;
+    }
+
+    /**
+     * Add given places to place.
+     *
+     * @param Place $place
+     * @param Place[] $places
+     * @param string $className
+     * @param bool $sort
+     * @return Place
+     * @throws Exception
+     */
+    protected function addPlacesToPlace(Place $place, array $places, string $className, bool $sort = false): Place
+    {
+        /* Sort places */
+        if ($sort) {
+            usort($places, function (Place $a, Place $b) {
+                return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
+            });
+        }
+
+        foreach ($places as $placeEntry) {
+            if (get_class($placeEntry) !== $className) {
+                throw new Exception(sprintf('Unexpected place instance "%s". "%s" expected (%s:%d).', get_class($placeEntry), $className, __FILE__, __LINE__));
+            }
+
+            $this->translateFeatureCode($placeEntry);
+
+            switch (true) {
+                case $placeEntry instanceof PlaceL:
+                    $place->addPark($placeEntry);
+                    break;
+                case $placeEntry instanceof PlaceP:
+                    $place->addPlace($placeEntry);
+                    break;
+                case $placeEntry instanceof PlaceS:
+                    $place->addSpot($placeEntry);
+                    break;
+                case $placeEntry instanceof PlaceT:
+                    $place->addMountain($placeEntry);
+                    break;
+                case $placeEntry instanceof PlaceV:
+                    $place->addForest($placeEntry);
+                    break;
+                default:
+                    throw new Exception(sprintf('Unsupported class "%s" (%s:%d).', get_class($placeEntry), __FILE__, __LINE__));
+            }
+        }
+
+        return $place;
+    }
+
+    /**
+     * Finds the nearest place by coordinate.
+     *
+     * @param float $latitude
+     * @param float $longitude
+     * @param string|string[]|null $featureCodes
+     * @param array<string, Place[]> $data
+     * @param Place|null $placeSource
+     * @return ?Place
+     * @throws DoctrineDBALException
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function findPlaceByPositionOrPlaceSource(float $latitude, float $longitude, string|array|null $featureCodes = null, array &$data = [], ?Place $placeSource = null): ?Place
+    {
+        if ($this->placeARepository === null) {
+            return null;
+        }
+
+        /* Get placeP entities from given latitude and longitude. */
+        $placesP = $this->getPlacesPFromPosition($latitude, $longitude, $featureCodes, $placeSource);
+
+        /* No placeP entries was found. */
+        if ($placesP === null) {
+            throw new Exception(sprintf('No placeP entries found (%s:%d).', __FILE__, __LINE__));
+        }
+
+        /* Gets first placeP entity or given placeSource. */
         if ($placeSource !== null) {
             $place = $placeSource;
         } else {
             $place = array_shift($placesP);
         }
 
-        foreach ($placesP as $placeP) {
-            if (!$placeP instanceof PlaceP) {
-                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeP), __FILE__, __LINE__));
-            }
-
-            $this->translateFeatureCode($placeP);
-            $place->addPlace($placeP);
+        if (is_null($place)) {
+            throw new Exception(sprintf('Unable to get placeP entity (%s:%d).', __FILE__, __LINE__));
         }
 
+        $place = $this->addPlacesToPlace($place, $placesP, PlaceP::class);
+        /** @phpstan-ignore-next-line → PHPStan: $placeSource is not nullsafe */
         $data['P'] = $place->getPlaces(self::MAX_NUMBER_PLACES, $placeSource?->getId());
 
         /* Verbose information */
@@ -817,62 +886,26 @@ SQL;
 
         /* L → Parks, Areas */
         $parkPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_L);
-        usort($parkPlaces, function (Place $a, Place $b) {
-            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
-        });
-        foreach ($parkPlaces as $parkPlace) {
-            if (!$parkPlace instanceof PlaceL) {
-                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($parkPlace), __FILE__, __LINE__));
-            }
-
-            $this->translateFeatureCode($parkPlace);
-            $place->addPark($parkPlace);
-        }
+        $place = $this->addPlacesToPlace($place, $parkPlaces, PlaceL::class, true);
+        /** @phpstan-ignore-next-line → PHPStan: $placeSource is not nullsafe */
         $data['L'] = $place->getParks(self::MAX_NUMBER_PLACES, $placeSource?->getId());
 
         /* S → Add point of interest (Hotel, Rail station) */
         $spotPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_S);
-        usort($spotPlaces, function (Place $a, Place $b) {
-            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
-        });
-        foreach ($spotPlaces as $spotPlace) {
-            if (!$spotPlace instanceof PlaceS) {
-                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($spotPlace), __FILE__, __LINE__));
-            }
-
-            $this->translateFeatureCode($spotPlace);
-            $place->addSpot($spotPlace);
-        }
+        $place = $this->addPlacesToPlace($place, $spotPlaces, PlaceS::class, true);
+        /** @phpstan-ignore-next-line → PHPStan: $placeSource is not nullsafe */
         $data['S'] = $place->getSpots(self::MAX_NUMBER_PLACES, $placeSource?->getId());
 
         /* T → Mountain */
         $mountainPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_T);
-        usort($mountainPlaces, function (Place $a, Place $b) {
-            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
-        });
-        foreach ($mountainPlaces as $mountainPlace) {
-            if (!$mountainPlace instanceof PlaceT) {
-                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($mountainPlace), __FILE__, __LINE__));
-            }
-
-            $this->translateFeatureCode($mountainPlace);
-            $place->addMountain($mountainPlace);
-        }
+        $place = $this->addPlacesToPlace($place, $mountainPlaces, PlaceT::class, true);
+        /** @phpstan-ignore-next-line → PHPStan: $placeSource is not nullsafe */
         $data['T'] = $place->getMountains(self::MAX_NUMBER_PLACES, $placeSource?->getId());
 
         /* V → Forest */
         $forestPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_V);
-        usort($forestPlaces, function (Place $a, Place $b) {
-            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
-        });
-        foreach ($forestPlaces as $forestPlace) {
-            if (!$forestPlace instanceof PlaceV) {
-                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($forestPlace), __FILE__, __LINE__));
-            }
-
-            $this->translateFeatureCode($forestPlace);
-            $place->addForest($forestPlace);
-        }
+        $place = $this->addPlacesToPlace($place, $forestPlaces, PlaceV::class, true);
+        /** @phpstan-ignore-next-line → PHPStan: $placeSource is not nullsafe */
         $data['V'] = $place->getForests(self::MAX_NUMBER_PLACES, $placeSource?->getId());
 
         /* Verbose information */
