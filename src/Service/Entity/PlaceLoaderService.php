@@ -16,7 +16,6 @@ namespace App\Service\Entity;
 use App\Config\SearchConfig;
 use App\Constant\Code;
 use App\Constant\Country;
-use App\Controller\ContentController;
 use App\DataType\Point;
 use App\Entity\Place;
 use App\Entity\PlaceA;
@@ -555,10 +554,23 @@ SQL;
      */
     protected function findNextAdminCity(array $placesP, Place $place): ?PlaceP
     {
+        /* Get the nearest placeP entry with equal admin4 code. */
         foreach ($placesP as $placeP) {
             switch (true) {
                 case in_array($placeP->getFeatureCode(), Code::FEATURE_CODES_P_ADMIN_PLACES) &&
                     $place->getAdmin4Code() == $placeP->getAdmin4Code():
+                    return $placeP;
+            }
+        }
+
+        /* Get the nearest placeP entry if no equal admin4 code was found. */
+        foreach ($placesP as $placeP) {
+            switch (true) {
+                case in_array($placeP->getFeatureCode(), Code::FEATURE_CODES_P_ADMIN_PLACES):
+
+                    #print $placeP->getName();
+                    #exit();
+
                     return $placeP;
             }
         }
@@ -683,13 +695,18 @@ SQL;
                 $district = $this->findNextDistrict($placesP, $city);
                 break;
 
-            /* Places P given. Extract city from any Place type. */
+            /* Places P given. Extract city from first placeP entry. */
             case $placesP !== null:
-                $city2 = $this->findNextAdminCity($placesP, $place);
-                $city3 = $this->findNextCityPopulation($placesP, $place);
+                $placeAdmin = array_shift($placesP);
 
-                $city = $city2 !== null && $city2->getPopulation(true) > 0 ? $city2 : $city3;
+                if (is_null($placeAdmin)) {
+                    throw new Exception(sprintf('Unable to find first placeP entry (%s:%d).', __FILE__, __LINE__));
+                }
 
+                $this->addAdministrationInformationToPlace($placeAdmin, $placesP);
+
+                $city = $placeAdmin->getCity();
+                $district = $placeAdmin->getDistrict();
                 break;
         }
 
@@ -753,6 +770,7 @@ SQL;
         /* Find feature class P */
         $cityPTimer = Timer::start();
         $sqlRaw = $this->getRawSqlPosition($latitude, $longitude, $limit, $featureClass, $featureCodes);
+
         $statement = $connection->prepare($sqlRaw);
         $result = $statement->executeQuery();
         $cityPTime = Timer::stop($cityPTimer);
