@@ -325,12 +325,7 @@ document.querySelectorAll('.location-own-position').forEach(
             showAppLoader(message);
 
             navigator.geolocation.getCurrentPosition((position) => {
-
-                /* Write location. */
-                setHiddenFieldValue('q', getPosition(position));
-
-                /* Submit form. */
-                submitSearchFormReset();
+                location.href = 'location/' + round(position.coords.latitude, 6) + '/' + round(position.coords.longitude, 6);
             })
         }
     )
@@ -409,12 +404,7 @@ document.querySelectorAll('.search-current-position').forEach(
         showAppLoader(message);
 
         navigator.geolocation.getCurrentPosition((position) => {
-
-            /* Write location. */
-            setHiddenFieldValue('q', getPosition(position));
-
-            /* Submit form. */
-            submitSearchFormReset();
+            location.href = 'location/' + round(position.coords.latitude, 6) + '/' + round(position.coords.longitude, 6);
         });
     })
 );

@@ -50,6 +50,7 @@ title:
     nextDetail: "Wälder, Heiden, etc." # V
 
 general:
+  currentSearch: "Deine aktuelle Position:"
   detectPosition: "Aktuelle Position wird ermittelt..."
   detailed: "Detailliert"
   elevationNotGiven: "Höhe nicht angegeben"

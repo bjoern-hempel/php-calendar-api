@@ -118,6 +118,26 @@ class ContentController extends BaseController
     }
 
     /**
+     * Location view route.
+     *
+     * @param string $param1
+     * @param string $param2
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/location/{param1}/{param2}', name: BaseController::ROUTE_NAME_APP_LOCATION_VIEW)]
+    public function locationView(string $param1, string $param2): Response
+    {
+        if (in_array($param1, ['a', 'h', 'l', 'p', 'r', 's', 't', 'u', 'v', ])) {
+            $this->searchConfig->setIdString(sprintf('%s:%s', $param1, $param2));
+        } else {
+            $this->searchConfig->setLocation([floatval($param1), floatval($param2)]);
+        }
+
+        return $this->locationDetail();
+    }
+
+    /**
      * Location search.
      *
      * @return Response
@@ -209,6 +229,7 @@ class ContentController extends BaseController
 
         return $this->renderForm('content/location/detail.html.twig', [
             'searchConfig' => $this->searchConfig,
+            'currentSearch' => $this->searchConfig->hasLocation(),
             'locationData' => $locationData,
             'placesNear' => $placesNear,
             'version' => $this->versionService->getVersion(),

@@ -22,11 +22,15 @@
                     {# Stage of detail #}
                     {% if attribute(locationData, 'place-full') is defined %}
                         <div class="cite">
-                            <p>{{ 'general.successMessage'|trans([], 'location') }}</p>
+                            {% if currentSearch %}
+                                <p style="margin-left: 0;">{{ 'general.currentSearch'|trans([], 'location') }}</p>
+                            {% endif %}
+
+                            {# <p>{{ 'general.successMessage'|trans([], 'location') }}</p> #}
                             <q>{{ attribute(locationData, 'place-full') }}</q>
 
                             {# Add google link. #}
-                            <p style="padding: 0.5rem; text-align: center;">
+                            <p style="padding: 0.5rem; padding-top: 2rem; text-align: center; margin-left: 0;">
                                 <span style="font-size: large;">{{ constant('App\\Utils\\Icon::ICON_WORLD') }}</span>&nbsp;
                                 {% set counter = 0 %}
                                 {% for key,value in locationData %}

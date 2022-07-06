@@ -42,7 +42,7 @@
                                             <small><kbd style="background-color: #800000;">{{ place.relevance }}</kbd></small>&nbsp;
                                         {% endif %}
                                     {% endif %}
-                                    <b>{{ place.nameFull(false) }}</b>
+                                    <a href="{{ path('app_location_view', {param1: place.featureClass|lower, param2: place.id}) }}" class="link-primary">{{ place.nameFull(false) }}</a>
 
                                     <br /><small>{{ (place.featureClass ~ '.' ~ place.featureCode)|trans([], 'place') }}</small>
 
@@ -51,9 +51,6 @@
                                     {% elseif place.elevationHill is not null %}
                                         <small>, <nobr>{{ place.elevationHill }} m</nobr></small>
                                     {% endif %}
-                                </td>
-                                <td class="table-value" style="width: 0%!important;">
-                                    <a class="btn btn-primary location-id" data-feature-class="{{ place.featureClass|lower }}" data-id="{{ place.id }}">Öffnen</a>
                                 </td>
                             </tr>
                         {% endfor %}
