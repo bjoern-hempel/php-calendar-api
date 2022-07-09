@@ -64,6 +64,7 @@ class LocationDataService
     public const KEY_NAME_PLACE_DISTRICT = 'place-district';
     public const KEY_NAME_PLACE_CITY = 'place-city';
     public const KEY_NAME_PLACE_STATE = 'place-state';
+    public const KEY_NAME_PLACE_LAKE = 'place-lake';
     public const KEY_NAME_PLACE_PARK = 'place-park';
     public const KEY_NAME_PLACE_MOUNTAIN = 'place-mountain';
     public const KEY_NAME_PLACE_SPOT = 'place-spot';
@@ -309,6 +310,14 @@ class LocationDataService
         if ($place->getState() !== null) {
             $dataReturn = array_merge($dataReturn, [
                 self::KEY_NAME_PLACE_STATE => $this->getData('Place State', $place->getState()->getName($this->verbose, true), '%s', null),
+            ]);
+        }
+
+        /* PlaceH */
+        $firstLake = $place->getFirstLake(true, $placeSource);
+        if (!is_null($firstLake)) {
+            $dataReturn = array_merge($dataReturn, [
+                self::KEY_NAME_PLACE_LAKE => $this->getData('Place Lake', $firstLake->getName($this->verbose, true), '%s', null),
             ]);
         }
 

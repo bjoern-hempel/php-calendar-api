@@ -33,6 +33,9 @@ place:
   timeTaken: "Benötigte Zeit"
 
 title:
+  H:
+    next: "Nächste Flüsse, Seen" # H
+    nextDetail: "Flüsse, Seen, etc." # H
   P:
     next: "Nächste Stadtteile oder Ortschaften" # P
     nextDetail: "Stadtteile, Ortschaften, etc." # P

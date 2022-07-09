@@ -60,6 +60,12 @@ class PlaceLoaderService
     protected bool $debug = false;
     protected bool $verbose = false;
 
+    /* H → lakes */
+    public const MAX_DISTANCE_LAKE_METER_TITLE_RURAL = 2000;
+    public const MAX_DISTANCE_LAKE_METER_LIST_RURAL = self::MAX_DISTANCE_LAKE_METER_TITLE_RURAL * 5;
+    public const MAX_DISTANCE_LAKE_METER_TITLE_CITY = 1600;
+    public const MAX_DISTANCE_LAKE_METER_LIST_CITY = self::MAX_DISTANCE_LAKE_METER_LIST_RURAL;
+
     /* L → parks,area */
     public const MAX_DISTANCE_PARK_METER_TITLE_RURAL = 1000;
     public const MAX_DISTANCE_PARK_METER_LIST_RURAL = self::MAX_DISTANCE_PARK_METER_TITLE_RURAL * 5;
@@ -831,6 +837,9 @@ SQL;
             $this->translateFeatureCode($placeEntry);
 
             switch (true) {
+                case $placeEntry instanceof PlaceH:
+                    $place->addLake($placeEntry);
+                    break;
                 case $placeEntry instanceof PlaceL:
                     $place->addPark($placeEntry);
                     break;
@@ -901,6 +910,12 @@ SQL;
 
         /* Add district, city, etc. */
         $this->addAdministrationInformationToPlace($place, $placesP, $placeSource);
+
+        /* H → Lakes */
+        $lakePlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_H);
+        $place = $this->addPlacesToPlace($place, $lakePlaces, PlaceH::class, true);
+        /** @phpstan-ignore-next-line → PHPStan: $placeSource is not nullsafe */
+        $data['H'] = $place->getLakes(self::MAX_NUMBER_PLACES, $placeSource?->getId());
 
         /* L → Parks, Areas */
         $parkPlaces = $this->findByPosition($latitude, $longitude, 50, Code::FEATURE_CLASS_L);

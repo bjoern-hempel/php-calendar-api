@@ -112,6 +112,9 @@ abstract class Place
 
     protected ?PlaceA $state = null;
 
+    /** @var PlaceH[] $lakes */
+    protected array $lakes = [];
+
     /** @var PlaceL[] $parks */
     protected array $parks = [];
 
@@ -1006,6 +1009,79 @@ abstract class Place
     public function setState(?PlaceA $state): self
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    /**
+     * Gets lakes of this place. Not used for db.
+     *
+     * @param int|null $max
+     * @param int[]|int|null $filterIds
+     * @return PlaceH[]
+     */
+    public function getLakes(?int $max = null, array|int|null $filterIds = null): array
+    {
+        /** @phpstan-ignore-next-line → Filter result depends to given $this->parks. */
+        return $this->filter($this->lakes, $max, $filterIds);
+    }
+
+    /**
+     * Gets first lake of this place. Not used for db.
+     *
+     * @param bool $checkDistance
+     * @param Place|null $placeSource
+     * @return PlaceH|null
+     */
+    public function getFirstLake(bool $checkDistance = false, ?Place $placeSource = null): ?PlaceH
+    {
+        if ($placeSource instanceof PlaceH) {
+            return $placeSource;
+        }
+
+        if ($placeSource !== null) {
+            return null;
+        }
+
+        if (count($this->lakes) <= 0) {
+            return null;
+        }
+
+        $firstLake = $this->lakes[0];
+
+        if (!$checkDistance || $firstLake->withinTheDistance($this, PlaceLoaderService::MAX_DISTANCE_LAKE_METER_TITLE_RURAL, PlaceLoaderService::MAX_DISTANCE_LAKE_METER_TITLE_CITY)) {
+            return $firstLake;
+        }
+
+        return null;
+    }
+
+    /**
+     * Sets parks of this place. Not used for db.
+     *
+     * @param PlaceH[] $lakes
+     * @return $this
+     */
+    public function setLakes(array $lakes): self
+    {
+        $this->lakes = $lakes;
+
+        return $this;
+    }
+
+    /**
+     * Adds lake to this place. Not used for db.
+     *
+     * @param PlaceH $lake
+     * @return $this
+     */
+    public function addLake(PlaceH $lake): self
+    {
+        if ($lake->getDistanceMeter() > PlaceLoaderService::MAX_DISTANCE_LAKE_METER_LIST_RURAL) {
+            return $this;
+        }
+
+        $this->lakes[] = $lake;
 
         return $this;
     }
