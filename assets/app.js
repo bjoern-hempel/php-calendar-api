@@ -325,7 +325,7 @@ document.querySelectorAll('.location-own-position').forEach(
             showAppLoader(message);
 
             navigator.geolocation.getCurrentPosition((position) => {
-                location.href = 'location/' + round(position.coords.latitude, 6) + '/' + round(position.coords.longitude, 6);
+                location.href = '/location/' + round(position.coords.latitude, 6) + '/' + round(position.coords.longitude, 6);
             })
         }
     )
@@ -404,7 +404,7 @@ document.querySelectorAll('.search-current-position').forEach(
         showAppLoader(message);
 
         navigator.geolocation.getCurrentPosition((position) => {
-            location.href = 'location/' + round(position.coords.latitude, 6) + '/' + round(position.coords.longitude, 6);
+            location.href = '/location/' + round(position.coords.latitude, 6) + '/' + round(position.coords.longitude, 6);
         });
     })
 );
