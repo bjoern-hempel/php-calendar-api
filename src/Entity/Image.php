@@ -164,7 +164,7 @@ class Image implements EntityInterface
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['image_extended'])]
-    private ?string $titlei = null;
+    private ?string $title = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['image_extended'])]
