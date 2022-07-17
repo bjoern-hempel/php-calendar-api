@@ -19,6 +19,7 @@ use App\EventListener\Entity\UserListener;
 use App\Repository\ImageRepository;
 use App\Security\Voter\UserVoter;
 use App\Utils\FileNameConverter;
+use App\Utils\GPSConverter;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -163,11 +164,11 @@ class Image implements EntityInterface
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['image_extended'])]
-    private ?string $title;
+    private ?string $titlei = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['image_extended'])]
-    private ?string $url;
+    private ?string $url = null;
 
     #[ORM\Column(name: 'gps_height', type: 'integer', nullable: true)]
     #[Groups(['image_extended'])]
@@ -804,6 +805,25 @@ class Image implements EntityInterface
         $this->longitude = $longitude;
 
         return $this;
+    }
+
+    /**
+     * Returns the full position of this image.
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getFullPosition(): string
+    {
+        if ($this->getLatitude() === null || $this->getLongitude() === null) {
+            return '';
+        }
+
+        return sprintf(
+            '%s %s',
+            GPSConverter::decimalDegree2dms($this->getLatitude(), $this->getLatitude() < 0 ? GPSConverter::DIRECTION_SOUTH : GPSConverter::DIRECTION_NORTH),
+            GPSConverter::decimalDegree2dms($this->getLongitude(), $this->getLongitude() < 0 ? GPSConverter::DIRECTION_WEST : GPSConverter::DIRECTION_EAST)
+        );
     }
 
     /**
