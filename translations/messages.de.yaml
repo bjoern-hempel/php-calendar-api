@@ -404,13 +404,58 @@ admin:
         help: 'Der vollständige Zielpfad dieses Eintrags.'
       width:
         label: 'Weite'
-        help: 'Die Weite dieses Eintrags.'
+        help: 'Die Weite dieses Bildes.'
       height:
         label: 'Höhe'
-        help: 'Die Höhe dieses Eintrags.'
+        help: 'Die Höhe dieses Bildes.'
       size:
         label: 'Größe'
-        help: 'Die Grö0e dieses Eintrags.'
+        help: 'Die Grö0e dieses Bildes.'
+      title:
+        label: 'Titel'
+        help: 'Der Titel dieses Bildes.'
+      longitude:
+        label: 'Longitude'
+        help: 'Die geographische Länge dieses Bildes.'
+      latitude:
+        label: 'Latitude'
+        help: 'Die geographische Breite dieses Bildes.'
+      url:
+        label: 'URL'
+        help: 'Die URL dieses Bildes.'
+      gpsHeight:
+        label: 'Höhe'
+        help: 'Die Höhe dieses Bildes.'
+      iso:
+        label: 'ISO'
+        help: 'Die ISO dieses Bildes.'
+      mime:
+        label: 'MIME'
+        help: 'Die MIME dieses Bildes.'
+      place:
+        label: 'Ort'
+        help: 'Der Ort dieses Bildes.'
+      placeDistrict:
+        label: 'Stadteil / Ortschaft'
+        help: 'Der Stadteil / Ortschaft dieses Bildes.'
+      placeCity:
+        label: 'Stadt / Gemeinde'
+        help: 'Der Stadt / Gemeinde dieses Bildes.'
+      placeState:
+        label: 'Bundesland'
+        help: 'Das Bundesland dieses Bildes.'
+      placeCountry:
+        label: 'Land'
+        help: 'Das Land dieses Bildes.'
+      placeTimezone:
+        label: 'Zeitzone'
+        help: 'Die Zeitzone dieses Bildes.'
+      takenAt:
+        label: 'Aufgenommen am'
+        help: 'Die Zeit in der dieses Bild aufgenommen wurde.'
+      information:
+        label: 'Informationen'
+        help: 'Weitere Informationen über dieses Bild.'
       updatedAt:
         label: 'Geändert am'
         help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'

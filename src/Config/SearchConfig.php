@@ -23,12 +23,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * Class SearchConfig
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-07-03)
+ * @version 1.0.1 (2022-07-16)
+ * @since 1.0.1 (2022-07-16) Fix empty current request for cli commands.
+ * @since 1.0.0 (2022-07-03) First version.
  * @package App\Config
  */
 class SearchConfig
 {
-    protected Request $request;
+    protected ?Request $request;
 
     protected ?string $error;
 
@@ -55,7 +57,7 @@ class SearchConfig
     protected string $sort;
 
     /* Verbose mode */
-    protected bool $verbose;
+    protected bool $verbose = false;
 
     public const ORDER_BY_LOCATION = 'l';
     public const ORDER_BY_NAME = 'n';
@@ -102,13 +104,7 @@ class SearchConfig
      */
     public function __construct(RequestStack $requestStack)
     {
-        $request = $requestStack->getCurrentRequest();
-
-        if ($request === null) {
-            throw new Exception(sprintf('Unable to get request stack (%s:%d).', __FILE__, __LINE__));
-        }
-
-        $this->request = $request;
+        $this->request = $requestStack->getCurrentRequest();
 
         /* Request all parameters. */
         $this->requestParameters();
@@ -122,6 +118,10 @@ class SearchConfig
      */
     protected function requestParameters(): void
     {
+        if ($this->request === null) {
+            return;
+        }
+
         $this->setError(null);
         $this->setIdString(
             $this->request->query->has(self::PARAMETER_NAME_ID_STRING) ?
@@ -502,10 +502,17 @@ class SearchConfig
     }
 
     /**
+     * Returns the current request.
+     *
      * @return Request
+     * @throws Exception
      */
     public function getRequest(): Request
     {
+        if ($this->request === null) {
+            throw new Exception(sprintf('Unable to get current request (%s:%d).', __FILE__, __LINE__));
+        }
+
         return $this->request;
     }
 

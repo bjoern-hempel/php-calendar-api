@@ -31,8 +31,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Entity class Image
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.1 (2022-01-29)
- * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
+ * @version 1.0.2 (2022-07-16)
+ * @since 1.0.2 (2022-07-16) Change self::$path to string|null.
+ * @since 1.0.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
  * @since 1.0.0 First version.
  * @package App\Entity
  */
@@ -102,15 +103,15 @@ class Image implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'name', 'path', 'pathSource', 'pathSourcePreview', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'name', 'path', 'pathSource', 'pathSourcePreview', 'width', 'height', 'size', 'title', 'latitude', 'longitude', 'url', 'gpsHeight', 'iso', 'mime', 'place', 'placeDistrict', 'placeCity', 'placeState', 'placeCountry', 'placeTimezone', 'information', 'takenAt', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'user', 'name', 'pathSourcePreview', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_INDEX = ['id', 'user', 'name', 'pathSourcePreview', 'width', 'height', 'size', 'title', 'latitude', 'longitude', 'information', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'user', 'path'];
+    public const CRUD_FIELDS_NEW = ['id', 'user', 'path', 'title', 'url'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'width', 'height', 'size', 'title', 'latitude', 'longitude', 'url', 'gpsHeight', 'iso', 'mime', 'place', 'placeDistrict', 'placeCity', 'placeState', 'placeCountry', 'placeTimezone', 'information', 'takenAt', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_FILTER = ['user', 'width', 'height', 'size'];
 
@@ -128,7 +129,8 @@ class Image implements EntityInterface
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['image', 'image_extended'])]
-    private string $path;
+    /** @phpstan-ignore-next-line → Exception if null given for database already catch. */
+    private ?string $path = null;
 
     private ?string $pathSource = null;
 
@@ -202,7 +204,7 @@ class Image implements EntityInterface
     #[Groups(['image_extended'])]
     private ?string $placeTimezone;
 
-    /** @var array<string|int|float|bool> $information */
+    /** @var array<string, mixed> $information */
     #[ORM\Column(type: 'json')]
     #[Groups(['image_extended'])]
     private array $information = [];
@@ -241,6 +243,7 @@ class Image implements EntityInterface
      * __toString method.
      *
      * @return string
+     * @throws Exception
      */
     public function __toString(): string
     {
@@ -251,9 +254,14 @@ class Image implements EntityInterface
      * Gets the name of the image.
      *
      * @return string
+     * @throws Exception
      */
     public function getName(): string
     {
+        if ($this->path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
         $array = explode('/', $this->path);
 
         return end($array);
@@ -314,11 +322,15 @@ class Image implements EntityInterface
      * @param string $rootPath
      * @param int|null $width
      * @param CalendarImage|null $calendarImage
-     * @return string
+     * @return string|null
      * @throws Exception
      */
-    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false, bool $test = false, string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, string $rootPath = '', ?int $width = null, ?CalendarImage $calendarImage = null): string
+    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false, bool $test = false, string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, string $rootPath = '', ?int $width = null, ?CalendarImage $calendarImage = null): ?string
     {
+        if ($this->path === null) {
+            return null;
+        }
+
         $path = match (true) {
             $type === self::PATH_TYPE_SOURCE && $this->pathSource !== null => $this->pathSource,
             $type === self::PATH_TYPE_TARGET && $this->pathTarget !== null => $this->pathTarget,
@@ -351,7 +363,13 @@ class Image implements EntityInterface
      */
     public function getPathFull(string $type = self::PATH_TYPE_SOURCE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath($type, $tmp, $test, FileNameConverter::MODE_OUTPUT_ABSOLUTE, $rootPath, $width, $calendarImage);
+        $path = $this->getPath($type, $tmp, $test, FileNameConverter::MODE_OUTPUT_ABSOLUTE, $rootPath, $width, $calendarImage);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**
@@ -368,7 +386,13 @@ class Image implements EntityInterface
      */
     public function getPathSource(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_SOURCE, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+        $path = $this->getPath(self::PATH_TYPE_SOURCE, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**
@@ -418,7 +442,13 @@ class Image implements EntityInterface
      */
     public function getPathTarget(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_TARGET, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+        $path = $this->getPath(self::PATH_TYPE_TARGET, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**
@@ -468,7 +498,13 @@ class Image implements EntityInterface
      */
     public function getPathExpected(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_EXPECTED, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+        $path = $this->getPath(self::PATH_TYPE_EXPECTED, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**
@@ -485,7 +521,13 @@ class Image implements EntityInterface
      */
     public function getPathCompare(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_COMPARE, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+        $path = $this->getPath(self::PATH_TYPE_COMPARE, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**
@@ -555,10 +597,10 @@ class Image implements EntityInterface
     /**
      * Sets the relative path of this image.
      *
-     * @param string $path
+     * @param string|null $path
      * @return $this
      */
-    public function setPath(string $path): self
+    public function setPath(?string $path): self
     {
         $this->path = $path;
 
@@ -1020,7 +1062,7 @@ class Image implements EntityInterface
     /**
      * Gets the information of this image.
      *
-     * @return bool[]|float[]|int[]|string[]|null
+     * @return array<string, mixed>|null
      */
     public function getInformation(): ?array
     {
@@ -1030,7 +1072,7 @@ class Image implements EntityInterface
     /**
      * Sets the information of this image.
      *
-     * @param array<string|int|float|bool> $information
+     * @param array<string, mixed> $information
      * @return $this
      */
     public function setInformation(array $information): self

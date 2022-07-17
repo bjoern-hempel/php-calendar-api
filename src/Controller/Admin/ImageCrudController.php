@@ -21,9 +21,14 @@ use App\Service\IdHashService;
 use App\Service\ImageService;
 use App\Service\SecurityService;
 use App\Utils\ImageProperty;
+use App\Utils\JsonConverter;
+use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CodeEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use Exception;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -50,6 +55,15 @@ class ImageCrudController extends BaseCrudController
     protected ImageService $imageService;
 
     protected IdHashService $idHashService;
+
+    protected const RAW_SQL_POSITION = <<<SQL
+SELECT
+    path
+FROM
+    image
+WHERE
+    id=%d;
+SQL;
 
     /**
      * UserCrudController constructor.
@@ -133,6 +147,7 @@ class ImageCrudController extends BaseCrudController
                             );
                         }
                     )
+                    ->setRequired(false)
                     ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                     ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
 
@@ -140,6 +155,43 @@ class ImageCrudController extends BaseCrudController
             case 'pathTargetPreview':
                 return ImageField::new($fieldName)
                     ->setTemplatePath('admin/crud/field/image_preview.html.twig')
+                    ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                    ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
+
+            case 'latitude':
+            case 'longitude':
+            return NumberField::new($fieldName)
+                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName))
+                ->setNumberFormat('%.3f°');
+
+            case 'iso':
+                return NumberField::new($fieldName)
+                    ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                    ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName))
+                    ->setNumberFormat('%d');
+
+            case 'gpsHeight':
+                return NumberField::new($fieldName)
+                    ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                    ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName))
+                    ->setNumberFormat('%d m');
+
+            case 'information':
+                return CodeEditorField::new($fieldName)
+                    ->setTemplatePath('admin/crud/field/code_editor.html.twig')
+                    /* Not called within formulas. */
+                    ->formatValue(
+                        function ($json) {
+                            return (new JsonConverter($json))->getBeautified(2);
+                        }
+                    )
+                    ->setLanguage('css')
+                    ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                    ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
+
+            case 'takenAt':
+                return DateTimeField::new($fieldName)
                     ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                     ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
         }
@@ -164,6 +216,44 @@ class ImageCrudController extends BaseCrudController
         }
 
         $this->imageProperty->init($image->getUser(), $image);
+    }
+
+    /**
+     * Get original image path.
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param Image $image
+     * @return string
+     * @throws DoctrineDBALException
+     * @throws Exception
+     */
+    protected function getImagePath(EntityManagerInterface $entityManager, Image $image): string
+    {
+        $connection = $entityManager->getConnection();
+        $sqlRaw = sprintf(self::RAW_SQL_POSITION, $image->getId());
+
+        $statement = $connection->prepare($sqlRaw);
+        $result = $statement->executeQuery();
+
+        /* Reads all results. */
+        if (($row = $result->fetchAssociative()) !== false) {
+            return strval($row['path']);
+        }
+
+        throw new Exception(sprintf('Unable to find image with id %d (%s:%d).', $image->getId(), __FILE__, __LINE__));
+    }
+
+    /**
+     * Updates image path from original image.
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param Image $image
+     * @return void
+     * @throws Exception
+     */
+    protected function updateImagePath(EntityManagerInterface $entityManager, Image $image): void
+    {
+        $image->setPath($this->getImagePath($entityManager, $image));
     }
 
     /**
@@ -201,7 +291,11 @@ class ImageCrudController extends BaseCrudController
 
         $image = $entityInstance;
 
-        $this->updateImageProperties($image);
+        if ($image->getPath() === null) {
+            $this->updateImagePath($entityManager, $image);
+        } else {
+            $this->updateImageProperties($image);
+        }
 
         parent::updateEntity($entityManager, $image);
     }

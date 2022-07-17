@@ -111,8 +111,8 @@ final class ImageDataServiceTest extends TestCase
                     'format' => '%s',
                     'unit' => null,
                     'unit-before' => null,
-                    'value' => 'https://www.google.de/maps/place/14.417200+50.062819',
-                    'value-formatted' => 'https://www.google.de/maps/place/14.417200+50.062819',
+                    'value' => 'https://www.google.de/maps/place/50.062819+14.417200',
+                    'value-formatted' => 'https://www.google.de/maps/place/50.062819+14.417200',
                 ],
                 'gps-height' => [
                     'title' => 'GPS Height',

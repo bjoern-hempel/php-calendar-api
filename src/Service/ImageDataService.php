@@ -17,6 +17,8 @@ use App\Service\Entity\PlaceLoaderService;
 use App\Utils\GPSConverter;
 use App\Utils\SizeConverter;
 use App\Utils\StringConverter;
+use DateTime;
+use DateTimeImmutable;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
 
@@ -32,6 +34,9 @@ class ImageDataService
     protected bool $debug = false;
 
     protected bool $verbose = false;
+
+    /** @var array<string, array<string, mixed>>|null $imageDataFull */
+    protected ?array $imageDataFull = null;
 
     protected string $imagePath;
 
@@ -120,8 +125,8 @@ class ImageDataService
      * @param string|null $unit
      * @param string|null $unitBefore
      * @param string|null $valueFormatted
-     * @param array<string, string|mixed|null> $addValues
-     * @return array<string, string|mixed|null>
+     * @param array<string, mixed|null> $addValues
+     * @return array<string, mixed|null>
      */
     #[ArrayShape([self::KEY_NAME_TITLE => "string", self::KEY_NAME_FORMAT => "string", self::KEY_NAME_UNIT => "null|string", self::KEY_NAME_UNIT_BEFORE => "null|string", self::KEY_NAME_VALUE => "mixed", self::KEY_NAME_VALUE_FORMATTED => "string"])]
     protected function getData(string $title, mixed $value, string $format, ?string $unit, ?string $unitBefore = null, ?string $valueFormatted = null, array $addValues = null): array
@@ -153,6 +158,11 @@ class ImageDataService
         $value1 = StringConverter::calculate($coordinate[0]);
         $value2 = StringConverter::calculate($coordinate[1]);
         $value3 = StringConverter::calculate($coordinate[2]);
+
+        /* value3 given with value2 (from decimal points) */
+        if (gettype($value2) === 'double') {
+            $value3 += 60 * ($value2 - floor($value2));
+        }
 
         return sprintf('%d°%d’%.2f"%s', $value1, $value2, $value3, $ref);
     }
@@ -206,10 +216,10 @@ class ImageDataService
             $dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DIRECTION] = $this->getData('GPS Longitude Direction', $longitudeDirection, '%s', null);
 
             $dataExifReturn[self::KEY_NAME_GPS_GOOGLE_LINK] = $this->getData('GPS Google', GPSConverter::decimalDegree2GoogleLink(
-                floatval($dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DECIMAL_DEGREE]['value']),
                 floatval($dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DECIMAL_DEGREE]['value']),
-                strval($dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DIRECTION]['value']),
-                strval($dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DIRECTION]['value'])
+                floatval($dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DECIMAL_DEGREE]['value']),
+                strval($dataExifReturn[self::KEY_NAME_GPS_LATITUDE_DIRECTION]['value']),
+                strval($dataExifReturn[self::KEY_NAME_GPS_LONGITUDE_DIRECTION]['value'])
             ), '%s', null);
         }
 
@@ -278,11 +288,18 @@ class ImageDataService
     /**
      * Gets full image data.
      *
+     * @param bool $force
+     * @param bool $set
      * @return array<string, array<string, mixed>>
      * @throws Exception
      */
-    public function getImageDataFull(): array
+    public function getImageDataFull(bool $force = true, bool $set = false): array
     {
+        /* Get cache data */
+        if ($this->imageDataFull !== null && !$force) {
+            return $this->imageDataFull;
+        }
+
         $data = $this->getDataExif();
 
         $imageSize = getimagesize($this->imagePath);
@@ -329,6 +346,11 @@ class ImageDataService
         /* Sort by key */
         ksort($data);
 
+        /* Cache data */
+        if ($set) {
+            $this->imageDataFull = $data;
+        }
+
         return $data;
     }
 
@@ -349,5 +371,119 @@ class ImageDataService
         }
 
         return $array;
+    }
+
+    /**
+     * Gets area of data.
+     *
+     * @param string $key
+     * @return array<string, mixed>|null
+     * @throws Exception
+     */
+    public function getAreaData(string $key): ?array
+    {
+        $imageDataFull = $this->getImageDataFull(false);
+
+        if (!array_key_exists($key, $imageDataFull)) {
+            return null;
+        }
+
+        return $imageDataFull[$key];
+    }
+
+    /**
+     * Get full place value.
+     *
+     * @param string $key
+     * @return string|null
+     * @throws Exception
+     */
+    public function getValue(string $key): ?string
+    {
+        $areaData = $this->getAreaData($key);
+
+        if ($areaData === null) {
+            return null;
+        }
+
+        if (!array_key_exists(self::KEY_NAME_VALUE, $areaData)) {
+            return null;
+        }
+
+        return strval($areaData[self::KEY_NAME_VALUE]);
+    }
+
+    /**
+     * Get full place value as floatval.
+     *
+     * @param string $key
+     * @return float|null
+     * @throws Exception
+     */
+    public function getValueFloat(string $key): ?float
+    {
+        $areaData = $this->getAreaData($key);
+
+        if ($areaData === null) {
+            return null;
+        }
+
+        if (!array_key_exists(self::KEY_NAME_VALUE, $areaData)) {
+            return null;
+        }
+
+        return floatval($areaData[self::KEY_NAME_VALUE]);
+    }
+
+    /**
+     * Get full place value as integer.
+     *
+     * @param string $key
+     * @return int|null
+     * @throws Exception
+     */
+    public function getValueInt(string $key): ?int
+    {
+        $areaData = $this->getAreaData($key);
+
+        if ($areaData === null) {
+            return null;
+        }
+
+        if (!array_key_exists(self::KEY_NAME_VALUE, $areaData)) {
+            return null;
+        }
+
+        return intval($areaData[self::KEY_NAME_VALUE]);
+    }
+
+    /**
+     * Get full place value as DateTimeImmutable.
+     *
+     * @param string $key
+     * @return DateTimeImmutable|null
+     * @throws Exception
+     */
+    public function getValueDateTimeImmutable(string $key): ?DateTimeImmutable
+    {
+        $areaData = $this->getAreaData($key);
+
+        if ($areaData === null) {
+            return null;
+        }
+
+        if (!array_key_exists(self::KEY_NAME_VALUE_DATE_TIME, $areaData)) {
+            return null;
+        }
+
+        if ($areaData[self::KEY_NAME_VALUE_DATE_TIME] instanceof DateTime) {
+            return DateTimeImmutable::createFromMutable($areaData[self::KEY_NAME_VALUE_DATE_TIME]);
+        }
+
+        if ($areaData[self::KEY_NAME_VALUE_DATE_TIME] instanceof DateTimeImmutable) {
+            return $areaData[self::KEY_NAME_VALUE_DATE_TIME];
+        }
+
+        return null;
     }
 }
