@@ -404,13 +404,58 @@ admin:
         help: 'The full target path of this entry.'
       width:
         label: 'Width'
-        help: 'The width of this entry.'
+        help: 'The width of this image.'
       height:
         label: 'Height'
-        help: 'The height of this entry.'
+        help: 'The height of this image.'
       size:
         label: 'Size'
-        help: 'The size of this entry.'
+        help: 'The size of this image.'
+      title:
+        label: 'Title'
+        help: 'The title of this image.'
+      longitude:
+        label: 'Longitude'
+        help: 'The longitude of this image.'
+      latitude:
+        label: 'Latitude'
+        help: 'The latitude of this image.'
+      url:
+        label: 'URL'
+        help: 'The URL of this image.'
+      gpsHeight:
+        label: 'Height'
+        help: 'The height of this image.'
+      iso:
+        label: 'ISO'
+        help: 'The ISO of this image.'
+      mime:
+        label: 'MIME'
+        help: 'The MIME of this image.'
+      place:
+        label: 'Place'
+        help: 'The place of this image.'
+      placeDistrict:
+        label: 'District'
+        help: 'The district of this image.'
+      placeCity:
+        label: 'City'
+        help: 'The city of this image.'
+      placeState:
+        label: 'State'
+        help: 'The state of this image.'
+      placeCountry:
+        label: 'Country'
+        help: 'The country of this image.'
+      placeTimezone:
+        label: 'Timezone'
+        help: 'The timezone of this image.'
+      takenAt:
+        label: 'Taken at'
+        help: 'The time in which this picture was taken.'
+      information:
+        label: 'Information'
+        help: 'More information about this image.'
       updatedAt:
         label: 'Updated At'
         help: 'The date and time when this entry was last edited.'

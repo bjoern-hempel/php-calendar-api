@@ -1,0 +1,76 @@
+place:
+  placeLatitude: "Latitude"
+  placeLongitude: "Longitude"
+  placeLatitudeDms: "Latitude DMS"
+  placeLongitudeDms: "Longitude DMS"
+  placePoint: "Point"
+  placeGoogleLink: "Google Maps"
+  placeOpenstreetmapLink: "OpenStreetMap"
+  placeDistrict: "Stadtteil / Ortschaft" # P
+  placeCity: "Stadt / Gemeinde" # A
+  placeState: "Bundesland" # A
+  placeMountain: "Berg, Hügel, Fels, Strand" # T
+  placePark: "Parks, Flächen" # L
+  placeSpot: "Ort, Gebäude, Farm" # S
+  placeForest: "Wald, Heide" # V
+  placeFull: "Vollständiger Ortsname"
+  placeCountry: "Land"
+  placeCountryCode: "Ländercode"
+  placeTimezone: "Zeitzone"
+  placePopulation: "Einwohner"
+  placeElevation: "Höhe"
+  placeFeatureClass: "Oberschlüssel"
+  placeFeatureCode:	"Schlüssel"
+  placeFeatureName: "Merkmalname"
+  placeDistanceDb: "Abstand (DB)"
+  placeDistanceMeter: "Abstand in Meter"
+  placeDem: "Digitales Höhenmodell"
+  placeAdmin1: "Schlüssel Admin 1"
+  placeAdmin2: "Schlüssel Admin 2"
+  placeAdmin3: "Schlüssel Admin 3"
+  placeAdmin4: "Schlüssel Admin 4"
+  cityOrRural: "Stadt oder ländliche Gegend"
+  timeTaken: "Benötigte Zeit"
+
+title:
+  H:
+    next: "Nächste Flüsse, Seen" # H
+    nextDetail: "Flüsse, Seen, etc." # H
+  P:
+    next: "Nächste Stadtteile oder Ortschaften" # P
+    nextDetail: "Stadtteile, Ortschaften, etc." # P
+  L:
+    next: "Nächste Parks oder Flächen" # L
+    nextDetail: "Parks, Flächen, etc." # L
+  S:
+    next: "Nächste Orte, Hotels, Gebäude oder Farmen" # S
+    nextDetail: "Brauereien, Brücken, Farmen, Flughäfen, Gebäude, Hotels, Krankenhäuser, Kirchen, Orte, etc." # S
+  T:
+    next: "Nächste Berge, Hügel, Felsen oder Strände" # T
+    nextDetail: "Berge, Hügel, Felsen, Strände, etc." # T
+  V:
+    next: "Nächste Wälder oder Heiden" # V
+    nextDetail: "Wälder, Heiden, etc." # V
+
+general:
+  currentSearch: "Deine aktuelle Position:"
+  detectPosition: "Aktuelle Position wird ermittelt..."
+  detailed: "Detailliert"
+  elevationNotGiven: "Höhe nicht angegeben"
+  links:
+    sort:
+      relevance: "Relevanz"
+      relevanceAndPosition: "Relevanz m. Position"
+      name: "Name"
+      position: "Aktuelle Position"
+  locationSearchTitle: "Suche nach Standort"
+  locationSearch: "Suche"
+  locationSearchCurrentPosition: "Aktuelle Position"
+  notAvailable: "Der Ort \"%place%\" konnte nicht gefunden werden."
+  notAvailableId: "Die angegebene ID \"%idString%\" konnte nicht gefunden werden."
+  notAvailableLocation: "Die angegebene Position \"%location%\" konnte nicht gefunden werden."
+  notGiven: "Nicht angegeben"
+  pleaseWait: "Bitte warten"
+  results: "%numberResults% Ergebnisse wurden mit dem Suchbegriff \"%search%\" gefunden:"
+  successMessage: "Sieht so aus, als ob du nach Folgendem suchst:"
+  tryThis: "Versuche doch einmal Folgendes"

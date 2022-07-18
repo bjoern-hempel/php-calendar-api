@@ -7,6 +7,8 @@ doctrine:
         password: "%env(resolve:DOCTRINE_DB_PASS)%"
         driver: "%env(resolve:DOCTRINE_DB_DRIVER)%"
         server_version: "%env(resolve:DOCTRINE_DB_VERSION)%"
+        types:
+            point: CrEOF\Spatial\DBAL\Types\Geometry\PointType
 
     orm:
         auto_generate_proxy_classes: true

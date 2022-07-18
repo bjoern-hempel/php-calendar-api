@@ -48,6 +48,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Exception;
@@ -136,7 +137,32 @@ abstract class BaseCrudController extends AbstractCrudController
     protected function getYearSelection(): array
     {
         $years = range(intval(date('Y')) - 3, intval(date('Y') + 10));
+
         return array_combine($years, $years);
+    }
+
+    /**
+     * Returns month selection.
+     *
+     * @return int[]
+     */
+    protected function getMonthSelection(): array
+    {
+        return [
+            'title' => 0,
+            'january' => 1,
+            'february' => 2,
+            'march' => 3,
+            'april' => 4,
+            'may' => 5,
+            'june' => 6,
+            'july' => 7,
+            'august' => 8,
+            'september' => 9,
+            'october' => 10,
+            'november' => 11,
+            'december' => 12,
+        ];
     }
 
     /**
@@ -156,6 +182,7 @@ abstract class BaseCrudController extends AbstractCrudController
         /* Special crud names. */
         switch ($this->getCrudName()) {
 
+            /* Calendar */
             case $this->getCrudName(Calendar::class):
                 switch ($fieldName) {
 
@@ -180,6 +207,33 @@ abstract class BaseCrudController extends AbstractCrudController
                 }
                 break;
 
+            /* CalendarImage */
+            case $this->getCrudName(CalendarImage::class):
+                switch ($fieldName) {
+                    case 'year':
+                        return $this->easyAdminField->getChoiceField($fieldName, $this->getYearSelection());
+
+                    case 'month':
+                        return $this->easyAdminField->getChoiceField($fieldName, $this->getMonthSelection(), true);
+
+                    case 'pathSource':
+                    case 'pathTarget':
+                        return ImageField::new($fieldName)
+                            //->setBasePath(sprintf('%s/%s', Image::PATH_DATA, Image::PATH_IMAGES))
+                            ->setTemplatePath('admin/crud/field/image_preview.html.twig')
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
+
+                    case 'pathSourcePreview':
+                    case 'pathTargetPreview':
+                        return ImageField::new($fieldName)
+                            ->setTemplatePath('admin/crud/field/image_preview.html.twig')
+                            ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                            ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName));
+                }
+                break;
+
+            /* Event */
             case $this->getCrudName(Event::class):
                 switch ($fieldName) {
 
@@ -203,6 +257,7 @@ abstract class BaseCrudController extends AbstractCrudController
                 }
                 break;
 
+            /* Holiday */
             case $this->getCrudName(Holiday::class):
                 switch ($fieldName) {
 
@@ -225,6 +280,7 @@ abstract class BaseCrudController extends AbstractCrudController
                 }
                 break;
 
+            /* HolidayGroup */
             case $this->getCrudName(HolidayGroup::class):
                 switch ($fieldName) {
 
@@ -237,6 +293,7 @@ abstract class BaseCrudController extends AbstractCrudController
                 }
                 break;
 
+            /* Image */
             case $this->getCrudName(Image::class):
                 switch ($fieldName) {
 
@@ -281,6 +338,7 @@ abstract class BaseCrudController extends AbstractCrudController
                 }
                 break;
 
+            /* User */
             case $this->getCrudName(User::class):
                 switch ($fieldName) {
 

@@ -3,3 +3,6 @@
 	url = git@github.com:ixnode/bash-version-manager.git
         branch = main
 
+[submodule "submodules/table-dumper"]
+	path = submodules/table-dumper
+	url = git@github.com:bjoern-hempel/table-dumper.git

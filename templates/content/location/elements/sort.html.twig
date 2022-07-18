@@ -1,0 +1,24 @@
+{# Show sort area #}
+<p class="sort-area">
+    <b>Sortieren nach</b>:
+    {% if searchConfig.sort is not same as('r') %}
+        <nobr><a class="link-primary sort-by sort-by-relevance" href="#">{{ 'general.links.sort.relevance'|trans([], 'location') }}</a></nobr>
+    {% else %}
+        <nobr>{{ 'general.links.sort.relevance'|trans([], 'location') }}</nobr>
+    {% endif %} |
+    {% if searchConfig.sort is not same as('rl') %}
+        <nobr><a class="link-primary sort-by sort-by-relevance-current-location" data-app-loader-message="{{ 'general.detectPosition'|trans([], 'location') }}" href="#">{{ 'general.links.sort.relevanceAndPosition'|trans([], 'location') }}</a></nobr>
+    {% else %}
+        <nobr>{{ 'general.links.sort.relevanceAndPosition'|trans([], 'location') }}</nobr>
+    {% endif %} |
+    {% if searchConfig.sort is not same as('n') %}
+        <nobr><a class="link-primary sort-by sort-by-name" href="#">{{ 'general.links.sort.name'|trans([], 'location') }}</a></nobr>
+    {% else %}
+        <nobr>{{ 'general.links.sort.name'|trans([], 'location') }}</nobr>
+    {% endif %} |
+    {% if searchConfig.sort is not same as('l') %}
+        <nobr><a class="link-primary sort-by sort-by-current-location" data-app-loader-message="{{ 'general.detectPosition'|trans([], 'location') }}" href="#">{{ 'general.links.sort.position'|trans([], 'location') }}</a></nobr>
+    {% else %}
+        <nobr>{{ 'general.links.sort.position'|trans([], 'location') }}</nobr>
+    {% endif %}
+</p>

@@ -329,6 +329,14 @@ class ImageService
         $pathFull = $image->getPath($type, false, false, FileNameConverter::MODE_OUTPUT_ABSOLUTE, $this->appKernel->getProjectDir(), null, $calendarImage);
         $pathResizedFull = $image->getPath($type, false, false, FileNameConverter::MODE_OUTPUT_ABSOLUTE, $this->appKernel->getProjectDir(), $widthResize, $calendarImage);
 
+        if ($pathFull === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        if ($pathResizedFull === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
         /* Get information about image. */
         $imageInfo = $this->getImageInfo($pathFull);
 
@@ -354,7 +362,13 @@ class ImageService
         $this->saveImage($imageResized, $pathResizedFull, $imageType, $mimeType);
 
         /* Return relative path */
-        return $image->getPath($type, false, false, FileNameConverter::MODE_OUTPUT_FILE, $this->appKernel->getProjectDir(), $widthResize, $calendarImage);
+        $path = $image->getPath($type, false, false, FileNameConverter::MODE_OUTPUT_FILE, $this->appKernel->getProjectDir(), $widthResize, $calendarImage);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**

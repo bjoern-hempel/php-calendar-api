@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'TwelvePics / Location' }}{% endblock %}
+
+{% block body_class %}content content-location bg-light{% endblock %}
+
+{% block body %}
+    {% apply spaceless %}
+
+        {% include 'content/header.html.twig' with {
+            'title': 'Suche nach Standort',
+        } %}
+
+        {% embed 'main_layout_without_header.html.twig' %}
+            {% block main_content %}
+                <div id="content-location">
+
+                    {% include 'content/location/elements/searchForm.html.twig' with {
+                        'searchConfig': searchConfig,
+                    } %}
+
+                    {% include 'content/location/elements/description.html.twig' with {
+                        'searchConfig': searchConfig
+                    } %}
+
+                    {% include 'content/location/elements/sort.html.twig' with {
+                        'searchConfig': searchConfig
+                    } %}
+
+                    {# List every result #}
+                    <table class="table">
+                        {% for place in results %}
+                            <tr>
+                                <td class="table-name" style="width: 100%!important;">
+                                    <small><kbd style="background-color: #000080;">{{ loop.index + (searchConfig.page - 1) * searchConfig.numberPerPage }}</kbd></small>&nbsp;
+                                    <small><kbd>{{ place.featureClass }}:{{ place.featureCode }}</kbd></small>&nbsp;
+                                    {% if place.distanceMeter is not same as(0.0) %}
+                                        <small><kbd style="background-color: #008000;">{{ place.distanceMeter(1, 'km', 1000, true)|raw }}</kbd></small>&nbsp;
+                                    {% endif %}
+                                    {% if searchConfig.verbose %}
+                                        {% if sort is same as('rl') or sort is same as('r') %}
+                                            <small><kbd style="background-color: #800000;">{{ place.relevance }}</kbd></small>&nbsp;
+                                        {% endif %}
+                                    {% endif %}
+                                    <a href="{{ path('app_location_view', {param1: place.featureClass|lower, param2: place.id}) }}" class="link-primary">{{ place.nameFull(false) }}</a>
+
+                                    <br /><small>{{ (place.featureClass ~ '.' ~ place.featureCode)|trans([], 'place') }}</small>
+
+                                    {% if place.elevationHill is same as(false) %}
+                                        <small>, <nobr>{{ 'general.elevationNotGiven'|trans([], 'location') }}</nobr></small>
+                                    {% elseif place.elevationHill is not null %}
+                                        <small>, <nobr>{{ place.elevationHill }} m</nobr></small>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+
+                    {% include 'content/location/elements/pager.html.twig' with {
+                        'searchConfig': searchConfig
+                    } %}
+
+                    {% include 'content/location/elements/legal.html.twig' with {
+                        'version': version,
+                        'time': time
+                    } %}
+                </div>
+            {% endblock %}
+        {% endembed %}
+
+        {% include 'content/footer.html.twig' %}
+    {% endapply %}
+{% endblock %}

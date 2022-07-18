@@ -18,6 +18,7 @@ use App\Entity\Image;
 use App\Service\ImageService;
 use App\Service\UrlService;
 use App\Utils\FileNameConverter;
+use App\Utils\NamingConventionsConverter;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use DateTime;
@@ -75,6 +76,7 @@ class AppExtension extends AbstractExtension
     {
         return [
             new TwigFilter('preg_replace', [$this, 'pregReplace']),
+            new TwigFilter('camel_case', [$this, 'camelCase']),
             new TwigFilter('path_orig', [$this, 'getPathOrig']),
             new TwigFilter('path_preview', [$this, 'getPathPreview']),
             new TwigFilter('image_dimensions', [$this, 'getImageDimensions']),
@@ -117,6 +119,20 @@ class AppExtension extends AbstractExtension
         }
 
         return $replaced;
+    }
+
+    /**
+     * TwigFilter: Convert given string to camel case.
+     *
+     * @param string $string
+     * @return string
+     * @throws Exception
+     */
+    public function camelCase(string $string): string
+    {
+        $converter = new NamingConventionsConverter(str_replace('-', '_', $string));
+
+        return $converter->getCamelCase();
     }
 
     /**

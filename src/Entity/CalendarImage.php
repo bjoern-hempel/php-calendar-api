@@ -23,7 +23,6 @@ use App\Utils\FileNameConverter;
 use App\Utils\Traits\JsonHelper;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
-use Hoa\File\File;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -106,7 +105,7 @@ class CalendarImage implements EntityInterface
 
     public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'calendar', 'image', 'pathSource', 'pathSourcePreview', 'pathTarget', 'pathTargetPreview', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'user', 'calendar', 'pathSourcePreview', 'pathTargetPreview', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_INDEX = ['id', 'user', 'calendar', 'pathSourcePreview', 'pathTargetPreview', 'year', 'month', 'title', 'position', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_NEW = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson'];
 
@@ -152,11 +151,11 @@ class CalendarImage implements EntityInterface
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups('calendar_image_extended')]
-    private ?string $title;
+    private ?string $title = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups('calendar_image_extended')]
-    private ?string $position;
+    private ?string $position = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups('calendar_image_extended')]
@@ -220,7 +219,13 @@ class CalendarImage implements EntityInterface
             throw new Exception(sprintf('No Image was found (%s:%d).', __FILE__, __LINE__));
         }
 
-        return $this->getImage()->getPath(Image::PATH_TYPE_SOURCE, $tmp, $test, $outputMode, $rootPath, $width, $this);
+        $path = $this->getImage()->getPath(Image::PATH_TYPE_SOURCE, $tmp, $test, $outputMode, $rootPath, $width, $this);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**
@@ -285,7 +290,13 @@ class CalendarImage implements EntityInterface
             throw new Exception(sprintf('No Image was found (%s:%d).', __FILE__, __LINE__));
         }
 
-        return $this->getImage()->getPath(Image::PATH_TYPE_TARGET, $tmp, $test, $outputMode, $rootPath, $width, $this);
+        $path = $this->getImage()->getPath(Image::PATH_TYPE_TARGET, $tmp, $test, $outputMode, $rootPath, $width, $this);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**
@@ -320,7 +331,13 @@ class CalendarImage implements EntityInterface
             throw new Exception(sprintf('No Image was found (%s:%d).', __FILE__, __LINE__));
         }
 
-        return $this->getImage()->getPath(Image::PATH_TYPE_TARGET, $tmp, $test, FileNameConverter::MODE_OUTPUT_RELATIVE, $rootPath, $width, $this);
+        $path = $this->getImage()->getPath(Image::PATH_TYPE_TARGET, $tmp, $test, FileNameConverter::MODE_OUTPUT_RELATIVE, $rootPath, $width, $this);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**

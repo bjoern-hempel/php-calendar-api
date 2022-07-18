@@ -1424,6 +1424,14 @@ class CalendarBuilderService
             calendarImage: $this->useCalendarImagePath ? $this->calendarImage : null
         );
 
+        if ($pathSourceRelative === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        if ($pathTargetRelative === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
         if ($this->deleteTargetImages) {
             $this->removeTargetImages($this->pathTargetAbsolute);
         }

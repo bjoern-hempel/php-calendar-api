@@ -20,7 +20,7 @@ use Exception;
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 1.0 (2021-12-31)
- * @package App\Command
+ * @package App\Utils
  *
  * @method float|null getAspectRatio()
  * @method int|null getHeight()

@@ -1,0 +1,4 @@
+{# Show pager #}
+{% if searchConfig.nextPage is not same as(null) %}
+    <a class="next-page" data-next-page="{{ searchConfig.nextPage }}" href="#">Nächste Seite</a>
+{% endif %}

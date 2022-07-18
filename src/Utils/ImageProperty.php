@@ -16,6 +16,9 @@ namespace App\Utils;
 use App\Entity\CalendarImage;
 use App\Entity\Image;
 use App\Entity\User;
+use App\Service\Entity\PlaceLoaderService;
+use App\Service\ImageDataService;
+use App\Service\LocationDataService;
 use Exception;
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
@@ -38,6 +41,10 @@ class ImageProperty
 
     protected KernelInterface $kernel;
 
+    protected ?PlaceLoaderService $placeLoaderService;
+
+    protected ?LocationDataService $locationDataService;
+
     protected string $pathRoot;
 
     protected string $pathData;
@@ -58,11 +65,17 @@ class ImageProperty
      * ImageProperty constructor.
      *
      * @param KernelInterface $kernel
+     * @param PlaceLoaderService|null $placeLoaderService
+     * @param LocationDataService|null $locationDataService
      */
-    public function __construct(KernelInterface $kernel)
+    public function __construct(KernelInterface $kernel, PlaceLoaderService $placeLoaderService = null, LocationDataService $locationDataService = null)
     {
         /* Set kernel. */
         $this->kernel = $kernel;
+
+        $this->placeLoaderService = $placeLoaderService;
+
+        $this->locationDataService = $locationDataService;
 
         /* Set root path. */
         $this->pathRoot = $this->kernel->getProjectDir();
@@ -142,11 +155,23 @@ class ImageProperty
                 throw new Exception(sprintf('Unable to get Image class (%s:%d).', __FILE__, __LINE__));
             }
 
-            return sprintf($format, $this->getPathUser($calendarImage->getUser(), $test), $image->getPath($type));
+            $path = $image->getPath($type);
+
+            if ($path === null) {
+                throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+            }
+
+            return sprintf($format, $this->getPathUser($calendarImage->getUser(), $test), $path);
         }
 
         if ($image !== null && $user !== null) {
-            return sprintf($format, $this->getPathUser($user, $test), $image->getPath($type));
+            $path = $image->getPath($type);
+
+            if ($path === null) {
+                throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+            }
+
+            return sprintf($format, $this->getPathUser($user, $test), $path);
         }
 
         throw new Exception(sprintf('Please specify $calendarImage or $image and $user (%s:%d).', __FILE__, __LINE__));
@@ -311,5 +336,84 @@ class ImageProperty
         $image->setWidth($this->width);
         $image->setHeight($this->height);
         $image->setSize($this->size);
+
+        /* To get mor image data we need the following services. */
+        if ($this->placeLoaderService === null || $this->locationDataService === null) {
+            return;
+        }
+
+        $imageData = new ImageDataService(
+            $pathImage,
+            $this->placeLoaderService,
+            $this->locationDataService,
+            false,
+            false
+        );
+
+        $image->setInformation($imageData->getImageData());
+
+        $gpsLatitudeDecimalDegree = $imageData->getValueFloat(ImageDataService::KEY_NAME_GPS_LATITUDE_DECIMAL_DEGREE);
+        if ($gpsLatitudeDecimalDegree !== null) {
+            $image->setLatitude($gpsLatitudeDecimalDegree);
+        }
+
+        $gpsLongitudeDecimalDegree = $imageData->getValueFloat(ImageDataService::KEY_NAME_GPS_LONGITUDE_DECIMAL_DEGREE);
+        if ($gpsLongitudeDecimalDegree !== null) {
+            $image->setLongitude($gpsLongitudeDecimalDegree);
+        }
+
+        $url = $imageData->getValue(LocationDataService::KEY_NAME_PLACE_GOOGLE_LINK);
+        if (empty($image->getUrl()) && $url !== null) {
+            $image->setUrl($url);
+        }
+
+        $height = $imageData->getValueInt(LocationDataService::KEY_NAME_PLACE_DEM);
+        if ($height !== null) {
+            $image->setGpsHeight($height);
+        }
+
+        $iso = $imageData->getValueInt(ImageDataService::KEY_NAME_IMAGE_ISO);
+        if ($iso !== null) {
+            $image->setIso($iso);
+        }
+
+        $mime = $imageData->getValue(ImageDataService::KEY_NAME_IMAGE_MIME);
+        if ($mime !== null) {
+            $image->setMime($mime);
+        }
+
+        $placeFullValue = $imageData->getValue(LocationDataService::KEY_NAME_PLACE_FULL);
+        if ($placeFullValue !== null) {
+            $image->setPlace($placeFullValue);
+        }
+        $placeDistrict = $imageData->getValue(LocationDataService::KEY_NAME_PLACE_DISTRICT);
+        if ($placeDistrict !== null) {
+            $image->setPlaceDistrict($placeDistrict);
+        }
+        $placeCity = $imageData->getValue(LocationDataService::KEY_NAME_PLACE_CITY);
+        if ($placeCity !== null) {
+            $image->setPlaceCity($placeCity);
+        }
+        $placeState = $imageData->getValue(LocationDataService::KEY_NAME_PLACE_STATE);
+        if ($placeState !== null) {
+            $image->setPlaceState($placeState);
+        }
+        $placeCountry = $imageData->getValue(LocationDataService::KEY_NAME_PLACE_COUNTRY);
+        if ($placeCountry !== null) {
+            $image->setPlaceCountry($placeCountry);
+        }
+        $placeTimezone = $imageData->getValue(LocationDataService::KEY_NAME_PLACE_TIMEZONE);
+        if ($placeTimezone !== null) {
+            $image->setPlaceTimezone($placeTimezone);
+        }
+
+        $takenAt = $imageData->getValueDateTimeImmutable(ImageDataService::KEY_NAME_IMAGE_DATE_TIME_ORIGINAL);
+        if ($takenAt !== null) {
+            $image->setTakenAt($takenAt);
+        }
+
+        if (empty($image->getTitle()) && !empty($image->getPlace())) {
+            $image->setTitle($image->getPlace());
+        }
     }
 }
