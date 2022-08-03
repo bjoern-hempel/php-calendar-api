@@ -46,7 +46,7 @@ CREATE TABLE `place_r` (
   `admin4_code` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   SPATIAL KEY `coordinate_place_r` (`coordinate`)
-) ENGINE=InnoDB AUTO_INCREMENT=678986 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=679001 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1395,7 +1395,22 @@ INSERT INTO `place_r` VALUES
 (678850,11790712,'OB Watergraafsmeer','OB Watergraafsmeer','','\0\0\0\0\0\0\0âuý‚-J@Ù=yXÈ@','R','RYD','NL','',0,0,1,'Europe/Amsterdam','2018-01-03','2022-05-12 19:44:26','2022-05-12 19:44:26','07','0363','M',NULL),
 (678877,11875695,'Rotterdam Noord Goederen','Rotterdam Noord Goederen','','\0\0\0\0\0\0\0÷’ÆhùI@\rý\\@','R','RYD','NL','',0,0,-1,'Europe/Amsterdam','2018-05-28','2022-05-12 19:44:38','2022-05-12 19:44:38','11','0599',NULL,NULL),
 (678879,11875918,'IJsselmonde goederen','IJsselmonde goederen','','\0\0\0\0\0\0\0\Z4ôOpñI@¶ø\0ã@','R','RYD','NL','',0,0,-2,'Europe/Amsterdam','2018-05-30','2022-05-12 19:44:39','2022-05-12 19:44:39','11','0599',NULL,NULL),
-(678942,12149377,'Rail Service Center (RSC) Waalhaven','Rail Service Center (RSC) Waalhaven','','\0\0\0\0\0\0\0y’tÍäïI@uå³<®@','R','RYD','NL','',0,0,4,'Europe/Amsterdam','2020-04-10','2022-05-12 19:45:09','2022-05-12 19:45:09','11','0599',NULL,NULL);
+(678942,12149377,'Rail Service Center (RSC) Waalhaven','Rail Service Center (RSC) Waalhaven','','\0\0\0\0\0\0\0y’tÍäïI@uå³<®@','R','RYD','NL','',0,0,4,'Europe/Amsterdam','2020-04-10','2022-05-12 19:45:09','2022-05-12 19:45:09','11','0599',NULL,NULL),
+(678986,3197608,'ÄŒvor Kosnica','Cvor Kosnica','Kosnica interchange','\0\0\0\0\0\0\0 OäIÒáF@»òYž0@','R','RDJCT','HR','',0,0,106,'Europe/Zagreb','2021-02-04','2022-08-03 09:19:27','2022-08-03 09:19:27','20',NULL,NULL,NULL),
+(678987,3273745,'Tunel Sinac','Tunel Sinac','','\0\0\0\0\0\0\0š™™™™iF@Ãõ(\\Â.@','R','TNLRR','HR','',0,0,920,'Europe/Zagreb','2005-06-04','2022-08-03 10:03:17','2022-08-03 10:03:17','08',NULL,NULL,NULL),
+(678988,3274048,'Tunel Ramljani','Tunel Ramljani','','\0\0\0\0\0\0\0æèñ{cF@Ø¶(³AÆ.@','R','TNLRR','HR','',0,0,680,'Europe/Zagreb','2005-06-04','2022-08-03 10:03:33','2022-08-03 10:03:33','08',NULL,NULL,NULL),
+(678989,3343553,'Tunel Kupjak','Tunel Kupjak','','\0\0\0\0\0\0\0¤p=\n×³F@Ž¯=³$À-@','R','TNL','HR','',0,0,841,'Europe/Zagreb','2005-06-04','2022-08-03 10:43:11','2022-08-03 10:43:11','12',NULL,NULL,NULL),
+(678990,6545053,'LomniÄka','Lomnicka','','\0\0\0\0\0\0\0…™¶eåF@íØÄëê/@','R','ST','HR','HR',0,0,118,'Europe/Zagreb','2010-02-23','2022-08-03 10:43:32','2022-08-03 10:43:32',NULL,NULL,NULL,NULL),
+(678991,8629544,'Zagreb Ranzirni depot','Zagreb Ranzirni depot','','\0\0\0\0\0\0\0ÿ!ýöuàF@3mÿÊJ0@','R','RYD','HR','',0,0,112,'Europe/Zagreb','2013-10-29','2022-08-03 10:43:56','2022-08-03 10:43:56',NULL,NULL,NULL,NULL),
+(678992,8629576,'RanÅ¾irni railway yard','Ranzirni railway yard','','\0\0\0\0\0\0\0\r7àóÃàF@{÷Ç{Õ0@','R','RYD','HR','',0,0,110,'Europe/Zagreb','2013-10-31','2022-08-03 10:43:56','2022-08-03 10:43:56',NULL,NULL,NULL,NULL),
+(678993,12036343,'Stradun','Stradun','','\0\0\0\0\0\0\0`vORE@$0ðÜ2@','R','RD','HR','',0,0,18,'Europe/Zagreb','2019-04-12','2022-08-03 10:47:54','2022-08-03 10:47:54',NULL,NULL,NULL,NULL),
+(678994,12212925,'ÄŒvor JakuÅ¡evec','Cvor Jakusevec','Jakusevec interchange,JakuÅ¡evec interchange','\0\0\0\0\0\0\0@û‘\"2àF@Óö¯¬40@','R','RDJCT','HR','',0,0,110,'Europe/Zagreb','2021-02-04','2022-08-03 10:48:49','2022-08-03 10:48:49','21',NULL,NULL,NULL),
+(678995,12212926,'ÄŒvor Ivanja Reka','Cvor Ivanja Reka','Ivanja Reka interchange','\0\0\0\0\0\0\0-!ôlæF@oÅ!0@','R','RDJCT','HR','',0,0,106,'Europe/Zagreb','2021-02-04','2022-08-03 10:48:49','2022-08-03 10:48:49','20',NULL,NULL,NULL),
+(678996,12212927,'ÄŒvor LuÄko','Cvor Lucko','Lucko interchange,LuÄko interchange','\0\0\0\0\0\0\0Úþ••&áF@#2¬âÌ/@','R','RDJCT','HR','',0,0,121,'Europe/Zagreb','2021-02-04','2022-08-03 10:48:49','2022-08-03 10:48:49','21',NULL,NULL,NULL),
+(678997,12212928,'ÄŒvor Jankomir','Cvor Jankomir','Jankomir interchange','\0\0\0\0\0\0\07àóÃåF@Q¥f´²/@','R','RDJCT','HR','',0,0,126,'Europe/Zagreb','2021-02-04','2022-08-03 10:48:49','2022-08-03 10:48:49','21',NULL,NULL,NULL),
+(678998,12214039,'ÄŒvor Sveta Helena','Cvor Sveta Helena','Cvor Sv. Helena,Sveta Helena interchange,ÄŒvor Sv. Helena','\0\0\0\0\0\0\0œ3¢´óF@!“Œœ…E0@','R','RDJCT','HR','',0,0,118,'Europe/Zagreb','2021-02-10','2022-08-03 10:48:50','2022-08-03 10:48:50','20',NULL,NULL,NULL),
+(678999,12216716,'ÄŒvor Sredanci','Cvor Sredanci','Sredanci,Sredanci interchange','\0\0\0\0\0\0\0t$—ÿ’F@¹ü‡ôÛO2@','R','RDJCT','HR','',0,0,82,'Europe/Zagreb','2021-02-15','2022-08-03 10:48:51','2022-08-03 10:48:51','02',NULL,NULL,NULL),
+(679000,12217373,'ÄŒvor PloÄe','Cvor Ploce','Ploce interchange,PloÄe interchange','\0\0\0\0\0\0\0W!å\'Õ’E@>\"¦D}1@','R','RDJCT','HR','',0,0,48,'Europe/Zagreb','2021-02-28','2022-08-03 10:48:52','2022-08-03 10:48:52','03',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `place_r` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
