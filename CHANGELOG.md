@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.30.21] - 2022-11-11
+
+* Bump twig/twig from 3.3.8 to 3.4.3
+* Disable sensiolabs security-checker
+
 ### [0.30.20] - 2022-11-11
 
 * [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location
