@@ -60,5 +60,6 @@ jobs:
         run: composer test
 
       # https://github.com/sensiolabs/security-checker
-      - name: Security check installed dependencies
-        uses: symfonycorp/security-checker-action@v2
+      #- name: Security check installed dependencies
+      #  uses: symfonycorp/security-checker-action@v2
+
