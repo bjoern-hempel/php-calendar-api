@@ -24,6 +24,7 @@ use App\Service\Entity\UserLoaderService;
 use App\Service\SecurityService;
 use App\Service\UrlService;
 use App\Utils\FileNameConverter;
+use App\Utils\GPSConverter;
 use chillerlan\QRCode\QRCode;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -124,30 +125,6 @@ class CalendarImageCrudController extends BaseCrudController
     }
 
     /**
-     * Returns month selection.
-     *
-     * @return int[]
-     */
-    protected function getMonthSelection(): array
-    {
-        return [
-            'title' => 0,
-            'january' => 1,
-            'february' => 2,
-            'march' => 3,
-            'april' => 4,
-            'may' => 5,
-            'june' => 6,
-            'july' => 7,
-            'august' => 8,
-            'september' => 9,
-            'october' => 10,
-            'november' => 11,
-            'december' => 12,
-        ];
-    }
-
-    /**
      * Returns the field by given name.
      *
      * @param string $fieldName
@@ -178,11 +155,13 @@ class CalendarImageCrudController extends BaseCrudController
                     'choice_label',
                     function (Image $image) use ($previewWidth) {
                         return sprintf(
-                            '<p><img class="preview" src="%s" width="%d" title="%s" alt="%s" data-title> &nbsp; %s</p>',
+                            '<p><img class="preview" src="%s" width="%d" title="%s" alt="%s" data-title="%s" data-position="%s"> &nbsp; %s</p>',
                             $image->getPath(outputMode: FileNameConverter::MODE_OUTPUT_RELATIVE, width: $previewWidth),
                             $previewWidth,
                             $image->getName(),
                             $image->getName(),
+                            $image->getTitle(),
+                            $image->getFullPosition(),
                             $image->getName()
                         );
                     }
@@ -190,17 +169,6 @@ class CalendarImageCrudController extends BaseCrudController
                 ->setRequired(true)
                 ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                 ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
-            'year' => $this->easyAdminField->getChoiceField($fieldName, $this->getYearSelection()),
-            'month' => $this->easyAdminField->getChoiceField($fieldName, $this->getMonthSelection(), true),
-            'pathSource', 'pathTarget' => ImageField::new($fieldName)
-                    //->setBasePath(sprintf('%s/%s', Image::PATH_DATA, Image::PATH_IMAGES))
-                    ->setTemplatePath('admin/crud/field/image_preview.html.twig')
-                    ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
-                    ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
-            'pathSourcePreview', 'pathTargetPreview' => ImageField::new($fieldName)
-                    ->setTemplatePath('admin/crud/field/image_preview.html.twig')
-                    ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
-                    ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName)),
             default => parent::getField($fieldName),
         };
     }

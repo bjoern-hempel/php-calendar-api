@@ -31,6 +31,18 @@
     "composer/xdebug-handler": {
         "version": "2.0.3"
     },
+    "creof/doctrine2-spatial": {
+        "version": "1.2.0"
+    },
+    "creof/geo-parser": {
+        "version": "2.2.1"
+    },
+    "creof/wkb-parser": {
+        "version": "v2.4"
+    },
+    "creof/wkt-parser": {
+        "version": "2.2.0"
+    },
     "doctrine/annotations": {
         "version": "1.13",
         "recipe": {

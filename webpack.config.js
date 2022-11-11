@@ -36,6 +36,10 @@ Encore
     // will require an extra script tag for runtime.js
     // but, you probably want this, unless you're building a single-page app
     .enableSingleRuntimeChunk()
+    .configureSplitChunks(function(splitChunks) {
+        // change the configuration
+        splitChunks.minSize = 0;
+    })
 
     /*
      * FEATURE CONFIG
@@ -75,6 +79,12 @@ Encore
 
     // uncomment if you're having problems with a jQuery plugin
     .autoProvidejQuery()
+    .autoProvideVariables({
+        $: 'jquery',
+        jQuery: 'jquery',
+        'window.jQuery': 'jquery',
+        '_': 'jquery',
+    })
 ;
 
 module.exports = Encore.getWebpackConfig();

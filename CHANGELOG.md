@@ -7,6 +7,86 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.30.19] - 2022-07-17
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add more image properties, Connect them with specified location
+
+### [0.30.18] - 2022-07-06
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add new design
+
+### [0.30.17] - 2022-07-03
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Do not add city and district if we do have an admin place
+
+### [0.30.16] - 2022-07-03
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Fix finding admin place (city and district) to non placeP entry
+
+### [0.30.15] - 2022-07-03
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add admin places to search list, refactoring
+
+### [0.30.14] - 2022-06-29
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add list index
+
+### [0.30.13] - 2022-06-29
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add pager to result list and new relevance search
+
+### [0.30.12] - 2022-06-28
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Fix relevance search
+
+### [0.30.11] - 2022-06-28
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add app loader
+
+### [0.30.10] - 2022-06-26
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add tag search
+
+### [0.30.9] - 2022-06-25
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add OpenStreetMap link
+
+### [0.30.8] - 2022-06-25
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add current position search, Improve name search
+
+### [0.30.7] - 2022-06-20
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add compass for places
+
+### [0.30.6] - 2022-06-18
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add direction to place
+
+### [0.30.5] - 2022-06-18
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Remove distance from direct search (one result, id search, always 0)
+
+### [0.30.4] - 2022-06-18
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add elevation to search result; Fix
+
+### [0.30.3] - 2022-06-18
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add elevation to search result
+
+### [0.30.2] - 2022-06-17
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add location parser
+
+### [0.30.1] - 2022-06-03
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Change twelvepics link
+
+### [0.30.0] - 2022-06-03
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location
+
 ### [0.29.0] - 2022-04-19
 
 * [#88](https://github.com/bjoern-hempel/php-calendar-api/issues/88) - EasyAdmin: Possibility to choose the images directly in the calendar

@@ -15,6 +15,7 @@ namespace App\EventSubscriber;
 
 use App\Entity\CalendarImage;
 use App\Entity\HolidayGroup;
+use App\Entity\Image;
 use App\Service\CalendarSheetCreateService;
 use App\Service\ImageService;
 use App\Service\UrlService;
@@ -249,6 +250,12 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     public function doBeforeEntityUpdatedEvent(BeforeEntityUpdatedEvent $entityInstance): void
     {
         $entity = $entityInstance->getEntityInstance();
+
+//        if ($entity instanceof Image) {
+//            print $entity->getTitle();
+//            print $entity->getPath();
+//            exit();
+//        }
 
         if (!$entity instanceof CalendarImage) {
             return;

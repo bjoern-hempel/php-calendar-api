@@ -1,0 +1,16 @@
+{# Search examples #}
+<div>
+    <p class="description">
+        {{ 'general.tryThis'|trans([], 'location') }}:
+    </p>
+
+    <ul class="list-group">
+        <li class="list-group-item"><a class="link-primary location-own-position" data-app-loader-message="{{ 'general.detectPosition'|trans([], 'location') }}">Dein aktueller Standort</a> {{ constant('App\\Utils\\Icon::ICON_HALO') }}</li>
+        <li class="list-group-item"><a class="link-primary location-position" data-search="" data-latitude="52.524889" data-longitude="13.3692797">Berlin Hauptbahnhof</a></li>
+        <li class="list-group-item"><a class="link-primary location-position" data-latitude="47.358580" data-longitude="8.530299">Museum Rietberg in Zürich</a></li>
+        <li class="list-group-item"><a class="link-primary location-position" data-latitude="47.900635" data-longitude="13.601868">Miglberg am Attersee</a></li>
+        <li class="list-group-item"><a class="link-primary location-position" data-latitude="51.118500" data-longitude="13.125058">Stadtsporthalle Döbeln</a></li>
+        <li class="list-group-item"><a class="link-primary location-position" data-latitude="27.7351308" data-longitude="-15.599363">Faro de Maspalomas auf Gran Canaria</a></li>
+        <li class="list-group-item"><a class="link-primary location-position" data-latitude="54.4067051" data-longitude="18.6620502">Westerplatte in Danzig</a></li>
+    </ul>
+</div>

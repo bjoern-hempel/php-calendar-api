@@ -19,6 +19,8 @@ use App\EventListener\Entity\UserListener;
 use App\Repository\ImageRepository;
 use App\Security\Voter\UserVoter;
 use App\Utils\FileNameConverter;
+use App\Utils\GPSConverter;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -30,8 +32,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Entity class Image
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.1 (2022-01-29)
- * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
+ * @version 1.0.2 (2022-07-16)
+ * @since 1.0.2 (2022-07-16) Change self::$path to string|null.
+ * @since 1.0.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
  * @since 1.0.0 First version.
  * @package App\Entity
  */
@@ -101,15 +104,15 @@ class Image implements EntityInterface
 
     public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'name', 'path', 'pathSource', 'pathSourcePreview', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'name', 'path', 'pathSource', 'pathSourcePreview', 'width', 'height', 'size', 'title', 'latitude', 'longitude', 'url', 'gpsHeight', 'iso', 'mime', 'place', 'placeDistrict', 'placeCity', 'placeState', 'placeCountry', 'placeTimezone', 'information', 'takenAt', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'user', 'name', 'pathSourcePreview', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_INDEX = ['id', 'user', 'name', 'pathSourcePreview', 'width', 'height', 'size', 'title', 'latitude', 'longitude', 'information', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'user', 'path'];
+    public const CRUD_FIELDS_NEW = ['id', 'user', 'path', 'title', 'url'];
 
     public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'width', 'height', 'size', 'updatedAt', 'createdAt'];
+    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'width', 'height', 'size', 'title', 'latitude', 'longitude', 'url', 'gpsHeight', 'iso', 'mime', 'place', 'placeDistrict', 'placeCity', 'placeState', 'placeCountry', 'placeTimezone', 'information', 'takenAt', 'updatedAt', 'createdAt'];
 
     public const CRUD_FIELDS_FILTER = ['user', 'width', 'height', 'size'];
 
@@ -127,7 +130,8 @@ class Image implements EntityInterface
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['image', 'image_extended'])]
-    private string $path;
+    /** @phpstan-ignore-next-line → Exception if null given for database already catch. */
+    private ?string $path = null;
 
     private ?string $pathSource = null;
 
@@ -149,6 +153,65 @@ class Image implements EntityInterface
     #[ORM\OneToMany(mappedBy: 'image', targetEntity: CalendarImage::class, orphanRemoval: true)]
     #[Groups(['image', 'image_extended'])]
     private Collection $calendarImages;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?float $latitude;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?float $longitude;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $title = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $url = null;
+
+    #[ORM\Column(name: 'gps_height', type: 'integer', nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?int $gpsHeight;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?int $iso;
+
+    #[ORM\Column(type: 'string', length: 63, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $mime;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $place;
+
+    #[ORM\Column(name: 'place_district', type: 'string', length: 255, nullable: true)]
+    private ?string $placeDistrict;
+
+    #[ORM\Column(name: 'place_city', type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $placeCity;
+
+    #[ORM\Column(name: 'place_state', type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $placeState;
+
+    #[ORM\Column(name: 'place_country', type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $placeCountry;
+
+    #[ORM\Column(name: 'place_timezone', type: 'string', length: 255, nullable: true)]
+    #[Groups(['image_extended'])]
+    private ?string $placeTimezone;
+
+    /** @var array<string, mixed> $information */
+    #[ORM\Column(type: 'json')]
+    #[Groups(['image_extended'])]
+    private array $information = [];
+
+    #[ORM\Column(name: 'taken_at', type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $takenAt;
 
     public const PATH_TYPE_SOURCE = 'source';
 
@@ -181,6 +244,7 @@ class Image implements EntityInterface
      * __toString method.
      *
      * @return string
+     * @throws Exception
      */
     public function __toString(): string
     {
@@ -191,9 +255,14 @@ class Image implements EntityInterface
      * Gets the name of the image.
      *
      * @return string
+     * @throws Exception
      */
     public function getName(): string
     {
+        if ($this->path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
         $array = explode('/', $this->path);
 
         return end($array);
@@ -254,11 +323,15 @@ class Image implements EntityInterface
      * @param string $rootPath
      * @param int|null $width
      * @param CalendarImage|null $calendarImage
-     * @return string
+     * @return string|null
      * @throws Exception
      */
-    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false, bool $test = false, string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, string $rootPath = '', ?int $width = null, ?CalendarImage $calendarImage = null): string
+    public function getPath(string $type = self::PATH_TYPE_SOURCE, bool $tmp = false, bool $test = false, string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, string $rootPath = '', ?int $width = null, ?CalendarImage $calendarImage = null): ?string
     {
+        if ($this->path === null) {
+            return null;
+        }
+
         $path = match (true) {
             $type === self::PATH_TYPE_SOURCE && $this->pathSource !== null => $this->pathSource,
             $type === self::PATH_TYPE_TARGET && $this->pathTarget !== null => $this->pathTarget,
@@ -291,7 +364,13 @@ class Image implements EntityInterface
      */
     public function getPathFull(string $type = self::PATH_TYPE_SOURCE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath($type, $tmp, $test, FileNameConverter::MODE_OUTPUT_ABSOLUTE, $rootPath, $width, $calendarImage);
+        $path = $this->getPath($type, $tmp, $test, FileNameConverter::MODE_OUTPUT_ABSOLUTE, $rootPath, $width, $calendarImage);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**
@@ -308,7 +387,13 @@ class Image implements EntityInterface
      */
     public function getPathSource(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_SOURCE, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+        $path = $this->getPath(self::PATH_TYPE_SOURCE, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**
@@ -358,7 +443,13 @@ class Image implements EntityInterface
      */
     public function getPathTarget(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_TARGET, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+        $path = $this->getPath(self::PATH_TYPE_TARGET, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**
@@ -408,7 +499,13 @@ class Image implements EntityInterface
      */
     public function getPathExpected(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_EXPECTED, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+        $path = $this->getPath(self::PATH_TYPE_EXPECTED, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**
@@ -425,7 +522,13 @@ class Image implements EntityInterface
      */
     public function getPathCompare(string $outputMode = FileNameConverter::MODE_OUTPUT_FILE, bool $test = false, string $rootPath = '', bool $tmp = false, ?int $width = null, ?CalendarImage $calendarImage = null): string
     {
-        return $this->getPath(self::PATH_TYPE_COMPARE, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+        $path = $this->getPath(self::PATH_TYPE_COMPARE, $tmp, $test, $outputMode, $rootPath, $width, $calendarImage);
+
+        if ($path === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $path;
     }
 
     /**
@@ -495,10 +598,10 @@ class Image implements EntityInterface
     /**
      * Sets the relative path of this image.
      *
-     * @param string $path
+     * @param string|null $path
      * @return $this
      */
-    public function setPath(string $path): self
+    public function setPath(?string $path): self
     {
         $this->path = $path;
 
@@ -654,6 +757,370 @@ class Image implements EntityInterface
                 $calendarImage->setImage(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Gets the latitude of this image.
+     *
+     * @return float|null
+     */
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    /**
+     * Sets the latitude of this image.
+     *
+     * @param float|null $latitude
+     * @return $this
+     */
+    public function setLatitude(?float $latitude): self
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    /**
+     * Gets the longitude of this image.
+     *
+     * @return float|null
+     */
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    /**
+     * Sets the longitude of this image.
+     *
+     * @param float|null $longitude
+     * @return $this
+     */
+    public function setLongitude(?float $longitude): self
+    {
+        $this->longitude = $longitude;
+
+        return $this;
+    }
+
+    /**
+     * Returns the full position of this image.
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getFullPosition(): string
+    {
+        if ($this->getLatitude() === null || $this->getLongitude() === null) {
+            return '';
+        }
+
+        return sprintf(
+            '%s %s',
+            GPSConverter::decimalDegree2dms($this->getLatitude(), $this->getLatitude() < 0 ? GPSConverter::DIRECTION_SOUTH : GPSConverter::DIRECTION_NORTH),
+            GPSConverter::decimalDegree2dms($this->getLongitude(), $this->getLongitude() < 0 ? GPSConverter::DIRECTION_WEST : GPSConverter::DIRECTION_EAST)
+        );
+    }
+
+    /**
+     * Gets the title of this image.
+     *
+     * @return string|null
+     */
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    /**
+     * Sets the title of this image.
+     *
+     * @param string|null $title
+     * @return $this
+     */
+    public function setTitle(?string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * Gets the url of this image.
+     *
+     * @return string|null
+     */
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    /**
+     * Sets the title of this image.
+     *
+     * @param string|null $url
+     * @return $this
+     */
+    public function setUrl(?string $url): self
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Gets the gps height of this image.
+     *
+     * @return int|null
+     */
+    public function getGpsHeight(): ?int
+    {
+        return $this->gpsHeight;
+    }
+
+    /**
+     * Sets the gps height of this image.
+     *
+     * @param int|null $gpsHeight
+     * @return $this
+     */
+    public function setGpsHeight(?int $gpsHeight): self
+    {
+        $this->gpsHeight = $gpsHeight;
+
+        return $this;
+    }
+
+    /**
+     * Gets the iso of this image.
+     *
+     * @return int|null
+     */
+    public function getIso(): ?int
+    {
+        return $this->iso;
+    }
+
+    /**
+     * Sets the iso of this image.
+     *
+     * @param int|null $iso
+     * @return $this
+     */
+    public function setIso(?int $iso): self
+    {
+        $this->iso = $iso;
+
+        return $this;
+    }
+
+    /**
+     * Gets the mime type of this image.
+     *
+     * @return string|null
+     */
+    public function getMime(): ?string
+    {
+        return $this->mime;
+    }
+
+    /**
+     * Sets the mime type of this image.
+     *
+     * @param string|null $mime
+     * @return $this
+     */
+    public function setMime(?string $mime): self
+    {
+        $this->mime = $mime;
+
+        return $this;
+    }
+
+    /**
+     * Gets the place name of this image.
+     *
+     * @return string|null
+     */
+    public function getPlace(): ?string
+    {
+        return $this->place;
+    }
+
+    /**
+     * Sets the place name of this image.
+     *
+     * @param string|null $place
+     * @return $this
+     */
+    public function setPlace(?string $place): self
+    {
+        $this->place = $place;
+
+        return $this;
+    }
+
+    /**
+     * Gets the district name of this image.
+     *
+     * @return string|null
+     */
+    public function getPlaceDistrict(): ?string
+    {
+        return $this->placeDistrict;
+    }
+
+    /**
+     * Sets the district name of this image.
+     *
+     * @param string|null $placeDistrict
+     * @return $this
+     */
+    public function setPlaceDistrict(?string $placeDistrict): self
+    {
+        $this->placeDistrict = $placeDistrict;
+
+        return $this;
+    }
+
+    /**
+     * Gets the city of this image.
+     *
+     * @return string|null
+     */
+    public function getPlaceCity(): ?string
+    {
+        return $this->placeCity;
+    }
+
+    /**
+     * Sets the city of this image.
+     *
+     * @param string|null $placeCity
+     * @return $this
+     */
+    public function setPlaceCity(?string $placeCity): self
+    {
+        $this->placeCity = $placeCity;
+
+        return $this;
+    }
+
+    /**
+     * Gets the state of this image.
+     *
+     * @return string|null
+     */
+    public function getPlaceState(): ?string
+    {
+        return $this->placeState;
+    }
+
+    /**
+     * Sets the state of this image.
+     *
+     * @param string|null $placeState
+     * @return $this
+     */
+    public function setPlaceState(?string $placeState): self
+    {
+        $this->placeState = $placeState;
+
+        return $this;
+    }
+
+    /**
+     * Gets the country of this image.
+     *
+     * @return string|null
+     */
+    public function getPlaceCountry(): ?string
+    {
+        return $this->placeCountry;
+    }
+
+    /**
+     * Sets the country of this image.
+     *
+     * @param string|null $placeCountry
+     * @return $this
+     */
+    public function setPlaceCountry(?string $placeCountry): self
+    {
+        $this->placeCountry = $placeCountry;
+
+        return $this;
+    }
+
+    /**
+     * Gets the timezone of this image.
+     *
+     * @return string|null
+     */
+    public function getPlaceTimezone(): ?string
+    {
+        return $this->placeTimezone;
+    }
+
+    /**
+     * Sets the timezone of this image.
+     *
+     * @param string|null $placeTimezone
+     * @return $this
+     */
+    public function setPlaceTimezone(?string $placeTimezone): self
+    {
+        $this->placeTimezone = $placeTimezone;
+
+        return $this;
+    }
+
+    /**
+     * Gets the information of this image.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function getInformation(): ?array
+    {
+        return $this->information;
+    }
+
+    /**
+     * Sets the information of this image.
+     *
+     * @param array<string, mixed> $information
+     * @return $this
+     */
+    public function setInformation(array $information): self
+    {
+        $this->information = $information;
+
+        return $this;
+    }
+
+    /**
+     * Gets the time taken at of this image.
+     *
+     * @return DateTimeImmutable|null
+     */
+    public function getTakenAt(): ?DateTimeImmutable
+    {
+        return $this->takenAt;
+    }
+
+    /**
+     * Sets the time taken at of this image.
+     *
+     * @param DateTimeImmutable|null $takenAt
+     * @return $this
+     */
+    public function setTakenAt(?DateTimeImmutable $takenAt): self
+    {
+        $this->takenAt = $takenAt;
 
         return $this;
     }

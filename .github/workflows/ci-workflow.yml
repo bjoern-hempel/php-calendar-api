@@ -25,7 +25,7 @@ jobs:
       fail-fast: true
       matrix:
         operating-system: [ubuntu-latest]
-        php-versions: ['8.0']
+        php-versions: ['8.1']
     steps:
       # https://github.com/actions/checkout (official)
       - name: Checkout

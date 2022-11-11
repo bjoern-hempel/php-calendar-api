@@ -38,3 +38,9 @@
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
+
+###> table-dumper ###
+/table-dumper.log
+/table-dumper.lock
+###< table-dumper ###
+
