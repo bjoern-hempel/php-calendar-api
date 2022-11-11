@@ -24,7 +24,9 @@ use Exception;
  * Class HolidayListener
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-04-03)
+ * @version 1.0.1 (2022-11-11)
+ * @since 1.0.1 (2022-11-11) Refactoring.
+ * @since 1.0.0 (2022-04-03) First version.
  * @package App\EventListener\Entity
  */
 class HolidayListener
@@ -60,8 +62,10 @@ class HolidayListener
     /**
      * Pre persist.
      *
-     * @param EntityInterface $entity
-     * @param LifecycleEventArgs $event
+     * @template EntityObject of EntityInterface
+     * @template EventObject of LifecycleEventArgs
+     * @param EntityObject $entity
+     * @param EventObject $event
      * @throws Exception
      */
     #[ORM\PrePersist]
@@ -77,8 +81,10 @@ class HolidayListener
     /**
      * Pre update.
      *
-     * @param EntityInterface $entity
-     * @param LifecycleEventArgs $event
+     * @template EntityObject of EntityInterface
+     * @template EventObject of LifecycleEventArgs
+     * @param EntityObject $entity
+     * @param EventObject $event
      * @throws Exception
      */
     #[ORM\PreUpdate]

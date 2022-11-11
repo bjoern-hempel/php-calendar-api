@@ -124,6 +124,7 @@ class FileUploadEmptyType extends FileUploadType
      * Configures options.
      *
      * @param OptionsResolver $resolver
+     * @throws Exception
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -147,6 +148,10 @@ class FileUploadEmptyType extends FileUploadType
             $index = 1;
             $pathInfo = pathinfo($filename);
 
+            if (!array_key_exists('dirname', $pathInfo)) {
+                throw new Exception(sprintf('Array key "%s" does not exists.', 'dirname'));
+            }
+
             $extension = '';
             if (array_key_exists('extension', $pathInfo)) {
                 $extension = sprintf('.%s', $pathInfo['extension']);
@@ -160,7 +165,7 @@ class FileUploadEmptyType extends FileUploadType
         };
 
         $downloadPath = function (Options $options) {
-            return mb_substr($options['upload_dir'], mb_strlen($this->projectDir.'/public/'));
+            return mb_substr(strval($options['upload_dir']), mb_strlen($this->projectDir.'/public/'));
         };
 
         $allowAdd = static function (Options $options) {

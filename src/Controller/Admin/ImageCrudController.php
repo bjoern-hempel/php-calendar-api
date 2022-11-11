@@ -160,10 +160,10 @@ SQL;
 
             case 'latitude':
             case 'longitude':
-            return NumberField::new($fieldName)
-                ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
-                ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName))
-                ->setNumberFormat('%.3f°');
+                return NumberField::new($fieldName)
+                    ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
+                    ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName))
+                    ->setNumberFormat('%.3f°');
 
             case 'iso':
                 return NumberField::new($fieldName)

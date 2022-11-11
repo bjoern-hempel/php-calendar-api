@@ -20,22 +20,22 @@ use Doctrine\ORM\Mapping as ORM;
  * Trait TimestampsTrait
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2021-12-30)
- * @package App\Entity
+ * @version 1.0.1 PHPStan refactoring.
+ * @since 1.0.0 (2021-12-30) First version.
+ * @since 1.0.1 (2022-11-11) PHPStan refactoring.
  */
-#[ORM\HasLifecycleCallbacks]
 trait TimestampsTrait
 {
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    protected ?DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime_immutable')]
-    protected ?DateTimeImmutable $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
     /**
      * Gets the created at field of this trait.
      *
-     * @return ?DateTimeImmutable
+     * @return DateTimeImmutable|null
      */
     public function getCreatedAt(): ?DateTimeImmutable
     {
@@ -46,18 +46,19 @@ trait TimestampsTrait
      * Sets the created at field of this trait.
      *
      * @param DateTimeImmutable $timestamp
-     * @return User|Event|TimestampsTrait
+     * @return $this
      */
     public function setCreatedAt(DateTimeImmutable $timestamp): self
     {
         $this->createdAt = $timestamp;
+
         return $this;
     }
 
     /**
      * Gets the updated at field of this trait.
      *
-     * @return ?DateTimeImmutable
+     * @return DateTimeImmutable|null
      */
     public function getUpdatedAt(): ?DateTimeImmutable
     {
@@ -68,11 +69,12 @@ trait TimestampsTrait
      * Sets the updated at field of this trait.
      *
      * @param DateTimeImmutable $timestamp
-     * @return User|Event|TimestampsTrait
+     * @return $this
      */
     public function setUpdatedAt(DateTimeImmutable $timestamp): self
     {
         $this->updatedAt = $timestamp;
+
         return $this;
     }
 
@@ -80,7 +82,7 @@ trait TimestampsTrait
      * Sets automatically the created at field.
      */
     #[ORM\PrePersist]
-    public function setCreatedAtAutomatically()
+    public function setCreatedAtAutomatically(): void
     {
         if ($this->createdAt === null) {
             $this->setCreatedAt(new DateTimeImmutable());
@@ -92,7 +94,7 @@ trait TimestampsTrait
      */
     #[ORM\PrePersist]
     #[ORM\PreUpdate]
-    public function setUpdatedAtAutomatically()
+    public function setUpdatedAtAutomatically(): void
     {
         $this->setUpdatedAt(new DateTimeImmutable());
     }

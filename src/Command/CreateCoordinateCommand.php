@@ -43,8 +43,9 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
  * Class CreateCoordinateCommand
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-05-08)
- * @package App\Command
+ * @version 0.1.1 (2022-11-11)
+ * @since 0.1.1 (2022-11-11) PHPStan refactoring.
+ * @since 0.1.0 (2022-05-08) First version.
  * @example bin/console app:coordinate:create [file]
  * @see http://download.geonames.org/export/dump/
  */
@@ -164,7 +165,7 @@ EOT
 
         $timer = Timer::start();
 
-        $handle = fopen($file, "r") or die("Couldn't get handle");
+        $handle = fopen($file, 'r');
 
         if ($handle === false) {
             throw new Exception(sprintf('Unable to get ressource (%s:%d).', __FILE__, __LINE__));
@@ -212,7 +213,7 @@ EOT
 
             $point = new Point(floatval($row[4]), floatval($row[5]));
 
-            $dateSplit = explode('-', $row[18]);
+            $dateSplit = explode('-', strval($row[18]));
             $date = new DateTime();
             $date->setDate(intval($dateSplit[0]), intval($dateSplit[1]), intval($dateSplit[2]));
 

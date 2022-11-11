@@ -601,7 +601,6 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         $holidayGroups = [];
 
         foreach ($this->holidayDatas as $holidayDatas) {
-
             /* Get persisted public holiday group */
             $holidayGroup = $this->setHolidayGroup(strval($holidayDatas['name']), strval($holidayDatas['name_short']));
 

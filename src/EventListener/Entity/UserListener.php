@@ -29,8 +29,9 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  * Class UserListener
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-02-26)
- * @package App\EventListener\Entity
+ * @version 1.0.1 (2022-11-11)
+ * @since 1.0.1 (2022-11-11) Refactoring.
+ * @since 1.0.0 (2022-02-26) First version.
  */
 class UserListener
 {
@@ -49,8 +50,10 @@ class UserListener
     /**
      * Pre persist.
      *
-     * @param EntityInterface $entity
-     * @param LifecycleEventArgs $event
+     * @template EntityObject of EntityInterface
+     * @template EventObject of LifecycleEventArgs
+     * @param EntityObject $entity
+     * @param EventObject $event
      * @throws Exception
      */
     #[ORM\PrePersist]
@@ -76,7 +79,7 @@ class UserListener
                 }
                 break;
 
-            /* Check indirect User. */
+                /* Check indirect User. */
             case $entity instanceof Image:
                 if ($entity->getUser() === null) {
                     throw new Exception(sprintf('No user was given (%s:%d).', __LINE__, __FILE__));
@@ -88,8 +91,10 @@ class UserListener
     /**
      * Post persist.
      *
-     * @param EntityInterface $entity
-     * @param LifecycleEventArgs $event
+     * @template EntityObject of EntityInterface
+     * @template EventObject of LifecycleEventArgs
+     * @param EntityObject $entity
+     * @param EventObject $event
      * @throws Exception
      */
     #[ORM\PostPersist]
@@ -117,8 +122,10 @@ class UserListener
     /**
      * Check permissions.
      *
-     * @param EntityInterface $entity
-     * @param LifecycleEventArgs $event
+     * @template EntityObject of EntityInterface
+     * @template EventObject of LifecycleEventArgs
+     * @param EntityObject $entity
+     * @param EventObject $event
      * @throws AccessDeniedHttpException|Exception
      */
     #[ORM\PostLoad]
@@ -146,7 +153,7 @@ class UserListener
                 }
                 break;
 
-            /* Check indirect User. */
+                /* Check indirect User. */
             case $entity instanceof Calendar:
             case $entity instanceof CalendarImage:
             case $entity instanceof Event:

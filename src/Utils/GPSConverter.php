@@ -521,7 +521,7 @@ class GPSConverter
                 list($latitude, $longitude) = self::parseLatitudeAndLongitudeFromGoogleLink($matches[1]);
                 break;
 
-            /* Google spot link https://www.google.de/maps/place/Strandbad+Wannsee+-+Berliner+B%C3%A4der/@52.4286142,13.1557256,13.54z/data=!4m5!3m4!1s0x47a858ffef30e359:0x165816b49cc6929a!8m2!3d52.4381357!4d13.1794242 */
+                /* Google spot link https://www.google.de/maps/place/Strandbad+Wannsee+-+Berliner+B%C3%A4der/@52.4286142,13.1557256,13.54z/data=!4m5!3m4!1s0x47a858ffef30e359:0x165816b49cc6929a!8m2!3d52.4381357!4d13.1794242 */
             case preg_match(self::REGEXP_ENCRYPTED_LATITUDE_LONGITUDE, $fullLocation, $matches):
                 $parsed = self::parseLatitudeAndLongitudeFromGoogleLinkDirect($fullLocation);
 
@@ -532,7 +532,7 @@ class GPSConverter
                 list($latitude, $longitude) = $parsed;
                 break;
 
-            /* Given location */
+                /* Given location */
             case preg_match(
                 sprintf(
                     '~((?:%s)|(?:%s))[, ]+((?:%s)|(?:%s))~',

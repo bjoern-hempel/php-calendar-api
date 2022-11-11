@@ -549,7 +549,7 @@ class LocationDataService
          * 20000 km: -200000
          */
         if ($place->getDistanceMeter() !== null && $sortBy === SearchConfig::ORDER_BY_RELEVANCE_LOCATION) {
-            $relevance -= intval(round($place->getDistanceMeter() * 0.01, 0));
+            $relevance -= intval(round(floatval($place->getDistanceMeter()) * 0.01, 0));
         }
 
         return $relevance;
@@ -671,7 +671,6 @@ class LocationDataService
 
         /* Sort by given $sort. */
         switch ($sort) {
-
             /* Sort by distance */
             case SearchConfig::ORDER_BY_LOCATION:
                 usort($placeResults, function (Place $a, Place $b) {
@@ -679,14 +678,14 @@ class LocationDataService
                 });
                 break;
 
-            /* Sort by name */
+                /* Sort by name */
             case SearchConfig::ORDER_BY_NAME:
                 usort($placeResults, function (Place $a, Place $b) {
                     return $a->getName() > $b->getName() ? 1 : -1;
                 });
                 break;
 
-            /* Sort by relevance */
+                /* Sort by relevance */
             case SearchConfig::ORDER_BY_RELEVANCE:
             case SearchConfig::ORDER_BY_RELEVANCE_LOCATION:
                 usort($placeResults, function (Place $a, Place $b) {
@@ -699,7 +698,6 @@ class LocationDataService
 
         /* Add administration information */
         foreach ($placeResults as $placeResult) {
-
             /* Get placeP entities from given latitude and longitude. */
             if ($withAdminPlaces && !$placeResult->isAdminPlace()) {
                 $placesP = $this->placeLoaderService->getPlacesPFromPosition($placeResult->getLatitude(), $placeResult->getLongitude(), Code::FEATURE_CODES_P_ADMIN_PLACES, $placeResult, 3);

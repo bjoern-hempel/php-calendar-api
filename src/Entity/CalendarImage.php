@@ -30,9 +30,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Entity class CalendarImage
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.1 (2022-01-29)
- * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
- * @since 1.0.0 First version.
+ * @version 0.1.2 (2022-11-11)
+ * @since 0.1.2 (2022-11-11) PHPStan refactoring.
+ * @since 0.1.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 0.1.0 First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: CalendarImageRepository::class)]
@@ -126,19 +127,16 @@ class CalendarImage implements EntityInterface
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'calendarImages')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['calendar_image', 'calendar_image_extended'])]
-    /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     public ?User $user;
 
     #[ORM\ManyToOne(targetEntity: Calendar::class, inversedBy: 'calendarImages')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['calendar_image', 'calendar_image_extended'])]
-    /** @phpstan-ignore-next-line → Calendar must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?Calendar $calendar;
 
     #[ORM\ManyToOne(targetEntity: Image::class, inversedBy: 'calendarImages')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['calendar_image', 'calendar_image_extended'])]
-    /** @phpstan-ignore-next-line → Image must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?Image $image;
 
     #[ORM\Column(type: 'integer')]

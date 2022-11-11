@@ -564,7 +564,7 @@ SQL;
         foreach ($placesP as $placeP) {
             switch (true) {
                 case in_array($placeP->getFeatureCode(), Code::FEATURE_CODES_P_ADMIN_PLACES) &&
-                    $place->getAdmin4Code() == $placeP->getAdmin4Code():
+                $place->getAdmin4Code() == $placeP->getAdmin4Code():
                     return $placeP;
             }
         }
@@ -670,7 +670,6 @@ SQL;
         $city = null;
         $district = null;
         switch (true) {
-
             /* PlaceP: Add administrative information */
             case in_array($place->getFeatureCode(), Code::FEATURE_CODES_P_DISTRICT_PLACES) && $placesP !== null:
                 if (!$place instanceof PlaceP) {
@@ -691,7 +690,7 @@ SQL;
 
                 break;
 
-            /* PlaceP: Add administrative information (Admin place) */
+                /* PlaceP: Add administrative information (Admin place) */
             case in_array($place->getFeatureCode(), Code::FEATURE_CODES_P_ADMIN_PLACES) && $placesP !== null:
                 if (!$place instanceof PlaceP) {
                     throw new Exception(sprintf('Unexpected type of Place (%s:%d).', __FILE__, __LINE__));
@@ -701,7 +700,7 @@ SQL;
                 $district = $this->findNextDistrict($placesP, $city);
                 break;
 
-            /* Places P given. Extract city from first placeP entry. */
+                /* Places P given. Extract city from first placeP entry. */
             case $placesP !== null:
                 $placeAdmin = array_shift($placesP);
 
@@ -786,7 +785,6 @@ SQL;
         /** @var PlaceP[] $placesP */
         $placesP = [];
         while (($row = $result->fetchAssociative()) !== false) {
-
             /* Build and add place. */
             $placeP = $this->buildPlaceFromRow($row, $latitude, $longitude, $featureClass, $placeSource);
 
@@ -1159,7 +1157,6 @@ SQL;
         }
 
         if (count($places) > 0) {
-
             /* Sort placesP */
             usort($places, function (Place $a, Place $b) {
                 return $a->getPopulation() < $b->getPopulation() ? 1 : -1;
@@ -1200,7 +1197,6 @@ SQL;
         $this->printRawQuery(sprintf('Place%s', $featureClass), $sqlRaw, $positionTime);
 
         while (($row = $result->fetchAssociative()) !== false) {
-
             /* Build place. */
             $place = $this->buildPlaceFromRow($row, $latitude, $longitude, $featureClass);
 

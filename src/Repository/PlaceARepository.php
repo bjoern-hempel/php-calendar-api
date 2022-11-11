@@ -141,7 +141,7 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
                     ->setParameter('ac', $place->getAdmin3Code());
                 break;
 
-            /* de, etc. */
+                /* de, etc. */
             default:
                 $queryBuilder->andWhere('a.featureCode = :fco')
                     ->setParameter('fco', Code::FEATURE_CODE_A_ADM4);
@@ -182,7 +182,6 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
             ->setParameter('fc', Code::FEATURE_CLASS_A);
 
         switch ($countryCode) {
-
             /* de, etc. */
             default:
                 $queryBuilder->andWhere('a.featureCode = :fco')

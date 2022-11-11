@@ -200,7 +200,7 @@ class UrlService
      * @param array<string, string|array<string, string>> $config
      * @param string $path
      * @param bool $decode
-     * @return array<string, string|int>
+     * @return array<string, bool|string|int>
      * @throws Exception
      */
     public static function parse(array $config, string $path, bool $decode = false): array
@@ -259,7 +259,7 @@ class UrlService
      *
      * @param array<string, string|array<string, string>> $config
      * @param string $path
-     * @return array<string, string|int>
+     * @return array<string, bool|string|int>
      * @throws Exception
      */
     public static function decode(array $config, string $path): array

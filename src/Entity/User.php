@@ -34,7 +34,9 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  * Entity class User
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2021-12-30)
+ * @version 1.0.1 (2021-11-11)
+ * @since 1.0.1 (2021-11-11) PHPStan refactoring.
+ * @since 1.0.0 (2021-12-30) First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -135,7 +137,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityI
     private int $id;
 
     #[ORM\Column(name: 'id_hash', type: 'string', length: 40, unique: true, nullable: false)]
-    /** @phpstan-ignore-next-line → idHash must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?string $idHash = null;
 
     #[ORM\Column(type: 'string', length: 255, unique: true)]

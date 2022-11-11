@@ -20,8 +20,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldConfiguratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto;
 use Exception;
+use InvalidArgumentException;
 use JetBrains\PhpStorm\Pure;
+
 use function Symfony\Component\String\u;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * ImageEmptyConfigurator class.
@@ -70,9 +74,13 @@ final class ImageEmptyConfigurator implements FieldConfiguratorInterface
     {
         $configuredBasePath = $field->getCustomOption(ImageEmptyField::OPTION_BASE_PATH);
 
+        if (!is_string($configuredBasePath) && !is_null($configuredBasePath)) {
+            throw new Exception('Unexpected case (string or null expected).');
+        }
+
         $formattedValue = \is_array($field->getValue())
             ? $this->getImagesPaths($field->getValue(), $configuredBasePath)
-            : $this->getImagePath($field->getValue(), $configuredBasePath);
+            : $this->getImagePath(strval($field->getValue()), $configuredBasePath);
         $field->setFormattedValue($formattedValue);
 
         $field->setFormTypeOption('upload_filename', $field->getCustomOption(ImageEmptyField::OPTION_UPLOADED_FILE_NAME_PATTERN));
@@ -91,11 +99,14 @@ final class ImageEmptyConfigurator implements FieldConfiguratorInterface
         }
 
         $relativeUploadDir = $field->getCustomOption(ImageEmptyField::OPTION_UPLOAD_DIR);
-        if (null === $relativeUploadDir) {
-            throw new \InvalidArgumentException(sprintf('The "%s" image field must define the directory where the images are uploaded using the setUploadDir() method.', $field->getProperty()));
+
+        if (!is_string($relativeUploadDir)) {
+            throw new InvalidArgumentException(sprintf('The "%s" image field must define the directory where the images are uploaded using the setUploadDir() method.', $field->getProperty()));
         }
-        $relativeUploadDir = u($relativeUploadDir)->trimStart(\DIRECTORY_SEPARATOR)->ensureEnd(\DIRECTORY_SEPARATOR)->toString();
-        $absoluteUploadDir = u($relativeUploadDir)->ensureStart($this->projectDir.\DIRECTORY_SEPARATOR)->toString();
+
+        $relativeUploadDir = u($relativeUploadDir)->trimStart(DIRECTORY_SEPARATOR)->ensureEnd(DIRECTORY_SEPARATOR)->toString();
+        $absoluteUploadDir = u($relativeUploadDir)->ensureStart($this->projectDir. DIRECTORY_SEPARATOR)->toString();
+
         $field->setFormTypeOption('upload_dir', $absoluteUploadDir);
     }
 

@@ -1220,7 +1220,6 @@ class CalendarBuilderService
 
         /** @var Event $event */
         foreach ($this->calendarImage->getUser()->getEvents() as $event) {
-
             /* Get event key */
             $eventKey = $this->getDayKey(intval($event->getDate()->format('j')));
 
@@ -1272,7 +1271,6 @@ class CalendarBuilderService
 
         /** @var Holiday $holiday */
         foreach ($this->holidayGroup->getHolidays() as $holiday) {
-
             /* Get event key */
             $holidayKey = $this->getDayKey(intval($holiday->getDate()->format('j')));
 
@@ -1384,7 +1382,6 @@ class CalendarBuilderService
         $imageFiles = $this->getAllTargetImages($pathTargetAbsolute);
 
         foreach ($imageFiles as $imageFile) {
-
             /* To avoid accidental deletion. */
             $matches = [];
             if (!preg_match('~([a-f0-9]{40}/target/[0-9]+)/(?:([a-f0-9]{10})\.)?([^\.]+)(?:\.([0-9]+))?\.([a-z][a-z0-9]+)$~', $imageFile, $matches)) {

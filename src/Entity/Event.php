@@ -30,9 +30,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Entity class Event
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.1 (2022-01-29)
- * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
- * @since 1.0.0 First version.
+ * @version 0.1.2 (2022-11-11)
+ * @since 0.1.2 (2022-11-11) PHPStan refactoring.
+ * @since 0.1.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 0.1.0 First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: EventRepository::class)]
@@ -124,7 +125,6 @@ class Event implements EntityInterface
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups('event')]
-    /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     public ?User $user;
 
     #[ORM\Column(type: 'string', length: 255)]

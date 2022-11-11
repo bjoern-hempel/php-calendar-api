@@ -32,10 +32,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Entity class Image
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.2 (2022-07-16)
- * @since 1.0.2 (2022-07-16) Change self::$path to string|null.
- * @since 1.0.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
- * @since 1.0.0 First version.
+ * @version 0.1.3 (2022-07-16)
+ * @since 0.1.3 (2022-11-11) PHPStan refactoring.
+ * @since 0.1.2 (2022-07-16) Change self::$path to string|null.
+ * @since 0.1.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 0.1.0 First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
@@ -125,12 +126,10 @@ class Image implements EntityInterface
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'images')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['image', 'image_extended'])]
-    /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     public ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['image', 'image_extended'])]
-    /** @phpstan-ignore-next-line → Exception if null given for database already catch. */
     private ?string $path = null;
 
     private ?string $pathSource = null;

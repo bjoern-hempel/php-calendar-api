@@ -33,9 +33,10 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  * Entity class Calendar
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.1 (2022-01-29)
- * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
- * @since 1.0.0 First version.
+ * @version 0.1.2 (2022-11-11)
+ * @since 0.1.2 (2022-11-11) PHPStan refactoring.
+ * @since 0.1.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 0.1.0 First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: CalendarRepository::class)]
@@ -128,14 +129,12 @@ class Calendar implements EntityInterface
     #[ORM\JoinColumn(nullable: false)]
     #[MaxDepth(1)]
     #[Groups(['calendar_extended', 'calendar'])]
-    /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     public ?User $user;
 
     #[ORM\ManyToOne(targetEntity: CalendarStyle::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[MaxDepth(1)]
     #[Groups(['calendar_extended', 'calendar'])]
-    /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?CalendarStyle $calendarStyle;
 
     #[ORM\Column(type: 'string', length: 255)]

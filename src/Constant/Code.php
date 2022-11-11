@@ -346,7 +346,8 @@ class Code
     public const FEATURE_CODE_S_CARN = 'CARN'; /* cairn	a heap of stones erected as a landmark or for other purposes */
     public const FEATURE_CODE_S_CAVE = 'CAVE'; /* cave(s)	an underground passageway or chamber, or cavity on the side of a cliff */
     public const FEATURE_CODE_S_CH = 'CH'; /* church	a building for public Christian worship */
-    public const FEATURE_CODE_S_CMP = 'CMP'; /* camp(s)	a site occupied by tents, huts, or other shelters for temporary use */public const FEATURE_CODE_S_CMPL = 'CMPL'; /* logging camp	a camp used by loggers */
+    public const FEATURE_CODE_S_CMP = 'CMP';
+    /* camp(s)	a site occupied by tents, huts, or other shelters for temporary use */public const FEATURE_CODE_S_CMPL = 'CMPL'; /* logging camp	a camp used by loggers */
     public const FEATURE_CODE_S_CMPLA = 'CMPLA'; /* labor camp	a camp used by migrant or temporary laborers */
     public const FEATURE_CODE_S_CMPMN = 'CMPMN'; /* mining camp	a camp used by miners */
     public const FEATURE_CODE_S_CMPO = 'CMPO'; /* oil camp	a camp used by oilfield workers */
