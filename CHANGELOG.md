@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.30.20] - 2022-11-11
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location
+  * Add database migration script
+  * Add Croatian translation
+  * Add croatian data
+
 ### [0.30.19] - 2022-07-17
 
 * [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add more image properties, Connect them with specified location
