@@ -18,7 +18,7 @@ on:
 # Configure jobs
 jobs:
   symfony:
-    name: Symfony 6.0 (PHP ${{ matrix.php-versions }})
+    name: Symfony 6.1 (PHP ${{ matrix.php-versions }})
     runs-on: ${{ matrix.operating-system }}
     # https://hub.docker.com/_/ubuntu/
     strategy:
