@@ -91,7 +91,9 @@ security:
         - { path: ^/api/v1/token/refresh, roles: PUBLIC_ACCESS } # Allows getting new tokens
         - { path: ^/api/v1/token/get, roles: PUBLIC_ACCESS } # Allows getting token with login
         - { path: ^/api/v1/version, roles: PUBLIC_ACCESS } # Allows getting the version
-        - { path: ^/api, roles: '%env(resolve:JWT_ROLE)%' } # Protect all others pages
+        - { path: ^/api/v1/contexts, roles: PUBLIC_ACCESS } # Allows getting the version
+        - { path: ^/api/v1/, roles: '%env(resolve:JWT_ROLE)%' } # Protect all others pages
+        - { path: ^/api/v1, roles: PUBLIC_ACCESS } # Allows getting the version
 
 when@test:
     security:
