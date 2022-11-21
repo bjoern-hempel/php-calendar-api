@@ -21,7 +21,9 @@ use SplPriorityQueue;
  * Class ColorDetectorCiede2000
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-05-04)
+ * @version 0.1.1 (2022-11-22)
+ * @since 0.1.1 (2022-11-22) Add PHP Magic Number Detector (PHPMND).
+ * @version 0.1.0 (2022-05-04) First version.
  * @package App\Utils\Image
  *
  * @license MIT License
@@ -32,6 +34,12 @@ use SplPriorityQueue;
  */
 class ColorDetectorCiede2000
 {
+    final public const ANGLE_360 = 360;
+
+    final public const ANGLE_180 = 180;
+
+    final public const ANGLE_0 = 0;
+
     protected Palette $palette;
 
     /** @var SplFixedArray<int>|null */
@@ -193,14 +201,14 @@ class ColorDetectorCiede2000
         $LpDelta = $lab2['L'] - $lab1['L'];
         $CpDelta = $C2p - $C1p;
 
-        if ($C1p * $C2p == 0) {
-            $hpDelta = 0;
-        } elseif (abs($h2p - $h1p) <= 180) {
+        if ($C1p * $C2p == self::ANGLE_0) {
+            $hpDelta = self::ANGLE_0;
+        } elseif (abs($h2p - $h1p) <= self::ANGLE_180) {
             $hpDelta = $h2p - $h1p;
-        } elseif ($h2p - $h1p > 180) {
-            $hpDelta = $h2p - $h1p - 360;
+        } elseif ($h2p - $h1p > self::ANGLE_180) {
+            $hpDelta = $h2p - $h1p - self::ANGLE_360;
         } else {
-            $hpDelta = $h2p - $h1p + 360;
+            $hpDelta = $h2p - $h1p + self::ANGLE_360;
         }
 
         $HpDelta = 2 * sqrt($C1p * $C2p) * sin($hpDelta / 2);
@@ -208,14 +216,14 @@ class ColorDetectorCiede2000
         $Lbp = ($lab1['L'] + $lab2['L']) / 2;
         $Cbp = ($C1p + $C2p) / 2;
 
-        if ($C1p * $C2p == 0) {
+        if ($C1p * $C2p == self::ANGLE_0) {
             $hbp = $h1p + $h2p;
-        } elseif (abs($h1p - $h2p) <= 180) {
+        } elseif (abs($h1p - $h2p) <= self::ANGLE_180) {
             $hbp = ($h1p + $h2p) / 2;
-        } elseif ($h1p + $h2p < 360) {
-            $hbp = ($h1p + $h2p + 360) / 2;
+        } elseif ($h1p + $h2p < self::ANGLE_360) {
+            $hbp = ($h1p + $h2p + self::ANGLE_360) / 2;
         } else {
-            $hbp = ($h1p + $h2p - 360) / 2;
+            $hbp = ($h1p + $h2p - self::ANGLE_360) / 2;
         }
 
         $T = 1 - .17 * cos($hbp - 30) + .24 * cos(2 * $hbp) + .32 * cos(3 * $hbp + 6) - .2 * cos(4 * $hbp - 63);

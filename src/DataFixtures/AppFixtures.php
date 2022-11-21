@@ -38,11 +38,17 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  * Class AppFixtures
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2021-12-30)
+ * @version 0.1.1 (2022-11-22)
+ * @since 0.1.1 (2022-11-22) Add PHP Magic Number Detector (PHPMND).
+ * @since 0.1.0 (2021-12-30) First version.
  * @package App\Entity
  */
 class AppFixtures extends Fixture implements ContainerAwareInterface
 {
+    final public const INDEX_1 = 1;
+
+    final public const INDEX_2 = 2;
+
     private UserPasswordHasherInterface $userPasswordHasher;
 
     private ?ObjectManager $manager = null;
@@ -466,10 +472,10 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         $salt = 'S4Lt';
 
         return match (true) {
-            !$admin && $i === 1 => 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290',
-            !$admin && $i === 2 => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
-            $admin && $i === 1 => '9cc28538cd413685762993a2376412393be29ccf',
-            $admin && $i === 2 => '8768be4811c6bc1df185440b82b41aeca048f319',
+            !$admin && $i === self::INDEX_1 => 'cf6b37d2b5f805a0f76ef2b3610eff7a705a2290',
+            !$admin && $i === self::INDEX_2 => 'da4b9237bacccdf19c0760cab7aec4a8359010b0',
+            $admin && $i === self::INDEX_1 => '9cc28538cd413685762993a2376412393be29ccf',
+            $admin && $i === self::INDEX_2 => '8768be4811c6bc1df185440b82b41aeca048f319',
             default => sha1(sprintf('%s-%s', $salt, $i)),
         };
     }
@@ -881,12 +887,12 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
         $calendarStyle = $this->getCalendarStyle();
 
         /* Create User resources. */
-        for ($i = 1; $i <= 2; $i++) {
+        for ($i = self::INDEX_1; $i <= self::INDEX_2; $i++) {
             $this->getUser($calendarStyle, $holidayGroups[self::NAME_HOLIDAY_GROUP_SAXONY], $i);
         }
 
         /* Create User resources. */
-        for ($i = 1; $i <= 2; $i++) {
+        for ($i = self::INDEX_1; $i <= self::INDEX_2; $i++) {
             $this->getUser($calendarStyle, $holidayGroups[self::NAME_HOLIDAY_GROUP_SAXONY], $i, true);
         }
 

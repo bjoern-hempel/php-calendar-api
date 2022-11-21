@@ -30,12 +30,16 @@ use Exception;
  * Class PlaceARepository
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-05-20)
+ * @version 0.1.1 (2022-11-22)
+ * @since 0.1.1 (2022-11-22) Add PHP Magic Number Detector (PHPMND).
+ * @since 0.1.0 (2022-05-20) First version.
  * @package App\Command
  * @extends ServiceEntityRepository<PlaceA>
  */
 class PlaceARepository extends ServiceEntityRepository implements PlaceRepositoryInterface
 {
+    final public const TYPE_2 = 2;
+
     protected ?QueryBuilder $lastSQL = null;
 
     /**
@@ -66,7 +70,7 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
         foreach ($this->lastSQL->getParameters() as $parameter) {
             $value = strval($parameter->getValue());
 
-            if ($parameter->getType() === 2) {
+            if ($parameter->getType() === self::TYPE_2) {
                 $value = sprintf('"%s"', $value);
             }
 

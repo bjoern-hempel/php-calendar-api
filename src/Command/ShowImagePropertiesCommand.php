@@ -33,7 +33,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class ShowImagePropertiesCommand
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-04-29)
+ * @version 0.1.1 (2022-11-22)
+ * @since 0.1.1 (2022-11-22) Add PHP Magic Number Detector (PHPMND).
+ * @since 0.1.0 (2022-04-29) First version.
  * @package App\Command
  * @example bin/console app:image:show "path"
  * @see https://github.com/posva/catimg
@@ -283,7 +285,7 @@ EOT
 
         $colorMostCommon = new ColorDetectorSimple($gdImage);
 
-        $colors = $colorMostCommon->getColors(self::DEFAULT_COLOR_COUNT, ColorDetectorSimple::DEFAULT_REDUCE_BRIGHTNESS, ColorDetectorSimple::DEFAULT_REDUCE_GRADIENTS, ColorDetectorSimple::DEFAULT_DELTA);
+        $colors = $colorMostCommon->getColors(self::DEFAULT_COLOR_COUNT, ColorDetectorSimple::REDUCE_BRIGHTNESS_DEFAULT, ColorDetectorSimple::REDUCE_GRADIENTS_DEFAULT, ColorDetectorSimple::DELTA_DEFAULT);
 
         $time = Timer::stop($timer);
 

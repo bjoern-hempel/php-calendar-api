@@ -21,11 +21,15 @@ use InvalidArgumentException;
  * Class StringConverter
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-05-07)
+ * @version 0.1.1 (2022-11-22)
+ * @since 0.1.1 (2022-11-22) Add PHP Magic Number Detector (PHPMND).
+ * @since 0.1.0 (2022-05-07) First version.
  * @package App\Utils
  */
 class StringConverter
 {
+    final public const PRECISION_NONE = -1;
+
     /**
      * Returns the calculated value.
      *
@@ -34,7 +38,7 @@ class StringConverter
      * @return int|float
      * @throws Exception
      */
-    public static function calculate(string $value, int $precision = -1): int|float
+    public static function calculate(string $value, int $precision = self::PRECISION_NONE): int|float
     {
         $matches = [];
         if (!preg_match('~([\-]?[0-9]+)([/])([0-9]+)+~', $value, $matches)) {
@@ -42,7 +46,7 @@ class StringConverter
         }
 
         return match ($matches[2]) {
-            '/' => $precision === -1 ? intval($matches[1]) / (intval(intval($matches[3]) === 0 ? 1 : $matches[3])) : round(intval($matches[1]) / (intval(intval($matches[3]) === 0 ? 1 : $matches[3])), $precision),
+            '/' => $precision === self::PRECISION_NONE ? intval($matches[1]) / (intval(intval($matches[3]) === 0 ? 1 : $matches[3])) : round(intval($matches[1]) / (intval(intval($matches[3]) === 0 ? 1 : $matches[3])), $precision),
             default => throw new Exception(sprintf('Unsupported calculation "%s" (%s:%d).', $matches[2], __FILE__, __LINE__)),
         };
     }

@@ -32,7 +32,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * Class CalendarBuilderService
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2021-12-29)
+ * @version 0.1.1 (2022-11-22)
+ * @since 0.1.1 (2022-11-22) Add PHP Magic Number Detector (PHPMND).
+ * @since 0.1.0 (2021-12-29) First version.
  * @package App\Command
  */
 class CalendarBuilderService
@@ -333,7 +335,7 @@ class CalendarBuilderService
 
         /* sizes */
         $this->aspectRatio = $this->calendar->getConfigObject()->getAspectRatio() ?? 3 / 2;
-        $this->height = $this->calendar->getConfigObject()->getHeight() ?? 4000;
+        $this->height = $this->calendar->getConfigObject()->getHeight() ?? self::ZOOM_HEIGHT_100;
         $this->width = intval(floor($this->height * $this->aspectRatio));
 
         /* Root path */
