@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.32.0] - 2022-11-22
+
+* [#108](https://github.com/bjoern-hempel/php-calendar-api/issues/108)
+  * Add PHP Magic Number Detector (PHPMND)
+
 ### [0.31.0] - 2022-11-21
 
 * [#106](https://github.com/bjoern-hempel/php-calendar-api/issues/106)
