@@ -13,87 +13,111 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\UserListener;
 use App\Repository\EventRepository;
 use App\Security\Voter\UserVoter;
 use App\Utils\ArrayToObject;
+use App\Utils\Traits\JsonHelper;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
+use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Entity class Event
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.1 (2022-01-29)
- * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
- * @since 1.0.0 First version.
+ * @version 0.1.3 (2022-11-11)
+ * @since 0.1.3 (2022-11-21) Update to symfony 6.1
+ * @since 0.1.2 (2022-11-11) PHPStan refactoring.
+ * @since 0.1.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 0.1.0 First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: EventRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
-    # Security filter for collection operations at App\Doctrine\CurrentUserExtension
-    collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['event']],
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['event_extended']],
-            'openapi_context' => [
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['event']]
+        ),
+        new GetCollection(
+            uriTemplate: '/events/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves the collection of extended Event resources.',
                 'summary' => 'Retrieves the collection of extended Event resources.',
             ],
-            'path' => '/events/extended.{_format}',
-        ],
-        'post' => [
-            'normalization_context' => ['groups' => ['event']],
-            'security_post_denormalize' => 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_POST.'")',
-            'security_post_denormalize_message' => "Only own events can be added.",
-        ],
-    ],
-    itemOperations: [
-        'delete' => [
-            'normalization_context' => ['groups' => ['event']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_DELETE.'", object.user)',
-            'security_message' => 'Only own events can be deleted.',
-        ],
-        'get' => [
-            'normalization_context' => ['groups' => ['event']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_GET.'", object.user)',
-            'security_message' => 'Only own events can be read.',
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['event_extended']],
-            'openapi_context' => [
+            normalizationContext: ['groups' => ['event_extended']]
+        ),
+        new Post(
+            normalizationContext: ['groups' => ['event']],
+            securityPostDenormalize: 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_POST.'")',
+            securityPostDenormalizeMessage: 'Only own events can be added.'
+        ),
+
+        new Delete(
+            normalizationContext: ['groups' => ['event']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_DELETE.'", object.user)',
+            securityMessage: 'Only own events can be deleted.'
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['event']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_GET.'", object.user)',
+            securityMessage: 'Only own events can be read.'
+        ),
+        new Get(
+            uriTemplate: '/events/{id}/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves an extended Event resource.',
                 'summary' => 'Retrieves an extended Event resource.',
             ],
-            'path' => '/events/{id}/extended.{_format}',
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_GET.'", object.user)',
-            'security_message' => 'Only own events can be read.',
-        ],
-        'patch' => [
-            'normalization_context' => ['groups' => ['event']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_PATCH.'", object.user)',
-            'security_message' => 'Only own events can be modified.',
-        ],
-        'put' => [
-            'normalization_context' => ['groups' => ['event']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_PUT.'", object.user)',
-            'security_message' => 'Only own events can be modified.',
-        ],
+            normalizationContext: ['groups' => ['event_extended']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_GET.'", object.user)',
+            securityMessage: 'Only own events can be read.'
+        ),
+        new Patch(
+            normalizationContext: ['groups' => ['event']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_PATCH.'", object.user)',
+            securityMessage: 'Only own events can be modified.'
+        ),
+        new Put(
+            normalizationContext: ['groups' => ['event']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_EVENT_PUT.'", object.user)',
+            securityMessage: 'Only own events can be modified.'
+        )
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['event']],
     order: ['id' => 'ASC'],
 )]
-class Event
+class Event implements EntityInterface
 {
     use TimestampsTrait;
+
+    use JsonHelper;
+
+    public const CRUD_FIELDS_ADMIN = ['id', 'user'];
+
+    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt', 'configJson'];
+
+    public const CRUD_FIELDS_INDEX = ['id', 'name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt', 'configJson'];
+
+    public const CRUD_FIELDS_NEW = ['id', 'name', 'type', 'user', 'date', 'yearly', 'configJson'];
+
+    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+
+    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt', 'configJson'];
+
+    public const CRUD_FIELDS_FILTER = ['name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -104,7 +128,6 @@ class Event
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups('event')]
-    /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     public ?User $user;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -122,9 +145,25 @@ class Event
     /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
     #[Groups(['event', 'event_extended'])]
-    private array $config = [];
+    private array $config = [
+        'color' => '255,255,255,100',
+    ];
+
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['event', 'event_extended'])]
+    private bool $yearly = false;
 
     private ArrayToObject $configObject;
+
+    /**
+     * __toString method.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->name;
+    }
 
     /**
      * Gets the id of this event.
@@ -144,6 +183,19 @@ class Event
     public function getUser(): ?User
     {
         return $this->user;
+    }
+
+    /**
+     * Gets the user id of this event.
+     *
+     * @return int|null
+     * @throws Exception
+     */
+    #[Pure]
+    #[Groups(['event', 'event_extended'])]
+    public function getUserId(): ?int
+    {
+        return $this->getUser()?->getId();
     }
 
     /**
@@ -265,6 +317,77 @@ class Event
         $this->config = $config;
 
         $this->configObject = new ArrayToObject($config);
+
+        return $this;
+    }
+
+    /**
+     * Gets the config element as JSON.
+     *
+     * @param bool $beautify
+     * @return string
+     * @throws Exception
+     */
+    public function getConfigJson(bool $beautify = true): string
+    {
+        return self::jsonEncode($this->config, $beautify, 2);
+    }
+
+    /**
+     * Sets the config element from JSON.
+     *
+     * @param string $json
+     * @return $this
+     */
+    public function setConfigJson(string $json): self
+    {
+        $this->config = self::jsonDecodeArray($json);
+
+        return $this;
+    }
+
+    /**
+     * Gets the config element as JSON.
+     *
+     * @param bool $beautify
+     * @return string
+     * @throws Exception
+     */
+    public function getConfigJsonRaw(bool $beautify = true): string
+    {
+        return $this->getConfigJson(false);
+    }
+
+    /**
+     * Sets the config element from JSON.
+     *
+     * @param string $json
+     * @return $this
+     */
+    public function setConfigJsonRaw(string $json): self
+    {
+        return $this->setConfigJson($json);
+    }
+
+    /**
+     * Gets the yearly status of this holiday.
+     *
+     * @return bool|null
+     */
+    public function getYearly(): ?bool
+    {
+        return $this->yearly;
+    }
+
+    /**
+     * Sets the yearly status from this holiday.
+     *
+     * @param bool $yearly
+     * @return $this
+     */
+    public function setYearly(bool $yearly): self
+    {
+        $this->yearly = $yearly;
 
         return $this;
     }

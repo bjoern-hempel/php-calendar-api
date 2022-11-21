@@ -13,12 +13,20 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\UserListener;
 use App\Repository\CalendarRepository;
 use App\Security\Voter\UserVoter;
 use App\Utils\ArrayToObject;
+use App\Utils\Traits\JsonHelper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -31,73 +39,105 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  * Entity class Calendar
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.1 (2022-01-29)
- * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
- * @since 1.0.0 First version.
+ * @version 0.1.4 (2022-11-19)
+ * @since 0.1.4 (2022-11-19) Update ApiPlatform.
+ * @since 0.1.3 (2022-11-12) Upgrade to symfony 6.1
+ * @since 0.1.2 (2022-11-11) PHPStan refactoring.
+ * @since 0.1.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 0.1.0 First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: CalendarRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     # Security filter for collection operations at App\Doctrine\CurrentUserExtension
-    collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['calendar']],
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['calendar_extended']],
-            'openapi_context' => [
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['calendar']]
+        ),
+        new GetCollection(
+            uriTemplate: '/calendars/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves the collection of extended Calendar resources.',
                 'summary' => 'Retrieves the collection of extended Calendar resources.',
             ],
-            'path' => '/calendars/extended.{_format}',
-        ],
-        'post' => [
-            'normalization_context' => ['groups' => ['calendar']],
-            'security_post_denormalize' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_POST.'")',
-            'security_post_denormalize_message' => "Only own calendars can be added.",
-        ],
-    ],
-    itemOperations: [
-        'delete' => [
-            'normalization_context' => ['groups' => ['calendar']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_DELETE.'", object.user)',
-            'security_message' => 'Only own calendars can be deleted.',
-        ],
-        'get' => [
-            'normalization_context' => ['groups' => ['calendar']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_GET.'", object.user)',
-            'security_message' => 'Only own calendars can be read.',
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['calendar_extended']],
-            'openapi_context' => [
+            normalizationContext: ['groups' => ['calendar_extended']]
+        ),
+        new GetCollection(
+            uriTemplate: '/users/{id}/calendars.{_format}',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'calendars',
+                    fromClass: User::class
+                )
+            ],
+        ),
+        new Post(
+            normalizationContext: ['groups' => ['calendar']],
+            securityPostDenormalize: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_POST.'")',
+            securityPostDenormalizeMessage: 'Only own calendars can be added.'
+        ),
+
+        new Delete(
+            normalizationContext: ['groups' => ['calendar']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_DELETE.'", object.user)',
+            securityMessage: 'Only own calendars can be deleted.'
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['calendar']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_GET.'", object.user)',
+            securityMessage: 'Only own calendars can be read.'
+        ),
+        new Get(
+            uriTemplate: '/calendars/{id}/extended.{_format}',
+            uriVariables: [
+                'id'
+            ],
+            openapiContext: [
                 'description' => 'Retrieves an extended Calendar resource.',
                 'summary' => 'Retrieves an extended Calendar resource.',
             ],
-            'path' => '/calendars/{id}/extended.{_format}',
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_GET.'", object.user)',
-            'security_message' => 'Only own calendars can be read.',
-        ],
-        'patch' => [
-            'normalization_context' => ['groups' => ['calendar']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_PATCH.'", object.user)',
-            'security_message' => 'Only own calendars can be modified.',
-        ],
-        'put' => [
-            'normalization_context' => ['groups' => ['calendar']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_PUT.'", object.user)',
-            'security_message' => 'Only own calendars can be modified.',
-        ],
+            normalizationContext: ['groups' => ['calendar_extended']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_GET.'", object.user)',
+            securityMessage: 'Only own calendars can be read.'
+        ),
+        new Patch(
+            normalizationContext: ['groups' => ['calendar']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_PATCH.'", object.user)',
+            securityMessage: 'Only own calendars can be modified.'
+        ),
+        new Put(
+            normalizationContext: ['groups' => ['calendar']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_PUT.'", object.user)',
+            securityMessage: 'Only own calendars can be modified.'
+        ),
     ],
-    normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar']],
-    order: ['id' => 'ASC'],
+    normalizationContext: [
+        'enable_max_depth' => true,
+        'groups' => ['calendar']
+    ],
+    order: ['id' => 'ASC']
 )]
-class Calendar
+class Calendar implements EntityInterface
 {
     use TimestampsTrait;
+
+    use JsonHelper;
+
+    public const CRUD_FIELDS_ADMIN = ['id', 'user'];
+
+    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
+
+    public const CRUD_FIELDS_INDEX = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson', 'published'];
+
+    public const CRUD_FIELDS_NEW = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'configJson', 'published'];
+
+    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+
+    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
+
+    public const CRUD_FIELDS_FILTER = ['name', 'title', 'subtitle', 'defaultYear', 'user', 'published'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -109,14 +149,12 @@ class Calendar
     #[ORM\JoinColumn(nullable: false)]
     #[MaxDepth(1)]
     #[Groups(['calendar_extended', 'calendar'])]
-    /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     public ?User $user;
 
     #[ORM\ManyToOne(targetEntity: CalendarStyle::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[MaxDepth(1)]
     #[Groups(['calendar_extended', 'calendar'])]
-    /** @phpstan-ignore-next-line → User must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?CalendarStyle $calendarStyle;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -133,29 +171,57 @@ class Calendar
 
     #[ORM\ManyToOne(targetEntity: HolidayGroup::class)]
     #[Groups(['calendar_extended', 'calendar'])]
-    private ?HolidayGroup $holiday_group;
+    private ?HolidayGroup $holidayGroup;
 
     /** @var Collection<int, CalendarImage> $calendarImages  */
     #[ORM\OneToMany(mappedBy: 'calendar', targetEntity: CalendarImage::class, orphanRemoval: true)]
     #[MaxDepth(1)]
     #[Groups('calendar_extended')]
-    #[ApiSubresource]
+    #[ORM\OrderBy(value: ['month' => 'ASC'])]
     private Collection $calendarImages;
 
     /** @var array<string|int|float|bool> $config */
     #[ORM\Column(type: 'json')]
     #[Groups(['calendar_extended', 'calendar'])]
-    private array $config = [];
+    private array $config = [
+        'backgroundColor' => '255,255,255,100',
+        'printCalendarWeek' => true,
+        'printWeekNumber' => true,
+        'printQrCodeMonth' => true,
+        'printQrCodeTitle' => true,
+        'aspectRatio' => 1.414,
+        'height' => 4000,
+    ];
+
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['calendar_extended', 'calendar'])]
+    private bool $published = false;
+
+    #[ORM\Column(name: 'default_year', type: 'integer')]
+    private int $defaultYear;
 
     private ArrayToObject $configObject;
 
     /**
      * Calendar constructor.
      */
-    #[Pure]
     public function __construct()
     {
         $this->calendarImages = new ArrayCollection();
+
+        /* Sets default year */
+        $this->defaultYear = intval(date('Y')) + 1;
+    }
+
+    /**
+     * __toString method.
+     *
+     * @return string
+     */
+    #[Pure]
+    public function __toString(): string
+    {
+        return sprintf('%s (%s)', $this->getName(), $this->getTitle());
     }
 
     /**
@@ -184,6 +250,18 @@ class Calendar
     }
 
     /**
+     * Gets the user id of this calendar.
+     *
+     * @return int|null
+     * @throws Exception
+     */
+    #[Groups(['calendar_extended', 'calendar'])]
+    public function getUserId(): ?int
+    {
+        return $this->getUser()->getId();
+    }
+
+    /**
      * Sets the user of this calendar.
      *
      * @param User|null $user
@@ -204,6 +282,17 @@ class Calendar
     public function getCalendarStyle(): ?CalendarStyle
     {
         return $this->calendarStyle;
+    }
+
+    /**
+     * Gets the calendar style id of this calendar.
+     *
+     * @return int|null
+     */
+    #[Groups(['calendar_extended', 'calendar'])]
+    public function getCalendarStyleId(): ?int
+    {
+        return $this->getCalendarStyle()?->getId();
     }
 
     /**
@@ -295,18 +384,29 @@ class Calendar
      */
     public function getHolidayGroup(): ?HolidayGroup
     {
-        return $this->holiday_group;
+        return $this->holidayGroup;
+    }
+
+    /**
+     * Gets the holiday group id of this calendar.
+     *
+     * @return int|null
+     */
+    #[Groups(['calendar_extended', 'calendar'])]
+    public function getHolidayGroupId(): ?int
+    {
+        return $this->getHolidayGroup()?->getId();
     }
 
     /**
      * Sets the holiday group of this calendar.
      *
-     * @param HolidayGroup|null $holiday_group
+     * @param HolidayGroup|null $holidayGroup
      * @return $this
      */
-    public function setHolidayGroup(?HolidayGroup $holiday_group): self
+    public function setHolidayGroup(?HolidayGroup $holidayGroup): self
     {
-        $this->holiday_group = $holiday_group;
+        $this->holidayGroup = $holidayGroup;
 
         return $this;
     }
@@ -393,6 +493,100 @@ class Calendar
         $this->config = $config;
 
         $this->configObject = new ArrayToObject($config);
+
+        return $this;
+    }
+
+    /**
+     * Gets the config element as JSON.
+     *
+     * @param bool $beautify
+     * @return string
+     * @throws Exception
+     */
+    public function getConfigJson(bool $beautify = true): string
+    {
+        return self::jsonEncode($this->config, $beautify, 2);
+    }
+
+    /**
+     * Sets the config element from JSON.
+     *
+     * @param string $json
+     * @return $this
+     */
+    public function setConfigJson(string $json): self
+    {
+        $this->config = self::jsonDecodeArray($json);
+
+        return $this;
+    }
+
+    /**
+     * Gets the config element as JSON.
+     *
+     * @param bool $beautify
+     * @return string
+     * @throws Exception
+     */
+    public function getConfigJsonRaw(bool $beautify = true): string
+    {
+        return $this->getConfigJson(false);
+    }
+
+    /**
+     * Sets the config element from JSON.
+     *
+     * @param string $json
+     * @return $this
+     */
+    public function setConfigJsonRaw(string $json): self
+    {
+        return $this->setConfigJson($json);
+    }
+
+    /**
+     * Gets the published status.
+     *
+     * @return bool|null
+     */
+    public function getPublished(): ?bool
+    {
+        return $this->published;
+    }
+
+    /**
+     * Sets the published status.
+     *
+     * @param bool $published
+     * @return $this
+     */
+    public function setPublished(bool $published): self
+    {
+        $this->published = $published;
+
+        return $this;
+    }
+
+    /**
+     * Gets the default year.
+     *
+     * @return int
+     */
+    public function getDefaultYear(): int
+    {
+        return $this->defaultYear;
+    }
+
+    /**
+     * Sets the default year.
+     *
+     * @param int $defaultYear
+     * @return $this
+     */
+    public function setDefaultYear(int $defaultYear): self
+    {
+        $this->defaultYear = $defaultYear;
 
         return $this;
     }

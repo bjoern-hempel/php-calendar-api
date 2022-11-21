@@ -6,6 +6,8 @@
 parameters:
     api.base_url: '%env(resolve:API_BASE_URL)%'
     jwt.role: '%env(resolve:JWT_ROLE)%'
+    backend.title.login: 'API Backend Login'
+    backend.title.main: 'API Backend'
 
 services:
     # default configuration for services in *this* file
@@ -38,6 +40,27 @@ services:
     App\EventListener\AddPaginationHeaders:
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    App\Field\Configurator\CollectionCalendarImageConfigurator:
+        tags:
+            - { name: 'ea.field_configurator', priority: -1 }
+
+    App\Field\Configurator\ImageEmptyConfigurator:
+        arguments: [ '%kernel.project_dir%' ]
+
+    App\Form\Type\FileUploadEmptyType:
+        arguments: [ '%kernel.project_dir%' ]
+
+    App\EventListener\Entity\UserListener:
+        tags:
+            - { name: 'doctrine.orm.entity_listener' }
+
+    App\EventListener\Entity\HolidayListener:
+        tags:
+            - { name: 'doctrine.orm.entity_listener' }
+
+    App\Service\CalendarBuilderService:
+        arguments: [ '@kernel' ]
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

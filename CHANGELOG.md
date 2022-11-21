@@ -7,9 +7,170 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.31.0] - 2022-11-21
+
+* [#106](https://github.com/bjoern-hempel/php-calendar-api/issues/106)
+  * Update to Symfony 6.1, API Platform 3.0.3 and PHP 8.1.12
+
+### [0.30.22] - 2022-11-11
+
+* PHPStan refactoring
+
+### [0.30.21] - 2022-11-11
+
+* Bump twig/twig from 3.3.8 to 3.4.3
+* Disable sensiolabs security-checker
+
+### [0.30.20] - 2022-11-11
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location
+  * Add database migration script
+  * Add Croatian translation
+  * Add croatian data
+
+### [0.30.19] - 2022-07-17
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add more image properties, Connect them with specified location
+
+### [0.30.18] - 2022-07-06
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add new design
+
+### [0.30.17] - 2022-07-03
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Do not add city and district if we do have an admin place
+
+### [0.30.16] - 2022-07-03
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Fix finding admin place (city and district) to non placeP entry
+
+### [0.30.15] - 2022-07-03
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add admin places to search list, refactoring
+
+### [0.30.14] - 2022-06-29
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add list index
+
+### [0.30.13] - 2022-06-29
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add pager to result list and new relevance search
+
+### [0.30.12] - 2022-06-28
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Fix relevance search
+
+### [0.30.11] - 2022-06-28
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add app loader
+
+### [0.30.10] - 2022-06-26
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add tag search
+
+### [0.30.9] - 2022-06-25
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add OpenStreetMap link
+
+### [0.30.8] - 2022-06-25
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add current position search, Improve name search
+
+### [0.30.7] - 2022-06-20
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add compass for places
+
+### [0.30.6] - 2022-06-18
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add direction to place
+
+### [0.30.5] - 2022-06-18
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Remove distance from direct search (one result, id search, always 0)
+
+### [0.30.4] - 2022-06-18
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add elevation to search result; Fix
+
+### [0.30.3] - 2022-06-18
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add elevation to search result
+
+### [0.30.2] - 2022-06-17
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Add location parser
+
+### [0.30.1] - 2022-06-03
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location; Change twelvepics link
+
+### [0.30.0] - 2022-06-03
+
+* [#92](https://github.com/bjoern-hempel/php-calendar-api/issues/92) - Calendar: Evaluate specified location
+
+### [0.29.0] - 2022-04-19
+
+* [#88](https://github.com/bjoern-hempel/php-calendar-api/issues/88) - EasyAdmin: Possibility to choose the images directly in the calendar
+
+### [0.28.0] - 2022-04-18
+
+* [#91](https://github.com/bjoern-hempel/php-calendar-api/issues/91) - Calendar: Offer non-legal holidays
+
+### [0.27.1] - 2022-04-18
+
+* Bump async from 2.6.3 to 2.6.4
+
+### [0.27.0] - 2022-04-18
+
+* [#89](https://github.com/bjoern-hempel/php-calendar-api/issues/89) - EasyAdmin: Holiday overview within HolidayGroup
+
+### [0.26.0] - 2022-04-09
+
+* [#86](https://github.com/bjoern-hempel/php-calendar-api/issues/86) - Holiday Import from an API
+
+### [0.25.1] - 2022-04-06
+
+* Add new version of submodule submodules/bash-version-manager
+
+### [0.25.0] - 2022-04-06
+
+* [#94](https://github.com/bjoern-hempel/php-calendar-api/issues/94) - Docker: Add ssl to nginx
+
+### [0.24.0] - 2022-04-04
+
+* [#82](https://github.com/bjoern-hempel/php-calendar-api/issues/82) - EasyAdmin: Fix ajax issue on live
+
+### [0.23.0] - 2022-04-03
+
+* [#75](https://github.com/bjoern-hempel/php-calendar-api/issues/75) - Add yearly option to events and holidays
+
+### [0.22.1] - 2022-04-01
+
+* [#72](https://github.com/bjoern-hempel/php-calendar-api/issues/72) - Add root page, impress, etc.
+
+### [0.22.0] - 2022-03-23
+
+* [#67](https://github.com/bjoern-hempel/php-calendar-api/issues/67) - Add auto url batch to calendar
+
+### [0.21.0] - 2022-03-23
+
+* [#59](https://github.com/bjoern-hempel/php-calendar-api/issues/59) - Add user login, Add bootstrap, Do refactoring, Add translations, Add calendar build batch
+
+### [0.20.0] - 2022-02-22
+
+* [#57](https://github.com/bjoern-hempel/php-calendar-api/issues/57) - Add authentication to admin panel
+
+### [0.19.0] - 2022-02-19
+
+* [#54](https://github.com/bjoern-hempel/php-calendar-api/issues/54) - Add easyAdmin to API
+
+### [0.18.0] - 2022-02-05
+
+* [#50](https://github.com/bjoern-hempel/php-calendar-api/issues/50) - Add direct ids to response
+
 ### [0.17.0] - 2022-02-05
 
-* [#45](https://github.com/bjoern-hempel/php-calendar-api/issues/48) - Add X-Total-Count to header
+* [#48](https://github.com/bjoern-hempel/php-calendar-api/issues/48) - Add X-Total-Count to header
 
 ### [0.16.0] - 2022-01-29
 

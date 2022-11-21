@@ -1,0 +1,629 @@
+/**
+ * Settings
+ */
+$enable-negative-margins: true
+
+/**
+ * Import bootstrap
+ */
+@import "~bootstrap/scss/bootstrap"
+
+/**
+ * Calendar index page
+ */
+html, body
+    margin: 0px
+    padding: 0px
+    width: 100%
+
+/**
+ * Loader
+ */
+body
+    .app-loader
+        position: fixed
+        top: 0
+        left: 0
+        right: 0
+        bottom: 0
+        z-index: 1000
+        display: none
+
+        .app-loader-background
+            position: absolute
+            top: 0
+            left: 0
+            right: 0
+            bottom: 0
+            background: rgb(255,255,255,0.8)
+
+        .app-loader-text
+            position: absolute
+            top: 0
+            left: 0
+            right: 0
+            bottom: 0
+            display: flex
+            display: -webkit-flex
+            margin: 0
+
+            p
+                margin: auto
+                text-align: center
+
+                img
+                    width: 30px
+                    height: 30px
+
+/**
+ * Content page
+ */
+body.content
+
+    /**
+     * <header> defaults.
+     */
+    header
+        .navbar.navbar-light
+            box-shadow: 0 12px 10px rgba(0, 0, 0, 0.1)
+            background: #fff!important
+
+        &.--not-top
+            .position-fixed
+                .navbar
+                    box-shadow: 0 12px 10px rgba(0, 0, 0, 0.1)
+                    background: #fff!important
+
+        .position-fixed
+            #navbarHeader.show+.navbar, #navbarHeader.collapsing+.navbar
+                box-shadow: 0 12px 10px rgba(0, 0, 0, 0.1)
+                background: #fff!important
+                &.navbar-dark
+                    @extend .navbar-light
+
+        &.bg-primary
+            /* fallback for old browsers */
+            background: #667eea
+
+            /* Chrome 10-25, Safari 5.1-6 */
+            background: -webkit-linear-gradient(to right, rgba(102, 126, 234, 0.5), rgba(118, 75, 162, 0.5))
+
+            /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            background: linear-gradient(to right, rgba(102, 126, 234, 0.5), rgba(118, 75, 162, 0.5))
+
+        .container
+            @extend .px-3
+
+        img.rounded-4
+            border-radius: 1rem!important
+
+    /**
+     * <main> defaults.
+     */
+    main
+        @extend .px-3
+
+        .container
+            @extend .px-0
+            &.container-without-header
+                margin-top: 150px
+
+        @include media-breakpoint-up(md)
+            .container
+                padding-left: 1rem!important
+                padding-right: 1rem!important
+
+    /**
+     * Main content defaults
+     */
+    .content-main
+        @extend .p-5
+        @extend .bg-white
+        @extend .rounded
+        @extend .shadow-sm
+        @extend .mt-n5
+        @extend .mb-5
+
+        hr
+            margin-top: 3rem!important
+
+        h2
+            @extend .text-center
+            @extend .fw-light
+            margin-top: 3rem!important
+
+        h3
+            @extend .text-center
+            @extend .fw-light
+            margin-top: 1.5rem!important
+
+        h4
+            @extend .text-center
+            margin-top: 1rem!important
+
+        .row
+            @extend .mt-5
+            margin-top: 1.5rem!important
+
+        @include media-breakpoint-up(sm)
+            p.h-auto
+                height: 3.5rem!important
+
+    @include media-breakpoint-up(md)
+        .content-main
+            padding-left: 8rem!important
+            padding-right: 8rem!important
+
+            hr
+                margin-top: 6rem!important
+
+            h2
+                margin-top: 6rem!important
+
+            h3
+                padding-top: 3rem!important
+
+            h4
+                padding-top: 2rem!important
+
+            .row
+                margin-top: 3rem!important
+
+    /**
+     * Calendar example defaults.
+     */
+    #content-example-calendar
+        @include media-breakpoint-up(sm)
+            .calendar-overview
+                .calendar-row-2
+                    img.w-100
+                        width: 50% !important
+
+    /**
+     * Lightbox content
+     */
+    .modal
+        .modal-dialog
+            max-width: calc(100% - 2rem)
+            max-height: calc(100% - 2rem)
+            margin: 1rem auto
+            @include media-breakpoint-up(lg)
+                max-width: calc(100% - 5rem)
+            @include media-breakpoint-up(xl)
+                max-width: calc(100% - 10rem)
+            @include media-breakpoint-up(xxl)
+                max-width: 1400px
+
+    .modal
+        .modal-dialog
+            .carousel-control.h-75
+                height: 100% !important
+            .carousel-item
+                p
+                    display: none
+
+    .modal
+        button
+            background-color: transparent!important
+            &.carousel-control-next
+                justify-content: right
+                margin-right: 1rem!important
+            &.carousel-control-prev
+                justify-content: left
+                margin-left: 1rem!important
+        &.button-dark
+            button
+                .carousel-control-next-icon
+                    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3E%3Cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E")
+                .carousel-control-prev-icon
+                    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3E%3Cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3E%3C/svg%3E")
+                &.btn-close
+                    svg
+                        fill: black
+
+        //&.button-dark
+        //    button
+        //        &.btn-close
+        //            background-color: black!important
+        //        span.carousel-control-next-icon, span.carousel-control-prev-icon
+        //            background-color: black!important
+        //
+        //.modal-content
+        //    &:hover
+        //        button
+        //            background-color: rgba(102,126,234,0.25)!important
+        //
+        //&.button-dark
+        //    .modal-content
+        //        &:hover
+        //            button.btn-close
+        //                background-color: black!important
+        //            button.carousel-control-next, button.carousel-control-prev
+        //                background-color: rgba(127,127,127,0.25)!important
+
+
+    //        min-height: 0!important
+    //        overflow: hidden
+    //        position: absolute
+    //        top: 0!important
+    //        left: 0!important
+    //        right: 0!important
+    //        bottom: 0!important
+    //        .modal-content
+    //            background-color: #f00
+    //            position: absolute
+    //            top: 0!important
+    //            left: 0!important
+    //            right: 0!important
+    //            bottom: 0!important
+    //            .modal-body
+    //                position: absolute
+    //                top: 0!important
+    //                left: 0!important
+    //                right: 0!important
+    //                bottom: 0!important
+    //                .lightbox-carousel
+    //                    position: absolute
+    //                    top: 0!important
+    //                    left: 0!important
+    //                    right: 0!important
+    //                    bottom: 0!important
+    //                    .carousel-inner
+    //                        position: absolute
+    //                        top: 0!important
+    //                        left: 0!important
+    //                        right: 0!important
+    //                        bottom: 0!important
+    //                        .carousel-item
+    //                            position: absolute
+    //                            top: 0!important
+    //                            left: 0!important
+    //                            right: 0!important
+    //                            bottom: 0!important
+    //                            .ratio
+    //                                position: absolute
+    //                                top: 0!important
+    //                                left: 0!important
+    //                                right: 0!important
+    //                                bottom: 0!important
+    //                                img
+    //                                    position: absolute
+    //                                    top: 0!important
+    //                                    left: 0!important
+    //                                    right: 0!important
+    //                                    bottom: 0!important
+    //
+    //        button
+    //            background-color: transparent!important
+    //            &:hover
+    //                background-color: rgba(102,126,234,0.25)!important
+    //        &.button-grey
+    //            button
+    //                background-color: rgba(127,127,127,0.25)!important
+    //                &:hover
+    //                    background-color: rgba(102,126,234,0.25)!important
+    //        .carousel-inner
+    //            .ratio
+    //                background-color: #fff!important
+    //                img
+    //                    padding: 0
+    //                    position: relative
+    //                    object-fit: contain!important
+    //                &:before
+    //                    display: none
+    //.modal
+    //    .modal-dialog
+    //        max-width: calc(100% - 2rem)
+    //        max-height: calc(100% - 2rem)
+    //        min-height: 0!important
+    //        margin: 1rem auto
+    //        overflow: hidden
+    //        position: absolute
+    //        top: 0!important
+    //        left: 0!important
+    //        right: 0!important
+    //        bottom: 0!important
+    //        @include media-breakpoint-up(sm)
+    //            max-width: calc(100% - 5rem)
+    //            max-height: calc(100% - 5rem)
+    //            margin: 2.5rem auto
+    //        @include media-breakpoint-up(md)
+    //            max-width: calc(100% - 10rem)
+    //            max-height: calc(100% - 10rem)
+    //            margin: 5rem auto
+    //        .modal-content
+    //            background-color: #f00
+    //            position: absolute
+    //            top: 0!important
+    //            left: 0!important
+    //            right: 0!important
+    //            bottom: 0!important
+    //            .modal-body
+    //                position: absolute
+    //                top: 0!important
+    //                left: 0!important
+    //                right: 0!important
+    //                bottom: 0!important
+    //                .lightbox-carousel
+    //                    position: absolute
+    //                    top: 0!important
+    //                    left: 0!important
+    //                    right: 0!important
+    //                    bottom: 0!important
+    //                    .carousel-inner
+    //                        position: absolute
+    //                        top: 0!important
+    //                        left: 0!important
+    //                        right: 0!important
+    //                        bottom: 0!important
+    //                        .carousel-item
+    //                            position: absolute
+    //                            top: 0!important
+    //                            left: 0!important
+    //                            right: 0!important
+    //                            bottom: 0!important
+    //                            .ratio
+    //                                position: absolute
+    //                                top: 0!important
+    //                                left: 0!important
+    //                                right: 0!important
+    //                                bottom: 0!important
+    //                                img
+    //                                    position: absolute
+    //                                    top: 0!important
+    //                                    left: 0!important
+    //                                    right: 0!important
+    //                                    bottom: 0!important
+    //
+    //        button
+    //            background-color: transparent!important
+    //            &:hover
+    //                background-color: rgba(102,126,234,0.25)!important
+    //        &.button-grey
+    //            button
+    //                background-color: rgba(127,127,127,0.25)!important
+    //                &:hover
+    //                    background-color: rgba(102,126,234,0.25)!important
+    //        .carousel-inner
+    //            .ratio
+    //                background-color: #fff!important
+    //                img
+    //                    padding: 0
+    //                    position: relative
+    //                    object-fit: contain!important
+    //                &:before
+    //                    display: none
+
+
+/**
+ * Calendar index page
+ */
+body.calendar-index
+    background-color: #fff
+
+    /* Decrease padding left and right from used px-5 on mobile devices */
+    @include media-breakpoint-between(xs, md)
+        header
+            .container-fluid.px-5
+                padding-left: .75rem!important
+                padding-right: .75rem!important
+        footer
+            .container-fluid.px-5
+                padding-left: .75rem!important
+                padding-right: .75rem!important
+
+    /* Show the calendar among each other */
+    .container-images
+        a.container-image-link
+            .container-image
+                width: 100%
+                height: 75vw
+                background-size: 100% 100%
+                float: left
+
+    /* Show tablet style */
+    @include media-breakpoint-up(md)
+        .container-images
+            a.container-image-link
+                .container-image
+                    width: 50%
+                    height: 37.5vw
+                &:first-child
+                    .container-image
+                        width: 100%
+                        height: 75vw
+
+    /* Show nice calendar style on larger devices */
+    @include media-breakpoint-up(lg)
+        .container-images
+            a.container-image-link
+                .container-image
+                    width: 25%
+                    height: 18.75vw
+                &:first-child
+                    .container-image
+                        width: 50%
+                        height: 37.5vw
+
+/**
+ * Calendar detail page
+ */
+body.calendar-detail
+    background-color: #fff
+
+
+/**
+ * Location
+ */
+body.content-location
+
+    .content-main
+        padding: 1rem!important
+
+        @include media-breakpoint-up(md)
+            padding: 3rem!important
+
+    #content-location
+        p.error
+            text-align: center
+
+        p.legal
+            margin-bottom: 0
+            margin-top: 3rem
+            font-size: small
+            text-align: right
+
+        form
+            div
+                width: 100%
+                text-align: center
+
+                button
+                    margin-top: .5rem
+                    margin-left: .5rem
+
+                    &:first-child
+                        margin-left: 0rem
+
+                input
+                    margin-top: 1.5rem
+                    width: 100%
+                    padding: 0.5rem 1rem
+                    border-radius: 2rem
+                    border-width: 1px
+                    outline: 0
+
+                    &:after
+                        content: ' \00270e '
+
+                    &:focus
+                        outline: 0
+
+        @include media-breakpoint-up(md)
+            form
+                div
+                    input
+                        width: 80%
+
+        p.description
+            margin-top: 2rem
+
+        .verbose
+            display: none
+
+            @include media-breakpoint-up(md)
+                display: none
+
+        a
+            cursor: pointer
+
+        h2
+            margin-top: 0rem!important
+            padding-top: 1.5rem!important
+
+            &.first
+                margin-top: 0!important
+                padding-top: 0!important
+
+        h3
+            margin-top: 0rem!important
+            padding-top: 1.5rem!important
+            text-align: left!important
+            margin-left: .5rem
+            margin-bottom: 1rem
+            font-weight: 400!important
+
+        p
+            margin-left: .5rem
+
+        div.cite
+            text-align: center
+            margin: 2rem 0rem
+            q
+                font-size: 2rem
+                font-family: Georgia
+                font-style: italic
+                color: #909090
+
+                &::before
+                    content: "" //open-quote
+
+                &::after
+                    content: "" //close-quote
+
+            @include media-breakpoint-up(md)
+                margin: 8rem
+
+    .compass
+        position: relative
+        width: 200px
+        height: 200px
+        margin: 20px auto
+        background: #222
+        padding: 0
+        border-radius: 40px
+        border: 5px solid #444
+        overflow: hidden
+        display: none
+
+        .arrow
+            position: absolute
+            top: 15px
+            left: 15px
+            z-index: 1000
+            background-image: url(data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYWFnXzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB3aWR0aD0iODg1LjM4N3B4IiBoZWlnaHQ9Ijg4NS4zODVweCIgdmlld0JveD0iMCAwIDg4NS4zODcgODg1LjM4NSIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgODg1LjM4NyA4ODUuMzg1IiB4bWw6c3BhY2U9InByZXNlcnZlIj48bGluZSBmaWxsPSJub25lIiBzdHJva2U9IiMxQzc4OTQiIHN0cm9rZS13aWR0aD0iNS42Mjg1IiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIHgxPSI0NDYuMTE0IiB5MT0iMzg2LjMxNCIgeDI9IjQ0Ni4xMTQiIHkyPSI0OTguNCIvPjxwb2x5Z29uIGZpbGw9IiMxQzc4OTQiIHBvaW50cz0iNDAzLjY5Niw0NDAuNTk0IDQ0Ni4xMTQsMTI3LjIwNyA0ODguNTMxLDQ0MC41OTQiLz48cG9seWdvbiBmaWxsPSIjMUM3ODk0IiBwb2ludHM9IjQwMy42OTcsNDQwLjM1NyA0NDYuMTE0LDc1OC4wMTUgNDg4LjUzLDQ0MC4zNTciLz48Y2lyY2xlIGZpbGw9IiMxQzc4OTQiIGN4PSI0NDYuMTE1IiBjeT0iNDQ0LjExIiByPSIxMi41MDEiLz48Y2lyY2xlIGZpbGw9IiMxQzc4OTQiIGN4PSI0NDYuMTE0IiBjeT0iNDQ0LjExIiByPSI5Ii8+PGxpbmUgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQkUxNjIyIiBzdHJva2Utd2lkdGg9IjUuNjI4NSIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiB4MT0iNDQyLjEwNiIgeTE9IjM4Ni4zMTQiIHgyPSI0NDIuMTA1IiB5Mj0iNDk4LjQiLz48cG9seWdvbiBmaWxsPSIjQkUxNjIyIiBwb2ludHM9IjM5OS42ODgsNDQwLjU5NCA0NDIuMTA2LDEyNy4yMDggNDg0LjUyMiw0NDAuNTk0Ii8+PHBvbHlnb24gZmlsbD0iI0Y2RjZGNiIgcG9pbnRzPSIzOTkuNjg4LDQ0MC4zNTYgNDQyLjEwNSw3NTguMDE0IDQ4NC41MjIsNDQwLjM1OCIvPjxjaXJjbGUgZmlsbD0iIzFDNzg5NCIgY3g9IjQ0Mi4xMDYiIGN5PSI0NDQuMTExIiByPSIxMi41MDEiLz48Y2lyY2xlIGZpbGw9IiM0MDhBQTciIGN4PSI0NDIuMTA2IiBjeT0iNDQ0LjExMSIgcj0iOSIvPjwvc3ZnPg==)
+            width: 160px
+            height: 160px
+            background-size: 100%
+
+        .disc
+            position: absolute
+            top: 5px
+            left: 5px
+            z-index: 200
+            background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgaWQ9IkxhYWdfMiIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSI4ODUuMzg2cHgiIGhlaWdodD0iODg1LjM4NXB4IiB2aWV3Qm94PSIwIDAgODg1LjM4NiA4ODUuMzg1IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA4ODUuMzg2IDg4NS4zODUiIHhtbDpzcGFjZT0icHJlc2VydmUiIHNvZGlwb2RpOmRvY25hbWU9InRlc3Quc3ZnIiBpbmtzY2FwZTp2ZXJzaW9uPSIxLjIgKGRjMmFlZGFmMDMsIDIwMjItMDUtMTUpIj48ZGVmcyBpZD0iZGVmczY2Ii8+PHNvZGlwb2RpOm5hbWVkdmlldyBpZD0ibmFtZWR2aWV3NjQiIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIgYm9yZGVyY29sb3I9IiMwMDAwMDAiIGJvcmRlcm9wYWNpdHk9IjAuMjUiIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSIyIiBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIiBpbmtzY2FwZTpwYWdlY2hlY2tlcmJvYXJkPSIwIiBpbmtzY2FwZTpkZXNrY29sb3I9IiNkMWQxZDEiIHNob3dncmlkPSJmYWxzZSIgaW5rc2NhcGU6em9vbT0iMC45MDgwNzk1MyIgaW5rc2NhcGU6Y3g9IjQ0Mi42OTI1IiBpbmtzY2FwZTpjeT0iNDI4LjkyNzE5IiBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjE5MjAiIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9Ijk5MSIgaW5rc2NhcGU6d2luZG93LXg9Ii05IiBpbmtzY2FwZTp3aW5kb3cteT0iLTkiIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9IkxhYWdfMiIvPjxjaXJjbGUgZmlsbD0iIzQwOGFhNyIgY3g9IjQ0Mi42OTI5OSIgY3k9IjQ0Mi42OTI5OSIgcj0iNDA4Ljk1MzQ5IiBpZD0iY2lyY2xlMzciIHN0eWxlPSJzdHJva2Utd2lkdGg6MS4wNTY5MiIvPjxjaXJjbGUgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWM3ODk0IiBzdHJva2Utd2lkdGg9IjM1Ny4wMzUiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgc3Ryb2tlLWRhc2hhcnJheT0iMjguNTczNSwgMjcuNTg4MiIgY3g9IjQ0Mi42NTEyOCIgY3k9IjQ0Mi43MTQyIiByPSIyMTQuNjEzMzMiIGlkPSJjaXJjbGUzOSIvPjxwb2x5Z29uIGZpbGw9IiMxQzc4OTQiIHBvaW50cz0iNTAwLjE0NSwzODUuMjQzIDYwNS4xOTIsNDQyLjY5MSA1MDAuMTQ3LDUwMC4xNDUgNDQyLjY5Miw2MDUuMTk0IDM4NS4yNDIsNTAwLjE0NiAyODAuMTkzLDQ0Mi42OTQgMzg1LjI0MSwzODUuMjM3IDQ0Mi42OTIsMjgwLjE5MSIgaWQ9InBvbHlnb240NyIvPjxwb2x5Z29uIGZpbGw9IiM0MDhBQTciIHBvaW50cz0iNDQyLjY5NCwzNjEuNDQ1IDU1Ny41OTcsMzI3Ljc4NyA1MjMuOTQ0LDQ0Mi42OTIgNTU3LjU5OSw1NTcuNTk4IDQ0Mi42OTMsNTIzLjk0MiAzMjcuNzksNTU3LjU5OCAzNjEuNDQyLDQ0Mi42OSAzMjcuNzg3LDMyNy43ODciIGlkPSJwb2x5Z29uNDkiLz48cG9seWdvbiBmaWxsPSIjNDA4QUE3IiBwb2ludHM9IjM5OC41MDEsMzk4LjUgNDQyLjY5MiwzMTcuNjkzIDQ4Ni44ODgsMzk4LjQ5OCA1NjcuNjk0LDQ0Mi42OTMgNDg2Ljg4OCw0ODYuODg2IDQ0Mi42OTQsNTY3LjY5MyAzOTguNDk3LDQ4Ni44ODYgMzE3LjY5Miw0NDIuNjkzIiBpZD0icG9seWdvbjUxIi8+PHBvbHlnb24gZmlsbD0iIzFDNzg5NCIgcG9pbnRzPSI0NDIuNjk0LDM4MC4xOTUgNTMxLjA4MSwzNTQuMzA0IDUwNS4xOTQsNDQyLjY5MiA1MzEuMDgyLDUzMS4wODIgNDQyLjY5NCw1MDUuMTkyIDM1NC4zMDYsNTMxLjA4MiAzODAuMTkyLDQ0Mi42OTEgMzU0LjMwNCwzNTQuMzA0IiBpZD0icG9seWdvbjUzIi8+PHRleHQgZmlsbD0iI0YxRjJDNCIgZm9udC1mYW1pbHk9IidDZW50dXJ5JyIgZm9udC1zaXplPSI2MiIgaWQ9InRleHQ1NSIgdHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgMSA4NS43NjM3IDQ1OS44Nzc0KSIgc3R5bGU9ImZpbGw6IzAwMDAwMCI+VzwvdGV4dD48dGV4dCBmaWxsPSIjRjFGMkM0IiBmb250LWZhbWlseT0iJ0NlbnR1cnknIiBmb250LXNpemU9IjYyIiBpZD0idGV4dDU3IiB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxIDQxNy40Mjk3IDc4MC42MDk5KSIgc3R5bGU9ImZpbGw6IzAwMDAwMCI+UzwvdGV4dD48dGV4dCBmaWxsPSIjRjFGMkM0IiBmb250LWZhbWlseT0iJ0NlbnR1cnknIiBmb250LXNpemU9IjYyIiBpZD0idGV4dDU5IiB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxIDc0OS4wOTU3IDQ1OS44Nzc0KSIgc3R5bGU9ImZpbGw6IzAwMDAwMCI+RTwvdGV4dD48dGV4dCBmaWxsPSIjRjFGMkM0IiBmb250LWZhbWlseT0iJ0NlbnR1cnknIiBmb250LXNpemU9IjYyIiBpZD0idGV4dDYxIiB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxIDQxNy40Mjk3IDEzOS4xNDUpIiBzdHlsZT0iZmlsbDojMDAwMDAwIj5OPC90ZXh0Pjwvc3ZnPg==)
+            width: 180px
+            height: 180px
+            background-size: 100%
+
+        &.compass-direction
+            width: 40px
+            height: 40px
+            border-radius: 10px
+            border: 1px solid #444
+            margin: 3px 0
+
+            .arrow
+                top: 3px
+                left: 3px
+                width: 32px
+                height: 32px
+
+    table
+        .table-tr-first
+            border-color: transparent
+        .table-name
+            width: auto!important
+        .table-value
+            width: auto!important
+            text-align: right
+
+            &.table-value-mobile
+                display: table-cell
+            &.table-value-desktop
+                display: none
+        .table-compass
+            width: 0
+            padding: .5rem 0
+
+        @include media-breakpoint-up(md)
+            .table-tr-first
+                border-color: #dee2e6
+            .table-name
+                width: 33%
+            .table-value
+                width: 67%
+                &.table-value-mobile
+                    display: none
+                &.table-value-desktop
+                    display: table-cell

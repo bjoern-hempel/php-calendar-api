@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace App\Tests\TestCase;
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client;
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Symfony\Bundle\Test\Client;
 use App\Tests\Library\DbHelper;
 use Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -26,10 +26,10 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * TestCase ApiClientTestCase
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.1 (2022-01-29)
- * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
- * @since 1.0.0 First version.
- * @package App\Tests\TestCase
+ * @version 0.1.2 (2022-11-12)
+ * @since 0.1.2 (2022-11-12) Upgrade to symfony 6.1
+ * @since 0.1.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 0.1.0 First version.
  */
 abstract class ApiClientTestCase extends ApiTestCase
 {

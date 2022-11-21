@@ -6,16 +6,33 @@
 parameters:
 
 services:
-    App\Service\CalendarLoaderService:
+    App\Service\Entity\CalendarLoaderService:
         arguments:
             - '@kernel'
             - '@doctrine.orm.entity_manager'
+            - '@App\Service\SecurityService'
+            - '@App\Service\Entity\UserLoaderService'
         public: true
 
-    App\Service\HolidayGroupLoaderService:
+    App\Service\Entity\HolidayGroupLoaderService:
         arguments:
             - '@kernel'
             - '@doctrine.orm.entity_manager'
+            - '@App\Service\SecurityService'
+        public: true
+
+    App\Service\Entity\ImageLoaderService:
+        arguments:
+            - '@kernel'
+            - '@doctrine.orm.entity_manager'
+            - '@App\Service\SecurityService'
+        public: true
+
+    App\Service\Entity\UserLoaderService:
+        arguments:
+            - '@kernel'
+            - '@doctrine.orm.entity_manager'
+            - '@App\Service\SecurityService'
         public: true
 
     App\Service\CalendarBuilderService:

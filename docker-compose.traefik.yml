@@ -1,0 +1,45 @@
+# ===========================================
+# A traefik recipe to deliver the app via Nginx, PHP 8.0.x and MySQL 5.7.35.
+#
+# @author Björn Hempel <bjoern@hempel.de>
+# @version 1.0 (2022-03-14)
+# ===========================================
+
+# ===========================================
+# This file is used in combination with the docker-compose.yml file. For commands and usage see this file.
+#
+# Start app:
+# ----------
+# ❯ docker-compose -f docker-compose.yml -f docker-compose.traefik.yml up -d
+# ===========================================
+
+# Use docker compose version 3.8
+version: "3.8"
+
+# configure services
+services:
+
+  # Nginx to serve the app.
+  nginx:
+    labels:
+      # enable
+      - "traefik.enable=true"
+      # calendar.ixno.de
+      - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.rule=Host(`${GENERAL_URL}`)"
+      - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.entrypoints=websecure"
+      - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.tls=true"
+      - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.tls.certresolver=letsencryptresolver"
+      - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.service=lb-php-8-0-12-apache-calendar-ixno-de"
+      # load balancer
+      - "traefik.http.services.lb-php-8-0-12-apache-calendar-ixno-de.loadbalancer.server.port=443"
+      - "traefik.http.services.lb-php-8-0-12-apache-calendar-ixno-de.loadbalancer.server.scheme=https"
+      # network
+      - "traefik.docker.network=traefik-public"
+    networks:
+      - traefik-public
+
+# configure networks
+networks:
+  traefik-public:
+    external: true
+    name: traefik-public

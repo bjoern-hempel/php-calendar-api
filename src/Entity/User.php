@@ -13,15 +13,22 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\UserListener;
 use App\Repository\UserRepository;
 use App\Security\Voter\UserVoter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
+use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -32,68 +39,73 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  * Entity class User
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2021-12-30)
+ * @version 0.1.2 (2022-11-19)
+ * @since 0.1.2 (2022-11-19) Update ApiPlatform.
+ * @since 1.0.1 (2021-11-11) PHPStan refactoring.
+ * @since 1.0.0 (2021-12-30) First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
-    # Security filter for collection operations at App\Doctrine\CurrentUserExtension
-    collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['user']],
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['user_extended']],
-            'openapi_context' => [
+    operations: [
+        # Security filter for collection operations at App\Doctrine\CurrentUserExtension
+        new GetCollection(
+            normalizationContext: ['groups' => ['user']]
+        ),
+        # Security filter for collection operations at App\Doctrine\CurrentUserExtension
+        new GetCollection(
+            uriTemplate: '/users/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves the collection of extended User resources.',
                 'summary' => 'Retrieves the collection of extended User resources.',
             ],
-            'path' => '/users/extended.{_format}',
-        ],
-        'post' => [
-            'normalization_context' => ['groups' => ['user']],
-            'security_post_denormalize' => 'is_granted("'.UserVoter::ATTRIBUTE_USER_POST.'")',
-            'security_post_denormalize_message' => "Only admins can add users.",
-        ],
-    ],
-    itemOperations: [
-        'delete' => [
-            'normalization_context' => ['groups' => ['user']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_USER_DELETE.'", object)',
-            'security_message' => 'Only own users can be deleted.',
-        ],
-        'get' => [
-            'normalization_context' => ['groups' => ['user']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_USER_GET.'", object)',
-            'security_message' => 'Only own users can be read.',
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['user_extended']],
-            'openapi_context' => [
+            normalizationContext: ['groups' => ['user_extended']]
+        ),
+        new Post(
+            normalizationContext: ['groups' => ['user']],
+            securityPostDenormalize: 'is_granted("'.UserVoter::ATTRIBUTE_USER_POST.'")',
+            securityPostDenormalizeMessage: 'Only admins can add users.'
+        ),
+
+        new Delete(
+            normalizationContext: ['groups' => ['user']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_USER_DELETE.'", object)',
+            securityMessage: 'Only own users can be deleted.'
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['user']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_USER_GET.'", object)',
+            securityMessage: 'Only own users can be read.'
+        ),
+        new Get(
+            uriTemplate: '/users/{id}/extended.{_format}',
+            uriVariables: [
+                'id'
+            ],
+            openapiContext: [
                 'description' => 'Retrieves an extended User resource.',
                 'summary' => 'Retrieves an extended User resource.',
             ],
-            'path' => '/users/{id}/extended.{_format}',
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_USER_GET.'", object)',
-            'security_message' => 'Only own users can be read.',
-        ],
-        'patch' => [
-            'normalization_context' => ['groups' => ['user']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_USER_PATCH.'", object)',
-            'security_message' => 'Only own users can be modified.',
-        ],
-        'put' => [
-            'normalization_context' => ['groups' => ['user']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_USER_PUT.'", object)',
-            'security_message' => 'Only own users can be modified.',
-        ],
+            normalizationContext: ['groups' => ['user_extended']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_USER_GET.'", object)',
+            securityMessage: 'Only own users can be read.'
+        ),
+        new Patch(
+            normalizationContext: ['groups' => ['user']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_USER_PATCH.'", object)',
+            securityMessage: 'Only own users can be modified.'
+        ),
+        new Put(
+            normalizationContext: ['groups' => ['user']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_USER_PUT.'", object)',
+            securityMessage: 'Only own users can be modified.'
+        ),
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['user']],
 )]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityInterface
 {
     use TimestampsTrait;
 
@@ -101,9 +113,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public const ROLE_ADMIN = 'ROLE_ADMIN';
 
+    public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
+
     public const API_ENDPOINT_COLLECTION = '/api/v1/users';
 
     public const API_ENDPOINT_ITEM = '/api/v1/users/%d';
+
+    public const PASSWORD_UNCHANGED = '**********';
+
+    public const SHORT_HASH_LENGTH = 8;
+
+    public const CRUD_FIELDS_ADMIN = ['id'];
+
+    public const CRUD_FIELDS_REGISTERED = ['id', 'idHash', 'email', 'username', 'password', 'plainPassword', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_INDEX = ['id', 'idHash', 'email', 'username', 'password', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_NEW = ['id', 'email', 'username', 'plainPassword', 'firstname', 'lastname', 'roles'];
+
+    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+
+    public const CRUD_FIELDS_DETAIL = ['id', 'idHash', 'email', 'username', 'password', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_FILTER = ['email', 'username', 'firstname', 'lastname'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -112,7 +144,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private int $id;
 
     #[ORM\Column(name: 'id_hash', type: 'string', length: 40, unique: true, nullable: false)]
-    /** @phpstan-ignore-next-line → idHash must be nullable, but PHPStan checks ORM\JoinColumn(nullable: false) */
     private ?string $idHash = null;
 
     #[ORM\Column(type: 'string', length: 255, unique: true)]
@@ -125,6 +156,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $password;
+
+    private string $plainPassword;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['user', 'user_extended'])]
@@ -149,20 +182,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Image::class, orphanRemoval: true)]
     #[MaxDepth(1)]
     #[Groups('user_extended')]
-    #[ApiSubresource]
     private Collection $images;
 
     /** @var Collection<int, Calendar> $calendars */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Calendar::class, orphanRemoval: true)]
     #[MaxDepth(1)]
     #[Groups('user_extended')]
-    #[ApiSubresource]
     private Collection $calendars;
 
     /** @var Collection<int, CalendarImage> $calendarImages */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: CalendarImage::class, orphanRemoval: true)]
     #[MaxDepth(1)]
-    #[ApiSubresource]
     private Collection $calendarImages;
 
     /**
@@ -178,6 +208,50 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * __toString method.
+     *
+     * @return string
+     */
+    #[Pure]
+    public function __toString(): string
+    {
+        return $this->getFullName();
+    }
+
+    /**
+     * Returns the full name of user.
+     *
+     * @param bool $withRole
+     * @return string
+     */
+    public function getFullName(bool $withRole = false): string
+    {
+        return sprintf('%s %s', $this->firstname, $this->lastname);
+    }
+
+    /**
+     * Returns the config of user.
+     *
+     * @return string[]
+     * @throws Exception
+     */
+    #[ArrayShape(['fullName' => 'string', 'roleI18n' => 'string'])]
+    public function getConfig(): array
+    {
+        $roleI18n = match (true) {
+            in_array(User::ROLE_SUPER_ADMIN, $this->roles) => 'admin.user.fields.roles.entries.roleSuperAdmin',
+            in_array(User::ROLE_ADMIN, $this->roles) => 'admin.user.fields.roles.entries.roleAdmin',
+            in_array(User::ROLE_USER, $this->roles), $this->roles === [] => 'admin.user.fields.roles.entries.roleUser',
+            default => throw new Exception(sprintf('Unknown role (%s:%d).', __FILE__, __LINE__)),
+        };
+
+        return [
+            'fullName' => sprintf('%s %s', $this->firstname, $this->lastname),
+            'roleI18n' => $roleI18n,
+        ];
+    }
+
+    /**
      * Gets the id of this user.
      *
      * @return int|null
@@ -190,22 +264,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Gets the hash id of this user.
      *
-     * @return string|null
+     * @return string
      */
-    public function getIdHash(): ?string
+    public function getIdHash(): string
     {
-        return $this->idHash;
+        return $this->idHash ?? $this->getIdHashNew();
+    }
+
+    /**
+     * Gets the hash id of this user.
+     *
+     * @return string
+     */
+    public function getIdHashShort(): string
+    {
+        return substr($this->getIdHash(), 0, self::SHORT_HASH_LENGTH);
+    }
+
+    /**
+     * Gets the hash id of this user.
+     *
+     * @return string
+     */
+    public function getIdHashNew(): string
+    {
+        return sha1(rand(1000000, 9999999).rand(1000000, 9999999));
     }
 
     /**
      * Sets the hash id of this user.
      *
-     * @param string $idHash
+     * @param string|null $idHash
      * @return $this
      */
-    public function setIdHash(string $idHash): self
+    public function setIdHash(?string $idHash = null): self
     {
-        $this->idHash = $idHash;
+        $this->idHash = $idHash ?? $this->getIdHashNew();
 
         return $this;
     }
@@ -275,6 +369,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * Gets the plain password of this user.
+     *
+     * @return string
+     */
+    public function getPlainPassword(): string
+    {
+        return $this->plainPassword ?? self::PASSWORD_UNCHANGED;
+    }
+
+    /**
+     * Sets the plain password of this user.
+     *
+     * @param string $plainPassword
+     * @return User
+     */
+    public function setPlainPassword(string $plainPassword): User
+    {
+        $this->plainPassword = $plainPassword;
 
         return $this;
     }

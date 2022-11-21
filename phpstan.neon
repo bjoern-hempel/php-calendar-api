@@ -3,8 +3,9 @@ parameters:
   paths:
     - src
     - tests
-  doctrine:
-    objectManagerLoader: tests/object-manager.php
+  # https://github.com/phpstan/phpstan-doctrine
+  #doctrine:
+  #  objectManagerLoader: tests/object-manager.php
   excludePaths:
     - tests/tmp/*
     - tests/*/Example*.php

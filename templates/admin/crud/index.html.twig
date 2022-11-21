@@ -1,0 +1,75 @@
+{% extends '@!EasyAdmin/crud/index.html.twig' %}
+
+{% block main %}
+    {{ parent() }}
+
+    <div id="modal-calendar-sheet" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4 class="modal-title">{{ 'admin.actions.calendarSheet.title'|trans|raw }}</h4>
+                    <p class="modal-text">{{ 'admin.actions.calendarSheet.questionIndex'|trans|raw }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">
+                        <span class="btn-label">{{ 'action.cancel'|trans([], 'EasyAdminBundle') }}</span>
+                    </button>
+
+                    {# \App\Controller\Admin\CalendarImageCrudController::configureActions (#action-calendar-sheet) #}
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-info" id="modal-calendar-sheet-button">
+                        <span class="btn-label">{{ 'action.generate'|trans([], 'actions') }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-calendar-sheets" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4 class="modal-title">{{ 'admin.actions.calendarSheets.title'|trans|raw }}</h4>
+                    <p class="modal-text">{{ 'admin.actions.calendarSheets.questionIndex'|trans|raw }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">
+                        <span class="btn-label">{{ 'action.cancel'|trans([], 'EasyAdminBundle') }}</span>
+                    </button>
+
+                    {# \App\Controller\Admin\CalendarImageCrudController::configureActions (#action-calendar-sheet) #}
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-info" id="modal-calendar-sheets-button">
+                        <span class="btn-label">{{ 'action.generate'|trans([], 'actions') }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-calendar-urls" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4 class="modal-title">{{ 'admin.actions.calendarUrls.title'|trans|raw }}</h4>
+                    <p class="modal-text">{{ 'admin.actions.calendarUrls.questionIndex'|trans|raw }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">
+                        <span class="btn-label">{{ 'action.cancel'|trans([], 'EasyAdminBundle') }}</span>
+                    </button>
+
+                    {# \App\Controller\Admin\CalendarImageCrudController::configureActions (#action-calendar-sheet) #}
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-info" id="modal-calendar-urls-button">
+                        <span class="btn-label">{{ 'action.generate'|trans([], 'actions') }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    {{ include('admin/crud/javascript/modal_calendar_sheet_index.html.twig') }}
+    {{ include('admin/crud/javascript/modal_calendar_sheets_index.html.twig') }}
+    {{ include('admin/crud/javascript/modal_calendar_urls_index.html.twig') }}
+{% endblock body_javascript %}

@@ -1,0 +1,59 @@
+<header class="bg-primary force-not-top">
+    <div class="position-fixed fixed-top">
+        <div class="collapse bg-white" id="navbarHeader">
+            <div class="{{ containerClass|default('container') }} {{ containerMargin|default('') }}">
+                <div class="row">
+                    <div class="col-sm-8 col-md-7 py-4">
+                        <h4 class="text-dark">{{ 'page.general.about'|trans }}</h4>
+                        <p class="text-muted">{{ 'page.general.info'|trans({'%class%': 'text-dark'})|raw }}</p>
+                    </div>
+                    <div class="col-sm-4 offset-md-1 py-4">
+                        <h4 class="text-dark">{{ 'page.general.contact'|trans }}</h4>
+                        <ul class="list-unstyled">
+                            <li><a href="{{ 'page.general.domainFull'|trans }}" class="text-dark">{{ 'page.general.name'|trans }}</a></li>
+                            <li><a href="mailto:{{ 'page.general.email'|trans }}" class="text-dark">{{ 'page.general.emailMe'|trans }}</a></li>
+                            <li><a href="/impress" class="text-dark">{{ 'page.general.impress'|trans }}</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="navbar {{ showStage|default(false) ? 'navbar-dark bg-transparent' : 'navbar-light bg-white' }}">
+            <div class="{{ containerClass|default('container') }} {{ containerMargin|default('') }}">
+                <a href="#" class="navbar-brand d-flex align-items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="me-2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    <strong>{{ title }}</strong>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {% if showStage|default(false) %}
+        <div>
+            <section class="py-5 text-center text-lg-start container">
+                <div class="row py-5 mb-5">
+                    <div class="col-lg-8 pb-5 py-lg-0">
+                        <h1 class="fw-light text-white">Erstelle deinen eigenen Kalender</h1>
+                        <p class="lead text-white">
+                            Ein Baukausten. Dein Kalender für dich zuhause. Mit Freunden und Familie online teilen.
+                        </p>
+                        <p>
+                            <a href="https://twelvepics.com/c/Y2Y2YjM3ZDIvMS8x" class="text-white">Demo-Kalender</a>
+                        </p>
+                        <p>
+                            <a class="" href="https://twelvepics.com/c/Y2Y2YjM3ZDIvMS8x"><img src="{{ 'https://twelvepics.com/c/Y2Y2YjM3ZDIvMS8x'|qr_code }}" style="width: 100px;" class="img-fluid img-thumbnail" alt="Demo-Kalender"></a>
+                        </p>
+                    </div>
+                    <div class="col-lg-4">
+                        <a href="{{ asset('build/images/calendar/04.2048.jpg') }}" class="lightbox-own" data-gallery="header">
+                            <img class="w-100 rounded-4"{{ 'build/images/calendar/04.2048.jpg'|image_dimensions|raw }} src="{{ asset('build/images/calendar/04.800.jpg') }}">
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    {% endif %}
+</header>

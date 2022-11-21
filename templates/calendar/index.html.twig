@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ calendar.name }}{% endblock %}
+
+{% block body_class %}calendar-index{% endblock %}
+
+{% block body %}
+    {% apply spaceless %}
+        {% include 'calendar/header.html.twig' with {
+            'title': calendar.title,
+            'containerClass': 'container-fluid',
+            'containerMargin': 'px-5'
+        } %}
+
+        <div class="container-fluid container-images px-0">
+            {% for key, calendarImage in calendar.calendarImages %}
+                <a class="container-image-link" href="{{ path_encoded('app_calendar_detail', {'hash': calendarImage.user.idHash, 'userId': calendarImage.user.id, 'calendarImageId': calendarImage.id}) }}">
+                    <div class="container-image" style="background-image:url({{ calendarImage.pathTarget|path_preview(key is same as(0) ? 800 : 800)|add_hash|url_absolute }});"></div>
+                </a>
+            {% endfor %}
+        </div>
+
+        {% include 'calendar/footer.html.twig' with {
+            'containerClass': 'container-fluid',
+            'containerMargin': 'px-5'
+        } %}
+    {% endapply %}
+{% endblock %}

@@ -13,10 +13,19 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\HolidayListener;
+use App\EventListener\Entity\UserListener;
 use App\Repository\HolidayRepository;
 use App\Utils\ArrayToObject;
+use App\Utils\Traits\JsonHelper;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
@@ -26,58 +35,78 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Entity class Holiday
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2021-12-30)
+ * @version 0.1.1 (2022-11-21)
+ * @since 0.1.1 (2022-11-21) Update to symfony 6.1
+ * @since 0.1.0 (2021-12-30) First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: HolidayRepository::class)]
+#[ORM\EntityListeners([UserListener::class, HolidayListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
-    collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['holiday']],
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['holiday_extended']],
-            'openapi_context' => [
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['holiday']]
+        ),
+        new GetCollection(
+            uriTemplate: '/holidays/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves the collection of extended Holiday resources.',
                 'summary' => 'Retrieves the collection of extended Holiday resources.',
             ],
-            'path' => '/holidays/extended.{_format}',
-        ],
-        'post' => [
-            'normalization_context' => ['groups' => ['holiday']],
-        ],
-    ],
-    itemOperations: [
-        'delete' => [
-            'normalization_context' => ['groups' => ['holiday']],
-        ],
-        'get' => [
-            'normalization_context' => ['groups' => ['holiday']],
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['holiday_extended']],
-            'openapi_context' => [
+            normalizationContext: ['groups' => ['holiday_extended']]
+        ),
+        new Post(
+            normalizationContext: ['groups' => ['holiday']]
+        ),
+
+        new Delete(
+            normalizationContext: ['groups' => ['holiday']]
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['holiday']]
+        ),
+        new Get(
+            uriTemplate: '/holidays/{id}/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves a extended Holiday resource.',
                 'summary' => 'Retrieves a extended Holiday resource.',
             ],
-            'path' => '/holidays/{id}/extended.{_format}',
-        ],
-        'patch' => [
-            'normalization_context' => ['groups' => ['holiday']],
-        ],
-        'put' => [
-            'normalization_context' => ['groups' => ['holiday']],
-        ],
+            normalizationContext: ['groups' => ['holiday_extended']]
+        ),
+        new Patch(
+            normalizationContext: ['groups' => ['holiday']]
+        ),
+        new Put(
+            normalizationContext: ['groups' => ['holiday']]
+        )
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['holiday']],
     order: ['id' => 'ASC'],
 )]
-class Holiday
+class Holiday implements EntityInterface
 {
     use TimestampsTrait;
+
+    use JsonHelper;
+
+    public const CRUD_FIELDS_ADMIN = [];
+
+    public const CRUD_FIELDS_REGISTERED = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_INDEX = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_NEW = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson'];
+
+    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+
+    public const CRUD_FIELDS_DETAIL = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_FILTER = ['holidayGroup', 'name', 'date', 'yearly', 'type'];
+
+    public const FIELD_TYPE_PUBLIC_DATE = 0;
+
+    public const FIELD_TYPE_NON_PUBLIC_DATE = 1;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -87,7 +116,7 @@ class Holiday
 
     #[ORM\ManyToOne(targetEntity: HolidayGroup::class, inversedBy: 'holidays')]
     #[Groups(['holiday', 'holiday_extended'])]
-    private ?HolidayGroup $holiday_group;
+    private ?HolidayGroup $holidayGroup;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['holiday', 'holiday_extended'])]
@@ -102,7 +131,24 @@ class Holiday
     #[Groups(['holiday', 'holiday_extended'])]
     private array $config = [];
 
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['holiday', 'holiday_extended'])]
+    private bool $yearly = false;
+
     private ArrayToObject $configObject;
+
+    #[ORM\Column(type: 'integer')]
+    private int $type = 0;
+
+    /**
+     * __toString method.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return sprintf('%s (%s)', $this->getName(), $this->getDate()->format('d.n.Y'));
+    }
 
     /**
      * Gets the id of this holiday.
@@ -121,18 +167,29 @@ class Holiday
      */
     public function getHolidayGroup(): ?HolidayGroup
     {
-        return $this->holiday_group;
+        return $this->holidayGroup;
+    }
+
+    /**
+     * Gets the holiday group id of this holiday.
+     *
+     * @return int|null
+     */
+    #[Groups(['holiday', 'holiday_extended'])]
+    public function getHolidayGroupId(): ?int
+    {
+        return $this->getHolidayGroup()?->getId();
     }
 
     /**
      * Sets the holiday group of this holiday.
      *
-     * @param HolidayGroup|null $holiday_group
+     * @param HolidayGroup|null $holidayGroup
      * @return $this
      */
-    public function setHolidayGroup(?HolidayGroup $holiday_group): self
+    public function setHolidayGroup(?HolidayGroup $holidayGroup): self
     {
-        $this->holiday_group = $holiday_group;
+        $this->holidayGroup = $holidayGroup;
 
         return $this;
     }
@@ -220,6 +277,89 @@ class Holiday
         $this->config = $config;
 
         $this->configObject = new ArrayToObject($config);
+
+        return $this;
+    }
+
+    /**
+     * Gets the config element as JSON.
+     *
+     * @param bool $beautify
+     * @return string
+     * @throws Exception
+     */
+    public function getConfigJson(bool $beautify = true): string
+    {
+        return self::jsonEncode($this->config, $beautify, 2);
+    }
+
+    /**
+     * Sets the config element from JSON.
+     *
+     * @param string $json
+     * @return $this
+     */
+    public function setConfigJson(string $json): self
+    {
+        $this->config = self::jsonDecodeArray($json);
+
+        return $this;
+    }
+
+    /**
+     * Gets the config element as JSON.
+     *
+     * @param bool $beautify
+     * @return string
+     * @throws Exception
+     */
+    public function getConfigJsonRaw(bool $beautify = true): string
+    {
+        return $this->getConfigJson(false);
+    }
+
+    /**
+     * Sets the config element from JSON.
+     *
+     * @param string $json
+     * @return $this
+     */
+    public function setConfigJsonRaw(string $json): self
+    {
+        return $this->setConfigJson($json);
+    }
+
+    /**
+     * Gets the yearly status of this holiday.
+     *
+     * @return bool|null
+     */
+    public function getYearly(): ?bool
+    {
+        return $this->yearly;
+    }
+
+    /**
+     * Sets the yearly status from this holiday.
+     *
+     * @param bool $yearly
+     * @return $this
+     */
+    public function setYearly(bool $yearly): self
+    {
+        $this->yearly = $yearly;
+
+        return $this;
+    }
+
+    public function getType(): ?int
+    {
+        return $this->type;
+    }
+
+    public function setType(int $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }

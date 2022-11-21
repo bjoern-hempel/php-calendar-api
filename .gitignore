@@ -3,7 +3,6 @@
 /.env.local
 /.env.local.php
 /.env.*.local
-/docker-compose.yml
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
@@ -32,3 +31,16 @@
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
+
+###> symfony/webpack-encore-bundle ###
+/node_modules/
+/public/build/
+npm-debug.log
+yarn-error.log
+###< symfony/webpack-encore-bundle ###
+
+###> table-dumper ###
+/table-dumper.log
+/table-dumper.lock
+###< table-dumper ###
+

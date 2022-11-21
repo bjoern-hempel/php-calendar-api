@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\DataFixtures\AppFixtures;
+use App\Entity\CalendarImage;
 use App\Service\CalendarBuilderService;
-use App\Service\CalendarLoaderService;
-use App\Service\HolidayGroupLoaderService;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\Entity\CalendarLoaderService;
+use App\Service\Entity\HolidayGroupLoaderService;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -42,25 +43,20 @@ class CreatePageCommand extends Command
 
     protected HolidayGroupLoaderService $holidayGroupLoaderService;
 
-    protected EntityManagerInterface $manager;
-
     /**
      * CreatePageCommand constructor
      *
      * @param KernelInterface $appKernel
      * @param CalendarLoaderService $calendarLoaderService
      * @param HolidayGroupLoaderService $holidayGroupLoaderService
-     * @param EntityManagerInterface $manager
      */
-    public function __construct(KernelInterface $appKernel, CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, EntityManagerInterface $manager)
+    public function __construct(KernelInterface $appKernel, CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService)
     {
         $this->appKernel = $appKernel;
 
         $this->calendarLoaderService = $calendarLoaderService;
 
         $this->holidayGroupLoaderService = $holidayGroupLoaderService;
-
-        $this->manager = $manager;
 
         parent::__construct();
     }
@@ -79,7 +75,8 @@ class CreatePageCommand extends Command
             ->setDescription('Creates a calendar page')
             ->setDefinition([
                 new InputOption('email', null, InputOption::VALUE_REQUIRED, 'The email of the user.'),
-                new InputOption('name', null, InputOption::VALUE_REQUIRED, 'The calendar name which will be used.'),
+                new InputOption('name', null, InputOption::VALUE_OPTIONAL, 'The calendar name which will be used.'),
+                new InputOption('id', null, InputOption::VALUE_OPTIONAL, 'The calendar id which will be used.'),
                 new InputOption('year', 'y', InputOption::VALUE_REQUIRED, 'The year with which the page will be created.'),
                 new InputOption('month', 'm', InputOption::VALUE_REQUIRED, 'The month with which the page will be created.'),
             ])
@@ -110,20 +107,31 @@ EOT
             '',
         ]);
 
-        /* Read parameter */
+        /* Read parameters */
         $email = strval($input->getOption('email'));
-        $calendarName = strval($input->getOption('name'));
+        switch (true) {
+            case $input->getOption('name') !== null:
+                $calendarNameOrId = strval($input->getOption('name'));
+                break;
+            case $input->getOption('id') !== null:
+                $calendarNameOrId = intval($input->getOption('id'));
+                break;
+            default:
+                $output->writeln('At least one option for calendar is missing: id or name.'."\n");
+                return Command::FAILURE;
+        }
+
         $year = intval($input->getOption('year'));
         $month = intval($input->getOption('month'));
-        $holidayGroupName = 'Saxony';
+        $holidayGroupName = AppFixtures::NAME_HOLIDAY_GROUP_SAXONY;
 
-        /* Read db */
-        $calendarImage = $this->calendarLoaderService->loadCalendarImage($email, $calendarName, $year, $month);
+        /* Read calendar image and holiday group */
+        $calendarImage = $this->calendarLoaderService->loadCalendarImageByCalendarNameYearAndMonth($email, $calendarNameOrId, $year, $month);
         $holidayGroup = $this->holidayGroupLoaderService->loadHolidayGroup($holidayGroupName);
 
         /* Print details */
         $output->writeln(sprintf('Email:          %s', $calendarImage->getUser()->getEmail()));
-        $output->writeln(sprintf('Calendar name:  %s', $calendarImage->getCalendar()->getName()));
+        $output->writeln(sprintf('Calendar name:  %s', $calendarImage->getCalendar()?->getName()));
         $output->writeln(sprintf('Year:           %d', $calendarImage->getYear()));
         $output->writeln(sprintf('Month:          %d', $calendarImage->getMonth()));
         $output->writeln(sprintf('Holiday group:  %s', $holidayGroup->getName()));
@@ -134,7 +142,7 @@ EOT
         /* Create calendar image */
         $timeStart = microtime(true);
         $calendarBuilderService = new CalendarBuilderService($this->appKernel);
-        $calendarBuilderService->init($calendarImage, $holidayGroup);
+        $calendarBuilderService->init($calendarImage, $holidayGroup, false, true, CalendarImage::QUALITY_TARGET);
         $file = $calendarBuilderService->build();
         $timeTaken = microtime(true) - $timeStart;
 

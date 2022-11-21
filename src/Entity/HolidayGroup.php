@@ -13,12 +13,21 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Trait\TimestampsTrait;
+use App\EventListener\Entity\UserListener;
 use App\Repository\HolidayGroupRepository;
+use App\Utils\HolidayCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -26,58 +35,72 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Entity class HolidayGroup
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2021-12-30)
+ * @version 0.1.1 (2022-11-21)
+ * @since 0.1.1 (2022-11-21) Update to symfony 6.1
+ * @since 0.1.0 (2021-12-30) First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: HolidayGroupRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
-    collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['holiday_group']],
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['holiday_group_extended']],
-            'openapi_context' => [
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['holiday_group']]
+        ),
+        new GetCollection(
+            uriTemplate: '/holiday_groups/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves the collection of extended HolidayGroup resources.',
                 'summary' => 'Retrieves the collection of extended HolidayGroup resources.',
             ],
-            'path' => '/holiday_groups/extended.{_format}',
-        ],
-        'post' => [
-            'normalization_context' => ['groups' => ['holiday_group']],
-        ],
-    ],
-    itemOperations: [
-        'delete' => [
-            'normalization_context' => ['groups' => ['holiday_group']],
-        ],
-        'get' => [
-            'normalization_context' => ['groups' => ['holiday_group']],
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['holiday_group_extended']],
-            'openapi_context' => [
+            normalizationContext: ['groups' => ['holiday_group_extended']]
+        ),
+        new Post(
+            normalizationContext: ['groups' => ['holiday_group']]
+        ),
+
+        new Delete(
+            normalizationContext: ['groups' => ['holiday_group']]
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['holiday_group']]
+        ),
+        new Get(
+            uriTemplate: '/holiday_groups/{id}/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves a extended HolidayGroup resource.',
                 'summary' => 'Retrieves a extended HolidayGroup resource.',
             ],
-            'path' => '/holiday_groups/{id}/extended.{_format}',
-        ],
-        'patch' => [
-            'normalization_context' => ['groups' => ['holiday_group']],
-        ],
-        'put' => [
-            'normalization_context' => ['groups' => ['holiday_group']],
-        ],
+            normalizationContext: ['groups' => ['holiday_group_extended']]
+        ),
+        new Patch(
+            normalizationContext: ['groups' => ['holiday_group']]
+        ),
+        new Put(
+            normalizationContext: ['groups' => ['holiday_group']]
+        )
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['holiday_group']],
     order: ['id' => 'ASC'],
 )]
-class HolidayGroup
+class HolidayGroup implements EntityInterface
 {
     use TimestampsTrait;
+
+    public const CRUD_FIELDS_ADMIN = [];
+
+    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'nameShort', 'holidays', 'holidaysGrouped', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_INDEX = ['id', 'name', 'nameShort', 'holidaysGrouped', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_NEW = ['id', 'name', 'nameShort'];
+
+    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+
+    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'nameShort', 'holidaysGrouped', 'updatedAt', 'createdAt'];
+
+    public const CRUD_FIELDS_FILTER = ['name'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -90,9 +113,14 @@ class HolidayGroup
     private string $name;
 
     /** @var Collection<int, Holiday> $holidays */
-    #[ORM\OneToMany(mappedBy: 'holiday_group', targetEntity: Holiday::class)]
+    #[ORM\OneToMany(mappedBy: 'holidayGroup', targetEntity: Holiday::class)]
     #[Groups(['holiday_group', 'holiday_group_extended'])]
+    #[ORM\OrderBy(value: ['date' => 'ASC'])]
     private Collection $holidays;
+
+    #[ORM\Column(name: 'name_short', type: 'string', length: 10)]
+    #[Groups(['holiday_group', 'holiday_group_extended'])]
+    private string $nameShort;
 
     /**
      * HolidayGroup constructor.
@@ -101,6 +129,16 @@ class HolidayGroup
     public function __construct()
     {
         $this->holidays = new ArrayCollection();
+    }
+
+    /**
+     * __toString method.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->name;
     }
 
     /**
@@ -137,6 +175,29 @@ class HolidayGroup
     }
 
     /**
+     * Gets the short name of this holiday group.
+     *
+     * @return string
+     */
+    public function getNameShort(): string
+    {
+        return $this->nameShort;
+    }
+
+    /**
+     * Sets the short name of this holiday group.
+     *
+     * @param string $nameShort
+     * @return $this
+     */
+    public function setNameShort(string $nameShort): self
+    {
+        $this->nameShort = $nameShort;
+
+        return $this;
+    }
+
+    /**
      * Gets all related holidays.
      *
      * @return Collection<int, Holiday>
@@ -144,6 +205,33 @@ class HolidayGroup
     public function getHolidays(): Collection
     {
         return $this->holidays;
+    }
+
+    /**
+     * Gets all related holidays grouped.
+     *
+     * @return Array<string, Array<int, Collection<int, Holiday>>|HolidayGroup>
+     * @throws Exception
+     */
+    public function getHolidaysGrouped(): array
+    {
+        return [
+            'holidayGroup' => $this,
+            'holidays' => HolidayCollection::getHolidaysGrouped($this->getHolidays())
+        ];
+    }
+
+    /**
+     * Gets all related holidays as simple id list.
+     *
+     * @return Collection<int, int>
+     */
+    #[Groups(['holiday_group', 'holiday_group_extended'])]
+    public function getHolidayIds(): Collection
+    {
+        return $this->getHolidays()->map(function (Holiday $holiday) {
+            return $holiday->getId();
+        });
     }
 
     /**

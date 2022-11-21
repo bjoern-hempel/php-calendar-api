@@ -18,14 +18,14 @@ on:
 # Configure jobs
 jobs:
   symfony:
-    name: Symfony 6.0 (PHP ${{ matrix.php-versions }})
+    name: Symfony 6.1 (PHP ${{ matrix.php-versions }})
     runs-on: ${{ matrix.operating-system }}
     # https://hub.docker.com/_/ubuntu/
     strategy:
       fail-fast: true
       matrix:
         operating-system: [ubuntu-latest]
-        php-versions: ['8.0']
+        php-versions: ['8.1']
     steps:
       # https://github.com/actions/checkout (official)
       - name: Checkout
@@ -60,5 +60,6 @@ jobs:
         run: composer test
 
       # https://github.com/sensiolabs/security-checker
-      - name: Security check installed dependencies
-        uses: symfonycorp/security-checker-action@v2
+      #- name: Security check installed dependencies
+      #  uses: symfonycorp/security-checker-action@v2
+

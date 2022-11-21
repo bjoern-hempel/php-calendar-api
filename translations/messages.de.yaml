@@ -1,0 +1,550 @@
+# Admin texts
+admin:
+
+  # Dashboard
+  dashboard:
+    label: 'Dashboard'
+
+  # Login
+  login:
+    labelEmail: 'E-Mail-Adresse'
+    labelPassword: 'Passwort'
+    labelLogin: 'Einloggen'
+    labelLogout: 'Ausloggen'
+    insufficientRights: 'Unzureichende Rechte für den Zugang verfügbar.'
+
+  # Actions
+  actions:
+    calendarSheet:
+      success: 'Das Kalenderblatt "%month% / %year%" vom Kalender "%calendar%" wurde erfolgreich erstellt: %file%, %width%x%height%px, %size%, %time%s.'
+      failure: 'Das Kalenderblatt "%month% / %year%" vom Kalender "%calendar%" konnte nicht erfolgreich erstellt werden.'
+      title: 'Kalenderblatt generieren?'
+      questionIndex: 'Hiermit wird das Kalenderblatt "%title%" (%year%, %month%) neu generiert.'
+      questionDetail: 'Hiermit wird das Kalenderblatt neu generiert.'
+    calendarSheets:
+      success: '%number% Kalenderblätter "%name% wurden erfolgreich erstellt: %time%s; %sizes%.'
+      failure: 'Die Kalenderblätter "%name% konnten nicht erfolgreich erstellt werden.'
+      title: 'Kalenderblätter neu generieren?'
+      questionIndex: 'Hiermit werden die Kalenderblätter "%name%" neu generiert.'
+      questionDetail: 'Hiermit werden die Kalenderblätter neu generiert.'
+    calendarUrls:
+      success: '%number% Kalender URLs "%name%" wurden erfolgreich erstellt.'
+      failure: 'Die Kalender URLs "%name%" konnten nicht erfolgreich erstellt werden.'
+      title: 'Kalender URLs generieren?'
+      questionIndex: 'Hiermit werden alle (!) Kalender URLs "%name%" neu generiert. Achtung: Die Kalenderblätter werden dabei nicht geändert. Dies muss zusätzlich ausgeführt werden (Kalenderblätter generieren).'
+      questionDetail: 'Hiermit werden alle (!) Kalender URLs neu generiert. Achtung: Die Kalenderblätter werden dabei nicht geändert. Dies muss zusätzlich ausgeführt werden (Kalenderblätter generieren).'
+
+  # Admin sections
+  section:
+    administration:
+      label: 'Administration'
+
+    calendar:
+      label: 'Kalender'
+
+    calendarImage:
+      label: 'Kalender Bilder'
+
+    calendarStyle:
+      label: 'Kalender Stile'
+
+    event:
+      label: 'Events'
+
+    holiday:
+      label: 'Feiertage'
+
+    holidayGroup:
+      label: 'Feiertagsgruppen'
+
+    image:
+      label: 'Bilder'
+
+    user:
+      label: 'User'
+
+  # Calendar section
+  calendar:
+    singular: Kalender
+    plural: Kalender
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      user:
+        label: 'User'
+        help: 'Der User dieses Eintrags.'
+      calendarStyle:
+        label: 'Kalender Stil'
+        help: 'Der Kalender Stil dieses Eintrags.'
+      holidayGroup:
+        label: 'Feiertag Gruppe'
+        help: 'Die Feiertag Gruppe dieses Eintrags.'
+      name:
+        label: 'Name'
+        help: 'Der Name dieses Eintrags.'
+      title:
+        label: 'Titel'
+        help: 'Der Titel dieses Eintrags.'
+      defaultYear:
+        label: 'Standardjahr'
+        help: 'Das Standardjahr dieses Eintrags.'
+        entries:
+          2010: 'Kalenderjahr 2010'
+          2011: 'Kalenderjahr 2011'
+          2012: 'Kalenderjahr 2012'
+          2013: 'Kalenderjahr 2013'
+          2014: 'Kalenderjahr 2014'
+          2015: 'Kalenderjahr 2015'
+          2016: 'Kalenderjahr 2016'
+          2017: 'Kalenderjahr 2017'
+          2018: 'Kalenderjahr 2018'
+          2019: 'Kalenderjahr 2019'
+          2020: 'Kalenderjahr 2020'
+          2021: 'Kalenderjahr 2021'
+          2022: 'Kalenderjahr 2022'
+          2023: 'Kalenderjahr 2023'
+          2024: 'Kalenderjahr 2024'
+          2025: 'Kalenderjahr 2025'
+          2026: 'Kalenderjahr 2026'
+          2027: 'Kalenderjahr 2027'
+          2028: 'Kalenderjahr 2028'
+          2029: 'Kalenderjahr 2029'
+          2030: 'Kalenderjahr 2030'
+          2031: 'Kalenderjahr 2031'
+          2032: 'Kalenderjahr 2032'
+      subtitle:
+        label: 'Untertitel'
+        help: 'Der Untertitel dieses Eintrags.'
+      configJson:
+        label: 'Konfiguration'
+        help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      published:
+        label: 'Veröffentlicht'
+        help: 'Gibt an, ob dieser Eintrag veröffentlicht werden soll.'
+      calendarImages:
+        label: 'Kalender Bilder'
+        help: 'Die Kalender Bilder dieses Eintrags.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+      buildCalendarSheets:
+        label: 'Kalenderblätter generieren'
+        help: 'Generiert die Kalenderblätter'
+      buildCalendarUrls:
+        label: 'Kalender URLs generieren'
+        help: 'Generiert die Kalender URLs'
+      viewCalendarSheets:
+        label: 'Kalenderblätter anzeigen'
+        help: 'Zeigt die Kalenderblätter an'
+      newCalendarImage:
+        label: 'Kalenderbild hinzufügen'
+        help: 'Fügt ein Kalenderbild hinzu.'
+
+  # CalendarImage section
+  calendarImage:
+    singular: Kalender Bild
+    plural: Kalender Bilder
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      user:
+        label: 'User'
+        help: 'Der User dieses Eintrags.'
+      calendar:
+        label: 'Kalender'
+        help: 'Der Kalender dieses Eintrags.'
+      image:
+        label: 'Bild'
+        help: 'Das Bild dieses Eintrags.'
+      pathSource:
+        label: 'Bild'
+        help: 'Das Bild dieses Eintrags.'
+      pathSourcePreview:
+        label: 'Bild'
+        help: 'Der Bild dieses Eintrags.'
+      pathTarget:
+        label: 'Kalenderblatt'
+        help: 'Der Kalenderblatt dieses Eintrags.'
+      pathTargetPreview:
+        label: 'Kalenderblatt'
+        help: 'Der Kalenderblatt dieses Eintrags.'
+      year:
+        label: 'Jahr'
+        help: 'Das Jahr dieses Eintrags.'
+        entries:
+          2010: 'Kalenderjahr 2010'
+          2011: 'Kalenderjahr 2011'
+          2012: 'Kalenderjahr 2012'
+          2013: 'Kalenderjahr 2013'
+          2014: 'Kalenderjahr 2014'
+          2015: 'Kalenderjahr 2015'
+          2016: 'Kalenderjahr 2016'
+          2017: 'Kalenderjahr 2017'
+          2018: 'Kalenderjahr 2018'
+          2019: 'Kalenderjahr 2019'
+          2020: 'Kalenderjahr 2020'
+          2021: 'Kalenderjahr 2021'
+          2022: 'Kalenderjahr 2022'
+          2023: 'Kalenderjahr 2023'
+          2024: 'Kalenderjahr 2024'
+          2025: 'Kalenderjahr 2025'
+          2026: 'Kalenderjahr 2026'
+          2027: 'Kalenderjahr 2027'
+          2028: 'Kalenderjahr 2028'
+          2029: 'Kalenderjahr 2029'
+          2030: 'Kalenderjahr 2030'
+          2031: 'Kalenderjahr 2031'
+          2032: 'Kalenderjahr 2032'
+      month:
+        label: 'Monat'
+        help: 'Der Monat dieses Eintrags.'
+        entries:
+          title: 'Titelblatt'
+          january: 'Januar'
+          february: 'Februar'
+          march: 'März'
+          april: 'April'
+          may: 'Mai'
+          june: 'Juni'
+          july: 'Juli'
+          august: 'August'
+          september: 'September'
+          october: 'Oktober'
+          november: 'November'
+          december: 'Dezember'
+      title:
+        label: 'Titel'
+        help: 'Der Titel dieses Eintrags.'
+      position:
+        label: 'Position'
+        help: 'Die Position dieses Eintrags.'
+      url:
+        label: 'URL'
+        help: 'Die URL dieses Eintrags.'
+      configJson:
+        label: 'Konfiguration'
+        help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+      buildCalendarSheet:
+        label: 'Kalenderblatt generieren'
+        help: 'Generiert das Kalenderblatt'
+      rebuildUrl:
+        label: 'Url automatisch setzen'
+        help: 'Setzt die Url automatisch'
+
+  # CalendarStyle section
+  calendarStyle:
+    singular: Kalender Stil
+    plural: Kalender Stile
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      name:
+        label: 'Name'
+        help: 'Der Name dieses Eintrags.'
+      configJson:
+        label: 'Konfiguration'
+        help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+
+  # Event section
+  event:
+    singular: Event
+    plural: Events
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      user:
+        label: 'User'
+        help: 'Der User dieses Eintrags.'
+      name:
+        label: 'Name'
+        help: 'Der Name dieses Eintrags.'
+      type:
+        label: 'Typ'
+        help: 'Der Typ dieses Eintrags.'
+        entries:
+          entry0: 'Geburtstag'
+          entry1: 'Event (eintägig)'
+          entry2: 'Event (mehrtägig)'
+      date:
+        label: 'Datum'
+        help: 'Das Datum dieses Eintrags.'
+      yearly:
+        label: 'Jährlich'
+        help: 'Der Jährlich Status dieses Eintrags.'
+      configJson:
+        label: 'Konfiguration'
+        help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+
+  # Holiday section
+  holiday:
+    singular: Feiertag
+    plural: Feiertage
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      holidayGroup:
+        label: 'Feiertag Gruppe'
+        help: 'Die Feiertag Gruppe dieses Eintrags.'
+      name:
+        label: 'Name'
+        help: 'Der Name dieses Eintrags.'
+      date:
+        label: 'Datum'
+        help: 'Das Datum dieses Eintrags.'
+      yearly:
+        label: 'Jährlich'
+        help: 'Der Jährlich Status dieses Eintrags.'
+      type:
+        label: 'Typ'
+        help: 'Der Typ dieses Eintrags.'
+        entries:
+          entry0: 'Gesetzlicher Feiertag'
+          entry1: 'Nicht gesetzlicher Feiertag'
+      configJson:
+        label: 'Konfiguration'
+        help: 'Die aktuelle Konfiguration dieses Eintrags im JSON-Format.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+
+  # HolidayGroup section
+  holidayGroup:
+    singular: Feiertagsgruppe
+    plural: Feiertagsgruppen
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      name:
+        label: 'Name'
+        help: 'Der Name dieses Eintrags.'
+      nameShort:
+        label: 'Kürzel'
+        help: 'Der Kürzel dieses Eintrags.'
+      holidays:
+        label: 'Feiertage'
+        help: 'Die Feiertage dieses Eintrags.'
+      holidaysGrouped:
+        label: 'Feiertage'
+        help: 'Die Feiertage dieses Eintrags.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+      newHoliday:
+        label: 'Feiertag anlegen'
+        help: 'Legt einen neuen Feiertag an.'
+
+  # Image section
+  image:
+    singular: Bild
+    plural: Bilder
+    notGenerated: 'Dieses Bild wurde noch nicht generiert.'
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      user:
+        label: 'User'
+        help: 'Der User dieses Eintrags.'
+      name:
+        label: 'Name'
+        help: 'Der Name dieses Eintrags.'
+      path:
+        label: 'Pfad'
+        help: 'Der Pfad dieses Eintrags.'
+      pathSource:
+        label: 'Quellpfad'
+        help: 'Der Quellpfad dieses Eintrags.'
+      pathSourcePreview:
+        label: 'Quellpfad'
+        help: 'Der Quellpfad dieses Eintrags.'
+      pathTarget:
+        label: 'Zielpfad'
+        help: 'Der Zielpfad dieses Eintrags.'
+      pathTargetPreview:
+        label: 'Zielpfad'
+        help: 'Der Zielpfad dieses Eintrags.'
+      pathSourceFull:
+        label: 'Vollständiger Quellpfad'
+        help: 'Der vollständige Quellpfad dieses Eintrags.'
+      pathTargetFull:
+        label: 'Vollständiger Zielpfad'
+        help: 'Der vollständige Zielpfad dieses Eintrags.'
+      width:
+        label: 'Weite'
+        help: 'Die Weite dieses Bildes.'
+      height:
+        label: 'Höhe'
+        help: 'Die Höhe dieses Bildes.'
+      size:
+        label: 'Größe'
+        help: 'Die Grö0e dieses Bildes.'
+      title:
+        label: 'Titel'
+        help: 'Der Titel dieses Bildes.'
+      longitude:
+        label: 'Longitude'
+        help: 'Die geographische Länge dieses Bildes.'
+      latitude:
+        label: 'Latitude'
+        help: 'Die geographische Breite dieses Bildes.'
+      url:
+        label: 'URL'
+        help: 'Die URL dieses Bildes.'
+      gpsHeight:
+        label: 'Höhe'
+        help: 'Die Höhe dieses Bildes.'
+      iso:
+        label: 'ISO'
+        help: 'Die ISO dieses Bildes.'
+      mime:
+        label: 'MIME'
+        help: 'Die MIME dieses Bildes.'
+      place:
+        label: 'Ort'
+        help: 'Der Ort dieses Bildes.'
+      placeDistrict:
+        label: 'Stadteil / Ortschaft'
+        help: 'Der Stadteil / Ortschaft dieses Bildes.'
+      placeCity:
+        label: 'Stadt / Gemeinde'
+        help: 'Der Stadt / Gemeinde dieses Bildes.'
+      placeState:
+        label: 'Bundesland'
+        help: 'Das Bundesland dieses Bildes.'
+      placeCountry:
+        label: 'Land'
+        help: 'Das Land dieses Bildes.'
+      placeTimezone:
+        label: 'Zeitzone'
+        help: 'Die Zeitzone dieses Bildes.'
+      takenAt:
+        label: 'Aufgenommen am'
+        help: 'Die Zeit in der dieses Bild aufgenommen wurde.'
+      information:
+        label: 'Informationen'
+        help: 'Weitere Informationen über dieses Bild.'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+
+  # User section
+  user:
+    singular: Benutzer
+    plural: Benutzer
+    fields:
+      id:
+        label: 'ID'
+        help: 'Der ID dieses Eintrags.'
+      idHash:
+        label: 'ID Hash'
+        help: 'Der ID Hash dieses Eintrags.'
+      email:
+        label: 'Email'
+        help: 'Die Email dieses Eintrags.'
+      username:
+        label: 'Username'
+        help: 'Der Username dieses Eintrags.'
+      password:
+        label: 'Passwort'
+        help: 'Das Passwort dieses Eintrags.'
+      plainPassword:
+        label: 'Passwort'
+        help: 'Das Passwort dieses Eintrags.'
+      firstname:
+        label: 'Vorname'
+        help: 'Der Vorname dieses Eintrags.'
+      lastname:
+        label: 'Nachname'
+        help: 'Der Nachname dieses Eintrags.'
+      roles:
+        label: 'Rollen'
+        help: 'Die Rollen dieses Eintrags.'
+        entries:
+          roleUser: 'Benutzer'
+          roleAdmin: 'Administrator (einfach)'
+          roleSuperAdmin: 'Administrator (erweitert)'
+      updatedAt:
+        label: 'Geändert am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag zuletzt bearbeitet wurde.'
+      createdAt:
+        label: 'Angelegt am'
+        help: 'Das Datum und die Uhrzeit, zu der dieser Eintrag erstellt wurde.'
+
+# Words
+words:
+  cancel: 'Abbrechen'
+  delete: 'Löschen'
+  disconnect: 'Verbindung aufheben'
+  image: 'Bild'
+  month: 'Monat'
+  position: 'Position'
+  title: 'Titel'
+  url: 'Url'
+  year: 'Jahr'
+  yearUnknown: 'Jahr unbekannt'
+  yearly: 'jährlich stattfindend'
+
+# Modals
+modal:
+  general:
+    delete:
+      title: Soll das Element wirklich gelöscht werden?
+      text: Diese Aktion kann nicht rückgängig gemacht werden.
+  calendarImage:
+    delete:
+      title: Soll das Kalenderbild mit dem Titel "%title%" wirklich vom Kalender entfernt werden?
+
+# Pages
+page:
+  general:
+    about: 'Über'
+    backToTop: 'Zurück zum Anfang'
+    contact: 'Kontakt'
+    domain: 'twelvepics.com'
+    domainFull: 'https://twelvepics.com'
+    email: 'contact@twelvepics.com'
+    emailMe: 'Kontakt'
+    impress: 'Impressum'
+    info: >
+      Dieser Service wird bereitgestellt von <a href="https://twelvepics.com" class="%class%">twelvepics.com</a>
+    name: 'TwelvePics'
+
+# Easyadmin
+page_title:
+  new: '%entity_label_singular% erstellen'

@@ -15,9 +15,8 @@ namespace App\Command;
 
 use App\Entity\CalendarImage;
 use App\Service\CalendarBuilderService;
-use App\Service\CalendarLoaderService;
-use App\Service\HolidayGroupLoaderService;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\Entity\CalendarLoaderService;
+use App\Service\Entity\HolidayGroupLoaderService;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -43,25 +42,20 @@ class CreateCalendarCommand extends Command
 
     protected HolidayGroupLoaderService $holidayGroupLoaderService;
 
-    protected EntityManagerInterface $manager;
-
     /**
      * CreatePageCommand constructor
      *
      * @param CalendarBuilderService $calendarBuilderService
      * @param CalendarLoaderService $calendarLoaderService
      * @param HolidayGroupLoaderService $holidayGroupLoaderService
-     * @param EntityManagerInterface $manager
      */
-    public function __construct(CalendarBuilderService $calendarBuilderService, CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, EntityManagerInterface $manager)
+    public function __construct(CalendarBuilderService $calendarBuilderService, CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService)
     {
         $this->calendarBuilderService = $calendarBuilderService;
 
         $this->calendarLoaderService = $calendarLoaderService;
 
         $this->holidayGroupLoaderService = $holidayGroupLoaderService;
-
-        $this->manager = $manager;
 
         parent::__construct();
     }
@@ -113,7 +107,7 @@ EOT
         $email = strval($input->getOption('email'));
         $calendarName = strval($input->getOption('name'));
 
-        /* Read db */
+        /* Read calendar */
         $calendar = $this->calendarLoaderService->loadCalendar($email, $calendarName);
 
         /* Get application */

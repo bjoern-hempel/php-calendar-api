@@ -59,9 +59,9 @@ class CalendarBuilderService
 
     protected string $pathData;
 
-    protected string $pathSource;
+    protected string $pathSourceAbsolute;
 
-    protected string $pathTarget;
+    protected string $pathTargetAbsolute;
 
     protected string $pathFont;
 
@@ -136,7 +136,9 @@ class CalendarBuilderService
 
     protected ?HolidayGroup $holidayGroup = null;
 
-    protected bool $test;
+    protected bool $test = false;
+
+    protected bool $useCalendarImagePath = false;
 
     /** @var array<array{name: string[]}> $eventsAndHolidaysRaw */
     protected array $eventsAndHolidaysRaw = [];
@@ -146,6 +148,10 @@ class CalendarBuilderService
 
     /** @var array<bool> $holidays */
     protected array $holidays = [];
+
+    protected int $qrCodeVersion = 5;
+
+    protected bool $deleteTargetImages = false;
 
     public const BIRTHDAY_YEAR_NOT_GIVEN = 2100;
 
@@ -175,7 +181,7 @@ class CalendarBuilderService
 
     public const EVENT_TYPE_EVENT_GROUP = 2;
 
-    public const PATH_IMAGES = 'images';
+    public const DEFAULT_QR_CODE_VERSION = 5;
 
     /**
      * Calendar constructor
@@ -188,14 +194,118 @@ class CalendarBuilderService
     }
 
     /**
+     * This is a replacement for imageftbbox within test mode to avoid different dimensions within different versions of gd libs.
+     * These settings are valid for GD GD Version 2.2.5. Some other versions could return other values for that.
+     *
+     * @param string $text
+     * @param int $fontSize
+     * @param int $angle
+     * @return array<int, int>
+     * @throws Exception
+     */
+    public function getTestImageftbbox(string $text, int $fontSize, int $angle = 0): array
+    {
+        $data = [
+            "28°08’53.9\"N 15°25’53.0\"W - 6 - 90" => [1, 1, 1, -75, -7, -75, -7, 1, ],
+            "01 - 44 - 0" => [0, 2, 48, 2, 48, -44, 0, -44, ],
+            "2022 - 20 - 0" => [0, 1, 43, 1, 43, -20, 0, -20, ],
+            "16 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "15 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "14 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "13 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "12 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "11 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "10 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "09 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "08 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "07 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "06 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "05 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "04 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "03 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "02 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "01 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "17 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "18 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "19 - 12 - 0" => [0, 1, 14, 1, 14, -13, 0, -13, ],
+            "20 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "21 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "22 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "23 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "24 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "25 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "26 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "27 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "28 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "29 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "30 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "31 - 12 - 0" => [-1, 1, 14, 1, 14, -13, -1, -13, ],
+            "KW 02 > - 6 - 0" => [-1, 1, 22, 1, 22, -7, -1, -7, ],
+            "KW 01 > - 6 - 0" => [-1, 1, 22, 1, 22, -7, -1, -7, ],
+            "KW 03 > - 6 - 0" => [-1, 1, 22, 1, 22, -7, -1, -7, ],
+            "KW 04 > - 6 - 0" => [-1, 1, 22, 1, 22, -7, -1, -7, ],
+            "KW 05 > - 6 - 0" => [-1, 1, 22, 1, 22, -7, -1, -7, ],
+            "Neujahr - 8 - 80" => [3, 1, 9, -28, -4, -30, -9, 0, ],
+        ];
+
+        $key = sprintf('%s - %s - %s', $text, $fontSize, $angle);
+
+        if (!array_key_exists($key, $data)) {
+            throw new Exception(sprintf('Data settings missing for key "%s" (%s:%d).', $key, __FILE__, __LINE__));
+        }
+
+        return $data[$key];
+    }
+
+    /**
+     * Gets calendar from given calendar image.
+     *
+     * @param CalendarImage $calendarImage
+     * @return Calendar
+     * @throws Exception
+     */
+    protected function getCalendar(CalendarImage $calendarImage): Calendar
+    {
+        $calendar = $calendarImage->getCalendar();
+
+        if ($calendar === null) {
+            throw new Exception(sprintf('Calendar is missing (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $calendar;
+    }
+
+    /**
+     * Gets image from given calendar image.
+     *
+     * @param CalendarImage $calendarImage
+     * @return Image
+     * @throws Exception
+     */
+    protected function getImage(CalendarImage $calendarImage): Image
+    {
+        $image = $calendarImage->getImage();
+
+        if ($image === null) {
+            throw new Exception(sprintf('Calendar is missing (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $image;
+    }
+
+    /**
      * Init function.
      *
      * @param CalendarImage $calendarImage
      * @param HolidayGroup|null $holidayGroup
      * @param bool $test
+     * @param bool $useCalendarImagePath
+     * @param int $qualityTarget
+     * @param int $qrCodeVersion
+     * @param bool $deleteTargetImages
      * @throws Exception
      */
-    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false): void
+    public function init(CalendarImage $calendarImage, HolidayGroup $holidayGroup = null, bool $test = false, bool $useCalendarImagePath = false, int $qualityTarget = 100, int $qrCodeVersion = self::DEFAULT_QR_CODE_VERSION, bool $deleteTargetImages = false): void
     {
         /* Clear positions */
         $this->positionDays = [];
@@ -203,15 +313,27 @@ class CalendarBuilderService
         /* Test mode */
         $this->test = $test;
 
+        /* Use CalendarImage path */
+        $this->useCalendarImagePath = $useCalendarImagePath;
+
+        /* Set quality */
+        $this->qualityTarget = $qualityTarget;
+
+        /* Set qr code version */
+        $this->qrCodeVersion = $qrCodeVersion;
+
+        /* Set delete target images */
+        $this->deleteTargetImages = $deleteTargetImages;
+
         /* calendar instances */
         $this->calendarImage = $calendarImage;
         $this->holidayGroup = $holidayGroup;
-        $this->calendar = $this->calendarImage->getCalendar();
-        $this->image = $this->calendarImage->getImage();
+        $this->calendar = $this->getCalendar($this->calendarImage);
+        $this->image = $this->getImage($this->calendarImage);
 
         /* sizes */
-        $this->aspectRatio = $this->calendarImage->getCalendar()->getConfigObject()->getAspectRatio() ?? 3 / 2;
-        $this->height = $this->calendarImage->getCalendar()->getConfigObject()->getHeight() ?? 4000;
+        $this->aspectRatio = $this->calendar->getConfigObject()->getAspectRatio() ?? 3 / 2;
+        $this->height = $this->calendar->getConfigObject()->getHeight() ?? 4000;
         $this->width = intval(floor($this->height * $this->aspectRatio));
 
         /* Root path */
@@ -262,17 +384,17 @@ class CalendarBuilderService
     #[ArrayShape(['width' => "int", 'height' => "int"])]
     protected function getDimension(string $text, int $fontSize, int $angle = 0): array
     {
-        $boundingBox = imageftbbox($fontSize, $angle, $this->pathFont, $text);
+        $boundingBox = $this->test ? $this->getTestImageftbbox($text, $fontSize, $angle) : imageftbbox($fontSize, $angle, $this->pathFont, $text);
 
         if ($boundingBox === false) {
             throw new Exception(sprintf('Unable to get bounding box (%s:%d', __FILE__, __LINE__));
         }
 
-        list($left, $bottom, $right, , , $top) = $boundingBox;
+        list($leftBottomX, $leftBottomY, $rightBottomX, $rightBottomY, $rightTopX, $rightTopY, $leftTopX, $leftTopY) = $boundingBox;
 
         return [
-            'width' => $right - $left,
-            'height' => $bottom - $top,
+            'width' => $rightBottomX - $leftBottomX,
+            'height' => $leftBottomY - $rightTopY,
         ];
     }
 
@@ -295,7 +417,7 @@ class CalendarBuilderService
     protected function writeImage(): void
     {
         /* Write image */
-        imagejpeg($this->imageTarget, $this->pathTarget, $this->qualityTarget);
+        imagejpeg($this->imageTarget, $this->pathTargetAbsolute, $this->qualityTarget);
     }
 
     /**
@@ -419,7 +541,7 @@ class CalendarBuilderService
     protected function createImages(): void
     {
         $this->imageTarget = $this->createImage($this->width, $this->height);
-        $this->imageSource = $this->createImageFromImage($this->pathSource);
+        $this->imageSource = $this->createImageFromImage($this->pathSourceAbsolute);
     }
 
     /**
@@ -472,7 +594,7 @@ class CalendarBuilderService
      */
     protected function calculateVariables(): void
     {
-        $propertiesSource = getimagesize($this->pathSource);
+        $propertiesSource = getimagesize($this->pathSourceAbsolute);
 
         if ($propertiesSource === false) {
             throw new Exception(sprintf('Unable to get image size (%s:%d)', __FILE__, __LINE__));
@@ -562,7 +684,8 @@ class CalendarBuilderService
         }
 
         /* Print day in red if holiday */
-        if (array_key_exists($this->getDayKey($day), $this->holidays)) {
+        $dayKey = $this->getDayKey($day);
+        if (array_key_exists($dayKey, $this->holidays) && $this->holidays[$dayKey] === true) {
             return $this->colors['red'];
         }
 
@@ -648,7 +771,7 @@ class CalendarBuilderService
         }
 
         if (!file_exists($pathToCheck)) {
-            mkdir($pathToCheck);
+            mkdir($pathToCheck, 0775, true);
         }
 
         if (!file_exists($pathToCheck)) {
@@ -970,7 +1093,7 @@ class CalendarBuilderService
         $options = [
             'eccLevel' => QRCode::ECC_H,
             'outputType' => QRCode::OUTPUT_IMAGICK,
-            'version' => 5,
+            'version' => $this->qrCodeVersion,
             'addQuietzone' => false,
             'scale' => $scale,
             'markupDark' => '#fff',
@@ -1000,42 +1123,47 @@ class CalendarBuilderService
 
         /* Add dynamically generated qr image to main image */
         imagecopyresized($this->imageTarget, $imageQrCode, $this->padding, $this->height - $this->padding - $this->heightQrCode, 0, 0, $this->widthQrCode, $this->heightQrCode, $widthQrCode, $heightQrCode);
+
+        /* Destroy image. */
+        imagedestroy($imageQrCode);
     }
 
     /**
      * Returns image properties from given image.
      *
-     * @param string $path
+     * @param string $pathAbsolute
+     * @param string $pathRelative
      * @param string $keyPostfix
      * @return array<string|int>
      * @throws Exception
      */
-    protected function getImageProperties(string $path, string $keyPostfix = 'Target'): array
+    protected function getImageProperties(string $pathAbsolute, string $pathRelative, string $keyPostfix = 'Target'): array
     {
         /* Check created image */
-        if (!file_exists($path)) {
-            throw new Exception(sprintf('Missing file "%s" (%s:%d).', $path, __FILE__, __LINE__));
+        if (!file_exists($pathAbsolute)) {
+            throw new Exception(sprintf('Missing file "%s" (%s:%d).', $pathAbsolute, __FILE__, __LINE__));
         }
 
         /* Get image properties */
-        $image = getimagesize($path);
+        $image = getimagesize($pathAbsolute);
 
         /* Check image properties */
         if ($image === false) {
-            throw new Exception(sprintf('Unable to get file information from "%s" (%s:%d).', $path, __FILE__, __LINE__));
+            throw new Exception(sprintf('Unable to get file information from "%s" (%s:%d).', $pathAbsolute, __FILE__, __LINE__));
         }
 
         /* Get file size */
-        $sizeByte = filesize($path);
+        $sizeByte = filesize($pathAbsolute);
 
         /* Check image properties */
         if ($sizeByte === false) {
-            throw new Exception(sprintf('Unable to get file size from "%s" (%s:%d).', $path, __FILE__, __LINE__));
+            throw new Exception(sprintf('Unable to get file size from "%s" (%s:%d).', $pathAbsolute, __FILE__, __LINE__));
         }
 
         /* Return the image properties */
         return [
-            sprintf('path%s', $keyPostfix) => $path,
+            sprintf('path%s', $keyPostfix) => $pathAbsolute,
+            sprintf('pathRelative%s', $keyPostfix) => $pathRelative,
             sprintf('width%s', $keyPostfix) => intval($image[0]),
             sprintf('height%s', $keyPostfix) => intval($image[1]),
             sprintf('mime%s', $keyPostfix) => strval($image['mime']),
@@ -1048,12 +1176,13 @@ class CalendarBuilderService
     /**
      * Returns the year month key.
      *
+     * @param int $year
      * @param int $month
      * @return string
      */
-    protected function getYearMonthKey(int $month): string
+    protected function getYearMonthKey(int $year, int $month): string
     {
-        return sprintf('%04d-%02d', $this->year, $month);
+        return sprintf('%04d-%02d', $year, $month);
     }
 
     /**
@@ -1061,8 +1190,9 @@ class CalendarBuilderService
      *
      * @param string $key
      * @param string $name
+     * @param bool $holiday
      */
-    protected function addEventOrHoliday(string $key, string $name): void
+    protected function addEventOrHoliday(string $key, string $name, bool $holiday = false): void
     {
         /* Add new key */
         if (!array_key_exists($key, $this->eventsAndHolidaysRaw)) {
@@ -1073,6 +1203,9 @@ class CalendarBuilderService
 
         /* Add name */
         $this->eventsAndHolidaysRaw[$key]['name'][] = $name;
+
+        /* Add holiday */
+        $this->holidays[$key] = $holiday;
     }
 
     /**
@@ -1083,11 +1216,10 @@ class CalendarBuilderService
     protected function addEvents(): void
     {
         /* Build current year and month */
-        $yearMonthPage = $this->getYearMonthKey($this->month);
+        $yearMonthPage = $this->getYearMonthKey($this->year, $this->month);
 
         /** @var Event $event */
         foreach ($this->calendarImage->getUser()->getEvents() as $event) {
-
             /* Get event key */
             $eventKey = $this->getDayKey(intval($event->getDate()->format('j')));
 
@@ -1098,7 +1230,7 @@ class CalendarBuilderService
             $age = $this->calendarImage->getYear() - $year;
 
             /* This event does not fit the month → Skip */
-            if ($yearMonthPage !== $this->getYearMonthKey(intval($event->getDate()->format('n')))) {
+            if ($yearMonthPage !== $this->getYearMonthKey($this->year, intval($event->getDate()->format('n')))) {
                 continue;
             }
 
@@ -1137,25 +1269,27 @@ class CalendarBuilderService
             return;
         }
 
-        /* Build current year and month */
-        $yearMonthPage = $this->getYearMonthKey($this->month);
-
         /** @var Holiday $holiday */
         foreach ($this->holidayGroup->getHolidays() as $holiday) {
-
             /* Get event key */
             $holidayKey = $this->getDayKey(intval($holiday->getDate()->format('j')));
 
-            /* This event does not fit the month → Skip */
-            if ($yearMonthPage !== $this->getYearMonthKey(intval($holiday->getDate()->format('n')))) {
+            /* Get year and month */
+            $year = intval($holiday->getDate()->format('Y'));
+            $month = intval($holiday->getDate()->format('n'));
+
+            /* Check holiday (month) → Skip if not equal */
+            if ($this->month !== $month) {
+                continue;
+            }
+
+            /* Check holiday (year) → Skip if not equal */
+            if (!$holiday->getYearly() && $this->year !== $year) {
                 continue;
             }
 
             /* Add event or holiday label */
-            $this->addEventOrHoliday($holidayKey, $holiday->getName());
-
-            /* Add holiday */
-            $this->holidays[$holidayKey] = true;
+            $this->addEventOrHoliday($holidayKey, $holiday->getName(), $holiday->getType() === Holiday::FIELD_TYPE_PUBLIC_DATE);
         }
     }
 
@@ -1200,6 +1334,71 @@ class CalendarBuilderService
     }
 
     /**
+     * Sets the QR Code version.
+     *
+     * @param int $qrCodeVersion
+     * @return void
+     */
+    public function setQrCodeVersion(int $qrCodeVersion)
+    {
+        $this->qrCodeVersion = $qrCodeVersion;
+    }
+
+    /**
+     * Gets all target paths.
+     *
+     * @param string $pathTargetAbsolute
+     * @return string[]
+     * @throws Exception
+     */
+    protected function getAllTargetImages(string $pathTargetAbsolute): array
+    {
+        $pathTargetAbsolutePattern = preg_replace('~\.([a-z][a-z0-9]+)$~i', '.*.$1', $pathTargetAbsolute);
+
+        if (!is_string($pathTargetAbsolutePattern)) {
+            throw new Exception(sprintf('Unable to replace string (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $imageFiles = glob($pathTargetAbsolutePattern);
+
+        if ($imageFiles === false) {
+            throw new Exception(sprintf('Unable to get files via glob (%s:%d).', __FILE__, __LINE__));
+        }
+
+        $imageFiles[] = $pathTargetAbsolute;
+
+        return $imageFiles;
+    }
+
+    /**
+     * Removes target images.
+     *
+     * @param string $pathTargetAbsolute
+     * @return bool
+     * @throws Exception
+     */
+    protected function removeTargetImages(string $pathTargetAbsolute): bool
+    {
+        $imageFiles = $this->getAllTargetImages($pathTargetAbsolute);
+
+        foreach ($imageFiles as $imageFile) {
+            /* To avoid accidental deletion. */
+            $matches = [];
+            if (!preg_match('~([a-f0-9]{40}/target/[0-9]+)/(?:([a-f0-9]{10})\.)?([^\.]+)(?:\.([0-9]+))?\.([a-z][a-z0-9]+)$~', $imageFile, $matches)) {
+                throw new Exception(sprintf('Unexpected image path given: "%s" (%s:%d).', $imageFile, __FILE__, __LINE__));
+            }
+
+            list($path, $fileHash, $fileName, $width, $extension) = $matches;
+
+            if (file_exists($imageFile)) {
+                unlink($imageFile);
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Builds the given source image to a calendar page.
      *
      * @return array<string|int>
@@ -1207,13 +1406,33 @@ class CalendarBuilderService
      */
     public function build(): array
     {
-        /* Get user path */
-        $imagePath = sprintf($this->test ? '%s/tests/%s' : '%s/%s', $this->pathData, self::PATH_IMAGES);
-        $userPath = sprintf('%s/%s', $imagePath, $this->image->getUser()->getIdHash());
-
         /* Save given values */
-        $this->pathSource = sprintf('%s/%s', $userPath, $this->image->getPathSource());
-        $this->pathTarget = sprintf('%s/%s', $userPath, $this->image->getPathTarget());
+        $this->pathSourceAbsolute = $this->image->getPathFull(type: Image::PATH_TYPE_SOURCE, test: $this->test, rootPath: $this->pathRoot);
+        $pathSourceRelative = $this->image->getPath(type: Image::PATH_TYPE_SOURCE, test: $this->test);
+        $this->pathTargetAbsolute = $this->image->getPathFull(
+            type: Image::PATH_TYPE_TARGET,
+            test: $this->test,
+            rootPath: $this->pathRoot,
+            calendarImage: $this->useCalendarImagePath ? $this->calendarImage : null
+        );
+        $pathTargetRelative = $this->image->getPath(
+            type: Image::PATH_TYPE_TARGET,
+            test: $this->test,
+            calendarImage: $this->useCalendarImagePath ? $this->calendarImage : null
+        );
+
+        if ($pathSourceRelative === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        if ($pathTargetRelative === null) {
+            throw new Exception(sprintf('Unexpected null value (%s:%d).', __FILE__, __LINE__));
+        }
+
+        if ($this->deleteTargetImages) {
+            $this->removeTargetImages($this->pathTargetAbsolute);
+        }
+
         $this->textTitle = $this->calendarImage->getTitle() ?? '';
         $this->textPosition = $this->calendarImage->getPosition() ?? '';
         $this->year = $this->calendarImage->getYear();
@@ -1222,7 +1441,7 @@ class CalendarBuilderService
         $this->url = $this->calendarImage->getUrl() ?? 'https://github.com/';
 
         /* Check target path */
-        $this->checkAndCreateDirectory($this->pathTarget, true);
+        $this->checkAndCreateDirectory($this->pathTargetAbsolute, true);
 
         /* Init */
         $this->prepare();
@@ -1255,8 +1474,8 @@ class CalendarBuilderService
         $this->destroy();
 
         return array_merge(
-            $this->getImageProperties($this->pathSource, 'Source'),
-            $this->getImageProperties($this->pathTarget),
+            $this->getImageProperties($this->pathSourceAbsolute, $pathSourceRelative, 'Source'),
+            $this->getImageProperties($this->pathTargetAbsolute, $pathTargetRelative),
         );
     }
 }

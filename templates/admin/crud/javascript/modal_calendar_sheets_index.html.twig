@@ -1,0 +1,35 @@
+<script>
+
+    let modalCalendarSheetsTitle = '{{ 'admin.actions.calendarSheets.title'|trans|raw }}';
+    let modalCalendarSheetsText = '{{ 'admin.actions.calendarSheets.questionIndex'|trans|raw }}';
+    let modalCalendarSheets = document.getElementById('modal-calendar-sheets');
+
+    modalCalendarSheets.addEventListener('show.bs.modal', function (event) {
+
+        /* Button that triggered the modal */
+        let button = event.relatedTarget;
+
+        // /* Get Properties */
+        let tr = button.closest('tr');
+        let name = tr.querySelector('td[data-label="Name"], td[data-label="Name"]').textContent.trim();
+
+        /* Href */
+        let href = button.href;
+
+        /* Modal elements */
+        let modalButton = modalCalendarSheets.querySelector('#modal-calendar-sheets-button');
+        let modalTitle = modalCalendarSheets.querySelector('.modal-title');
+        let modalText = modalCalendarSheets.querySelector('.modal-text');
+
+        /* Change Text */
+        modalTitle.textContent = modalCalendarSheetsTitle;
+        modalText.textContent = modalCalendarSheetsText.
+            replace(/%name%/, name);
+
+        /* Set onclick */
+        modalButton.onclick = function() {
+            location.href = href;
+        };
+    })
+
+</script>

@@ -17,8 +17,8 @@ use App\DataFixtures\AppFixtures;
 use App\Entity\CalendarImage;
 use App\Entity\HolidayGroup;
 use App\Service\CalendarBuilderService;
-use App\Service\CalendarLoaderService;
-use App\Service\HolidayGroupLoaderService;
+use App\Service\Entity\CalendarLoaderService;
+use App\Service\Entity\HolidayGroupLoaderService;
 use App\Tests\Library\DbHelper;
 use App\Utils\ImageProperty;
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -163,7 +163,7 @@ final class CreatePageTest extends KernelTestCase
      */
     protected function getCalendarImage(string $email, string $calendarName, int $year, int $month): CalendarImage
     {
-        return $this->calendarLoaderService->loadCalendarImage($email, $calendarName, $year, $month);
+        return $this->calendarLoaderService->loadCalendarImageByCalendarNameYearAndMonth($email, $calendarName, $year, $month);
     }
 
     /**
@@ -209,7 +209,7 @@ final class CreatePageTest extends KernelTestCase
         $imageExpected->readImage($pathExpected);
 
         /* Compare the images using METRIC=1 (Absolute Error). */
-        $result = $imageExpected->compareImages($imageTarget, 1);
+        $result = $imageExpected->compareImages($imageTarget, Imagick::METRIC_ABSOLUTEERRORMETRIC);
 
         /* Return the image comparison. */
         return floatval($result[1] / $width / $height * 100);
@@ -228,22 +228,28 @@ final class CreatePageTest extends KernelTestCase
         $calendarName = 'Calendar 1';
         $year = 2022;
         $month = 1;
-        $holidayGroupName = 'Saxony';
+        $holidayGroupName = AppFixtures::NAME_HOLIDAY_GROUP_SAXONY;
 
         /* Arrange */
         $calendarImage = $this->getCalendarImage($email, $calendarName, $year, $month);
         $holidayGroup = $this->getHolidayGroup($holidayGroupName);
-        $height = $calendarImage->getCalendar()->getConfigObject()->getInt('height');
-        $width = $calendarImage->getCalendar()->getConfigObject()->getInt('width');
+        $calendar = $calendarImage->getCalendar();
+        if ($calendar === null) {
+            throw new Exception(sprintf('Calendar class is missing (%s:%d).', __FILE__, __LINE__));
+        }
+        $height = $calendar->getConfigObject()->getInt('height');
+        $width = $calendar->getConfigObject()->getInt('width');
 
         /* Act */
         $this->calendarBuilderService->init($calendarImage, $holidayGroup, true);
         $file = $this->calendarBuilderService->build();
-        $differenceValue = $this->compareImages($calendarImage, intval($file['widthTarget']), intval($file['heightTarget']));
+        $widthBuild = intval($file['widthTarget']);
+        $heightBuild = intval($file['heightTarget']);
+        $differenceValue = $this->compareImages($calendarImage, $widthBuild, $heightBuild);
 
         /* Assert */
-        $this->assertSame($file['widthTarget'], $width);
-        $this->assertSame($file['heightTarget'], $height);
-        $this->assertLessThan(0.05, $differenceValue, sprintf('The difference is more than 0.05%% (%.2f%%).', $differenceValue));
+        $this->assertSame($widthBuild, $width);
+        $this->assertSame($heightBuild, $height);
+        $this->assertLessThan(0.02, $differenceValue, sprintf('The difference is more than 0.02%% (%.2f%%).', $differenceValue));
     }
 }

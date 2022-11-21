@@ -108,7 +108,7 @@ EOT
         $user->setPassword($this->userPasswordHasher->hashPassword($user, $password));
         $user->setFirstName($firstName);
         $user->setLastName($lastName);
-        $user->setIdHash(sha1(rand(1000000, 9999999).rand(1000000, 9999999)));
+        $user->setIdHash($user->getIdHashNew());
 
         /* Persists the user. */
         $this->manager->persist($user);

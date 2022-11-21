@@ -1,0 +1,11 @@
+<footer class="text-muted py-5 footer bg-light mt-auto">
+    <div class="{{ containerClass|default('container') }} {{ containerMargin|default('') }}">
+        <p class="float-end mb-1">
+            <a href="#" class="text-dark">{{ 'page.general.backToTop'|trans }}</a>
+        </p>
+        <p class="mb-1">
+            {{ 'page.general.info'|trans({'%class%': 'text-dark'})|raw }} |
+            <a href="/impress" class="text-dark">{{ 'page.general.impress'|trans }}</a>
+        </p>
+    </div>
+</footer>

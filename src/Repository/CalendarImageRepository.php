@@ -81,4 +81,43 @@ class CalendarImageRepository extends ServiceEntityRepository
 
         return null;
     }
+
+    /**
+     * Find one by calendar id.
+     *
+     * @param User $user
+     * @param int $calendarId
+     * @return CalendarImage
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public function findOneByCalendarId(User $user, int $calendarId): CalendarImage
+    {
+        $result = $this->createQueryBuilder('ci')
+            ->where('ci.user = :user')
+            ->andWhere('ci.calendar = :calendar')
+            ->andWhere('ci.year = :year')
+            ->andWhere('ci.month = :month')
+            ->setParameter('user', $user)
+            ->setParameter('id', $calendarId)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (!$result instanceof CalendarImage) {
+            throw new Exception(sprintf('Unsupported type (%s:%d).', __FILE__, __LINE__));
+        }
+
+        return $result;
+    }
+
+    /**
+     * Find calendar images by given calendar.
+     *
+     * @param Calendar $calendar
+     * @return CalendarImage[]
+     */
+    public function findByCalendar(Calendar $calendar): array
+    {
+        return $this->findBy(['calendar' => $calendar], ['month' => 'ASC']);
+    }
 }
