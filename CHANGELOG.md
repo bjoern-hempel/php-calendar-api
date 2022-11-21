@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.31.0] - 2022-11-21
+
+* [#106](https://github.com/bjoern-hempel/php-calendar-api/issues/106)
+  * Update to Symfony 6.1, API Platform 3.0.3 and PHP 8.1.12
+
 ### [0.30.22] - 2022-11-11
 
 * PHPStan refactoring
