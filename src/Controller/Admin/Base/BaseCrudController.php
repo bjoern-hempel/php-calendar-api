@@ -67,10 +67,6 @@ abstract class BaseCrudController extends AbstractCrudController
 
     protected string $crudName;
 
-    protected SecurityService $securityService;
-
-    protected TranslatorInterface $translator;
-
     protected EasyAdminField $easyAdminField;
 
     protected const CRUD_FIELDS_ADMIN = 'CRUD_FIELDS_ADMIN';
@@ -80,12 +76,8 @@ abstract class BaseCrudController extends AbstractCrudController
      *
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator)
+    public function __construct(protected SecurityService $securityService, protected TranslatorInterface $translator)
     {
-        $this->securityService = $securityService;
-
-        $this->translator = $translator;
-
         $this->easyAdminField = new EasyAdminField($this->getCrudName());
     }
 
@@ -309,18 +301,14 @@ abstract class BaseCrudController extends AbstractCrudController
                         return IntegerField::new($fieldName)
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                             ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName))
-                            ->formatValue(function ($value) {
-                                return sprintf('%d px', $value);
-                            });
+                            ->formatValue(fn($value) => sprintf('%d px', $value));
 
                         /* Size field */
                     case 'size':
                         return IntegerField::new($fieldName)
                             ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
                             ->setHelp(sprintf('admin.%s.fields.%s.help', $this->getCrudName(), $fieldName))
-                            ->formatValue(function ($value) {
-                                return SizeConverter::getHumanReadableSize($value);
-                            });
+                            ->formatValue(fn($value) => SizeConverter::getHumanReadableSize($value));
 
                         /* Full path fields */
                     case 'pathSourceFull':
@@ -366,9 +354,7 @@ abstract class BaseCrudController extends AbstractCrudController
             'configJson' => CodeEditorField::new($fieldName)
                 /* Not called within formulas. */
                 ->formatValue(
-                    function ($json) {
-                        return (new JsonConverter($json))->getBeautified(2);
-                    }
+                    fn($json) => (new JsonConverter($json))->getBeautified(2)
                 )
                 ->setLanguage('css')
                 ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))

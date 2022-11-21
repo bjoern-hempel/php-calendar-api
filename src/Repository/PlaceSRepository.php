@@ -31,22 +31,14 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PlaceSRepository extends ServiceEntityRepository implements PlaceRepositoryInterface
 {
-    protected ManagerRegistry $registry;
-
-    protected EntityManagerInterface $manager;
-
     /**
      * PlaceHRepository constructor.
      *
      * @param ManagerRegistry $registry
      * @param EntityManagerInterface $manager
      */
-    public function __construct(ManagerRegistry $registry, EntityManagerInterface $manager)
+    public function __construct(protected ManagerRegistry $registry, protected EntityManagerInterface $manager)
     {
-        $this->registry = $registry;
-
-        $this->manager = $manager;
-
         parent::__construct($registry, PlaceS::class);
     }
 

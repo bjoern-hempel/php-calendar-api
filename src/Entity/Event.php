@@ -99,25 +99,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['event']],
     order: ['id' => 'ASC'],
 )]
-class Event implements EntityInterface
+class Event implements EntityInterface, \Stringable
 {
     use TimestampsTrait;
 
     use JsonHelper;
 
-    public const CRUD_FIELDS_ADMIN = ['id', 'user'];
+    final public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt', 'configJson'];
+    final public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt', 'configJson'];
+    final public const CRUD_FIELDS_INDEX = ['id', 'name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name', 'type', 'user', 'date', 'yearly', 'configJson'];
+    final public const CRUD_FIELDS_NEW = ['id', 'name', 'type', 'user', 'date', 'yearly', 'configJson'];
 
-    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+    final public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt', 'configJson'];
+    final public const CRUD_FIELDS_DETAIL = ['id', 'name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const CRUD_FIELDS_FILTER = ['name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_FILTER = ['name', 'type', 'user', 'date', 'yearly', 'updatedAt', 'createdAt'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -128,7 +128,7 @@ class Event implements EntityInterface
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups('event')]
-    public ?User $user;
+    public ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['event', 'event_extended'])]

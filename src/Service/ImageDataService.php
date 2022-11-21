@@ -38,58 +38,52 @@ class ImageDataService
     /** @var array<string, array<string, mixed>>|null $imageDataFull */
     protected ?array $imageDataFull = null;
 
-    protected string $imagePath;
+    final public const WIDTH_TITLE = 30;
 
-    protected ?PlaceLoaderService $placeLoaderService;
+    final public const KEY_NAME_FORMAT = 'format';
 
-    protected ?LocationDataService $locationDataService;
+    final public const KEY_NAME_TITLE = 'title';
 
-    public const WIDTH_TITLE = 30;
+    final public const KEY_NAME_UNIT = 'unit';
 
-    public const KEY_NAME_FORMAT = 'format';
+    final public const KEY_NAME_UNIT_BEFORE = 'unit-before';
 
-    public const KEY_NAME_TITLE = 'title';
+    final public const KEY_NAME_VALUE = 'value';
 
-    public const KEY_NAME_UNIT = 'unit';
+    final public const KEY_NAME_VALUE_ORIGINAL = 'value-original';
 
-    public const KEY_NAME_UNIT_BEFORE = 'unit-before';
+    final public const KEY_NAME_VALUE_FORMATTED = 'value-formatted';
 
-    public const KEY_NAME_VALUE = 'value';
+    final public const KEY_NAME_VALUE_DATE_TIME = 'value-date-time';
 
-    public const KEY_NAME_VALUE_ORIGINAL = 'value-original';
+    final public const KEY_NAME_DEVICE_MANUFACTURER = 'device-manufacturer';
+    final public const KEY_NAME_DEVICE_MODEL = 'device-model';
 
-    public const KEY_NAME_VALUE_FORMATTED = 'value-formatted';
+    final public const KEY_NAME_EXIF_VERSION = 'exif-version';
 
-    public const KEY_NAME_VALUE_DATE_TIME = 'value-date-time';
+    final public const KEY_NAME_IMAGE_APERTURE = 'image-aperture';
+    final public const KEY_NAME_IMAGE_DATE_TIME_ORIGINAL = 'image-date-time-original';
+    final public const KEY_NAME_IMAGE_EXPOSURE_BIAS_VALUE = 'image-exposure-bias-value';
+    final public const KEY_NAME_IMAGE_EXPOSURE_TIME = 'image-exposure-time';
+    final public const KEY_NAME_IMAGE_FILENAME = 'image-filename';
+    final public const KEY_NAME_IMAGE_FOCAL_LENGTH = 'image-focal-length';
+    final public const KEY_NAME_IMAGE_HEIGHT = 'image-height';
+    final public const KEY_NAME_IMAGE_ISO = 'image-iso';
+    final public const KEY_NAME_IMAGE_MIME = 'image-mime';
+    final public const KEY_NAME_IMAGE_SIZE = 'image-size';
+    final public const KEY_NAME_IMAGE_SIZE_HUMAN = 'image-size-human';
+    final public const KEY_NAME_IMAGE_WIDTH = 'image-width';
+    final public const KEY_NAME_IMAGE_X_RESOLUTION = 'image-x-resolution';
+    final public const KEY_NAME_IMAGE_Y_RESOLUTION = 'image-y-resolution';
 
-    public const KEY_NAME_DEVICE_MANUFACTURER = 'device-manufacturer';
-    public const KEY_NAME_DEVICE_MODEL = 'device-model';
-
-    public const KEY_NAME_EXIF_VERSION = 'exif-version';
-
-    public const KEY_NAME_IMAGE_APERTURE = 'image-aperture';
-    public const KEY_NAME_IMAGE_DATE_TIME_ORIGINAL = 'image-date-time-original';
-    public const KEY_NAME_IMAGE_EXPOSURE_BIAS_VALUE = 'image-exposure-bias-value';
-    public const KEY_NAME_IMAGE_EXPOSURE_TIME = 'image-exposure-time';
-    public const KEY_NAME_IMAGE_FILENAME = 'image-filename';
-    public const KEY_NAME_IMAGE_FOCAL_LENGTH = 'image-focal-length';
-    public const KEY_NAME_IMAGE_HEIGHT = 'image-height';
-    public const KEY_NAME_IMAGE_ISO = 'image-iso';
-    public const KEY_NAME_IMAGE_MIME = 'image-mime';
-    public const KEY_NAME_IMAGE_SIZE = 'image-size';
-    public const KEY_NAME_IMAGE_SIZE_HUMAN = 'image-size-human';
-    public const KEY_NAME_IMAGE_WIDTH = 'image-width';
-    public const KEY_NAME_IMAGE_X_RESOLUTION = 'image-x-resolution';
-    public const KEY_NAME_IMAGE_Y_RESOLUTION = 'image-y-resolution';
-
-    public const KEY_NAME_GPS_GOOGLE_LINK = 'gps-google-link';
-    public const KEY_NAME_GPS_HEIGHT = 'gps-height';
-    public const KEY_NAME_GPS_LATITUDE_DMS = 'gps-latitude-dms';
-    public const KEY_NAME_GPS_LATITUDE_DECIMAL_DEGREE = 'gps-latitude-decimal-degree';
-    public const KEY_NAME_GPS_LATITUDE_DIRECTION = 'gps-latitude-direction';
-    public const KEY_NAME_GPS_LONGITUDE_DMS = 'gps-longitude-dms';
-    public const KEY_NAME_GPS_LONGITUDE_DECIMAL_DEGREE = 'gps-longitude-decimal-degree';
-    public const KEY_NAME_GPS_LONGITUDE_DIRECTION = 'gps-longitude-direction';
+    final public const KEY_NAME_GPS_GOOGLE_LINK = 'gps-google-link';
+    final public const KEY_NAME_GPS_HEIGHT = 'gps-height';
+    final public const KEY_NAME_GPS_LATITUDE_DMS = 'gps-latitude-dms';
+    final public const KEY_NAME_GPS_LATITUDE_DECIMAL_DEGREE = 'gps-latitude-decimal-degree';
+    final public const KEY_NAME_GPS_LATITUDE_DIRECTION = 'gps-latitude-direction';
+    final public const KEY_NAME_GPS_LONGITUDE_DMS = 'gps-longitude-dms';
+    final public const KEY_NAME_GPS_LONGITUDE_DECIMAL_DEGREE = 'gps-longitude-decimal-degree';
+    final public const KEY_NAME_GPS_LONGITUDE_DIRECTION = 'gps-longitude-direction';
 
     /**
      * ImageData constructor.
@@ -100,16 +94,10 @@ class ImageDataService
      * @param bool $debug
      * @param bool $verbose
      */
-    public function __construct(string $imagePath, ?PlaceLoaderService $placeLoaderService = null, ?LocationDataService $locationDataService = null, bool $debug = false, bool $verbose = false)
+    public function __construct(protected string $imagePath, protected ?\App\Service\Entity\PlaceLoaderService $placeLoaderService = null, protected ?\App\Service\LocationDataService $locationDataService = null, bool $debug = false, bool $verbose = false)
     {
-        $this->imagePath = $imagePath;
-
-        $this->placeLoaderService = $placeLoaderService;
-
         $this->placeLoaderService?->setDebug($debug);
         $this->placeLoaderService?->setVerbose($verbose);
-
-        $this->locationDataService = $locationDataService;
 
         $this->debug = $debug;
 
@@ -137,7 +125,7 @@ class ImageDataService
             self::KEY_NAME_UNIT => $unit,
             self::KEY_NAME_UNIT_BEFORE => $unitBefore,
             self::KEY_NAME_VALUE => $value,
-            self::KEY_NAME_VALUE_FORMATTED => sprintf('%s%s%s', $unitBefore, $valueFormatted !== null ? $valueFormatted : strval($value), $unit),
+            self::KEY_NAME_VALUE_FORMATTED => sprintf('%s%s%s', $unitBefore, $valueFormatted ?? strval($value), $unit),
         ];
 
         if ($addValues !== null) {
@@ -308,7 +296,7 @@ class ImageDataService
             throw new Exception(sprintf('Unable to get image size (%s:%d).', __FILE__, __LINE__));
         }
 
-        list($width, $height) = $imageSize;
+        [$width, $height] = $imageSize;
 
         $imageMime = mime_content_type($this->imagePath);
 
@@ -340,7 +328,7 @@ class ImageDataService
 
             $dataPlaceInformation = $this->locationDataService->getLocationDataFull($latitude, $longitude);
 
-            $data = array_merge($data, $dataPlaceInformation);
+            $data = [...$data, ...$dataPlaceInformation];
         }
 
         /* Sort by key */

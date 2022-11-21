@@ -25,9 +25,6 @@ use JetBrains\PhpStorm\Pure;
  */
 class NamingConventionsConverter
 {
-    /** @var string|array<int, string> $raw */
-    protected string|array $raw;
-
     /** @var array<int, string> $words */
     protected array $words;
 
@@ -37,10 +34,8 @@ class NamingConventionsConverter
      * @param string|array<int, string> $raw
      * @throws Exception
      */
-    public function __construct(string|array $raw)
+    public function __construct(protected string|array $raw)
     {
-        $this->raw = $raw;
-
         $this->words = $this->convertRawToWords($raw);
     }
 
@@ -117,9 +112,7 @@ class NamingConventionsConverter
      */
     public function getPascalCase(): string
     {
-        return implode('', array_map(function ($word) {
-            return ucfirst($word);
-        }, $this->words));
+        return implode('', array_map(fn($word) => ucfirst((string) $word), $this->words));
     }
 
     /**

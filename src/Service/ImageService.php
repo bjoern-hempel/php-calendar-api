@@ -33,33 +33,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ImageService
 {
-    protected KernelInterface $appKernel;
-
-    protected UserLoaderService $userLoaderService;
-
-    protected RequestStack $requestStack;
-
-    protected TranslatorInterface $translator;
-
     protected int $jpegQuality = 75;
 
-    public const TEXT_NOT_GENERATED = 'admin.image.notGenerated';
+    final public const TEXT_NOT_GENERATED = 'admin.image.notGenerated';
 
-    public const PATH_FONT = 'data/font/OpenSansCondensed-Bold.ttf';
+    final public const PATH_FONT = 'data/font/OpenSansCondensed-Bold.ttf';
 
     /**
      * ImageService constructor
      *
      */
-    public function __construct(KernelInterface $appKernel, UserLoaderService $userLoaderService, RequestStack $requestStack, TranslatorInterface $translator)
+    public function __construct(protected KernelInterface $appKernel, protected UserLoaderService $userLoaderService, protected RequestStack $requestStack, protected TranslatorInterface $translator)
     {
-        $this->appKernel = $appKernel;
-
-        $this->userLoaderService = $userLoaderService;
-
-        $this->requestStack = $requestStack;
-
-        $this->translator = $translator;
     }
 
     /**
@@ -413,7 +398,7 @@ class ImageService
         }
 
         /* Get box. */
-        list($left, $bottom, $right, , , $top) = $box;
+        [$left, $bottom, $right, , , $top] = $box;
 
         /* Calculate center. */
         $centerX = intval($width / 2);
@@ -474,6 +459,7 @@ class ImageService
      * @param Image $image
      * @return void
      * @throws Exception
+     * @noRector
      */
     public function createSourceImage(Image $image): void
     {

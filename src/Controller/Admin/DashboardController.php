@@ -47,14 +47,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DashboardController extends AbstractDashboardController
 {
-    protected TranslatorInterface $translator;
-
-    protected ConfigService $configService;
-
-    protected VersionService $versionService;
-
-    protected SecurityService $securityService;
-
     /**
      * DashboardController constructor.
      *
@@ -63,15 +55,8 @@ class DashboardController extends AbstractDashboardController
      * @param VersionService $versionService
      * @param SecurityService $securityService
      */
-    public function __construct(TranslatorInterface $translator, ConfigService $configService, VersionService $versionService, SecurityService $securityService)
+    public function __construct(protected TranslatorInterface $translator, protected ConfigService $configService, protected VersionService $versionService, protected SecurityService $securityService)
     {
-        $this->translator = $translator;
-
-        $this->configService = $configService;
-
-        $this->versionService = $versionService;
-
-        $this->securityService = $securityService;
     }
 
     /**

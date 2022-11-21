@@ -32,15 +32,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class UrlService
 {
-    protected RequestStack $requestStack;
+    final public const SEPARATOR = '/';
 
-    protected UrlGeneratorInterface $router;
+    final public const REPLACE_ENCODE = '+/=';
 
-    public const SEPARATOR = '/';
-
-    public const REPLACE_ENCODE = '+/=';
-
-    public const REPLACE_DECODE = '._-';
+    final public const REPLACE_DECODE = '._-';
 
     /**
      * UrlService constructor.
@@ -48,11 +44,8 @@ class UrlService
      * @param RequestStack $requestStack
      * @param UrlGeneratorInterface $router
      */
-    public function __construct(RequestStack $requestStack, UrlGeneratorInterface $router)
+    public function __construct(protected RequestStack $requestStack, protected UrlGeneratorInterface $router)
     {
-        $this->requestStack = $requestStack;
-
-        $this->router = $router;
     }
 
     /**
@@ -205,7 +198,7 @@ class UrlService
      */
     public static function parse(array $config, string $path, bool $decode = false): array
     {
-        $short = !str_contains($path, strval($config['path']));
+        $short = !str_contains($path, (string) strval($config['path']));
 
         $configParameter = $config['parameter'];
         $configPath = strval($config[$short ? 'pathShort' : 'path']);

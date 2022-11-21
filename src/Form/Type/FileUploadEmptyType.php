@@ -42,16 +42,13 @@ use Traversable;
  */
 class FileUploadEmptyType extends FileUploadType
 {
-    private string $projectDir;
-
     /**
      * FileUploadEmptyType constructor.
      *
      * @param string $projectDir
      */
-    public function __construct(string $projectDir)
+    public function __construct(private readonly string $projectDir)
     {
-        $this->projectDir = $projectDir;
     }
 
     /**
@@ -136,9 +133,7 @@ class FileUploadEmptyType extends FileUploadType
             unlink($file->getPathname());
         };
 
-        $uploadFilename = static function (UploadedFile $file): string {
-            return $file->getClientOriginalName();
-        };
+        $uploadFilename = static fn(UploadedFile $file): string => $file->getClientOriginalName();
 
         $uploadValidate = static function (string $filename): string {
             if (!file_exists($filename)) {
@@ -164,21 +159,13 @@ class FileUploadEmptyType extends FileUploadType
             return $filename;
         };
 
-        $downloadPath = function (Options $options) {
-            return mb_substr(strval($options['upload_dir']), mb_strlen($this->projectDir.'/public/'));
-        };
+        $downloadPath = fn(Options $options) => mb_substr(strval($options['upload_dir']), mb_strlen($this->projectDir.'/public/'));
 
-        $allowAdd = static function (Options $options) {
-            return $options['multiple'];
-        };
+        $allowAdd = static fn(Options $options) => $options['multiple'];
 
-        $dataClass = static function (Options $options) {
-            return $options['multiple'] ? null : File::class;
-        };
+        $dataClass = static fn(Options $options) => $options['multiple'] ? null : File::class;
 
-        $emptyData = static function (Options $options) {
-            return $options['multiple'] ? [] : null;
-        };
+        $emptyData = static fn(Options $options) => $options['multiple'] ? [] : null;
 
         $resolver->setDefaults([
             'upload_dir' => $this->projectDir.'/public/uploads/files/',
@@ -226,24 +213,22 @@ class FileUploadEmptyType extends FileUploadType
                 return $fileNamePatternOrCallable;
             }
 
-            return static function (UploadedFile $file) use ($fileNamePatternOrCallable) {
-                return strtr($fileNamePatternOrCallable, [
-                    '[contenthash]' => sha1_file($file->getRealPath() ?: ''),
-                    '[day]' => date('d'),
-                    '[extension]' => $file->guessClientExtension(),
-                    '[month]' => date('m'),
-                    '[name]' => pathinfo($file->getClientOriginalName(), \PATHINFO_FILENAME),
-                    '[randomhash]' => bin2hex(random_bytes(20)),
-                    '[slug]' => (new AsciiSlugger())
-                        ->slug(pathinfo($file->getClientOriginalName(), \PATHINFO_FILENAME))
-                        ->lower()
-                        ->toString(),
-                    '[timestamp]' => time(),
-                    '[uuid]' => Uuid::v4()->toRfc4122(),
-                    '[ulid]' => new Ulid(),
-                    '[year]' => date('Y'),
-                ]);
-            };
+            return static fn(UploadedFile $file) => strtr($fileNamePatternOrCallable, [
+                '[contenthash]' => sha1_file($file->getRealPath() ?: ''),
+                '[day]' => date('d'),
+                '[extension]' => $file->guessClientExtension(),
+                '[month]' => date('m'),
+                '[name]' => pathinfo($file->getClientOriginalName(), \PATHINFO_FILENAME),
+                '[randomhash]' => bin2hex(random_bytes(20)),
+                '[slug]' => (new AsciiSlugger())
+                    ->slug(pathinfo($file->getClientOriginalName(), \PATHINFO_FILENAME))
+                    ->lower()
+                    ->toString(),
+                '[timestamp]' => time(),
+                '[uuid]' => Uuid::v4()->toRfc4122(),
+                '[ulid]' => new Ulid(),
+                '[year]' => date('Y'),
+            ]);
         });
         $resolver->setNormalizer('allow_add', static function (Options $options, string $value): string {
             if ($value && !$options['multiple']) {

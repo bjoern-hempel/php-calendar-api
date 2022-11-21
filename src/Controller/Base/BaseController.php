@@ -24,23 +24,23 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 abstract class BaseController extends AbstractController
 {
-    public const KEY_NAME_ENCODED = 'encoded';
+    final public const KEY_NAME_ENCODED = 'encoded';
 
-    public const ROUTE_NAME_APP_INDEX = 'app_index';
+    final public const ROUTE_NAME_APP_INDEX = 'app_index';
 
-    public const ROUTE_NAME_APP_IMPRESS = 'app_impress';
+    final public const ROUTE_NAME_APP_IMPRESS = 'app_impress';
 
-    public const ROUTE_NAME_APP_LOCATION = 'app_location';
+    final public const ROUTE_NAME_APP_LOCATION = 'app_location';
 
-    public const ROUTE_NAME_APP_LOCATION_VIEW = 'app_location_view';
+    final public const ROUTE_NAME_APP_LOCATION_VIEW = 'app_location_view';
 
-    public const ROUTE_NAME_APP_CALENDAR_INDEX = 'app_calendar_index';
+    final public const ROUTE_NAME_APP_CALENDAR_INDEX = 'app_calendar_index';
 
-    public const ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED = 'app_calendar_index_encoded';
+    final public const ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED = 'app_calendar_index_encoded';
 
-    public const ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED_SHORT = 'app_calendar_index_encoded_short';
+    final public const ROUTE_NAME_APP_CALENDAR_INDEX_ENCODED_SHORT = 'app_calendar_index_encoded_short';
 
-    public const CONFIG_APP_CALENDAR_INDEX = [
+    final public const CONFIG_APP_CALENDAR_INDEX = [
         'path' => 'calendar',
         'pathShort' => 'c',
         'parameter' => [
@@ -53,13 +53,13 @@ abstract class BaseController extends AbstractController
         ]
     ];
 
-    public const ROUTE_NAME_APP_CALENDAR_DETAIL = 'app_calendar_detail';
+    final public const ROUTE_NAME_APP_CALENDAR_DETAIL = 'app_calendar_detail';
 
-    public const ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED = 'app_calendar_detail_encoded';
+    final public const ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED = 'app_calendar_detail_encoded';
 
-    public const ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED_SHORT = 'app_calendar_detail_encoded_short';
+    final public const ROUTE_NAME_APP_CALENDAR_DETAIL_ENCODED_SHORT = 'app_calendar_detail_encoded_short';
 
-    public const CONFIG_APP_CALENDAR_DETAIL = [
+    final public const CONFIG_APP_CALENDAR_DETAIL = [
         'path' => 'calendar/detail',
         'pathShort' => 'd',
         'parameter' => [

@@ -42,10 +42,6 @@ class ShowLocationCommand extends Command
 
     protected const LINE_BREAK = "\n";
 
-    protected PlaceLoaderService $placeLoaderService;
-
-    protected LocationDataService $locationDataService;
-
     protected bool $debug = false;
 
     protected bool $verbose = false;
@@ -53,13 +49,9 @@ class ShowLocationCommand extends Command
     /**
      * ShowImagePropertiesCommand constructor.
      */
-    public function __construct(PlaceLoaderService $placeLoaderService, LocationDataService $locationDataService)
+    public function __construct(protected PlaceLoaderService $placeLoaderService, protected LocationDataService $locationDataService)
     {
         parent::__construct();
-
-        $this->placeLoaderService = $placeLoaderService;
-
-        $this->locationDataService = $locationDataService;
     }
 
     /**

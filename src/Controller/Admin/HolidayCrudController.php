@@ -31,11 +31,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class HolidayCrudController extends BaseCrudController
 {
-    protected RequestStack $requestStack;
-
-    protected HolidayGroupLoaderService $holidayGroupLoaderService;
-
-    public const PARAMETER_HOLIDAY_GROUP = 'holidayGroup';
+    final public const PARAMETER_HOLIDAY_GROUP = 'holidayGroup';
 
     /**
      * HolidayCrudController constructor.
@@ -46,13 +42,9 @@ class HolidayCrudController extends BaseCrudController
      * @param HolidayGroupLoaderService $holidayGroupLoaderService
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator, RequestStack $requestStack, HolidayGroupLoaderService $holidayGroupLoaderService)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, protected RequestStack $requestStack, protected HolidayGroupLoaderService $holidayGroupLoaderService)
     {
         parent::__construct($securityService, $translator);
-
-        $this->requestStack = $requestStack;
-
-        $this->holidayGroupLoaderService = $holidayGroupLoaderService;
     }
 
     /**

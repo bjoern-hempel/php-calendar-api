@@ -35,9 +35,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class HolidayGroupCrudController extends BaseCrudController
 {
-    protected AdminUrlGenerator $adminUrlGenerator;
-
-    public const ACTION_NEW_HOLIDAY = 'newHoliday';
+    final public const ACTION_NEW_HOLIDAY = 'newHoliday';
 
     /**
      * HolidayGroupCrudController constructor.
@@ -47,11 +45,9 @@ class HolidayGroupCrudController extends BaseCrudController
      * @param AdminUrlGenerator $adminUrlGenerator
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator, AdminUrlGenerator $adminUrlGenerator)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, protected AdminUrlGenerator $adminUrlGenerator)
     {
         parent::__construct($securityService, $translator);
-
-        $this->adminUrlGenerator = $adminUrlGenerator;
     }
 
     /**

@@ -32,10 +32,10 @@ class SearchConfig
 {
     protected ?Request $request;
 
-    protected ?string $error;
+    protected ?string $error = null;
 
     /* The id string like a:189454, etc. */
-    protected ?string $idString;
+    protected ?string $idString = null;
 
     /* The current location like 51.061182,13.740584, etc. */
     /** @var float[]|null  */
@@ -51,7 +51,7 @@ class SearchConfig
     protected int $page;
 
     /* The search query like "Dresden", etc. */
-    protected ?string $searchQuery;
+    protected ?string $searchQuery = null;
 
     /* The sort order of search list. */
     protected string $sort;
@@ -59,42 +59,42 @@ class SearchConfig
     /* Verbose mode */
     protected bool $verbose = false;
 
-    public const ORDER_BY_LOCATION = 'l';
-    public const ORDER_BY_NAME = 'n';
-    public const ORDER_BY_RELEVANCE = 'r';
-    public const ORDER_BY_RELEVANCE_LOCATION = 'rl';
+    final public const ORDER_BY_LOCATION = 'l';
+    final public const ORDER_BY_NAME = 'n';
+    final public const ORDER_BY_RELEVANCE = 'r';
+    final public const ORDER_BY_RELEVANCE_LOCATION = 'rl';
 
-    public const VIEW_MODE_SEARCH = 0;
-    public const VIEW_MODE_LIST = 1;
-    public const VIEW_MODE_DETAIL = 2;
-    public const VIEW_MODE_CURRENT_POSITION = 3;
+    final public const VIEW_MODE_SEARCH = 0;
+    final public const VIEW_MODE_LIST = 1;
+    final public const VIEW_MODE_DETAIL = 2;
+    final public const VIEW_MODE_CURRENT_POSITION = 3;
 
-    public const PARAMETER_NAME_ERROR = 'e';
-    public const PARAMETER_DEFAULT_ERROR = null;
+    final public const PARAMETER_NAME_ERROR = 'e';
+    final public const PARAMETER_DEFAULT_ERROR = null;
 
-    public const PARAMETER_NAME_ID_STRING = 'id';
-    public const PARAMETER_DEFAULT_ID_STRING = null;
+    final public const PARAMETER_NAME_ID_STRING = 'id';
+    final public const PARAMETER_DEFAULT_ID_STRING = null;
 
-    public const PARAMETER_NAME_LOCATION = 'l';
-    public const PARAMETER_DEFAULT_LOCATION = null;
+    final public const PARAMETER_NAME_LOCATION = 'l';
+    final public const PARAMETER_DEFAULT_LOCATION = null;
 
-    public const PARAMETER_NAME_NUMBER_PER_PAGE = 'n';
-    public const PARAMETER_DEFAULT_NUMBER_PER_PAGE = 10;
+    final public const PARAMETER_NAME_NUMBER_PER_PAGE = 'n';
+    final public const PARAMETER_DEFAULT_NUMBER_PER_PAGE = 10;
 
-    public const PARAMETER_NAME_NUMBER_RESULTS = 'r';
-    public const PARAMETER_DEFAULT_NUMBER_RESULTS = 0;
+    final public const PARAMETER_NAME_NUMBER_RESULTS = 'r';
+    final public const PARAMETER_DEFAULT_NUMBER_RESULTS = 0;
 
-    public const PARAMETER_NAME_PAGE = 'p';
-    public const PARAMETER_DEFAULT_PAGE = 1;
+    final public const PARAMETER_NAME_PAGE = 'p';
+    final public const PARAMETER_DEFAULT_PAGE = 1;
 
-    public const PARAMETER_NAME_SEARCH_QUERY = 'q';
-    public const PARAMETER_DEFAULT_SEARCH_QUERY = null;
+    final public const PARAMETER_NAME_SEARCH_QUERY = 'q';
+    final public const PARAMETER_DEFAULT_SEARCH_QUERY = null;
 
-    public const PARAMETER_NAME_SORT = 's';
-    public const PARAMETER_DEFAULT_SORT = self::ORDER_BY_RELEVANCE;
+    final public const PARAMETER_NAME_SORT = 's';
+    final public const PARAMETER_DEFAULT_SORT = self::ORDER_BY_RELEVANCE;
 
-    public const PARAMETER_NAME_VERBOSE = 'v';
-    public const PARAMETER_DEFAULT_VERBOSE = false;
+    final public const PARAMETER_NAME_VERBOSE = 'v';
+    final public const PARAMETER_DEFAULT_VERBOSE = false;
 
     /**
      * SearchConfig constructor.

@@ -54,31 +54,22 @@ final class GPSConverterTest extends TestCase
         $this->assertContains($method, get_class_methods(GPSConverter::class));
         $this->assertIsCallable($callback);
 
-        switch ($method) {
-            case 'dms2DecimalDegrees':
-            case 'decimalDegree2dmss':
-            case 'decimalDegree2GoogleLink':
-            case 'decimalDegree2OpenstreetmapLink':
-            case 'getDegreeString':
-            case 'getDirectionFromPositionsString':
-                match (true) {
-                    $parameter3 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $given2, $parameter1, $parameter2, $parameter3)),
-                    $parameter2 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $given2, $parameter1, $parameter2)),
-                    $parameter1 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $given2, $parameter1)),
-                    // no break
-                    default => $this->assertSame($expected, call_user_func($callback, $given1, $given2)),
-                };
-                break;
-
-            default:
-                match (true) {
-                    $parameter3 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $parameter1, $parameter2, $parameter3)),
-                    $parameter2 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $parameter1, $parameter2)),
-                    $parameter1 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $parameter1)),
-                    // no break
-                    default => $this->assertSame($expected, call_user_func($callback, $given1)),
-                };
-        }
+        match ($method) {
+            'dms2DecimalDegrees', 'decimalDegree2dmss', 'decimalDegree2GoogleLink', 'decimalDegree2OpenstreetmapLink', 'getDegreeString', 'getDirectionFromPositionsString' => match (true) {
+                $parameter3 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $given2, $parameter1, $parameter2, $parameter3)),
+                $parameter2 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $given2, $parameter1, $parameter2)),
+                $parameter1 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $given2, $parameter1)),
+                // no break
+                default => $this->assertSame($expected, call_user_func($callback, $given1, $given2)),
+            },
+            default => match (true) {
+                $parameter3 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $parameter1, $parameter2, $parameter3)),
+                $parameter2 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $parameter1, $parameter2)),
+                $parameter1 !== null => $this->assertSame($expected, call_user_func($callback, $given1, $parameter1)),
+                // no break
+                default => $this->assertSame($expected, call_user_func($callback, $given1)),
+            },
+        };
     }
 
     /**

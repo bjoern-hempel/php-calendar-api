@@ -34,71 +34,67 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class UserVoter extends Voter
 {
-    protected ParameterBagInterface $parameterBag;
+    final public const ATTRIBUTE_CALENDAR_DELETE = 'CALENDAR_DELETE';
+
+    final public const ATTRIBUTE_CALENDAR_GET = 'CALENDAR_GET';
+
+    final public const ATTRIBUTE_CALENDAR_PATCH = 'CALENDAR_PATCH';
+
+    final public const ATTRIBUTE_CALENDAR_POST = 'CALENDAR_POST';
+
+    final public const ATTRIBUTE_CALENDAR_PUT = 'CALENDAR_PUT';
 
 
-    public const ATTRIBUTE_CALENDAR_DELETE = 'CALENDAR_DELETE';
+    final public const ATTRIBUTE_CALENDAR_IMAGE_DELETE = 'CALENDAR_IMAGE_DELETE';
 
-    public const ATTRIBUTE_CALENDAR_GET = 'CALENDAR_GET';
+    final public const ATTRIBUTE_CALENDAR_IMAGE_GET = 'CALENDAR_IMAGE_GET';
 
-    public const ATTRIBUTE_CALENDAR_PATCH = 'CALENDAR_PATCH';
+    final public const ATTRIBUTE_CALENDAR_IMAGE_PATCH = 'CALENDAR_IMAGE_PATCH';
 
-    public const ATTRIBUTE_CALENDAR_POST = 'CALENDAR_POST';
+    final public const ATTRIBUTE_CALENDAR_IMAGE_POST = 'CALENDAR_IMAGE_POST';
 
-    public const ATTRIBUTE_CALENDAR_PUT = 'CALENDAR_PUT';
-
-
-    public const ATTRIBUTE_CALENDAR_IMAGE_DELETE = 'CALENDAR_IMAGE_DELETE';
-
-    public const ATTRIBUTE_CALENDAR_IMAGE_GET = 'CALENDAR_IMAGE_GET';
-
-    public const ATTRIBUTE_CALENDAR_IMAGE_PATCH = 'CALENDAR_IMAGE_PATCH';
-
-    public const ATTRIBUTE_CALENDAR_IMAGE_POST = 'CALENDAR_IMAGE_POST';
-
-    public const ATTRIBUTE_CALENDAR_IMAGE_PUT = 'CALENDAR_IMAGE_PUT';
+    final public const ATTRIBUTE_CALENDAR_IMAGE_PUT = 'CALENDAR_IMAGE_PUT';
 
 
-    public const ATTRIBUTE_EVENT_DELETE = 'EVENT_DELETE';
+    final public const ATTRIBUTE_EVENT_DELETE = 'EVENT_DELETE';
 
-    public const ATTRIBUTE_EVENT_GET = 'EVENT_GET';
+    final public const ATTRIBUTE_EVENT_GET = 'EVENT_GET';
 
-    public const ATTRIBUTE_EVENT_PATCH = 'EVENT_PATCH';
+    final public const ATTRIBUTE_EVENT_PATCH = 'EVENT_PATCH';
 
-    public const ATTRIBUTE_EVENT_POST = 'EVENT_POST';
+    final public const ATTRIBUTE_EVENT_POST = 'EVENT_POST';
 
-    public const ATTRIBUTE_EVENT_PUT = 'EVENT_PUT';
-
-
-    public const ATTRIBUTE_IMAGE_DELETE = 'IMAGE_DELETE';
-
-    public const ATTRIBUTE_IMAGE_GET = 'IMAGE_GET';
-
-    public const ATTRIBUTE_IMAGE_PATCH = 'IMAGE_PATCH';
-
-    public const ATTRIBUTE_IMAGE_POST = 'IMAGE_POST';
-
-    public const ATTRIBUTE_IMAGE_PUT = 'IMAGE_PUT';
+    final public const ATTRIBUTE_EVENT_PUT = 'EVENT_PUT';
 
 
-    public const ATTRIBUTE_USER_DELETE = 'USER_DELETE';
+    final public const ATTRIBUTE_IMAGE_DELETE = 'IMAGE_DELETE';
 
-    public const ATTRIBUTE_USER_GET = 'USER_GET';
+    final public const ATTRIBUTE_IMAGE_GET = 'IMAGE_GET';
 
-    public const ATTRIBUTE_USER_PATCH = 'USER_PATCH';
+    final public const ATTRIBUTE_IMAGE_PATCH = 'IMAGE_PATCH';
 
-    public const ATTRIBUTE_USER_POST = 'USER_POST';
+    final public const ATTRIBUTE_IMAGE_POST = 'IMAGE_POST';
 
-    public const ATTRIBUTE_USER_PUT = 'USER_PUT';
+    final public const ATTRIBUTE_IMAGE_PUT = 'IMAGE_PUT';
+
+
+    final public const ATTRIBUTE_USER_DELETE = 'USER_DELETE';
+
+    final public const ATTRIBUTE_USER_GET = 'USER_GET';
+
+    final public const ATTRIBUTE_USER_PATCH = 'USER_PATCH';
+
+    final public const ATTRIBUTE_USER_POST = 'USER_POST';
+
+    final public const ATTRIBUTE_USER_PUT = 'USER_PUT';
 
     /**
      * UserVoter constructor.
      *
      * @param ParameterBagInterface $parameterBag
      */
-    public function __construct(ParameterBagInterface $parameterBag)
+    public function __construct(protected ParameterBagInterface $parameterBag)
     {
-        $this->parameterBag = $parameterBag;
     }
 
     /**

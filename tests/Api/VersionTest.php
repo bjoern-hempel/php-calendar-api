@@ -56,7 +56,7 @@ class VersionTest extends ApiClientTestCase
         $response = $this->doRequest($endpoint, $method);
         $json = $response->getContent();
         $this->assertIsString($json);
-        $object = json_decode($response->getContent());
+        $object = json_decode($response->getContent(), null, 512, JSON_THROW_ON_ERROR);
         if ($version === false) {
             throw new Exception(sprintf('Unable to read file "%s" (%s:%d).', $versionFile, __FILE__, __LINE__));
         }

@@ -43,17 +43,13 @@ class CreateHolidayCommand extends Command
 {
     protected static $defaultName = 'app:holiday:create';
 
-    private EntityManagerInterface $manager;
-
-    private HttpClientInterface $client;
-
     protected const API_ENDPOINT = 'https://feiertage-api.de/api/?jahr=%d';
 
     protected const API_DATE_FIELD = 'datum';
 
-    public const API_DATE_FORMAT = 'Y-m-d';
+    final public const API_DATE_FORMAT = 'Y-m-d';
 
-    public const YEARLY_YEAR = 1970;
+    final public const YEARLY_YEAR = 1970;
 
     protected const YEARLY_DATES = [
         '01-01', // New Year (Neujahr)
@@ -78,13 +74,9 @@ class CreateHolidayCommand extends Command
      * @param EntityManagerInterface $manager
      * @param HttpClientInterface $client
      */
-    public function __construct(EntityManagerInterface $manager, HttpClientInterface $client)
+    public function __construct(private readonly EntityManagerInterface $manager, private readonly HttpClientInterface $client)
     {
         parent::__construct();
-
-        $this->manager = $manager;
-
-        $this->client = $client;
     }
 
     /**

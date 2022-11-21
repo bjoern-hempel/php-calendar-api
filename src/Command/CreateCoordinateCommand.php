@@ -56,26 +56,6 @@ class CreateCoordinateCommand extends Command
 
     final public const COLS_EXPECTED = 19;
 
-    private EntityManagerInterface $manager;
-
-    protected PlaceARepository $placeARepository;
-
-    protected PlaceHRepository $placeHRepository;
-
-    protected PlaceLRepository $placeLRepository;
-
-    protected PlacePRepository $placePRepository;
-
-    protected PlaceRRepository $placeRRepository;
-
-    protected PlaceSRepository $placeSRepository;
-
-    protected PlaceTRepository $placeTRepository;
-
-    protected PlaceURepository $placeURepository;
-
-    protected PlaceVRepository $placeVRepository;
-
     /**
      * CreateUserCommand constructor.
      *
@@ -90,21 +70,9 @@ class CreateCoordinateCommand extends Command
      * @param PlaceURepository $placeURepository
      * @param PlaceVRepository $placeVRepository
      */
-    public function __construct(EntityManagerInterface $manager, PlaceARepository $placeARepository, PlaceHRepository $placeHRepository, PlaceLRepository $placeLRepository, PlacePRepository $placePRepository, PlaceRRepository $placeRRepository, PlaceSRepository $placeSRepository, PlaceTRepository $placeTRepository, PlaceURepository $placeURepository, PlaceVRepository $placeVRepository)
+    public function __construct(private readonly EntityManagerInterface $manager, protected PlaceARepository $placeARepository, protected PlaceHRepository $placeHRepository, protected PlaceLRepository $placeLRepository, protected PlacePRepository $placePRepository, protected PlaceRRepository $placeRRepository, protected PlaceSRepository $placeSRepository, protected PlaceTRepository $placeTRepository, protected PlaceURepository $placeURepository, protected PlaceVRepository $placeVRepository)
     {
         parent::__construct();
-
-        $this->manager = $manager;
-
-        $this->placeARepository = $placeARepository;
-        $this->placeHRepository = $placeHRepository;
-        $this->placeLRepository = $placeLRepository;
-        $this->placePRepository = $placePRepository;
-        $this->placeRRepository = $placeRRepository;
-        $this->placeSRepository = $placeSRepository;
-        $this->placeTRepository = $placeTRepository;
-        $this->placeURepository = $placeURepository;
-        $this->placeVRepository = $placeVRepository;
     }
 
     /**

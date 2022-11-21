@@ -39,11 +39,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
 
-    public const LOGIN_ROUTE = 'app_admin_login';
-
-    private UrlGeneratorInterface $urlGenerator;
-
-    private UserRepository $userRepository;
+    final public const LOGIN_ROUTE = 'app_admin_login';
 
     /**
      * LoginFormAuthenticator constructor.
@@ -51,10 +47,8 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
      * @param UserRepository $userRepository
      * @param UrlGeneratorInterface $urlGenerator
      */
-    public function __construct(UserRepository $userRepository, UrlGeneratorInterface $urlGenerator)
+    public function __construct(private readonly UserRepository $userRepository, private readonly UrlGeneratorInterface $urlGenerator)
     {
-        $this->urlGenerator = $urlGenerator;
-        $this->userRepository = $userRepository;
     }
 
     /**
@@ -111,9 +105,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         $csrfToken = strval($request->request->get('_csrf_token'));
 
         return new Passport(
-            new UserBadge($email, function ($userIdentifier) {
-                return $this->userRepository->findOneBy(['email' => $userIdentifier]);
-            }),
+            new UserBadge($email, fn($userIdentifier) => $this->userRepository->findOneBy(['email' => $userIdentifier])),
             new PasswordCredentials($password),
             [new CsrfTokenBadge('login', $csrfToken)]
         );

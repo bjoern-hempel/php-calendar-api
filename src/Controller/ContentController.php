@@ -34,18 +34,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ContentController extends BaseController
 {
-    protected LocationDataService $locationDataService;
-
-    protected TranslatorInterface $translator;
-
-    protected KernelInterface $kernel;
-
-    protected VersionService $versionService;
-
-    protected PlaceLoaderService $placeLoaderService;
-
-    protected SearchConfig $searchConfig;
-
     /**
      * ContentController constructor.
      *
@@ -56,19 +44,8 @@ class ContentController extends BaseController
      * @param PlaceLoaderService $placeLoaderService
      * @param SearchConfig $searchConfig
      */
-    public function __construct(LocationDataService $locationDataService, TranslatorInterface $translator, KernelInterface $kernel, VersionService $versionService, PlaceLoaderService $placeLoaderService, SearchConfig $searchConfig)
+    public function __construct(protected LocationDataService $locationDataService, protected TranslatorInterface $translator, protected KernelInterface $kernel, protected VersionService $versionService, protected PlaceLoaderService $placeLoaderService, protected SearchConfig $searchConfig)
     {
-        $this->locationDataService = $locationDataService;
-
-        $this->translator = $translator;
-
-        $this->kernel = $kernel;
-
-        $this->versionService = $versionService;
-
-        $this->placeLoaderService = $placeLoaderService;
-
-        $this->searchConfig = $searchConfig;
     }
 
     /**

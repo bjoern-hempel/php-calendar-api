@@ -29,12 +29,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class IdHashService
 {
-    protected SecurityService $securityService;
-
-    protected RequestStack $requestStack;
-
-    protected UserLoaderService $userLoaderService;
-
     /**
      * IdHashService constructor
      *
@@ -42,13 +36,8 @@ class IdHashService
      * @param RequestStack $requestStack
      * @param UserLoaderService $userLoaderService
      */
-    public function __construct(SecurityService $securityService, RequestStack $requestStack, UserLoaderService $userLoaderService)
+    public function __construct(protected SecurityService $securityService, protected RequestStack $requestStack, protected UserLoaderService $userLoaderService)
     {
-        $this->securityService = $securityService;
-
-        $this->requestStack = $requestStack;
-
-        $this->userLoaderService = $userLoaderService;
     }
 
     /**

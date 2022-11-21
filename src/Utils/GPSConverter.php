@@ -54,31 +54,31 @@ class GPSConverter
 
     final public const ANGLE_0_0 = 0.;
 
-    public const REGEXP_ENCRYPTED_LATITUDE_LONGITUDE = '~!3d([0-9]+\.[0-9]+)+.+!4d([0-9]+\.[0-9]+)~';
+    final public const REGEXP_ENCRYPTED_LATITUDE_LONGITUDE = '~!3d([0-9]+\.[0-9]+)+.+!4d([0-9]+\.[0-9]+)~';
 
-    public const REGEXP_GOOGLE_REDIRECT = '~(https://maps.app.goo.gl/[a-zA-Z0-9]+)$~';
+    final public const REGEXP_GOOGLE_REDIRECT = '~(https://maps.app.goo.gl/[a-zA-Z0-9]+)$~';
 
-    public const REGEXP_GOOGLE_LOCATION_REDIRECT = '~^location: .+!3d([0-9]+\.[0-9]+)+.+!4d([0-9]+\.[0-9]+).+~m';
+    final public const REGEXP_GOOGLE_LOCATION_REDIRECT = '~^location: .+!3d([0-9]+\.[0-9]+)+.+!4d([0-9]+\.[0-9]+).+~m';
 
-    public const REGEXP_SPLIT_LATITUDE_LONGITUDE = '~[, ]+~';
+    final public const REGEXP_SPLIT_LATITUDE_LONGITUDE = '~[, ]+~';
 
-    public const REGEXP_DECIMAL = '[\-_]?\d+[.]\d+[°]*';
+    final public const REGEXP_DECIMAL = '[\-_]?\d+[.]\d+[°]*';
 
-    public const REGEXP_DMS = '(?:[NEOWS]?)[ ]?(?:\d+°)[ ]?(?:\d+′)[ ]?\d+(?:(?:.\d+)?″)[ ]?(?:[NEOWS]?)';
+    final public const REGEXP_DMS = '(?:[NEOWS]?)[ ]?(?:\d+°)[ ]?(?:\d+′)[ ]?\d+(?:(?:.\d+)?″)[ ]?(?:[NEOWS]?)';
 
-    public const REGEXP_DMS_2 = '([NEOWS]?)[ ]?(\d+°)[ ]?(\d+′)[ ]?(\d+(?:.\d+)?″)[ ]?([NEOWS]?)';
+    final public const REGEXP_DMS_2 = '([NEOWS]?)[ ]?(\d+°)[ ]?(\d+′)[ ]?(\d+(?:.\d+)?″)[ ]?([NEOWS]?)';
 
-    public const UNIT_DEGREE = [
+    final public const UNIT_DEGREE = [
         '°',
     ];
 
-    public const UNIT_MINUTES = [
+    final public const UNIT_MINUTES = [
         '’',
         '\'',
         '′',
     ];
 
-    public const UNIT_SECONDS = [
+    final public const UNIT_SECONDS = [
         '\'’',
         '"',
         '″',
@@ -88,10 +88,10 @@ class GPSConverter
 
     protected const REGEXP_VERSION_2 = 2;
 
-    public const DIRECTION_NORTH = 'N';
-    public const DIRECTION_SOUTH = 'S';
-    public const DIRECTION_WEST = 'W';
-    public const DIRECTION_EAST = 'E';
+    final public const DIRECTION_NORTH = 'N';
+    final public const DIRECTION_SOUTH = 'S';
+    final public const DIRECTION_WEST = 'W';
+    final public const DIRECTION_EAST = 'E';
 
     /**
      * @param array<int, string> $units
@@ -182,12 +182,12 @@ class GPSConverter
             $matches = [];
 
             if (preg_match(self::getRegexp($units, self::REGEXP_VERSION_1), $dms, $matches)) {
-                list(, $degree, $minutes, $seconds, $direction) = $matches;
+                [, $degree, $minutes, $seconds, $direction] = $matches;
                 return self::getData(intval($degree), intval($minutes), floatval($seconds), $direction);
             }
 
             if (preg_match(self::getRegexp($units, self::REGEXP_VERSION_2), $dms, $matches)) {
-                list(, $direction, $degree, $minutes, $seconds) = $matches;
+                [, $direction, $degree, $minutes, $seconds] = $matches;
                 return self::getData(intval($degree), intval($minutes), floatval($seconds), $direction);
             }
         }
@@ -394,7 +394,7 @@ class GPSConverter
             throw new Exception(sprintf('Unable to split given string "%s" (%s:%d).', $decimalDegreeFrom, __FILE__, __LINE__));
         }
 
-        list($decimalDegreeFromLongitude, $decimalDegreeFromLatitude) = $decimalDegreeFromExploded;
+        [$decimalDegreeFromLongitude, $decimalDegreeFromLatitude] = $decimalDegreeFromExploded;
 
         $decimalDegreeToExploded = preg_split('~[, ]~', $decimalDegreeTo);
 
@@ -402,7 +402,7 @@ class GPSConverter
             throw new Exception(sprintf('Unable to split given string "%s" (%s:%d).', $decimalDegreeTo, __FILE__, __LINE__));
         }
 
-        list($decimalDegreeToLongitude, $decimalDegreeToLatitude) = $decimalDegreeToExploded;
+        [$decimalDegreeToLongitude, $decimalDegreeToLatitude] = $decimalDegreeToExploded;
 
         return self::getDegree(
             floatval($decimalDegreeFromLongitude),
@@ -544,7 +544,7 @@ class GPSConverter
         switch (true) {
             /* Google redirect link https://maps.app.goo.gl/PHq5axBaDdgRWj4T6 */
             case preg_match(self::REGEXP_GOOGLE_REDIRECT, $fullLocation, $matches):
-                list($latitude, $longitude) = self::parseLatitudeAndLongitudeFromGoogleLink($matches[1]);
+                [$latitude, $longitude] = self::parseLatitudeAndLongitudeFromGoogleLink($matches[1]);
                 break;
 
                 /* Google spot link https://www.google.de/maps/place/Strandbad+Wannsee+-+Berliner+B%C3%A4der/@52.4286142,13.1557256,13.54z/data=!4m5!3m4!1s0x47a858ffef30e359:0x165816b49cc6929a!8m2!3d52.4381357!4d13.1794242 */
@@ -555,7 +555,7 @@ class GPSConverter
                     throw new Exception(sprintf('Unable to parse google link "%s" (%s:%d).', $fullLocation, __FILE__, __LINE__));
                 }
 
-                list($latitude, $longitude) = $parsed;
+                [$latitude, $longitude] = $parsed;
                 break;
 
                 /* Given location */
@@ -587,7 +587,7 @@ class GPSConverter
                     $fullLocation = str_replace('O', 'E', $fullLocation);
                 }
 
-                list($latitude, $longitude) = self::parseLatitudeAndLongitudeFromString($fullLocation);
+                [$latitude, $longitude] = self::parseLatitudeAndLongitudeFromString($fullLocation);
                 break;
 
             default:
@@ -629,7 +629,7 @@ class GPSConverter
         if (!preg_match(self::REGEXP_ENCRYPTED_LATITUDE_LONGITUDE, $googleLink, $matchesLocation)) {
             return false;
         }
-        list(, $latitude, $longitude) = $matchesLocation;
+        [, $latitude, $longitude] = $matchesLocation;
 
         $latitude = floatval($latitude);
         $longitude = floatval($longitude);
@@ -667,10 +667,10 @@ class GPSConverter
         // location: https://www.google.com/maps/place/Malbork,+Polen/data=!4m6!3m5!1s0x46fd5bffa9b675d5:0xb4e2fe366cccb936!7e2!8m2!3d54.073048299999996!4d18.992402?utm_source=mstt_1&entry=gps
         $matchesLocation = [];
         if (!preg_match(self::REGEXP_GOOGLE_LOCATION_REDIRECT, $headerLines, $matchesLocation)) {
-            throw new InvalidArgumentException(sprintf('Unable to parse header from google link "%s".', $$googleLink));
+            throw new InvalidArgumentException(sprintf('Unable to parse header from google link "%s".', ${$googleLink}));
         }
 
-        list(, $latitude, $longitude) = $matchesLocation;
+        [, $latitude, $longitude] = $matchesLocation;
 
         return [floatval($latitude), floatval($longitude)];
     }
@@ -690,7 +690,7 @@ class GPSConverter
             throw new Exception(sprintf('Unable to split given full location string (%s:%d).', __FILE__, __LINE__));
         }
 
-        list($latitude, $longitude) = $split;
+        [$latitude, $longitude] = $split;
 
         $latitude = trim(str_replace('_', '-', $latitude));
         $longitude = trim(str_replace('_', '-', $longitude));

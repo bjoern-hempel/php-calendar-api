@@ -83,9 +83,7 @@ class HolidayCollection
         foreach ($holidayGrouped as $year => &$holidayGroup) {
             $iterator = $holidayGroup->getIterator();
             /** @phpstan-ignore-next-line → Method uasort exists. */
-            $iterator->uasort(function ($a, $b) {
-                return ($a->getDate() < $b->getDate()) ? -1 : 1;
-            });
+            $iterator->uasort(fn($a, $b) => ($a->getDate() < $b->getDate()) ? -1 : 1);
             $holidayGroup = new ArrayCollection(iterator_to_array($iterator));
         }
 

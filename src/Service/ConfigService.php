@@ -25,20 +25,17 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class ConfigService
 {
-    public const PARAMETER_NAME_BACKEND_TITLE_MAIN = 'backend.title.main';
+    final public const PARAMETER_NAME_BACKEND_TITLE_MAIN = 'backend.title.main';
 
-    public const PARAMETER_NAME_BACKEND_TITLE_LOGIN = 'backend.title.login';
-
-    protected ParameterBagInterface $parameterBag;
+    final public const PARAMETER_NAME_BACKEND_TITLE_LOGIN = 'backend.title.login';
 
     /**
      * ConfigService constructor
      *
      * @param ParameterBagInterface $parameterBag
      */
-    public function __construct(ParameterBagInterface $parameterBag)
+    public function __construct(protected ParameterBagInterface $parameterBag)
     {
-        $this->parameterBag = $parameterBag;
     }
 
     /**

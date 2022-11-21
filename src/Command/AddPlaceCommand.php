@@ -57,30 +57,6 @@ class AddPlaceCommand extends Command
 {
     protected static $defaultName = 'app:place:add';
 
-    protected EntityManagerInterface $manager;
-
-    protected TranslatorInterface $translator;
-
-    protected LocationDataService $locationDataService;
-
-    protected PlaceARepository $placeARepository;
-
-    protected PlaceHRepository $placeHRepository;
-
-    protected PlaceLRepository $placeLRepository;
-
-    protected PlacePRepository $placePRepository;
-
-    protected PlaceRRepository $placeRRepository;
-
-    protected PlaceSRepository $placeSRepository;
-
-    protected PlaceTRepository $placeTRepository;
-
-    protected PlaceURepository $placeURepository;
-
-    protected PlaceVRepository $placeVRepository;
-
     /**
      * CreateUserCommand constructor.
      *
@@ -97,23 +73,9 @@ class AddPlaceCommand extends Command
      * @param PlaceURepository $placeURepository
      * @param PlaceVRepository $placeVRepository
      */
-    public function __construct(EntityManagerInterface $manager, TranslatorInterface $translator, LocationDataService $locationDataService, PlaceARepository $placeARepository, PlaceHRepository $placeHRepository, PlaceLRepository $placeLRepository, PlacePRepository $placePRepository, PlaceRRepository $placeRRepository, PlaceSRepository $placeSRepository, PlaceTRepository $placeTRepository, PlaceURepository $placeURepository, PlaceVRepository $placeVRepository)
+    public function __construct(protected EntityManagerInterface $manager, protected TranslatorInterface $translator, protected LocationDataService $locationDataService, protected PlaceARepository $placeARepository, protected PlaceHRepository $placeHRepository, protected PlaceLRepository $placeLRepository, protected PlacePRepository $placePRepository, protected PlaceRRepository $placeRRepository, protected PlaceSRepository $placeSRepository, protected PlaceTRepository $placeTRepository, protected PlaceURepository $placeURepository, protected PlaceVRepository $placeVRepository)
     {
         parent::__construct();
-
-        $this->manager = $manager;
-        $this->translator = $translator;
-        $this->locationDataService = $locationDataService;
-
-        $this->placeARepository = $placeARepository;
-        $this->placeHRepository = $placeHRepository;
-        $this->placeLRepository = $placeLRepository;
-        $this->placePRepository = $placePRepository;
-        $this->placeRRepository = $placeRRepository;
-        $this->placeSRepository = $placeSRepository;
-        $this->placeTRepository = $placeTRepository;
-        $this->placeURepository = $placeURepository;
-        $this->placeVRepository = $placeVRepository;
     }
 
     /**
@@ -197,7 +159,7 @@ EOT
             return Command::INVALID;
         }
 
-        list($latitude, $longitude) = $result;
+        [$latitude, $longitude] = $result;
 
         $placeRepository = $this->getPlaceRepository($featureClass);
 
@@ -232,7 +194,7 @@ EOT
             return Command::INVALID;
         }
 
-        $lowestId = 100000000;
+        $lowestId = 100_000_000;
         $geonameId = $placeRepository->getHighestGeonameId();
         $geonameId++;
 

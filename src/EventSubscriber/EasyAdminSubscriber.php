@@ -42,16 +42,6 @@ use Symfony\Component\Translation\TranslatableMessage;
  */
 class EasyAdminSubscriber implements EventSubscriberInterface
 {
-    protected ImageService $imageService;
-
-    protected CalendarSheetCreateService $calendarSheetCreateService;
-
-    protected RequestStack $requestStack;
-
-    protected UrlService $urlService;
-
-    protected EntityManagerInterface $manager;
-
     /**
      * EasyAdminSubscriber constructor.
      *
@@ -61,17 +51,8 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      * @param UrlService $urlService
      * @param EntityManagerInterface $manager
      */
-    public function __construct(ImageService $imageService, CalendarSheetCreateService $calendarSheetCreateService, RequestStack $requestStack, UrlService $urlService, EntityManagerInterface $manager)
+    public function __construct(protected ImageService $imageService, protected CalendarSheetCreateService $calendarSheetCreateService, protected RequestStack $requestStack, protected UrlService $urlService, protected EntityManagerInterface $manager)
     {
-        $this->imageService = $imageService;
-
-        $this->calendarSheetCreateService = $calendarSheetCreateService;
-
-        $this->requestStack = $requestStack;
-
-        $this->urlService = $urlService;
-
-        $this->manager = $manager;
     }
 
     /**

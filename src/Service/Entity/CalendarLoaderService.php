@@ -36,14 +36,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class CalendarLoaderService extends BaseLoaderService
 {
-    protected KernelInterface $appKernel;
-
-    protected EntityManagerInterface $manager;
-
-    protected SecurityService $securityService;
-
-    protected UserLoaderService $userLoaderService;
-
     protected CalendarLoaderService $calendarLoaderService;
 
     protected User $user;
@@ -62,15 +54,8 @@ class CalendarLoaderService extends BaseLoaderService
      * @param SecurityService $securityService
      * @param UserLoaderService $userLoaderService
      */
-    public function __construct(KernelInterface $appKernel, EntityManagerInterface $manager, SecurityService $securityService, UserLoaderService $userLoaderService)
+    public function __construct(protected KernelInterface $appKernel, protected EntityManagerInterface $manager, protected SecurityService $securityService, protected UserLoaderService $userLoaderService)
     {
-        $this->appKernel = $appKernel;
-
-        $this->manager = $manager;
-
-        $this->securityService = $securityService;
-
-        $this->userLoaderService = $userLoaderService;
     }
 
     /**

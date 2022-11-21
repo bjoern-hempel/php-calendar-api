@@ -81,25 +81,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar_style']],
     order: ['id' => 'ASC'],
 )]
-class CalendarStyle implements EntityInterface
+class CalendarStyle implements EntityInterface, \Stringable
 {
     use TimestampsTrait;
 
     use JsonHelper;
 
-    public const CRUD_FIELDS_ADMIN = [];
+    final public const CRUD_FIELDS_ADMIN = [];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'updatedAt', 'createdAt', 'configJson'];
+    final public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'name', 'updatedAt', 'createdAt', 'configJson'];
+    final public const CRUD_FIELDS_INDEX = ['id', 'name', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name', 'configJson'];
+    final public const CRUD_FIELDS_NEW = ['id', 'name', 'configJson'];
 
-    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+    final public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'updatedAt', 'createdAt', 'configJson'];
+    final public const CRUD_FIELDS_DETAIL = ['id', 'name', 'updatedAt', 'createdAt', 'configJson'];
 
-    public const CRUD_FIELDS_FILTER = ['name', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_FILTER = ['name', 'updatedAt', 'createdAt'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

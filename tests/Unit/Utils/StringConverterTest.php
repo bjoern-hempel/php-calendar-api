@@ -49,18 +49,11 @@ final class StringConverterTest extends TestCase
         $this->assertContains($method, get_class_methods(StringConverter::class));
         $this->assertIsCallable($callback);
 
-        switch (true) {
-            case $param2 !== null:
-                $this->assertSame($expected, call_user_func($callback, $param1, $param2));
-                break;
-
-            case $param1 !== null:
-                $this->assertSame($expected, call_user_func($callback, $param1));
-                break;
-
-            default:
-                $this->assertSame($expected, call_user_func($callback));
-        }
+        match (true) {
+            $param2 !== null => $this->assertSame($expected, call_user_func($callback, $param1, $param2)),
+            $param1 !== null => $this->assertSame($expected, call_user_func($callback, $param1)),
+            default => $this->assertSame($expected, call_user_func($callback)),
+        };
     }
 
     /**

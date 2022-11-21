@@ -28,21 +28,15 @@ class FileNameConverter
 {
     protected string $filename;
 
-    protected string $rootPath;
+    final public const MODE_OUTPUT_FILE = 'MODE_OUTPUT_FILE';
 
-    protected bool $test;
+    final public const MODE_OUTPUT_RELATIVE = 'MODE_OUTPUT_RELATIVE';
 
-    protected string $outputMode;
+    final public const MODE_OUTPUT_ABSOLUTE = 'MODE_OUTPUT_ABSOLUTE';
 
-    public const MODE_OUTPUT_FILE = 'MODE_OUTPUT_FILE';
+    final public const PATH_IMAGES = Image::PATH_IMAGES;
 
-    public const MODE_OUTPUT_RELATIVE = 'MODE_OUTPUT_RELATIVE';
-
-    public const MODE_OUTPUT_ABSOLUTE = 'MODE_OUTPUT_ABSOLUTE';
-
-    public const PATH_IMAGES = Image::PATH_IMAGES;
-
-    public const PATH_DATA = Image::PATH_DATA;
+    final public const PATH_DATA = Image::PATH_DATA;
 
     /**
      * FileNameConverter constructor.
@@ -53,15 +47,9 @@ class FileNameConverter
      * @param string $outputMode
      * @throws Exception
      */
-    public function __construct(string $filename, string $rootPath = '', bool $test = false, string $outputMode = self::MODE_OUTPUT_FILE)
+    public function __construct(string $filename, protected string $rootPath = '', protected bool $test = false, protected string $outputMode = self::MODE_OUTPUT_FILE)
     {
         $this->filename = $this->filterFilename($filename);
-
-        $this->rootPath = $rootPath;
-
-        $this->test = $test;
-
-        $this->outputMode = $outputMode;
     }
 
     /**
@@ -211,8 +199,8 @@ class FileNameConverter
      */
     public function getFilename(string $type = Image::PATH_TYPE_SOURCE, ?int $width = null, bool $tmp = false, ?bool $test = null, ?string $outputMode = null, string $additionalPath = null): string
     {
-        $test = $test ?? $this->test;
-        $outputMode = $outputMode ?? $this->outputMode;
+        $test ??= $this->test;
+        $outputMode ??= $this->outputMode;
 
         $filename = match ($type) {
             Image::PATH_TYPE_TARGET, Image::PATH_TYPE_EXPECTED, Image::PATH_TYPE_COMPARE => self::replacePathType($this->filename, $type, $additionalPath),

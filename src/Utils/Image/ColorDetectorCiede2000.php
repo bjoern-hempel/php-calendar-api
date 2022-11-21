@@ -40,17 +40,14 @@ class ColorDetectorCiede2000
 
     final public const ANGLE_0 = 0;
 
-    protected Palette $palette;
-
     /** @var SplFixedArray<int>|null */
     protected ?SplFixedArray $sortedColors = null;
 
     /**
      * ColorDetectorCiede2000 constructor.
      */
-    public function __construct(Palette $palette)
+    public function __construct(protected Palette $palette)
     {
-        $this->palette = $palette;
     }
 
     /**
@@ -183,17 +180,17 @@ class ColorDetectorCiede2000
      */
     protected static function ciede2000DeltaE(array $lab1, array $lab2): float
     {
-        $C1 = sqrt(pow($lab1['a'], 2) + pow($lab1['b'], 2));
-        $C2 = sqrt(pow($lab2['a'], 2) + pow($lab2['b'], 2));
+        $C1 = sqrt($lab1['a'] ** 2 + $lab1['b'] ** 2);
+        $C2 = sqrt($lab2['a'] ** 2 + $lab2['b'] ** 2);
         $Cb = ($C1 + $C2) / 2;
 
-        $G = .5 * (1 - sqrt(pow($Cb, 7) / (pow($Cb, 7) + pow(25, 7))));
+        $G = .5 * (1 - sqrt($Cb ** 7 / ($Cb ** 7 + 25 ** 7)));
 
         $a1p = (1 + $G) * $lab1['a'];
         $a2p = (1 + $G) * $lab2['a'];
 
-        $C1p = sqrt(pow($a1p, 2) + pow($lab1['b'], 2));
-        $C2p = sqrt(pow($a2p, 2) + pow($lab2['b'], 2));
+        $C1p = sqrt($a1p ** 2 + $lab1['b'] ** 2);
+        $C2p = sqrt($a2p ** 2 + $lab2['b'] ** 2);
 
         $h1p = $a1p == 0 && $lab1['b'] == 0 ? 0 : atan2($lab1['b'], $a1p);
         $h2p = $a2p == 0 && $lab2['b'] == 0 ? 0 : atan2($lab2['b'], $a2p);
@@ -228,20 +225,20 @@ class ColorDetectorCiede2000
 
         $T = 1 - .17 * cos($hbp - 30) + .24 * cos(2 * $hbp) + .32 * cos(3 * $hbp + 6) - .2 * cos(4 * $hbp - 63);
 
-        $sigmaDelta = 30 * exp(-pow(($hbp - 275) / 25, 2));
+        $sigmaDelta = 30 * exp(-(($hbp - 275) / 25) ** 2);
 
-        $Rc = 2 * sqrt(pow($Cbp, 7) / (pow($Cbp, 7) + pow(25, 7)));
+        $Rc = 2 * sqrt($Cbp ** 7 / ($Cbp ** 7 + 25 ** 7));
 
-        $Sl = 1 + ((.015 * pow($Lbp - 50, 2)) / sqrt(20 + pow($Lbp - 50, 2)));
+        $Sl = 1 + ((.015 * ($Lbp - 50) ** 2) / sqrt(20 + ($Lbp - 50) ** 2));
         $Sc = 1 + .045 * $Cbp;
         $Sh = 1 + .015 * $Cbp * $T;
 
         $Rt = -sin(2 * $sigmaDelta) * $Rc;
 
         return sqrt(
-            pow($LpDelta / $Sl, 2) +
-            pow($CpDelta / $Sc, 2) +
-            pow($HpDelta / $Sh, 2) +
+            ($LpDelta / $Sl) ** 2 +
+            ($CpDelta / $Sc) ** 2 +
+            ($HpDelta / $Sh) ** 2 +
             $Rt * ($CpDelta / $Sc) * ($HpDelta / $Sh)
         );
     }

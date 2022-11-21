@@ -39,8 +39,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class CalendarBuilderService
 {
-    protected KernelInterface $appKernel;
-
     protected float $aspectRatio;
 
     protected int $width;
@@ -155,44 +153,43 @@ class CalendarBuilderService
 
     protected bool $deleteTargetImages = false;
 
-    public const BIRTHDAY_YEAR_NOT_GIVEN = 2100;
+    final public const BIRTHDAY_YEAR_NOT_GIVEN = 2100;
 
-    public const ALIGN_LEFT = 1;
+    final public const ALIGN_LEFT = 1;
 
-    public const ALIGN_CENTER = 2;
+    final public const ALIGN_CENTER = 2;
 
-    public const ALIGN_RIGHT = 3;
+    final public const ALIGN_RIGHT = 3;
 
-    public const VALIGN_TOP = 1;
+    final public const VALIGN_TOP = 1;
 
-    public const VALIGN_BOTTOM = 2;
+    final public const VALIGN_BOTTOM = 2;
 
-    public const ZOOM_HEIGHT_100 = 4000;
+    final public const ZOOM_HEIGHT_100 = 4000;
 
-    public const DAY_SUNDAY = 0;
+    final public const DAY_SUNDAY = 0;
 
-    public const DAY_MONDAY = 1;
+    final public const DAY_MONDAY = 1;
 
-    public const IMAGE_PNG = 'png';
+    final public const IMAGE_PNG = 'png';
 
-    public const IMAGE_JPG = 'jpg';
+    final public const IMAGE_JPG = 'jpg';
 
-    public const EVENT_TYPE_BIRTHDAY = 0;
+    final public const EVENT_TYPE_BIRTHDAY = 0;
 
-    public const EVENT_TYPE_EVENT = 1;
+    final public const EVENT_TYPE_EVENT = 1;
 
-    public const EVENT_TYPE_EVENT_GROUP = 2;
+    final public const EVENT_TYPE_EVENT_GROUP = 2;
 
-    public const DEFAULT_QR_CODE_VERSION = 5;
+    final public const DEFAULT_QR_CODE_VERSION = 5;
 
     /**
      * Calendar constructor
      *
      * @param KernelInterface $appKernel
      */
-    public function __construct(KernelInterface $appKernel)
+    public function __construct(protected KernelInterface $appKernel)
     {
-        $this->appKernel = $appKernel;
     }
 
     /**
@@ -392,7 +389,7 @@ class CalendarBuilderService
             throw new Exception(sprintf('Unable to get bounding box (%s:%d', __FILE__, __LINE__));
         }
 
-        list($leftBottomX, $leftBottomY, $rightBottomX, $rightBottomY, $rightTopX, $rightTopY, $leftTopX, $leftTopY) = $boundingBox;
+        [$leftBottomX, $leftBottomY, $rightBottomX, $rightBottomY, $rightTopX, $rightTopY, $leftTopX, $leftTopY] = $boundingBox;
 
         return [
             'width' => $rightBottomX - $leftBottomX,
@@ -1390,7 +1387,7 @@ class CalendarBuilderService
                 throw new Exception(sprintf('Unexpected image path given: "%s" (%s:%d).', $imageFile, __FILE__, __LINE__));
             }
 
-            list($path, $fileHash, $fileName, $width, $extension) = $matches;
+            [$path, $fileHash, $fileName, $width, $extension] = $matches;
 
             if (file_exists($imageFile)) {
                 unlink($imageFile);

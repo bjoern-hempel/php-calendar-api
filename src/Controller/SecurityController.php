@@ -32,12 +32,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class SecurityController extends AbstractController
 {
-    protected TranslatorInterface $translator;
-
-    protected ConfigService $configService;
-
-    protected VersionService $versionService;
-
     /**
      * SecurityController constructor.
      *
@@ -45,23 +39,18 @@ class SecurityController extends AbstractController
      * @param ConfigService $configService
      * @param VersionService $versionService
      */
-    public function __construct(TranslatorInterface $translator, ConfigService $configService, VersionService $versionService)
+    public function __construct(protected TranslatorInterface $translator, protected ConfigService $configService, protected VersionService $versionService)
     {
-        $this->translator = $translator;
-
-        $this->configService = $configService;
-
-        $this->versionService = $versionService;
     }
 
     /**
      * Login method.
      *
-     * @Route("/admin/login", name="app_admin_login")
      * @param AuthenticationUtils $authenticationUtils
      * @return Response
      * @throws Exception
      */
+    #[Route(path: '/admin/login', name: 'app_admin_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         // Get the login error if there is one
@@ -94,10 +83,8 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/logout", name="app_admin_logout")
-     */
-    public function logout(): Response
+    #[Route(path: '/admin/logout', name: 'app_admin_logout')]
+    public function logout(): never
     {
         throw new LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }

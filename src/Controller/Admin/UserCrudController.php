@@ -31,20 +31,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class UserCrudController extends BaseCrudController
 {
-    protected UserPasswordHasherInterface $userPasswordHasher;
-
     /**
      * UserCrudController constructor.
      *
-     * @param UserPasswordHasherInterface $imageProperty
+     * @param UserPasswordHasherInterface $userPasswordHasher
      * @param SecurityService $securityService
      * @param TranslatorInterface $translator
      * @throws Exception
      */
-    public function __construct(UserPasswordHasherInterface $imageProperty, SecurityService $securityService, TranslatorInterface $translator)
+    public function __construct(protected UserPasswordHasherInterface $userPasswordHasher, SecurityService $securityService, TranslatorInterface $translator)
     {
-        $this->userPasswordHasher = $imageProperty;
-
         parent::__construct($securityService, $translator);
     }
 

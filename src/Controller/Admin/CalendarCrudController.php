@@ -44,21 +44,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CalendarCrudController extends BaseCrudController
 {
-    public const ACTION_BUILD_CALENDAR_SHEETS = 'buildCalendarSheets';
+    final public const ACTION_BUILD_CALENDAR_SHEETS = 'buildCalendarSheets';
 
-    public const ACTION_BUILD_CALENDAR_URLS = 'buildCalendarUrls';
+    final public const ACTION_BUILD_CALENDAR_URLS = 'buildCalendarUrls';
 
-    public const ACTION_VIEW_CALENDAR_SHEETS = 'viewCalendarSheets';
+    final public const ACTION_VIEW_CALENDAR_SHEETS = 'viewCalendarSheets';
 
-    public const ACTION_NEW_CALENDAR_IMAGE = 'newCalendarImage';
-
-    protected CalendarSheetCreateService $calendarSheetCreateService;
-
-    protected UrlService $urlService;
-
-    protected EntityManagerInterface $manager;
-
-    protected AdminUrlGenerator $adminUrlGenerator;
+    final public const ACTION_NEW_CALENDAR_IMAGE = 'newCalendarImage';
 
     /**
      * CalendarCrudController constructor.
@@ -71,17 +63,9 @@ class CalendarCrudController extends BaseCrudController
      * @param AdminUrlGenerator $adminUrlGenerator
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarSheetCreateService $calendarSheetCreateService, UrlService $urlService, EntityManagerInterface $manager, AdminUrlGenerator $adminUrlGenerator)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, protected CalendarSheetCreateService $calendarSheetCreateService, protected UrlService $urlService, protected EntityManagerInterface $manager, protected AdminUrlGenerator $adminUrlGenerator)
     {
         parent::__construct($securityService, $translator);
-
-        $this->calendarSheetCreateService = $calendarSheetCreateService;
-
-        $this->urlService = $urlService;
-
-        $this->manager = $manager;
-
-        $this->adminUrlGenerator = $adminUrlGenerator;
     }
 
     /**

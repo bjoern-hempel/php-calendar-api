@@ -64,6 +64,7 @@
         "phpstan/phpstan-doctrine": "^1.3",
         "phpunit/phpunit": "^9.5",
         "povils/phpmnd": "^3.0",
+        "rector/rector": "^0.14.8",
         "symfony/browser-kit": "6.1.*",
         "symfony/css-selector": "6.1.*",
         "symfony/maker-bundle": "^1.36",
@@ -169,6 +170,17 @@
         "phpcs:fix:tests": "bin/header/phpcs 'vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix tests 2>/dev/null' 'tests'",
         "phpcs:fix:all": "bin/header/phpcs 'vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix src 2>/dev/null && vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix tests 2>/dev/null' 'all'",
 
+        "rector:check:clear": "bin/header/rector 'vendor/bin/rector process --dry-run --clear-cache --memory-limit=512M' 'check, force'",
+        "rector:fix:clear": "bin/header/rector 'vendor/bin/rector process --clear-cache --memory-limit=512M' 'fix, force'",
+        "rector:check": "bin/header/rector 'vendor/bin/rector process --dry-run --memory-limit=512M' 'check'",
+        "rector:fix": "bin/header/rector 'vendor/bin/rector process --memory-limit=512M' 'fix'",
+        "rector": [
+            "@rector:check"
+        ],
+        "rector:clear": [
+            "@rector:check:clear"
+        ],
+
         ".test:basic": [
             "@ixno:header",
             "@phpunit",
@@ -202,7 +214,8 @@
             "@phpmnd",
             "@phpunit",
             "@phpstan",
-            "@phpcs"
+            "@phpcs",
+            "@rector:clear"
         ],
         "test:hardcore": [
             "composer .test:hardcore && bin/header/success || bin/header/error"
