@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
+use ApiPlatform\Doctrine\Orm\Paginator;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**

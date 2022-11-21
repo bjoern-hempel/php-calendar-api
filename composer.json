@@ -6,18 +6,19 @@
     "require": {
         "php": ">=8.1",
         "ext-ctype": "*",
+        "ext-curl": "*",
         "ext-exif": "*",
         "ext-fileinfo": "*",
         "ext-gd": "*",
         "ext-iconv": "*",
-        "api-platform/core": "^2.6",
+        "api-platform/core": "^3.0",
         "chillerlan/php-qrcode": "^4.3",
         "composer/package-versions-deprecated": "1.11.99.4",
         "creof/doctrine2-spatial": "^1.2",
         "doctrine/annotations": "^1.0",
-        "doctrine/doctrine-bundle": "^2.5",
+        "doctrine/doctrine-bundle": "^2.7",
         "doctrine/doctrine-migrations-bundle": "^3.2",
-        "doctrine/orm": "^2.11",
+        "doctrine/orm": "^2.13",
         "easycorp/easyadmin-bundle": "^4.0",
         "gesdinet/jwt-refresh-token-bundle": "^1.0",
         "lexik/jwt-authentication-bundle": "^2.14",
@@ -25,29 +26,34 @@
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.9",
         "sensio/framework-extra-bundle": "^6.2",
-        "symfony/asset": "6.0.*",
-        "symfony/console": "6.0.*",
+        "symfony/asset": "6.1.*",
+        "symfony/config": "6.1.*",
+        "symfony/console": "6.1.*",
+        "symfony/dependency-injection": "6.1.*",
         "symfony/deprecation-contracts": "^3.0",
-        "symfony/dotenv": "6.0.*",
-        "symfony/expression-language": "6.0.*",
+        "symfony/dotenv": "6.1.*",
+        "symfony/error-handler": "6.1.*",
+        "symfony/expression-language": "6.1.*",
         "symfony/flex": "^2",
-        "symfony/form": "6.0.*",
-        "symfony/framework-bundle": "6.0.*",
-        "symfony/http-client": "6.0.*",
-        "symfony/mime": "6.0.*",
+        "symfony/form": "6.1.*",
+        "symfony/framework-bundle": "6.1.*",
+        "symfony/http-client": "6.1.*",
+        "symfony/http-foundation": "6.1.*",
+        "symfony/http-kernel": "6.1.*",
+        "symfony/mime": "6.1.*",
         "symfony/monolog-bundle": "^3.7",
-        "symfony/password-hasher": "6.0.*",
-        "symfony/property-access": "6.0.*",
-        "symfony/property-info": "6.0.*",
-        "symfony/proxy-manager-bridge": "6.0.*",
-        "symfony/runtime": "6.0.*",
-        "symfony/security-bundle": "6.0.*",
-        "symfony/serializer": "6.0.*",
-        "symfony/twig-bundle": "6.0.*",
-        "symfony/validator": "6.0.*",
-        "symfony/webpack-encore-bundle": "^1.14",
-        "symfony/yaml": "6.0.*",
-        "ext-curl": "*"
+        "symfony/password-hasher": "6.1.*",
+        "symfony/property-access": "6.1.*",
+        "symfony/property-info": "6.1.*",
+        "symfony/proxy-manager-bridge": "6.1.*",
+        "symfony/runtime": "6.1.*",
+        "symfony/security-bundle": "6.1.*",
+        "symfony/serializer": "6.1.*",
+        "symfony/twig-bundle": "6.1.*",
+        "symfony/validator": "6.1.*",
+        "symfony/web-link": "6.1.*",
+        "symfony/webpack-encore-bundle": "^1.16",
+        "symfony/yaml": "6.1.*"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",
@@ -57,12 +63,12 @@
         "phpstan/phpstan": "^1.8",
         "phpstan/phpstan-doctrine": "^1.3",
         "phpunit/phpunit": "^9.5",
-        "symfony/browser-kit": "6.0.*",
-        "symfony/css-selector": "6.0.*",
+        "symfony/browser-kit": "6.1.*",
+        "symfony/css-selector": "6.1.*",
         "symfony/maker-bundle": "^1.36",
-        "symfony/phpunit-bridge": "^6.0",
-        "symfony/stopwatch": "6.0.*",
-        "symfony/web-profiler-bundle": "6.0.*"
+        "symfony/phpunit-bridge": "^6.1",
+        "symfony/stopwatch": "6.1.*",
+        "symfony/web-profiler-bundle": "6.1.*"
     },
     "config": {
         "allow-plugins": {
@@ -107,35 +113,41 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "phpunit-api": "phpunit tests/Api",
-        "phpunit-functional": "phpunit tests/Functional",
-        "phpunit-unit": "phpunit tests/Unit",
+
+        "phpunit:api": "phpunit tests/Api",
+        "phpunit:functional": "phpunit tests/Functional",
+        "phpunit:unit": "phpunit tests/Unit",
+        "phpunit:all": [
+            "@phpunit:api",
+            "@phpunit:functional",
+            "@phpunit:unit"
+        ],
         "phpunit": [
-            "@phpunit-api",
-            "@phpunit-functional",
-            "@phpunit-unit"
+            "@phpunit:all"
         ],
-        "sca": "phpstan analyse --level max --memory-limit 512M src tests",
-        "sca-xdebug": "phpstan analyse --level max --memory-limit 512M --xdebug src tests",
-        "phpcs-src": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 fix src 2>/dev/null",
-        "phpcs-tests": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 fix tests 2>/dev/null",
+
+        "phpstan:run": "phpstan analyse --level max --memory-limit 512M src tests",
+        "phpstan:run:xdebug": "phpstan analyse --level max --memory-limit 512M --xdebug src tests",
+        "phpstan": [
+            "@phpstan:run"
+        ],
+
+        "phpcs:check:src": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose fix src 2>/dev/null",
+        "phpcs:check:tests": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose fix tests 2>/dev/null",
+        "phpcs:check:all": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose fix src 2>/dev/null && vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose fix tests 2>/dev/null",
         "phpcs": [
-            "@phpcs-src",
-            "@phpcs-tests"
+            "@phpcs:check:all"
         ],
-        "phpcs-src-fix": "vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 -v fix src",
-        "phpcs-tests-fix": "vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 -v fix tests",
-        "phpcs-fix": [
-            "@phpcs-src-fix",
-            "@phpcs-tests-fix"
-        ],
+        "phpcs:fix:src": "vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix src 2>/dev/null",
+        "phpcs:fix:tests": "vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix tests 2>/dev/null",
+        "phpcs:fix:all": "vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix src 2>/dev/null && vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix tests 2>/dev/null",
+
         "test": [
-            "@phpunit-api",
-            "@phpunit-functional",
-            "@phpunit-unit",
-            "@sca",
+            "@phpunit",
+            "@phpstan",
             "@phpcs"
         ],
+
         "drop-schema-prod": "bin/console doctrine:schema:drop --force",
         "drop-schema-test": "bin/console doctrine:schema:drop --force --env=test",
         "create-schema-prod": "bin/console doctrine:schema:create",
@@ -152,7 +164,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.0.*"
+            "require": "6.1.*"
         }
     }
 }

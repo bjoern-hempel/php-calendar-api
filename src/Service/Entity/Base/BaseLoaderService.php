@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace App\Service\Entity\Base;
 
-use App\Entity\EntityInterface;
-use Exception;
 
 /**
  * Class HolidayGroupLoaderService

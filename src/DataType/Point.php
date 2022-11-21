@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace App\DataType;
 
 use CrEOF\Spatial\PHP\Types\Geometry\Point as SpatialPoint;
-use Exception;
 
 /**
  * Class Point

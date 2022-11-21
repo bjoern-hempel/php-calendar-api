@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace App\Service\Entity;
 
-use App\Entity\EntityInterface;
 use App\Entity\Image;
 use App\Repository\ImageRepository;
 use App\Service\Entity\Base\BaseLoaderService;

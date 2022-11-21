@@ -29,9 +29,10 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  * Class UserListener
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.1 (2022-11-11)
- * @since 1.0.1 (2022-11-11) Refactoring.
- * @since 1.0.0 (2022-02-26) First version.
+ * @version 0.1.2 (2022-11-19)
+ * @since 0.1.2 (2022-11-19) Update ApiPlatform.
+ * @since 0.1.1 (2022-11-11) Refactoring.
+ * @since 0.1.0 (2022-02-26) First version.
  */
 class UserListener
 {

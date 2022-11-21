@@ -13,7 +13,13 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Trait\TimestampsTrait;
 use App\EventListener\Entity\UserListener;
 use App\Repository\HolidayGroupRepository;
@@ -29,52 +35,51 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Entity class HolidayGroup
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2021-12-30)
+ * @version 0.1.1 (2022-11-21)
+ * @since 0.1.1 (2022-11-21) Update to symfony 6.1
+ * @since 0.1.0 (2021-12-30) First version.
  * @package App\Entity
  */
 #[ORM\Entity(repositoryClass: HolidayGroupRepository::class)]
 #[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
-    collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['holiday_group']],
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['holiday_group_extended']],
-            'openapi_context' => [
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['holiday_group']]
+        ),
+        new GetCollection(
+            uriTemplate: '/holiday_groups/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves the collection of extended HolidayGroup resources.',
                 'summary' => 'Retrieves the collection of extended HolidayGroup resources.',
             ],
-            'path' => '/holiday_groups/extended.{_format}',
-        ],
-        'post' => [
-            'normalization_context' => ['groups' => ['holiday_group']],
-        ],
-    ],
-    itemOperations: [
-        'delete' => [
-            'normalization_context' => ['groups' => ['holiday_group']],
-        ],
-        'get' => [
-            'normalization_context' => ['groups' => ['holiday_group']],
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['holiday_group_extended']],
-            'openapi_context' => [
+            normalizationContext: ['groups' => ['holiday_group_extended']]
+        ),
+        new Post(
+            normalizationContext: ['groups' => ['holiday_group']]
+        ),
+
+        new Delete(
+            normalizationContext: ['groups' => ['holiday_group']]
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['holiday_group']]
+        ),
+        new Get(
+            uriTemplate: '/holiday_groups/{id}/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves a extended HolidayGroup resource.',
                 'summary' => 'Retrieves a extended HolidayGroup resource.',
             ],
-            'path' => '/holiday_groups/{id}/extended.{_format}',
-        ],
-        'patch' => [
-            'normalization_context' => ['groups' => ['holiday_group']],
-        ],
-        'put' => [
-            'normalization_context' => ['groups' => ['holiday_group']],
-        ],
+            normalizationContext: ['groups' => ['holiday_group_extended']]
+        ),
+        new Patch(
+            normalizationContext: ['groups' => ['holiday_group']]
+        ),
+        new Put(
+            normalizationContext: ['groups' => ['holiday_group']]
+        )
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['holiday_group']],
     order: ['id' => 'ASC'],

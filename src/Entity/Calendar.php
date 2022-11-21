@@ -13,8 +13,14 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Trait\TimestampsTrait;
 use App\EventListener\Entity\UserListener;
 use App\Repository\CalendarRepository;
@@ -33,7 +39,9 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  * Entity class Calendar
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 0.1.2 (2022-11-11)
+ * @version 0.1.4 (2022-11-19)
+ * @since 0.1.4 (2022-11-19) Update ApiPlatform.
+ * @since 0.1.3 (2022-11-12) Upgrade to symfony 6.1
  * @since 0.1.2 (2022-11-11) PHPStan refactoring.
  * @since 0.1.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
  * @since 0.1.0 First version.
@@ -44,60 +52,72 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     # Security filter for collection operations at App\Doctrine\CurrentUserExtension
-    collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['calendar']],
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['calendar_extended']],
-            'openapi_context' => [
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['calendar']]
+        ),
+        new GetCollection(
+            uriTemplate: '/calendars/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves the collection of extended Calendar resources.',
                 'summary' => 'Retrieves the collection of extended Calendar resources.',
             ],
-            'path' => '/calendars/extended.{_format}',
-        ],
-        'post' => [
-            'normalization_context' => ['groups' => ['calendar']],
-            'security_post_denormalize' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_POST.'")',
-            'security_post_denormalize_message' => "Only own calendars can be added.",
-        ],
-    ],
-    itemOperations: [
-        'delete' => [
-            'normalization_context' => ['groups' => ['calendar']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_DELETE.'", object.user)',
-            'security_message' => 'Only own calendars can be deleted.',
-        ],
-        'get' => [
-            'normalization_context' => ['groups' => ['calendar']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_GET.'", object.user)',
-            'security_message' => 'Only own calendars can be read.',
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['calendar_extended']],
-            'openapi_context' => [
+            normalizationContext: ['groups' => ['calendar_extended']]
+        ),
+        new GetCollection(
+            uriTemplate: '/users/{id}/calendars.{_format}',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'calendars',
+                    fromClass: User::class
+                )
+            ],
+        ),
+        new Post(
+            normalizationContext: ['groups' => ['calendar']],
+            securityPostDenormalize: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_POST.'")',
+            securityPostDenormalizeMessage: 'Only own calendars can be added.'
+        ),
+
+        new Delete(
+            normalizationContext: ['groups' => ['calendar']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_DELETE.'", object.user)',
+            securityMessage: 'Only own calendars can be deleted.'
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['calendar']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_GET.'", object.user)',
+            securityMessage: 'Only own calendars can be read.'
+        ),
+        new Get(
+            uriTemplate: '/calendars/{id}/extended.{_format}',
+            uriVariables: [
+                'id'
+            ],
+            openapiContext: [
                 'description' => 'Retrieves an extended Calendar resource.',
                 'summary' => 'Retrieves an extended Calendar resource.',
             ],
-            'path' => '/calendars/{id}/extended.{_format}',
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_GET.'", object.user)',
-            'security_message' => 'Only own calendars can be read.',
-        ],
-        'patch' => [
-            'normalization_context' => ['groups' => ['calendar']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_PATCH.'", object.user)',
-            'security_message' => 'Only own calendars can be modified.',
-        ],
-        'put' => [
-            'normalization_context' => ['groups' => ['calendar']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_PUT.'", object.user)',
-            'security_message' => 'Only own calendars can be modified.',
-        ],
+            normalizationContext: ['groups' => ['calendar_extended']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_GET.'", object.user)',
+            securityMessage: 'Only own calendars can be read.'
+        ),
+        new Patch(
+            normalizationContext: ['groups' => ['calendar']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_PATCH.'", object.user)',
+            securityMessage: 'Only own calendars can be modified.'
+        ),
+        new Put(
+            normalizationContext: ['groups' => ['calendar']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_PUT.'", object.user)',
+            securityMessage: 'Only own calendars can be modified.'
+        ),
     ],
-    normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar']],
-    order: ['id' => 'ASC'],
+    normalizationContext: [
+        'enable_max_depth' => true,
+        'groups' => ['calendar']
+    ],
+    order: ['id' => 'ASC']
 )]
 class Calendar implements EntityInterface
 {
@@ -158,7 +178,6 @@ class Calendar implements EntityInterface
     #[MaxDepth(1)]
     #[Groups('calendar_extended')]
     #[ORM\OrderBy(value: ['month' => 'ASC'])]
-    #[ApiSubresource]
     private Collection $calendarImages;
 
     /** @var array<string|int|float|bool> $config */
@@ -186,7 +205,6 @@ class Calendar implements EntityInterface
     /**
      * Calendar constructor.
      */
-    #[Pure]
     public function __construct()
     {
         $this->calendarImages = new ArrayCollection();

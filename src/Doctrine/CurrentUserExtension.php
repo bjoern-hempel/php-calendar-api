@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace App\Doctrine;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Operation;
 use App\Entity\Calendar;
 use App\Entity\CalendarImage;
 use App\Entity\Event;
@@ -31,9 +32,10 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
  * Class CurrentUserExtension (used by JWT/API platform)
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.1 (2022-01-29)
- * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
- * @since 1.0.0 First version.
+ * @version 0.1.2 (2022-11-19)
+ * @since 0.1.2 (2022-11-19) Update ApiPlatform.
+ * @since 0.1.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 0.1.0 First version.
  * @package App\Doctrine
  */
 final class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
@@ -63,10 +65,11 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
      * @param QueryBuilder $queryBuilder
      * @param QueryNameGeneratorInterface $queryNameGenerator
      * @param string $resourceClass
-     * @param string|null $operationName
+     * @param Operation|null $operation
+     * @param array<int, mixed> $context
      * @throws Exception
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null): void
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         $this->addWhere($queryBuilder, $resourceClass);
     }
@@ -79,12 +82,11 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
      * @param QueryBuilder $queryBuilder
      * @param QueryNameGeneratorInterface $queryNameGenerator
      * @param string $resourceClass
-     * @param mixed[] $identifiers
-     * @param string|null $operationName
+     * @param array<int|string, mixed> $identifiers
+     * @param Operation|null $operation
      * @param string[] $context
-     * @throws Exception
      */
-    public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null, array $context = []): void
+    public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, Operation $operation = null, array $context = []): void
     {
     }
 
