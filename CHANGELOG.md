@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.33.0] - 2022-11-22
+
+* [#112](https://github.com/bjoern-hempel/php-calendar-api/issues/112)
+  * Add PHP rector
+
 ### [0.32.0] - 2022-11-22
 
 * [#108](https://github.com/bjoern-hempel/php-calendar-api/issues/108)

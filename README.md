@@ -46,6 +46,7 @@
 * **PHPUnit 9.5.x**: https://phpunit.de
 * **PHPStan: 1.9.x**: https://phpstan.org
 * **PHP Magic Number Detector (PHPMND): 3.0.x**: https://github.com/povils/phpmnd
+* **Rector PHP: 0.14.x**: https://github.com/rectorphp/rector
 
 ## Manuals
 
