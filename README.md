@@ -62,15 +62,30 @@
 ```bash
 ❯ git clone git@github.com:bjoern-hempel/calendarBuilder.git && cd calendarBuilder
 ❯ ln -s docker-compose.dev.yml docker-compose.yml
-❯ docker-compose up -d
-❯ docker-compose exec php /etc/init.d/supervisor start
-❯ docker-compose exec php composer install
-❯ docker-compose exec php yarn install
-❯ docker-compose exec php yarn encore production
-❯ docker-compose exec php composer migrate-prod
-❯ docker-compose exec php composer test
+❯ docker compose up -d
+❯ docker compose exec php /etc/init.d/supervisor start
+❯ docker compose exec php composer install
+❯ docker compose exec php yarn install
+❯ docker compose exec php yarn encore production
+❯ docker compose exec php composer migrate-prod
+❯ docker compose exec php composer test
 ```
 
 # 2. Documentation
 
 * [API - v1](docs/api/README.md)
+
+# 3. Versions
+
+```bash
+❯ docker compose exec php composer -V
+Composer version 2.4.4 2022-10-27 14:39:29
+```
+
+```bash
+❯ docker compose exec php php -v
+PHP 8.1.12 (cli) (built: Oct 28 2022 18:32:13) (NTS)
+Copyright (c) The PHP Group
+Zend Engine v4.1.12, Copyright (c) Zend Technologies
+    with Zend OPcache v8.1.12, Copyright (c), by Zend Technologies
+```

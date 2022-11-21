@@ -1,5 +1,8 @@
+# Add needed arguments
+ARG IMAGE_ADD
+
 # Use latest nginx image
-FROM nginx:latest
+FROM ${IMAGE_ADD}nginx:latest
 
 RUN openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt -subj "/C=DE/ST=Saxony/L=Dresden/O=Ixnode/OU=IT/CN=localhost"
 

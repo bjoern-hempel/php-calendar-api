@@ -29,7 +29,6 @@ use App\Repository\PlaceVRepository;
 use App\Service\Entity\PlaceLoaderService;
 use App\Service\LocationDataService;
 use App\Utils\GPSConverter;
-use App\Utils\Timer;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

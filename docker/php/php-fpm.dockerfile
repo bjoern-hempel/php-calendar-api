@@ -1,12 +1,16 @@
-# Use debian:bullseye-slim image
-FROM debian:bullseye-slim
+# Add needed arguments
+ARG IMAGE_ADD
 
-ENV PHP_VERSION 8.1.4
+# Use debian:bullseye-slim image
+FROM ${IMAGE_ADD}debian:bullseye-slim
+
+# Set environment variables
+ENV PHP_VERSION 8.1.12
 ENV PHP_VERSION_MINOR 8.1
 ENV PHP_RUN_DIRECTORY /run/php
 ENV PHP_FPM_PORT 9000
 ENV PHP_GD_VERSION 2.3.0
-ENV COMPOSER_VERSION 2.3.5
+ENV COMPOSER_VERSION 2.4.4
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV NODE_VERSION_MAYOR 16
 ENV WORK_DIRECTORY /var/www/web

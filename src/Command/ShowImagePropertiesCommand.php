@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Repository\PlaceRepository;
 use App\Service\Entity\PlaceLoaderService;
 use App\Service\ImageDataService;
 use App\Service\LocationDataService;

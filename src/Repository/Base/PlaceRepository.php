@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace App\Repository\Base;
 
 use App\Entity\PlaceV;
-use App\Repository\Base\PlaceRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;

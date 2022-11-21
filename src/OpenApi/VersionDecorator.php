@@ -13,16 +13,18 @@ declare(strict_types=1);
 
 namespace App\OpenApi;
 
-use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
-use ApiPlatform\Core\OpenApi\OpenApi;
-use ApiPlatform\Core\OpenApi\Model;
+use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\OpenApi\OpenApi;
+use ApiPlatform\OpenApi\Model;
 use ArrayObject;
 
 /**
  * Class VersionDecorator
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-01-26)
+ * @version 0.1.1 (2022-11-12)
+ * @since 0.1.1 (2022-11-12) Upgrade to symfony 6.1
+ * @since 0.1.0 (2022-01-26) First version.
  * @package App\Controller
  */
 final class VersionDecorator implements OpenApiFactoryInterface
@@ -34,7 +36,7 @@ final class VersionDecorator implements OpenApiFactoryInterface
      *
      * @param OpenApiFactoryInterface $decorated
      */
-    public function __construct(private OpenApiFactoryInterface $decorated)
+    public function __construct(private readonly OpenApiFactoryInterface $decorated)
     {
     }
 

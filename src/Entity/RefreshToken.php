@@ -11,16 +11,21 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace App\Service\Entity\Base;
+namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Gesdinet\JWTRefreshTokenBundle\Entity\RefreshToken as BaseRefreshToken;
 
 /**
- * Class HolidayGroupLoaderService
+ * Entity class RefreshToken
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-01-02)
- * @package App\Command
+ * @version 0.1.0 (2022-11-21)
+ * @since 0.1.0 (2022-11-21) First version.
+ * @package App\Entity
  */
-class BaseLoaderService
+#[ORM\Entity]
+#[ORM\Table("refresh_tokens")]
+class RefreshToken extends BaseRefreshToken
 {
 }

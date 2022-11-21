@@ -14,16 +14,12 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Config\SearchConfig;
-use App\Constant\Code;
 use App\Controller\Base\BaseController;
-use App\Entity\Place;
 use App\Service\Entity\PlaceLoaderService;
 use App\Service\LocationDataService;
 use App\Service\VersionService;
 use App\Utils\Timer;
 use Exception;
-use JetBrains\PhpStorm\ArrayShape;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;

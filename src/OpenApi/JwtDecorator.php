@@ -13,13 +13,18 @@ declare(strict_types=1);
 
 namespace App\OpenApi;
 
-use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
-use ApiPlatform\Core\OpenApi\OpenApi;
-use ApiPlatform\Core\OpenApi\Model;
+use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\OpenApi\Model;
+use ApiPlatform\OpenApi\OpenApi;
 use ArrayObject;
 
 /**
  * Class JwtDecorator
+ *
+ * @author Björn Hempel <bjoern@hempel.li>
+ * @version 0.1.1 (2022-11-12)
+ * @since 0.1.1 (2022-11-12) Upgrade to symfony 6.1
+ * @since 0.1.0 First version.
  */
 final class JwtDecorator implements OpenApiFactoryInterface
 {

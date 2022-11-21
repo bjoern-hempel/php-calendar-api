@@ -13,7 +13,14 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Trait\TimestampsTrait;
 use App\EventListener\Entity\UserListener;
 use App\Repository\CalendarImageRepository;
@@ -30,7 +37,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Entity class CalendarImage
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 0.1.2 (2022-11-11)
+ * @version 0.1.3 (2022-11-19)
+ * @since 0.1.3 (2022-11-19) Update ApiPlatform.
  * @since 0.1.2 (2022-11-11) PHPStan refactoring.
  * @since 0.1.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
  * @since 0.1.0 First version.
@@ -41,57 +49,89 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     # Security filter for collection operations at App\Doctrine\CurrentUserExtension
-    collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['calendar_image']],
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['calendar_image_extended']],
-            'openapi_context' => [
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['calendar_image']]
+        ),
+        new GetCollection(
+            uriTemplate: '/calendar_images/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves the collection of extended CalendarImage resources.',
                 'summary' => 'Retrieves the collection of extended CalendarImage resources.',
             ],
-            'path' => '/calendar_images/extended.{_format}',
-        ],
-        'post' => [
-            'normalization_context' => ['groups' => ['calendar_image']],
-            'security_post_denormalize' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_POST.'")',
-            'security_post_denormalize_message' => "Only own calendar images can be added.",
-        ],
-    ],
-    itemOperations: [
-        'delete' => [
-            'normalization_context' => ['groups' => ['calendar_image']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_DELETE.'", object.user)',
-            'security_message' => 'Only own calendar images can be deleted.',
-        ],
-        'get' => [
-            'normalization_context' => ['groups' => ['calendar_image']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_GET.'", object.user)',
-            'security_message' => 'Only own calendar images can be read.',
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['calendar_image_extended']],
-            'openapi_context' => [
+            normalizationContext: ['groups' => ['calendar_image_extended']]
+        ),
+        new GetCollection(
+            uriTemplate: '/calendars/{id}/calendar_images.{_format}',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'calendarImages',
+                    fromClass: Calendar::class
+                )
+            ],
+        ),
+        new GetCollection(
+            uriTemplate: '/users/{id}/calendar_images.{_format}',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'calendarImages',
+                    fromClass: User::class
+                )
+            ],
+        ),
+        # https://api-platform.com/docs/core/subresources/#company-employees
+        new GetCollection(
+            uriTemplate: '/users/{id}/calendars/{calendars}/calendar_images.{_format}',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'calendars',
+                    fromClass: User::class
+                ),
+                'calendars' => new Link(
+                    fromProperty: 'calendarImages',
+                    fromClass: Calendar::class
+                )
+            ],
+        ),
+        new Post(
+            normalizationContext: ['groups' => ['calendar_image']],
+            securityPostDenormalize: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_POST.'")',
+            securityPostDenormalizeMessage: 'Only own calendar images can be added.'
+        ),
+
+        new Delete(
+            normalizationContext: ['groups' => ['calendar_image']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_DELETE.'", object.user)',
+            securityMessage: 'Only own calendar images can be deleted.'
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['calendar_image']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_GET.'", object.user)',
+            securityMessage: 'Only own calendar images can be read.'
+        ),
+        new Get(
+            uriTemplate: '/calendar_images/{id}/extended.{_format}',
+            uriVariables: [
+                'id'
+            ],
+            openapiContext: [
                 'description' => 'Retrieves an extended CalendarImage resource.',
                 'summary' => 'Retrieves an extended CalendarImage resource.',
             ],
-            'path' => '/calendar_images/{id}/extended.{_format}',
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_GET.'", object.user)',
-            'security_message' => 'Only own calendar images can be read.',
-        ],
-        'patch' => [
-            'normalization_context' => ['groups' => ['calendar_image']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_PATCH.'", object.user)',
-            'security_message' => 'Only own calendar images can be modified.',
-        ],
-        'put' => [
-            'normalization_context' => ['groups' => ['calendar_image']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_PUT.'", object.user)',
-            'security_message' => 'Only own calendar images can be modified.',
-        ],
+            normalizationContext: ['groups' => ['calendar_image_extended']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_GET.'", object.user)',
+            securityMessage: 'Only own calendar images can be read.',
+        ),
+        new Patch(
+            normalizationContext: ['groups' => ['calendar_image']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_PATCH.'", object.user)',
+            securityMessage: 'Only own calendar images can be modified.'
+        ),
+        new Put(
+            normalizationContext: ['groups' => ['calendar_image']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_CALENDAR_IMAGE_PUT.'", object.user)',
+            securityMessage: 'Only own calendar images can be modified.'
+        )
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar_image']],
     order: ['id' => 'ASC'],

@@ -15,7 +15,6 @@ namespace App\EventSubscriber;
 
 use App\Entity\CalendarImage;
 use App\Entity\HolidayGroup;
-use App\Entity\Image;
 use App\Service\CalendarSheetCreateService;
 use App\Service\ImageService;
 use App\Service\UrlService;

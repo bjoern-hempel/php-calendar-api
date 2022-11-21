@@ -75,6 +75,8 @@ services:
     build:
       dockerfile: "nginx.dockerfile"
       context: "docker/nginx"
+      args:
+        - IMAGE_ADD=${IMAGE_ADD}
     image: "ixnode/nginx"
     container_name: "${NAMESPACE_DEVELOPMENT}.nginx"
     hostname: "${NAMESPACE_HOSTNAME_DEVELOPMENT}-nginx"
@@ -100,6 +102,8 @@ services:
     build:
       dockerfile: "${PHP_FPM_SERVER_DOCKERFILE}"
       context: "docker/php"
+      args:
+        - IMAGE_ADD=${IMAGE_ADD}
     image: "${APP_IMAGE_DEVELOPMENT}:${VERSION_APP}" # "${APP_IMAGE_DEVELOPMENT}:${VERSION_APP_LATEST}"
     container_name: "${NAMESPACE_DEVELOPMENT}.php.${PHP_VERSION}"
     hostname: "${NAMESPACE_HOSTNAME_DEVELOPMENT}-php-${PHP_VERSION_HOSTNAME}"

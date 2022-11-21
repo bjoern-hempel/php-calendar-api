@@ -13,8 +13,13 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Trait\TimestampsTrait;
 use App\EventListener\Entity\UserListener;
 use App\Repository\UserRepository;
@@ -34,7 +39,8 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  * Entity class User
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.1 (2021-11-11)
+ * @version 0.1.2 (2022-11-19)
+ * @since 0.1.2 (2022-11-19) Update ApiPlatform.
  * @since 1.0.1 (2021-11-11) PHPStan refactoring.
  * @since 1.0.0 (2021-12-30) First version.
  * @package App\Entity
@@ -43,58 +49,59 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 #[ORM\EntityListeners([UserListener::class])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
-    # Security filter for collection operations at App\Doctrine\CurrentUserExtension
-    collectionOperations: [
-        'get' => [
-            'normalization_context' => ['groups' => ['user']],
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['user_extended']],
-            'openapi_context' => [
+    operations: [
+        # Security filter for collection operations at App\Doctrine\CurrentUserExtension
+        new GetCollection(
+            normalizationContext: ['groups' => ['user']]
+        ),
+        # Security filter for collection operations at App\Doctrine\CurrentUserExtension
+        new GetCollection(
+            uriTemplate: '/users/extended.{_format}',
+            openapiContext: [
                 'description' => 'Retrieves the collection of extended User resources.',
                 'summary' => 'Retrieves the collection of extended User resources.',
             ],
-            'path' => '/users/extended.{_format}',
-        ],
-        'post' => [
-            'normalization_context' => ['groups' => ['user']],
-            'security_post_denormalize' => 'is_granted("'.UserVoter::ATTRIBUTE_USER_POST.'")',
-            'security_post_denormalize_message' => "Only admins can add users.",
-        ],
-    ],
-    itemOperations: [
-        'delete' => [
-            'normalization_context' => ['groups' => ['user']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_USER_DELETE.'", object)',
-            'security_message' => 'Only own users can be deleted.',
-        ],
-        'get' => [
-            'normalization_context' => ['groups' => ['user']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_USER_GET.'", object)',
-            'security_message' => 'Only own users can be read.',
-        ],
-        'get_extended' => [
-            'method' => 'GET',
-            'normalization_context' => ['groups' => ['user_extended']],
-            'openapi_context' => [
+            normalizationContext: ['groups' => ['user_extended']]
+        ),
+        new Post(
+            normalizationContext: ['groups' => ['user']],
+            securityPostDenormalize: 'is_granted("'.UserVoter::ATTRIBUTE_USER_POST.'")',
+            securityPostDenormalizeMessage: 'Only admins can add users.'
+        ),
+
+        new Delete(
+            normalizationContext: ['groups' => ['user']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_USER_DELETE.'", object)',
+            securityMessage: 'Only own users can be deleted.'
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['user']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_USER_GET.'", object)',
+            securityMessage: 'Only own users can be read.'
+        ),
+        new Get(
+            uriTemplate: '/users/{id}/extended.{_format}',
+            uriVariables: [
+                'id'
+            ],
+            openapiContext: [
                 'description' => 'Retrieves an extended User resource.',
                 'summary' => 'Retrieves an extended User resource.',
             ],
-            'path' => '/users/{id}/extended.{_format}',
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_USER_GET.'", object)',
-            'security_message' => 'Only own users can be read.',
-        ],
-        'patch' => [
-            'normalization_context' => ['groups' => ['user']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_USER_PATCH.'", object)',
-            'security_message' => 'Only own users can be modified.',
-        ],
-        'put' => [
-            'normalization_context' => ['groups' => ['user']],
-            'security' => 'is_granted("'.UserVoter::ATTRIBUTE_USER_PUT.'", object)',
-            'security_message' => 'Only own users can be modified.',
-        ],
+            normalizationContext: ['groups' => ['user_extended']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_USER_GET.'", object)',
+            securityMessage: 'Only own users can be read.'
+        ),
+        new Patch(
+            normalizationContext: ['groups' => ['user']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_USER_PATCH.'", object)',
+            securityMessage: 'Only own users can be modified.'
+        ),
+        new Put(
+            normalizationContext: ['groups' => ['user']],
+            security: 'is_granted("'.UserVoter::ATTRIBUTE_USER_PUT.'", object)',
+            securityMessage: 'Only own users can be modified.'
+        ),
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['user']],
 )]
@@ -175,20 +182,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityI
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Image::class, orphanRemoval: true)]
     #[MaxDepth(1)]
     #[Groups('user_extended')]
-    #[ApiSubresource]
     private Collection $images;
 
     /** @var Collection<int, Calendar> $calendars */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Calendar::class, orphanRemoval: true)]
     #[MaxDepth(1)]
     #[Groups('user_extended')]
-    #[ApiSubresource]
     private Collection $calendars;
 
     /** @var Collection<int, CalendarImage> $calendarImages */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: CalendarImage::class, orphanRemoval: true)]
     #[MaxDepth(1)]
-    #[ApiSubresource]
     private Collection $calendarImages;
 
     /**

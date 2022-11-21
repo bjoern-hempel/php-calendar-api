@@ -30,10 +30,10 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  * Class AuthenticationTest
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0.1 (2022-01-29)
- * @since 1.0.1 Possibility to disable the JWT locally for debugging processes (#45)
- * @since 1.0.0 Add API tests (#28)
- * @package App\Tests\Api
+ * @version 0.1.2 (2022-11-12)
+ * @since 0.1.2 (2022-11-12) Upgrade to symfony 6.1
+ * @since 0.1.1 (2022-01-29) Possibility to disable the JWT locally for debugging processes (#45)
+ * @since 0.1.0 Add API tests (#28)
  * @see https://api-platform.com/docs/core/security/#hooking-custom-permission-checks-using-voters
  */
 class AuthenticationTest extends ApiClientTestCase
