@@ -22,15 +22,21 @@ use UnexpectedValueException;
  * Class Color
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-05-03)
+ * @version 0.1.1 (2022-11-22)
+ * @since 0.1.1 (2022-11-22) Add PHP Magic Number Detector (PHPMND).
+ * @since 0.1.0 (2022-05-03) First version.
  * @package App\Utils\Image
  */
 class Color
 {
-    public const VALUE_HASH = '#';
+    final public const PRECISION_NONE = -1;
+
+    final public const VALUE_HASH = '#';
+
+    final public const CONVERT_0_03928 = .03928;
 
     /* @see http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html (sRGB → XYZ) */
-    public const MATRIX_SRGB_XYZ = [
+    final public const MATRIX_SRGB_XYZ = [
         [.4124564, .3575761, .1804375, ],
         [.2126729, .7151522, .0721750, ],
         [.0193339, .1191920, .9503041, ],
@@ -129,13 +135,13 @@ class Color
      * @param int $precision
      * @return float
      */
-    public static function convertRgbToSrgb(int $value, int $precision = -1): float
+    public static function convertRgbToSrgb(int $value, int $precision = self::PRECISION_NONE): float
     {
         $value /= 255;
 
-        $srgb = $value <= .03928 ? $value / 12.92 : pow(($value + .055) / 1.055, 2.4);
+        $srgb = $value <= self::CONVERT_0_03928 ? $value / 12.92 : pow(($value + .055) / 1.055, 2.4);
 
-        if ($precision === -1) {
+        if ($precision === self::PRECISION_NONE) {
             return $srgb;
         }
 
@@ -153,7 +159,7 @@ class Color
     {
         $lab = $value > 216 / 24389 ? pow($value, 1 / 3) : 841 * $value / 108 + 4 / 29;
 
-        if ($precision === -1) {
+        if ($precision === self::PRECISION_NONE) {
             return $lab;
         }
 
@@ -377,7 +383,7 @@ class Color
         $a = self::correctRangeFloat($a, self::COLOR_VALUE_LAB_A_MIN, self::COLOR_VALUE_LAB_A_MAX);
         $b = self::correctRangeFloat($b, self::COLOR_VALUE_LAB_B_MIN, self::COLOR_VALUE_LAB_B_MAX);
 
-        if ($precision === -1) {
+        if ($precision === self::PRECISION_NONE) {
             return [
                 self::COLOR_INDEX_LAB_LIGHTNESS => $lightness,
                 self::COLOR_INDEX_LAB_A => $a,
@@ -471,7 +477,7 @@ class Color
         $y2 = floatval($matrix[1][0] * $x1 + $matrix[1][1] * $x2 + $matrix[1][2] * $x3);
         $y3 = floatval($matrix[2][0] * $x1 + $matrix[2][1] * $x2 + $matrix[2][2] * $x3);
 
-        if ($precision === -1) {
+        if ($precision === self::PRECISION_NONE) {
             return [$y1, $y2, $y3, ];
         }
 

@@ -23,11 +23,37 @@ use JetBrains\PhpStorm\ArrayShape;
  * Class GPSConverter
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-04-22)
+ * @version 0.1.1 (2022-11-22)
+ * @since 0.1.1 (2022-11-22) Add PHP Magic Number Detector (PHPMND).
+ * @since 0.1.0 (2022-04-22) First version.
  * @package App\Command
  */
 class GPSConverter
 {
+    final public const ANGLE_360 = 360;
+
+    final public const ANGLE_180 = 180;
+
+    final public const ANGLE_90 = 90;
+
+    final public const ANGLE_0 = 0;
+
+    final public const ANGLE_360_0 = 360.;
+
+    final public const ANGLE_180_0 = 180.;
+
+    final public const ANGLE_157_5 = 157.5;
+
+    final public const ANGLE_112_5 = 112.5;
+
+    final public const ANGLE_90_0 = 90.;
+
+    final public const ANGLE_67_5 = 67.5;
+
+    final public const ANGLE_22_5 = 22.5;
+
+    final public const ANGLE_0_0 = 0.;
+
     public const REGEXP_ENCRYPTED_LATITUDE_LONGITUDE = '~!3d([0-9]+\.[0-9]+)+.+!4d([0-9]+\.[0-9]+)~';
 
     public const REGEXP_GOOGLE_REDIRECT = '~(https://maps.app.goo.gl/[a-zA-Z0-9]+)$~';
@@ -415,11 +441,11 @@ class GPSConverter
 
         $rad = atan2($deltaY, $deltaX);
 
-        $degree = -1 * $rad * (180 / pi());
+        $degree = -1 * $rad * (self::ANGLE_180_0 / pi());
 
-        $degree += 90.0;
+        $degree += self::ANGLE_90_0;
 
-        $degree -= $degree > 180 ? 360 : 0;
+        $degree -= $degree > self::ANGLE_180_0 ? self::ANGLE_360_0 : self::ANGLE_0_0;
 
         return round($degree, $decimals);
     }
@@ -468,23 +494,23 @@ class GPSConverter
      */
     public static function getDirectionFromDegree(float $degree): string
     {
-        if ($degree > 180.0) {
+        if ($degree > self::ANGLE_180_0) {
             throw new Exception(sprintf('Unexpected angle given 1 "%.2f" (%s:%d).', $degree, __FILE__, __LINE__));
         }
 
-        if ($degree < -180.0) {
+        if ($degree < -self::ANGLE_180_0) {
             throw new Exception(sprintf('Unexpected angle given 2 "%.2f" (%s:%d).', $degree, __FILE__, __LINE__));
         }
 
         return match (true) {
-            $degree >= -22.5 && $degree < 22.5 => 'N',
-            $degree >= 22.5 && $degree < 67.5 => 'NE',
-            $degree >= 67.5 && $degree < 112.5 => 'E',
-            $degree >= 112.5 && $degree < 157.5 => 'SE',
-            $degree >= 157.5 || $degree < -157.5 => 'S',
-            $degree >= -157.5 && $degree < -112.5 => 'SW',
-            $degree >= -112.5 && $degree < -67.5 => 'W',
-            $degree >= -67.5 && $degree < -22.5 => 'NW',
+            $degree >= -self::ANGLE_22_5 && $degree < self::ANGLE_22_5 => 'N',
+            $degree >= self::ANGLE_22_5 && $degree < self::ANGLE_67_5 => 'NE',
+            $degree >= self::ANGLE_67_5 && $degree < self::ANGLE_112_5 => 'E',
+            $degree >= self::ANGLE_112_5 && $degree < self::ANGLE_157_5 => 'SE',
+            $degree >= self::ANGLE_157_5 || $degree < -self::ANGLE_157_5 => 'S',
+            $degree >= -self::ANGLE_157_5 && $degree < -self::ANGLE_112_5 => 'SW',
+            $degree >= -self::ANGLE_112_5 && $degree < -self::ANGLE_67_5 => 'W',
+            $degree >= -self::ANGLE_67_5 && $degree < -self::ANGLE_22_5 => 'NW',
             default => throw new Exception(sprintf('Unexpected angle given 3 "%.2f" (%s:%d).', $degree, __FILE__, __LINE__)),
         };
     }

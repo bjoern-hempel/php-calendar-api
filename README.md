@@ -13,35 +13,39 @@
 
 ## Applications and Extensions
 
-* **Symfony 6.0.x**: https://symfony.com/releases/6.0
-    * **Released**: November 2021
-    * **Support until**: Juli 2022
-    * https://symfony.com/releases/6.0
-* **API Platform 2.6.x**: https://api-platform.com/docs
-    * **Released**: Jan 2021
+* **Symfony 6.1.x**: https://symfony.com/releases/6.1
+    * **Released**: May 2022
+    * **Support until**: January 2023
+    * https://symfony.com/releases/6.1
+    * https://endoflife.date/symfony
+* **API Platform 3.0.x**: https://api-platform.com/docs
+    * **Released**: 15 September 2022
     * https://github.com/api-platform/api-platform/releases
+    * https://endoflife.date/api-platform
 
 ## Scripting language and database management systems
 
-* **PHP 8.0.x**: https://www.php.net/releases/8.0/en.php
-    * **Released**: 26 Nov 2020
-    * **Active Support Until**: 26 Nov 2022
-    * **Security Support Until**: 26 Nov 2023
+* **PHP 8.1.x**: https://www.php.net/releases/8.1/en.php
+    * **Released**: 23 November 2021
+    * **Active Support Until**: 25 November 2023
+    * **Security Support Until**: 25 November 2024
     * https://www.php.net/supported-versions.php
-* **MariaDB 10.7.1**: https://mariadb.com/kb/en/mariadb-1071-release-notes
-    * **Released**: 8 November 2021
-    * **Support until**: July 2026
+    * https://endoflife.date/php
+* **MariaDB 10.7.3**: https://mariadb.com/kb/en/mariadb-1073-release-notes/
+    * **Released**: 8 February 2022
+    * **Support until**: 14 February 2023
     * https://endoflife.date/mariadb
 
 ## Helper
 
-* **Composer 2.2.x**: https://getcomposer.org/download
+* **Composer 2.4.x**: https://getcomposer.org/download
 * **Symfony Client**: https://symfony.com/download
 
 ## Testing and Analysis
 
 * **PHPUnit 9.5.x**: https://phpunit.de
-* **PHPStan: 1.2.x**: https://phpstan.org
+* **PHPStan: 1.9.x**: https://phpstan.org
+* **PHP Magic Number Detector (PHPMND): 3.0.x**: https://github.com/povils/phpmnd
 
 ## Manuals
 

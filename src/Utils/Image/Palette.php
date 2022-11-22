@@ -24,7 +24,9 @@ use IteratorAggregate;
  * Class Palette
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-05-04)
+ * @version 0.1.1 (2022-11-22)
+ * @since 0.1.1 (2022-11-22) Add PHP Magic Number Detector (PHPMND).
+ * @version 0.1.0 (2022-05-04) First version.
  * @package App\Utils\Image
  * @implements IteratorAggregate<int, int>
  *
@@ -36,6 +38,8 @@ use IteratorAggregate;
  */
 class Palette implements Countable, IteratorAggregate
 {
+    final public const COLORS_MAX = 16_777_215;
+
     /** @var array<int, int> */
     protected array $colors;
 
@@ -128,7 +132,7 @@ class Palette implements Countable, IteratorAggregate
      */
     public static function createPaletteFromGdImage(GdImage $image, ?int $backgroundColor = null): Palette
     {
-        if ($backgroundColor !== null && (!is_numeric($backgroundColor) || $backgroundColor < 0 || $backgroundColor > 16777215)) {
+        if ($backgroundColor !== null && (!is_numeric($backgroundColor) || $backgroundColor < 0 || $backgroundColor > self::COLORS_MAX)) {
             throw new InvalidArgumentException(sprintf('"%s" does not represent a valid color', $backgroundColor));
         }
 

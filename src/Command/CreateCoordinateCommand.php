@@ -43,7 +43,8 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
  * Class CreateCoordinateCommand
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 0.1.1 (2022-11-11)
+ * @version 0.1.2 (2022-11-22)
+ * @since 0.1.2 (2022-11-22) Add PHP Magic Number Detector (PHPMND).
  * @since 0.1.1 (2022-11-11) PHPStan refactoring.
  * @since 0.1.0 (2022-05-08) First version.
  * @example bin/console app:coordinate:create [file]
@@ -52,6 +53,8 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 class CreateCoordinateCommand extends Command
 {
     protected static $defaultName = 'app:coordinate:create';
+
+    final public const COLS_EXPECTED = 19;
 
     private EntityManagerInterface $manager;
 
@@ -193,7 +196,7 @@ EOT
 
             $row = str_getcsv($buffer, "\t", '\'');
 
-            if (count($row) !== 19) {
+            if (count($row) !== self::COLS_EXPECTED) {
                 $output->writeln(sprintf('%d/%d (%.2f%%): Line "%d" ignored (wrong format).', $currentLine, $numberOfLines, $percent, $currentLine));
                 continue;
             }

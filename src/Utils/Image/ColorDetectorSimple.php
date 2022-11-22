@@ -21,18 +21,34 @@ use JetBrains\PhpStorm\ArrayShape;
  * Class ColorDetectorSimple
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-05-05)
+ * @version 0.1.1 (2022-11-22)
+ * @since 0.1.1 (2022-11-22) Add PHP Magic Number Detector (PHPMND).
+ * @since 0.1.0 (2022-05-05) First version.
  * @package App\Utils\Image
  */
 class ColorDetectorSimple
 {
     protected GdImage $gdImage;
 
-    public const DEFAULT_REDUCE_BRIGHTNESS = false;
+    public const REDUCE_BRIGHTNESS_DEFAULT = false;
 
-    public const DEFAULT_REDUCE_GRADIENTS = false;
+    public const REDUCE_GRADIENTS_DEFAULT = false;
 
-    public const DEFAULT_DELTA = 24;
+    public const DELTA_DEFAULT = 24;
+
+    public const DELTA_0 = 0;
+
+    public const DELTA_1 = 1;
+
+    public const DELTA_2 = 2;
+
+    public const DELTA_32 = 32;
+
+    public const DELTA_MAX = 255;
+
+    public const COLOR_MIN = 0;
+
+    public const COLOR_MAX = 255;
 
     /**
      * ColorDetectorSimple constructor.
@@ -53,16 +69,16 @@ class ColorDetectorSimple
      */
     protected function reduceColorInformation(int $color, int $delta): int
     {
-        if ($delta <= 1) {
+        if ($delta <= self::DELTA_1) {
             return $color;
         }
 
-        $halfDelta = $delta > 2 ? $delta / 2 - 1 : 0;
+        $halfDelta = $delta > self::DELTA_2 ? $delta / self::DELTA_2 - self::DELTA_1 : self::DELTA_0;
 
         $color = intval((($color) + $halfDelta) / $delta) * $delta;
 
-        if ($color >= 256) {
-            $color = 255;
+        if ($color > self::COLOR_MAX) {
+            $color = self::COLOR_MAX;
         }
 
         return $color;
@@ -176,8 +192,8 @@ class ColorDetectorSimple
             $colorHex = strval($colorHex);
         }
 
-        $lowest = 255;
-        $highest = 0;
+        $lowest = self::COLOR_MAX;
+        $highest = self::COLOR_MIN;
 
         $colors = [
             'r' => intval(hexdec(substr($colorHex, 0, 2))),
@@ -206,8 +222,8 @@ class ColorDetectorSimple
         }
 
         if ($lowest === $highest) {
-            if ($delta <= 32) {
-                if ($highest >= (255 - $delta)) {
+            if ($delta <= self::DELTA_32) {
+                if ($highest >= (self::DELTA_MAX - $delta)) {
                     return $colorHex;
                 }
             } else {
@@ -215,7 +231,7 @@ class ColorDetectorSimple
             }
         }
 
-        for (; $highest < 256; $lowest += $delta, $highest += $delta) {
+        for (; $highest < (self::DELTA_MAX + 1); $lowest += $delta, $highest += $delta) {
             $colorHexNew = Color::convertRgbArrayToHex($colors, false, true);
 
             if (isset($colorArray[$colorHexNew])) {
@@ -356,7 +372,7 @@ class ColorDetectorSimple
      * @return array<string, float>
      * @throws Exception
      */
-    public function getColors(int $count = 20, bool $reduceBrightness = self::DEFAULT_REDUCE_BRIGHTNESS, bool $reduceGradients = self::DEFAULT_REDUCE_GRADIENTS, int $delta = self::DEFAULT_DELTA): array
+    public function getColors(int $count = 20, bool $reduceBrightness = self::REDUCE_BRIGHTNESS_DEFAULT, bool $reduceGradients = self::REDUCE_GRADIENTS_DEFAULT, int $delta = self::DELTA_DEFAULT): array
     {
         $colorArray = $this->getColorArray($delta, $reduceBrightness, $reduceGradients);
 

@@ -13,13 +13,16 @@ declare(strict_types=1);
 
 namespace App\Utils\Traits;
 
+use App\Constant\Constants;
 use Exception;
 
 /**
  * Trait JsonHelper
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-02-10)
+ * @version 0.1.1 (2022-11-22)
+ * @since 0.1.1 (2022-11-22) Add PHP Magic Number Detector (PHPMND).
+ * @since 0.1.0 (2022-02-10) First version.
  * @package App\Utils\Traits
  */
 trait JsonHelper
@@ -134,7 +137,7 @@ trait JsonHelper
         }
 
         /* Reduce indentation. */
-        if ($indentation === 2) {
+        if ($indentation === Constants::INDENTION_2) {
             $beautified = preg_replace_callback('/^ +/m', function ($m) {
                 return str_repeat(' ', intval(strlen($m[0]) / 2));
             }, $beautified);
@@ -144,7 +147,7 @@ trait JsonHelper
             throw new Exception(sprintf('Unable string format of JSON (%s:%d).', __FILE__, __LINE__));
         }
 
-        if ($lines > -1) {
+        if ($lines > Constants::LINES_MINUS_ONE) {
             $jsonLinesAll = explode($lineBreak, $beautified);
 
             $jsonLines = array_slice($jsonLinesAll, 0, $lines);
@@ -156,12 +159,12 @@ trait JsonHelper
             $beautified = implode($lineBreak, $jsonLines);
         }
 
-        if ($columns > -1) {
+        if ($columns > Constants::LINES_MINUS_ONE) {
             $jsonLines = explode($lineBreak, $beautified);
 
             foreach ($jsonLines as &$jsonLine) {
                 if (strlen($jsonLine) > $columns) {
-                    $length = $columns - 3 < 0 ? 0 : $columns - 3;
+                    $length = max($columns - 3, 0);
                     $jsonLine = substr($jsonLine, 0, $length).$indicant;
                 }
             }

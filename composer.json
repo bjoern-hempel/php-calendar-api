@@ -63,6 +63,7 @@
         "phpstan/phpstan": "^1.8",
         "phpstan/phpstan-doctrine": "^1.3",
         "phpunit/phpunit": "^9.5",
+        "povils/phpmnd": "^3.0",
         "symfony/browser-kit": "6.1.*",
         "symfony/css-selector": "6.1.*",
         "symfony/maker-bundle": "^1.36",
@@ -114,38 +115,100 @@
             "@auto-scripts"
         ],
 
-        "phpunit:api": "phpunit tests/Api",
-        "phpunit:functional": "phpunit tests/Functional",
-        "phpunit:unit": "phpunit tests/Unit",
+        "ixno:header": "bin/header/ixno",
+
+        "phpmnd:src": "bin/header/phpmnd 'vendor/bin/phpmnd run src --progress --hint --include-numeric-string --ignore-funcs=round,sleep' 'src'",
+        "phpmnd:tests": "bin/header/phpmnd 'vendor/bin/phpmnd run tests --progress --hint --include-numeric-string --ignore-funcs=round,sleep' 'tests'",
+        "phpmnd:all": "bin/header/phpmnd 'vendor/bin/phpmnd run src tests --progress --hint --include-numeric-string --ignore-funcs=round,sleep' 'all'",
+        "phpmnd": [
+            "@phpmnd:all"
+        ],
+
+        "phpunit:api": "bin/header/phpunit 'vendor/bin/phpunit -d memory_limit=512M --configuration phpunit.api.xml' 'API'",
+        "phpunit:functional": "bin/header/phpunit 'vendor/bin/phpunit -d memory_limit=512M --configuration phpunit.functional.xml' 'Functional'",
+        "phpunit:unit": "bin/header/phpunit 'vendor/bin/phpunit -d memory_limit=512M --configuration phpunit.unit.xml' 'Unit'",
+        "phpunit:api:coverage": "bin/header/phpunit 'XDEBUG_MODE=coverage vendor/bin/phpunit -d memory_limit=512M --configuration phpunit.api.xml --coverage-text' 'API'",
+        "phpunit:functional:coverage": "bin/header/phpunit 'XDEBUG_MODE=coverage vendor/bin/phpunit -d memory_limit=512M --configuration phpunit.functional.xml --coverage-text' 'Functional'",
+        "phpunit:unit:coverage": "bin/header/phpunit 'XDEBUG_MODE=coverage vendor/bin/phpunit -d memory_limit=512M --configuration phpunit.unit.xml --coverage-text' 'Unit'",
+        "phpunit:api:debug": "bin/header/phpunit 'PHPUNIT_DEBUG=1 vendor/bin/phpunit -d memory_limit=512M --configuration phpunit.api.xml' 'API'",
+        "phpunit:functional:debug": "bin/header/phpunit 'PHPUNIT_DEBUG=1 vendor/bin/phpunit -d memory_limit=512M --configuration phpunit.functional.xml' 'Functional'",
+        "phpunit:unit:debug": "bin/header/phpunit 'PHPUNIT_DEBUG=1 vendor/bin/phpunit -d memory_limit=512M --configuration phpunit.unit.xml' 'Unit'",
         "phpunit:all": [
-            "@phpunit:api",
+            "@phpunit:unit",
             "@phpunit:functional",
-            "@phpunit:unit"
+            "@phpunit:api"
+        ],
+        "phpunit:all:coverage": [
+            "@phpunit:unit:coverage",
+            "@phpunit:functional:coverage",
+            "@phpunit:api:coverage"
+        ],
+        "phpunit:all:debug": [
+            "@phpunit:unit:debug",
+            "@phpunit:functional:debug",
+            "@phpunit:api:debug"
         ],
         "phpunit": [
             "@phpunit:all"
         ],
 
-        "phpstan:run": "phpstan analyse --level max --memory-limit 512M src tests",
-        "phpstan:run:xdebug": "phpstan analyse --level max --memory-limit 512M --xdebug src tests",
+        "phpstan:run:soft": "bin/header/phpstan 'vendor/bin/phpstan analyse --level 5 --memory-limit 512M src tests' 'run'",
+        "phpstan:run": "bin/header/phpstan 'vendor/bin/phpstan analyse --level max --memory-limit 512M src tests' 'run'",
+        "phpstan:run:xdebug": "bin/header/phpstan 'vendor/bin/phpstan analyse --level max --memory-limit 512M --xdebug src tests' 'run'",
         "phpstan": [
             "@phpstan:run"
         ],
 
-        "phpcs:check:src": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose fix src 2>/dev/null",
-        "phpcs:check:tests": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose fix tests 2>/dev/null",
-        "phpcs:check:all": "vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose fix src 2>/dev/null && vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose fix tests 2>/dev/null",
+        "phpcs:check:src": "bin/header/phpcs 'vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose fix src 2>/dev/null' 'src'",
+        "phpcs:check:tests": "bin/header/phpcs 'vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose fix tests 2>/dev/null' 'tests'",
+        "phpcs:check:all": "bin/header/phpcs 'vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose fix src 2>/dev/null && vendor/bin/php-cs-fixer --dry-run --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose fix tests 2>/dev/null' 'all'",
         "phpcs": [
             "@phpcs:check:all"
         ],
-        "phpcs:fix:src": "vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix src 2>/dev/null",
-        "phpcs:fix:tests": "vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix tests 2>/dev/null",
-        "phpcs:fix:all": "vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix src 2>/dev/null && vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix tests 2>/dev/null",
+        "phpcs:fix:src": "bin/header/phpcs 'vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix src 2>/dev/null' 'src'",
+        "phpcs:fix:tests": "bin/header/phpcs 'vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix tests 2>/dev/null' 'tests'",
+        "phpcs:fix:all": "bin/header/phpcs 'vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix src 2>/dev/null && vendor/bin/php-cs-fixer --using-cache=no --rules=@PSR12 --rules=no_unused_imports --verbose -v fix tests 2>/dev/null' 'all'",
 
-        "test": [
+        ".test:basic": [
+            "@ixno:header",
+            "@phpunit",
+            "@phpstan"
+        ],
+        "test:basic": [
+            "composer .test:basic && bin/header/success || bin/header/error"
+        ],
+        ".test:most": [
+            "@ixno:header",
+            "@phpmnd",
             "@phpunit",
             "@phpstan",
             "@phpcs"
+        ],
+        "test:most": [
+            "composer .test:most && bin/header/success || bin/header/error"
+        ],
+        ".test:all": [
+            "@ixno:header",
+            "@phpmnd",
+            "@phpunit",
+            "@phpstan",
+            "@phpcs"
+        ],
+        "test:all": [
+            "composer .test:all && bin/header/success || bin/header/error"
+        ],
+        ".test:hardcore": [
+            "@ixno:header",
+            "@phpmnd",
+            "@phpunit",
+            "@phpstan",
+            "@phpcs"
+        ],
+        "test:hardcore": [
+            "composer .test:hardcore && bin/header/success || bin/header/error"
+        ],
+        "test": [
+            "@test:all"
         ],
 
         "drop-schema-prod": "bin/console doctrine:schema:drop --force",
