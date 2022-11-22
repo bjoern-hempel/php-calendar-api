@@ -78,7 +78,7 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
                 throw new Exception(sprintf('Unable to get SQL (%s:%d).', __FILE__, __LINE__));
             }
 
-            $sql = preg_replace('~\?~', $value, $sql, 1);
+            $sql = preg_replace('~\?~', $value, (string) $sql, 1);
         }
 
         if ($sql === null) {
@@ -97,7 +97,7 @@ class PlaceARepository extends ServiceEntityRepository implements PlaceRepositor
             "\n".'WHERE'."\n".'    ',
             'AND'."\n".'    ',
             ','."\n".'    ',
-        ], $sql);
+        ], (string) $sql);
     }
 
     /**

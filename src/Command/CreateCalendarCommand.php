@@ -36,12 +36,6 @@ class CreateCalendarCommand extends Command
 {
     protected static $defaultName = 'calendar:create-calendar';
 
-    protected CalendarBuilderService $calendarBuilderService;
-
-    protected CalendarLoaderService $calendarLoaderService;
-
-    protected HolidayGroupLoaderService $holidayGroupLoaderService;
-
     /**
      * CreatePageCommand constructor
      *
@@ -49,14 +43,8 @@ class CreateCalendarCommand extends Command
      * @param CalendarLoaderService $calendarLoaderService
      * @param HolidayGroupLoaderService $holidayGroupLoaderService
      */
-    public function __construct(CalendarBuilderService $calendarBuilderService, CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService)
+    public function __construct(protected CalendarBuilderService $calendarBuilderService, protected CalendarLoaderService $calendarLoaderService, protected HolidayGroupLoaderService $holidayGroupLoaderService)
     {
-        $this->calendarBuilderService = $calendarBuilderService;
-
-        $this->calendarLoaderService = $calendarLoaderService;
-
-        $this->holidayGroupLoaderService = $holidayGroupLoaderService;
-
         parent::__construct();
     }
 

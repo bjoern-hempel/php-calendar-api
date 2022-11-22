@@ -61,46 +61,46 @@ class PlaceLoaderService
     protected bool $verbose = false;
 
     /* H → lakes */
-    public const MAX_DISTANCE_LAKE_METER_TITLE_RURAL = 2000;
-    public const MAX_DISTANCE_LAKE_METER_LIST_RURAL = self::MAX_DISTANCE_LAKE_METER_TITLE_RURAL * 5;
-    public const MAX_DISTANCE_LAKE_METER_TITLE_CITY = 1600;
-    public const MAX_DISTANCE_LAKE_METER_LIST_CITY = self::MAX_DISTANCE_LAKE_METER_LIST_RURAL;
+    final public const MAX_DISTANCE_LAKE_METER_TITLE_RURAL = 2000;
+    final public const MAX_DISTANCE_LAKE_METER_LIST_RURAL = self::MAX_DISTANCE_LAKE_METER_TITLE_RURAL * 5;
+    final public const MAX_DISTANCE_LAKE_METER_TITLE_CITY = 1600;
+    final public const MAX_DISTANCE_LAKE_METER_LIST_CITY = self::MAX_DISTANCE_LAKE_METER_LIST_RURAL;
 
     /* L → parks,area */
-    public const MAX_DISTANCE_PARK_METER_TITLE_RURAL = 1000;
-    public const MAX_DISTANCE_PARK_METER_LIST_RURAL = self::MAX_DISTANCE_PARK_METER_TITLE_RURAL * 5;
-    public const MAX_DISTANCE_PARK_METER_TITLE_CITY = 800;
-    public const MAX_DISTANCE_PARK_METER_LIST_CITY = self::MAX_DISTANCE_PARK_METER_LIST_RURAL;
+    final public const MAX_DISTANCE_PARK_METER_TITLE_RURAL = 1000;
+    final public const MAX_DISTANCE_PARK_METER_LIST_RURAL = self::MAX_DISTANCE_PARK_METER_TITLE_RURAL * 5;
+    final public const MAX_DISTANCE_PARK_METER_TITLE_CITY = 800;
+    final public const MAX_DISTANCE_PARK_METER_LIST_CITY = self::MAX_DISTANCE_PARK_METER_LIST_RURAL;
 
     /* P → city, village */
-    public const MAX_DISTANCE_PLACE_METER_TITLE_RURAL = 1000;
-    public const MAX_DISTANCE_PLACE_METER_LIST_RURAL = self::MAX_DISTANCE_PLACE_METER_TITLE_RURAL * 5;
-    public const MAX_DISTANCE_PLACE_METER_TITLE_CITY = 1000;
-    public const MAX_DISTANCE_PLACE_METER_LIST_CITY = self::MAX_DISTANCE_PLACE_METER_LIST_RURAL;
+    final public const MAX_DISTANCE_PLACE_METER_TITLE_RURAL = 1000;
+    final public const MAX_DISTANCE_PLACE_METER_LIST_RURAL = self::MAX_DISTANCE_PLACE_METER_TITLE_RURAL * 5;
+    final public const MAX_DISTANCE_PLACE_METER_TITLE_CITY = 1000;
+    final public const MAX_DISTANCE_PLACE_METER_LIST_CITY = self::MAX_DISTANCE_PLACE_METER_LIST_RURAL;
 
     /* S → spot, building, farm */
-    public const MAX_DISTANCE_SPOT_METER_TITLE_RURAL = 300;
-    public const MAX_DISTANCE_SPOT_METER_LIST_RURAL = self::MAX_DISTANCE_SPOT_METER_TITLE_RURAL * 5;
-    public const MAX_DISTANCE_SPOT_METER_TITLE_CITY = 300;
-    public const MAX_DISTANCE_SPOT_METER_LIST_CITY = self::MAX_DISTANCE_SPOT_METER_LIST_RURAL;
+    final public const MAX_DISTANCE_SPOT_METER_TITLE_RURAL = 300;
+    final public const MAX_DISTANCE_SPOT_METER_LIST_RURAL = self::MAX_DISTANCE_SPOT_METER_TITLE_RURAL * 5;
+    final public const MAX_DISTANCE_SPOT_METER_TITLE_CITY = 300;
+    final public const MAX_DISTANCE_SPOT_METER_LIST_CITY = self::MAX_DISTANCE_SPOT_METER_LIST_RURAL;
 
     /* T → mountain, hill, rock */
-    public const MAX_DISTANCE_MOUNTAIN_METER_TITLE_RURAL = 2000;
-    public const MAX_DISTANCE_MOUNTAIN_METER_LIST_RURAL = self::MAX_DISTANCE_MOUNTAIN_METER_TITLE_RURAL * 5;
-    public const MAX_DISTANCE_MOUNTAIN_METER_TITLE_CITY = 500;
-    public const MAX_DISTANCE_MOUNTAIN_METER_LIST_CITY = self::MAX_DISTANCE_MOUNTAIN_METER_LIST_RURAL;
+    final public const MAX_DISTANCE_MOUNTAIN_METER_TITLE_RURAL = 2000;
+    final public const MAX_DISTANCE_MOUNTAIN_METER_LIST_RURAL = self::MAX_DISTANCE_MOUNTAIN_METER_TITLE_RURAL * 5;
+    final public const MAX_DISTANCE_MOUNTAIN_METER_TITLE_CITY = 500;
+    final public const MAX_DISTANCE_MOUNTAIN_METER_LIST_CITY = self::MAX_DISTANCE_MOUNTAIN_METER_LIST_RURAL;
 
     /* V → forest,heath */
-    public const MAX_DISTANCE_FOREST_METER_TITLE_RURAL = 2000;
-    public const MAX_DISTANCE_FOREST_METER_LIST_RURAL = self::MAX_DISTANCE_FOREST_METER_TITLE_RURAL * 5;
-    public const MAX_DISTANCE_FOREST_METER_TITLE_CITY = 500;
-    public const MAX_DISTANCE_FOREST_METER_LIST_CITY = self::MAX_DISTANCE_FOREST_METER_LIST_RURAL;
+    final public const MAX_DISTANCE_FOREST_METER_TITLE_RURAL = 2000;
+    final public const MAX_DISTANCE_FOREST_METER_LIST_RURAL = self::MAX_DISTANCE_FOREST_METER_TITLE_RURAL * 5;
+    final public const MAX_DISTANCE_FOREST_METER_TITLE_CITY = 500;
+    final public const MAX_DISTANCE_FOREST_METER_LIST_CITY = self::MAX_DISTANCE_FOREST_METER_LIST_RURAL;
 
-    public const CITY_POPULATION = 2000;
+    final public const CITY_POPULATION = 2000;
 
-    public const MAX_NUMBER_PLACES = 10;
+    final public const MAX_NUMBER_PLACES = 10;
 
-    public const CONFIG_ENTITY_CODES = [
+    final public const CONFIG_ENTITY_CODES = [
         [
             'tags' => ['brücke', 'brücken', ],
             'featureClasses' => [Code::FEATURE_CLASS_S, ],
@@ -133,7 +133,7 @@ class PlaceLoaderService
         ],
     ];
 
-    public const FEATURE_CLASSES_ALL = [
+    final public const FEATURE_CLASSES_ALL = [
         Code::FEATURE_CLASS_P,
         Code::FEATURE_CLASS_A,
         Code::FEATURE_CLASS_S,
@@ -157,28 +157,6 @@ ORDER BY distance ASC
 LIMIT %d;
 SQL;
 
-    private EntityManagerInterface $em;
-
-    protected TranslatorInterface $translator;
-
-    protected ?PlaceARepository $placeARepository;
-
-    protected ?PlaceHRepository $placeHRepository;
-
-    protected ?PlaceLRepository $placeLRepository;
-
-    protected ?PlacePRepository $placePRepository;
-
-    protected ?PlaceRRepository $placeRRepository;
-
-    protected ?PlaceSRepository $placeSRepository;
-
-    protected ?PlaceTRepository $placeTRepository;
-
-    protected ?PlaceURepository $placeURepository;
-
-    protected ?PlaceVRepository $placeVRepository;
-
     /**
      * PlaceLoaderService constructor.
      *
@@ -194,21 +172,8 @@ SQL;
      * @param PlaceURepository|null $placeURepository
      * @param PlaceVRepository|null $placeVRepository
      */
-    public function __construct(EntityManagerInterface $em, TranslatorInterface $translator, ?PlaceARepository $placeARepository = null, ?PlaceHRepository $placeHRepository = null, ?PlaceLRepository $placeLRepository = null, ?PlacePRepository $placePRepository = null, ?PlaceRRepository $placeRRepository = null, ?PlaceSRepository $placeSRepository = null, ?PlaceTRepository $placeTRepository = null, ?PlaceURepository $placeURepository = null, ?PlaceVRepository $placeVRepository = null)
+    public function __construct(private readonly EntityManagerInterface $em, protected TranslatorInterface $translator, protected ?\App\Repository\PlaceARepository $placeARepository = null, protected ?\App\Repository\PlaceHRepository $placeHRepository = null, protected ?\App\Repository\PlaceLRepository $placeLRepository = null, protected ?\App\Repository\PlacePRepository $placePRepository = null, protected ?\App\Repository\PlaceRRepository $placeRRepository = null, protected ?\App\Repository\PlaceSRepository $placeSRepository = null, protected ?\App\Repository\PlaceTRepository $placeTRepository = null, protected ?\App\Repository\PlaceURepository $placeURepository = null, protected ?\App\Repository\PlaceVRepository $placeVRepository = null)
     {
-        $this->em = $em;
-
-        $this->translator = $translator;
-
-        $this->placeARepository = $placeARepository;
-        $this->placeHRepository = $placeHRepository;
-        $this->placeLRepository = $placeLRepository;
-        $this->placePRepository = $placePRepository;
-        $this->placeRRepository = $placeRRepository;
-        $this->placeSRepository = $placeSRepository;
-        $this->placeTRepository = $placeTRepository;
-        $this->placeURepository = $placeURepository;
-        $this->placeVRepository = $placeVRepository;
     }
 
     /**
@@ -789,7 +754,7 @@ SQL;
             $placeP = $this->buildPlaceFromRow($row, $latitude, $longitude, $featureClass, $placeSource);
 
             if (!$placeP instanceof PlaceP) {
-                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', get_class($placeP), __FILE__, __LINE__));
+                throw new Exception(sprintf('Unexpected place instance "%s" (%s:%d).', $placeP::class, __FILE__, __LINE__));
             }
 
             $placesP[] = $placeP;
@@ -801,9 +766,7 @@ SQL;
         }
 
         /* Sort placesP */
-        usort($placesP, function (PlaceP $a, PlaceP $b) {
-            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
-        });
+        usort($placesP, fn(PlaceP $a, PlaceP $b) => $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1);
 
         return $placesP;
     }
@@ -822,40 +785,25 @@ SQL;
     {
         /* Sort places */
         if ($sort) {
-            usort($places, function (Place $a, Place $b) {
-                return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
-            });
+            usort($places, fn(Place $a, Place $b) => $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1);
         }
 
         foreach ($places as $placeEntry) {
-            if (get_class($placeEntry) !== $className) {
-                throw new Exception(sprintf('Unexpected place instance "%s". "%s" expected (%s:%d).', get_class($placeEntry), $className, __FILE__, __LINE__));
+            if ($placeEntry::class !== $className) {
+                throw new Exception(sprintf('Unexpected place instance "%s". "%s" expected (%s:%d).', $placeEntry::class, $className, __FILE__, __LINE__));
             }
 
             $this->translateFeatureCode($placeEntry);
 
-            switch (true) {
-                case $placeEntry instanceof PlaceH:
-                    $place->addLake($placeEntry);
-                    break;
-                case $placeEntry instanceof PlaceL:
-                    $place->addPark($placeEntry);
-                    break;
-                case $placeEntry instanceof PlaceP:
-                    $place->addPlace($placeEntry);
-                    break;
-                case $placeEntry instanceof PlaceS:
-                    $place->addSpot($placeEntry);
-                    break;
-                case $placeEntry instanceof PlaceT:
-                    $place->addMountain($placeEntry);
-                    break;
-                case $placeEntry instanceof PlaceV:
-                    $place->addForest($placeEntry);
-                    break;
-                default:
-                    throw new Exception(sprintf('Unsupported class "%s" (%s:%d).', get_class($placeEntry), __FILE__, __LINE__));
-            }
+            match (true) {
+                $placeEntry instanceof PlaceH => $place->addLake($placeEntry),
+                $placeEntry instanceof PlaceL => $place->addPark($placeEntry),
+                $placeEntry instanceof PlaceP => $place->addPlace($placeEntry),
+                $placeEntry instanceof PlaceS => $place->addSpot($placeEntry),
+                $placeEntry instanceof PlaceT => $place->addMountain($placeEntry),
+                $placeEntry instanceof PlaceV => $place->addForest($placeEntry),
+                default => throw new Exception(sprintf('Unsupported class "%s" (%s:%d).', $placeEntry::class, __FILE__, __LINE__)),
+            };
         }
 
         return $place;
@@ -1158,9 +1106,7 @@ SQL;
 
         if (count($places) > 0) {
             /* Sort placesP */
-            usort($places, function (Place $a, Place $b) {
-                return $a->getPopulation() < $b->getPopulation() ? 1 : -1;
-            });
+            usort($places, fn(Place $a, Place $b) => $a->getPopulation() < $b->getPopulation() ? 1 : -1);
 
             return $places;
         }
@@ -1206,9 +1152,7 @@ SQL;
         }
 
         /* Sort placesP */
-        usort($places, function (Place $a, Place $b) {
-            return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
-        });
+        usort($places, fn(Place $a, Place $b) => $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1);
 
         return $places;
     }

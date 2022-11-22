@@ -37,16 +37,13 @@ use const DIRECTORY_SEPARATOR;
  */
 final class ImageEmptyConfigurator implements FieldConfiguratorInterface
 {
-    private string $projectDir;
-
     /**
      * ImageEmptyConfigurator constructor
      *
      * @param string $projectDir
      */
-    public function __construct(string $projectDir)
+    public function __construct(private readonly string $projectDir)
     {
-        $this->projectDir = $projectDir;
     }
 
     /**

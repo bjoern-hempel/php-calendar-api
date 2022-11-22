@@ -40,10 +40,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
  */
 final class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    private SecurityService $securityService;
-
-    private ParameterBagInterface $parameterBag;
-
     public const PARAMETER_NAME_JWT_ROLE = 'jwt.role';
 
     /**
@@ -52,11 +48,8 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
      * @param SecurityService $securityService
      * @param ParameterBagInterface $parameterBag
      */
-    public function __construct(SecurityService $securityService, ParameterBagInterface $parameterBag)
+    public function __construct(private readonly SecurityService $securityService, private readonly ParameterBagInterface $parameterBag)
     {
-        $this->securityService = $securityService;
-
-        $this->parameterBag = $parameterBag;
     }
 
     /**

@@ -39,19 +39,19 @@ class SizeConverter
         $config = [
             [
                 'unit' => 'TB',
-                'value' => pow(1024, 4),
+                'value' => 1024 ** 4,
             ],
             [
                 'unit' => 'GB',
-                'value' => pow(1024, 3),
+                'value' => 1024 ** 3,
             ],
             [
                 'unit' => 'MB',
-                'value' => pow(1024, 2),
+                'value' => 1024 ** 2,
             ],
             [
                 'unit' => 'kB',
-                'value' => pow(1024, 1),
+                'value' => 1024 ** 1,
             ],
             [
                 'unit' => 'Bytes',

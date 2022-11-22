@@ -43,68 +43,68 @@ class Color
     ];
 
     /* @see https://en.wikipedia.org/wiki/SRGB */
-    public const COLOR_INDEX_RGB_RED = 'r';
-    public const COLOR_VALUE_RGB_RED_MIN = 0;
-    public const COLOR_VALUE_RGB_RED_MAX = 255;
-    public const COLOR_INDEX_RGB_GREEN = 'g';
-    public const COLOR_VALUE_RGB_GREEN_MIN = 0;
-    public const COLOR_VALUE_RGB_GREEN_MAX = 255;
-    public const COLOR_INDEX_RGB_BLUE = 'b';
-    public const COLOR_VALUE_RGB_BLUE_MIN = 0;
-    public const COLOR_VALUE_RGB_BLUE_MAX = 255;
+    final public const COLOR_INDEX_RGB_RED = 'r';
+    final public const COLOR_VALUE_RGB_RED_MIN = 0;
+    final public const COLOR_VALUE_RGB_RED_MAX = 255;
+    final public const COLOR_INDEX_RGB_GREEN = 'g';
+    final public const COLOR_VALUE_RGB_GREEN_MIN = 0;
+    final public const COLOR_VALUE_RGB_GREEN_MAX = 255;
+    final public const COLOR_INDEX_RGB_BLUE = 'b';
+    final public const COLOR_VALUE_RGB_BLUE_MIN = 0;
+    final public const COLOR_VALUE_RGB_BLUE_MAX = 255;
 
-    public const COLORS_RGB = [
+    final public const COLORS_RGB = [
         self::COLOR_INDEX_RGB_RED,
         self::COLOR_INDEX_RGB_GREEN,
         self::COLOR_INDEX_RGB_BLUE,
     ];
 
     /* @see https://en.wikipedia.org/wiki/SRGB */
-    public const COLOR_INDEX_SRGB_RED = 'r';
-    public const COLOR_VALUE_SRGB_RED_MIN = 0.;
-    public const COLOR_VALUE_SRGB_RED_MAX = 1.;
-    public const COLOR_INDEX_SRGB_GREEN = 'g';
-    public const COLOR_VALUE_SRGB_GREEN_MIN = 0.;
-    public const COLOR_VALUE_SRGB_GREEN_MAX = 1.;
-    public const COLOR_INDEX_SRGB_BLUE = 'b';
-    public const COLOR_VALUE_SRGB_BLUE_MIN = 0.;
-    public const COLOR_VALUE_SRGB_BLUE_MAX = 1.;
+    final public const COLOR_INDEX_SRGB_RED = 'r';
+    final public const COLOR_VALUE_SRGB_RED_MIN = 0.;
+    final public const COLOR_VALUE_SRGB_RED_MAX = 1.;
+    final public const COLOR_INDEX_SRGB_GREEN = 'g';
+    final public const COLOR_VALUE_SRGB_GREEN_MIN = 0.;
+    final public const COLOR_VALUE_SRGB_GREEN_MAX = 1.;
+    final public const COLOR_INDEX_SRGB_BLUE = 'b';
+    final public const COLOR_VALUE_SRGB_BLUE_MIN = 0.;
+    final public const COLOR_VALUE_SRGB_BLUE_MAX = 1.;
 
-    public const COLORS_SRGB = [
+    final public const COLORS_SRGB = [
         self::COLOR_INDEX_SRGB_RED,
         self::COLOR_INDEX_SRGB_GREEN,
         self::COLOR_INDEX_SRGB_BLUE,
     ];
 
     /* @see https://en.wikipedia.org/wiki/CIELAB_color_space */
-    public const COLOR_INDEX_LAB_LIGHTNESS = 'L';
-    public const COLOR_VALUE_LAB_LIGHTNESS_MIN = 0.;
-    public const COLOR_VALUE_LAB_LIGHTNESS_MAX = 100.;
-    public const COLOR_INDEX_LAB_A = 'a';
-    public const COLOR_VALUE_LAB_A_MIN = -128.;
-    public const COLOR_VALUE_LAB_A_MAX = 127.;
-    public const COLOR_INDEX_LAB_B = 'b';
-    public const COLOR_VALUE_LAB_B_MIN = -128.;
-    public const COLOR_VALUE_LAB_B_MAX = 127.;
+    final public const COLOR_INDEX_LAB_LIGHTNESS = 'L';
+    final public const COLOR_VALUE_LAB_LIGHTNESS_MIN = 0.;
+    final public const COLOR_VALUE_LAB_LIGHTNESS_MAX = 100.;
+    final public const COLOR_INDEX_LAB_A = 'a';
+    final public const COLOR_VALUE_LAB_A_MIN = -128.;
+    final public const COLOR_VALUE_LAB_A_MAX = 127.;
+    final public const COLOR_INDEX_LAB_B = 'b';
+    final public const COLOR_VALUE_LAB_B_MIN = -128.;
+    final public const COLOR_VALUE_LAB_B_MAX = 127.;
 
-    public const COLORS_LAB = [
+    final public const COLORS_LAB = [
         self::COLOR_INDEX_LAB_LIGHTNESS,
         self::COLOR_INDEX_LAB_A,
         self::COLOR_INDEX_LAB_B,
     ];
 
     /* @see https://en.wikipedia.org/wiki/CIE_1931_color_space */
-    public const COLOR_INDEX_XYZ_X = 'x';
-    public const COLOR_VALUE_XYZ_X_MIN = 0.;
-    public const COLOR_VALUE_XYZ_X_MAX = 1.;
-    public const COLOR_INDEX_XYZ_Y = 'y';
-    public const COLOR_VALUE_XYZ_Y_MIN = 0.;
-    public const COLOR_VALUE_XYZ_Y_MAX = 1.;
-    public const COLOR_INDEX_XYZ_Z = 'z';
-    public const COLOR_VALUE_XYZ_Z_MIN = 0.;
-    public const COLOR_VALUE_XYZ_Z_MAX = 1.;
+    final public const COLOR_INDEX_XYZ_X = 'x';
+    final public const COLOR_VALUE_XYZ_X_MIN = 0.;
+    final public const COLOR_VALUE_XYZ_X_MAX = 1.;
+    final public const COLOR_INDEX_XYZ_Y = 'y';
+    final public const COLOR_VALUE_XYZ_Y_MIN = 0.;
+    final public const COLOR_VALUE_XYZ_Y_MAX = 1.;
+    final public const COLOR_INDEX_XYZ_Z = 'z';
+    final public const COLOR_VALUE_XYZ_Z_MIN = 0.;
+    final public const COLOR_VALUE_XYZ_Z_MAX = 1.;
 
-    public const COLORS_XYZ = [
+    final public const COLORS_XYZ = [
         self::COLOR_INDEX_XYZ_X,
         self::COLOR_INDEX_XYZ_Y,
         self::COLOR_INDEX_XYZ_Z,
@@ -139,7 +139,7 @@ class Color
     {
         $value /= 255;
 
-        $srgb = $value <= self::CONVERT_0_03928 ? $value / 12.92 : pow(($value + .055) / 1.055, 2.4);
+        $srgb = $value <= self::CONVERT_0_03928 ? $value / 12.92 : (($value + .055) / 1.055) ** 2.4;
 
         if ($precision === self::PRECISION_NONE) {
             return $srgb;
@@ -157,7 +157,7 @@ class Color
      */
     public static function convertXyzToLab(float $value, int $precision = -1): float
     {
-        $lab = $value > 216 / 24389 ? pow($value, 1 / 3) : 841 * $value / 108 + 4 / 29;
+        $lab = $value > 216 / 24389 ? $value ** (1 / 3) : 841 * $value / 108 + 4 / 29;
 
         if ($precision === self::PRECISION_NONE) {
             return $lab;
@@ -349,7 +349,7 @@ class Color
     {
         self::checkSrgb($srgb);
 
-        list($x, $y, $z, ) = self::matrixVectorMultiplication(self::MATRIX_SRGB_XYZ, $srgb, $precision);
+        [$x, $y, $z, ] = self::matrixVectorMultiplication(self::MATRIX_SRGB_XYZ, $srgb, $precision);
 
         return [
             self::COLOR_INDEX_XYZ_X => $x,

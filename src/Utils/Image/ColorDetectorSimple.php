@@ -28,36 +28,33 @@ use JetBrains\PhpStorm\ArrayShape;
  */
 class ColorDetectorSimple
 {
-    protected GdImage $gdImage;
+    final public const REDUCE_BRIGHTNESS_DEFAULT = false;
 
-    public const REDUCE_BRIGHTNESS_DEFAULT = false;
+    final public const REDUCE_GRADIENTS_DEFAULT = false;
 
-    public const REDUCE_GRADIENTS_DEFAULT = false;
+    final public const DELTA_DEFAULT = 24;
 
-    public const DELTA_DEFAULT = 24;
+    final public const DELTA_0 = 0;
 
-    public const DELTA_0 = 0;
+    final public const DELTA_1 = 1;
 
-    public const DELTA_1 = 1;
+    final public const DELTA_2 = 2;
 
-    public const DELTA_2 = 2;
+    final public const DELTA_32 = 32;
 
-    public const DELTA_32 = 32;
+    final public const DELTA_MAX = 255;
 
-    public const DELTA_MAX = 255;
+    final public const COLOR_MIN = 0;
 
-    public const COLOR_MIN = 0;
-
-    public const COLOR_MAX = 255;
+    final public const COLOR_MAX = 255;
 
     /**
      * ColorDetectorSimple constructor.
      *
      * @param GdImage $gdImage
      */
-    public function __construct(GdImage $gdImage)
+    public function __construct(protected GdImage $gdImage)
     {
-        $this->gdImage = $gdImage;
     }
 
     /**

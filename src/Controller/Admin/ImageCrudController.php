@@ -44,18 +44,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ImageCrudController extends BaseCrudController
 {
-    protected ImageProperty $imageProperty;
-
-    protected ImageLoaderService $imageLoaderService;
-
-    protected UserLoaderService $userLoaderService;
-
-    protected RequestStack $requestStack;
-
-    protected ImageService $imageService;
-
-    protected IdHashService $idHashService;
-
     protected const RAW_SQL_POSITION = <<<SQL
 SELECT
     path
@@ -78,20 +66,8 @@ SQL;
      * @param TranslatorInterface $translator
      * @throws Exception
      */
-    public function __construct(ImageProperty $imageProperty, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, RequestStack $requestStack, ImageService $imageService, IdHashService $idHashService, SecurityService $securityService, TranslatorInterface $translator)
+    public function __construct(protected ImageProperty $imageProperty, protected ImageLoaderService $imageLoaderService, protected UserLoaderService $userLoaderService, protected RequestStack $requestStack, protected ImageService $imageService, protected IdHashService $idHashService, SecurityService $securityService, TranslatorInterface $translator)
     {
-        $this->imageProperty = $imageProperty;
-
-        $this->imageLoaderService = $imageLoaderService;
-
-        $this->userLoaderService = $userLoaderService;
-
-        $this->requestStack = $requestStack;
-
-        $this->imageService = $imageService;
-
-        $this->idHashService = $idHashService;
-
         parent::__construct($securityService, $translator);
     }
 
@@ -137,15 +113,13 @@ SQL;
                     ->setBasePath(sprintf('%s/%s', Image::PATH_DATA, Image::PATH_IMAGES))
                     ->setUploadDir(sprintf('%s/%s/%s/%s', Image::PATH_DATA, Image::PATH_IMAGES, $idHash, Image::PATH_TYPE_SOURCE))
                     ->setUploadedFileNamePattern(
-                        function (UploadedFile $file) use ($idHash) {
-                            return sprintf(
-                                '%s/%s/%s.%s',
-                                $idHash,
-                                Image::PATH_TYPE_SOURCE,
-                                substr(md5(sprintf('%s.%s', $file->getClientOriginalName(), random_int(1000, 9999))), 0, 10),
-                                $file->getClientOriginalName()
-                            );
-                        }
+                        fn(UploadedFile $file) => sprintf(
+                            '%s/%s/%s.%s',
+                            $idHash,
+                            Image::PATH_TYPE_SOURCE,
+                            substr(md5(sprintf('%s.%s', $file->getClientOriginalName(), random_int(1000, 9999))), 0, 10),
+                            $file->getClientOriginalName()
+                        )
                     )
                     ->setRequired(false)
                     ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))
@@ -182,9 +156,7 @@ SQL;
                     ->setTemplatePath('admin/crud/field/code_editor.html.twig')
                     /* Not called within formulas. */
                     ->formatValue(
-                        function ($json) {
-                            return (new JsonConverter($json))->getBeautified(2);
-                        }
+                        fn($json) => (new JsonConverter($json))->getBeautified(2)
                     )
                     ->setLanguage('css')
                     ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))

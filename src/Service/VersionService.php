@@ -25,20 +25,17 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class VersionService
 {
-    public const PATH_VERSION_FILE = 'VERSION';
+    final public const PATH_VERSION_FILE = 'VERSION';
 
-    public const PATH_REVISION_FILE = 'REVISION';
-
-    protected KernelInterface $appKernel;
+    final public const PATH_REVISION_FILE = 'REVISION';
 
     /**
      * VersionService constructor
      *
      * @param KernelInterface $appKernel
      */
-    public function __construct(KernelInterface $appKernel)
+    public function __construct(protected KernelInterface $appKernel)
     {
-        $this->appKernel = $appKernel;
     }
 
     /**

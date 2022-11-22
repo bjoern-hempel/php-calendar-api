@@ -22,8 +22,8 @@ namespace App\Constant;
  */
 class Country
 {
-    public const AUSTRIA_ISO_2 = 'AT';
-    public const POLAND_ISO_2 = 'PL';
-    public const SPAIN_ISO_2 = 'ES';
-    public const SWITZERLAND_ISO_2 = 'CH';
+    final public const AUSTRIA_ISO_2 = 'AT';
+    final public const POLAND_ISO_2 = 'PL';
+    final public const SPAIN_ISO_2 = 'ES';
+    final public const SWITZERLAND_ISO_2 = 'CH';
 }

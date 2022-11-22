@@ -105,37 +105,37 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     ],
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['user']],
 )]
-class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityInterface, \Stringable
 {
     use TimestampsTrait;
 
-    public const ROLE_USER = 'ROLE_USER';
+    final public const ROLE_USER = 'ROLE_USER';
 
-    public const ROLE_ADMIN = 'ROLE_ADMIN';
+    final public const ROLE_ADMIN = 'ROLE_ADMIN';
 
-    public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
+    final public const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
 
-    public const API_ENDPOINT_COLLECTION = '/api/v1/users';
+    final public const API_ENDPOINT_COLLECTION = '/api/v1/users';
 
-    public const API_ENDPOINT_ITEM = '/api/v1/users/%d';
+    final public const API_ENDPOINT_ITEM = '/api/v1/users/%d';
 
-    public const PASSWORD_UNCHANGED = '**********';
+    final public const PASSWORD_UNCHANGED = '**********';
 
-    public const SHORT_HASH_LENGTH = 8;
+    final public const SHORT_HASH_LENGTH = 8;
 
-    public const CRUD_FIELDS_ADMIN = ['id'];
+    final public const CRUD_FIELDS_ADMIN = ['id'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'idHash', 'email', 'username', 'password', 'plainPassword', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_REGISTERED = ['id', 'idHash', 'email', 'username', 'password', 'plainPassword', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'idHash', 'email', 'username', 'password', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_INDEX = ['id', 'idHash', 'email', 'username', 'password', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'email', 'username', 'plainPassword', 'firstname', 'lastname', 'roles'];
+    final public const CRUD_FIELDS_NEW = ['id', 'email', 'username', 'plainPassword', 'firstname', 'lastname', 'roles'];
 
-    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+    final public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'idHash', 'email', 'username', 'password', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_DETAIL = ['id', 'idHash', 'email', 'username', 'password', 'firstname', 'lastname', 'roles', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_FILTER = ['email', 'username', 'firstname', 'lastname'];
+    final public const CRUD_FIELDS_FILTER = ['email', 'username', 'firstname', 'lastname'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -161,11 +161,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityI
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['user', 'user_extended'])]
-    private ?string $firstname;
+    private ?string $firstname = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['user', 'user_extended'])]
-    private ?string $lastname;
+    private ?string $lastname = null;
 
     /** @var string[] $roles */
     #[ORM\Column(type: 'json', nullable: false)]
@@ -288,7 +288,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityI
      */
     public function getIdHashNew(): string
     {
-        return sha1(rand(1000000, 9999999).rand(1000000, 9999999));
+        return sha1(random_int(1_000_000, 9_999_999).random_int(1_000_000, 9_999_999));
     }
 
     /**
@@ -658,7 +658,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityI
     public function setIdHashAutomatically(): self
     {
         if ($this->idHash === null) {
-            $this->setIdHash(sha1(sprintf('salt_%d_%d', rand(0, 999999999), rand(0, 999999999))));
+            $this->setIdHash(sha1(sprintf('salt_%d_%d', random_int(0, 999_999_999), random_int(0, 999_999_999))));
         }
 
         return $this;

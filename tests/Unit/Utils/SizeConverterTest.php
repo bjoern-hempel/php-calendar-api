@@ -79,23 +79,23 @@ final class SizeConverterTest extends TestCase
             /**
              * MB: getHumanReadableSize
              */
-            [++$number, 'getHumanReadableSize', 1 * pow(1024, 2), '1.00 MB'],
-            [++$number, 'getHumanReadableSize', 6 * pow(1024, 2), '6.00 MB'],
-            [++$number, 'getHumanReadableSize', 6 * pow(1024, 2) + 1000 * 1024, '6.98 MB'],
+            [++$number, 'getHumanReadableSize', 1 * 1024 ** 2, '1.00 MB'],
+            [++$number, 'getHumanReadableSize', 6 * 1024 ** 2, '6.00 MB'],
+            [++$number, 'getHumanReadableSize', 6 * 1024 ** 2 + 1000 * 1024, '6.98 MB'],
 
             /**
              * GB: getHumanReadableSize
              */
-            [++$number, 'getHumanReadableSize', 1 * pow(1024, 3), '1.00 GB'],
-            [++$number, 'getHumanReadableSize', 6 * pow(1024, 3), '6.00 GB'],
-            [++$number, 'getHumanReadableSize', 6 * pow(1024, 3) + 1000 * pow(1024, 2), '6.98 GB'],
+            [++$number, 'getHumanReadableSize', 1 * 1024 ** 3, '1.00 GB'],
+            [++$number, 'getHumanReadableSize', 6 * 1024 ** 3, '6.00 GB'],
+            [++$number, 'getHumanReadableSize', 6 * 1024 ** 3 + 1000 * 1024 ** 2, '6.98 GB'],
 
             /**
              * TB: getHumanReadableSize
              */
-            [++$number, 'getHumanReadableSize', 1 * pow(1024, 4), '1.00 TB'],
-            [++$number, 'getHumanReadableSize', 6 * pow(1024, 4), '6.00 TB'],
-            [++$number, 'getHumanReadableSize', 6 * pow(1024, 4) + 1000 * pow(1024, 3), '6.98 TB'],
+            [++$number, 'getHumanReadableSize', 1 * 1024 ** 4, '1.00 TB'],
+            [++$number, 'getHumanReadableSize', 6 * 1024 ** 4, '6.00 TB'],
+            [++$number, 'getHumanReadableSize', 6 * 1024 ** 4 + 1000 * 1024 ** 3, '6.98 TB'],
         ];
     }
 }

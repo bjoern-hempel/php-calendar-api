@@ -30,12 +30,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class ImageLoaderService extends BaseLoaderService
 {
-    protected KernelInterface $appKernel;
-
-    protected EntityManagerInterface $manager;
-
-    protected SecurityService $securityService;
-
     /**
      * Calendar constructor
      *
@@ -43,13 +37,8 @@ class ImageLoaderService extends BaseLoaderService
      * @param EntityManagerInterface $manager
      * @param SecurityService $securityService
      */
-    public function __construct(KernelInterface $appKernel, EntityManagerInterface $manager, SecurityService $securityService)
+    public function __construct(protected KernelInterface $appKernel, protected EntityManagerInterface $manager, protected SecurityService $securityService)
     {
-        $this->appKernel = $appKernel;
-
-        $this->manager = $manager;
-
-        $this->securityService = $securityService;
     }
 
     /**

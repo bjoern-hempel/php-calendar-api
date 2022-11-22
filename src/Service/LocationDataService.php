@@ -35,60 +35,54 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class LocationDataService
 {
-    protected PlaceLoaderService $placeLoaderService;
-
-    protected TranslatorInterface $translator;
-
-    protected SearchConfig $searchConfig;
-
     protected bool $debug = false;
 
     protected bool $verbose = false;
 
-    public const KEY_NAME_FORMAT = 'format';
-    public const KEY_NAME_TITLE = 'title';
-    public const KEY_NAME_UNIT = 'unit';
-    public const KEY_NAME_UNIT_BEFORE = 'unit-before';
-    public const KEY_NAME_VALUE = 'value';
-    public const KEY_NAME_VALUE_FORMATTED = 'value-formatted';
+    final public const KEY_NAME_FORMAT = 'format';
+    final public const KEY_NAME_TITLE = 'title';
+    final public const KEY_NAME_UNIT = 'unit';
+    final public const KEY_NAME_UNIT_BEFORE = 'unit-before';
+    final public const KEY_NAME_VALUE = 'value';
+    final public const KEY_NAME_VALUE_FORMATTED = 'value-formatted';
 
-    public const KEY_NAME_PLACE_LATITUDE = 'place-latitude';
-    public const KEY_NAME_PLACE_LONGITUDE = 'place-longitude';
-    public const KEY_NAME_PLACE_LATITUDE_DMS = 'place-latitude-dms';
-    public const KEY_NAME_PLACE_LONGITUDE_DMS = 'place-longitude-dms';
-    public const KEY_NAME_PLACE_POINT = 'place-point';
-    public const KEY_NAME_PLACE_GOOGLE_LINK = 'place-google-link';
-    public const KEY_NAME_PLACE_OPENSTREETMAP_LINK = 'place-openstreetmap-link';
-    public const KEY_NAME_PLACE = 'place';
-    public const KEY_NAME_PLACE_FULL = 'place-full';
-    public const KEY_NAME_PLACE_DISTRICT = 'place-district';
-    public const KEY_NAME_PLACE_CITY = 'place-city';
-    public const KEY_NAME_PLACE_STATE = 'place-state';
-    public const KEY_NAME_PLACE_LAKE = 'place-lake';
-    public const KEY_NAME_PLACE_PARK = 'place-park';
-    public const KEY_NAME_PLACE_MOUNTAIN = 'place-mountain';
-    public const KEY_NAME_PLACE_SPOT = 'place-spot';
-    public const KEY_NAME_PLACE_FOREST = 'place-forest';
-    public const KEY_NAME_PLACE_COUNTRY = 'place-country';
-    public const KEY_NAME_PLACE_COUNTRY_CODE = 'place-country-code';
-    public const KEY_NAME_PLACE_TIMEZONE = 'place-timezone';
-    public const KEY_NAME_PLACE_POPULATION = 'place-population';
-    public const KEY_NAME_PLACE_ELEVATION = 'place-elevation';
-    public const KEY_NAME_PLACE_FEATURE_CLASS = 'place-feature-class';
-    public const KEY_NAME_PLACE_FEATURE_CODE = 'place-feature-code';
-    public const KEY_NAME_PLACE_FEATURE_NAME = 'place-feature-name';
-    public const KEY_NAME_PLACE_DISTANCE_DB = 'place-distance-db';
-    public const KEY_NAME_PLACE_DISTANCE_METER = 'place-distance-meter';
-    public const KEY_NAME_PLACE_DEM = 'place-dem';
-    public const KEY_NAME_PLACE_ADMIN1 = 'place-admin1';
-    public const KEY_NAME_PLACE_ADMIN2 = 'place-admin2';
-    public const KEY_NAME_PLACE_ADMIN3 = 'place-admin3';
-    public const KEY_NAME_PLACE_ADMIN4 = 'place-admin4';
-    public const KEY_NAME_CITY_OR_RURAL = 'city-or-rural';
-    public const KEY_NAME_PLACES_NEAR = 'places-near';
-    public const KEY_NAME_PLACE_TIME_TAKEN = 'time-taken';
+    final public const KEY_NAME_PLACE_LATITUDE = 'place-latitude';
+    final public const KEY_NAME_PLACE_LONGITUDE = 'place-longitude';
+    final public const KEY_NAME_PLACE_LATITUDE_DMS = 'place-latitude-dms';
+    final public const KEY_NAME_PLACE_LONGITUDE_DMS = 'place-longitude-dms';
+    final public const KEY_NAME_PLACE_POINT = 'place-point';
+    final public const KEY_NAME_PLACE_GOOGLE_LINK = 'place-google-link';
+    final public const KEY_NAME_PLACE_OPENSTREETMAP_LINK = 'place-openstreetmap-link';
+    final public const KEY_NAME_PLACE = 'place';
+    final public const KEY_NAME_PLACE_FULL = 'place-full';
+    final public const KEY_NAME_PLACE_DISTRICT = 'place-district';
+    final public const KEY_NAME_PLACE_CITY = 'place-city';
+    final public const KEY_NAME_PLACE_STATE = 'place-state';
+    final public const KEY_NAME_PLACE_LAKE = 'place-lake';
+    final public const KEY_NAME_PLACE_PARK = 'place-park';
+    final public const KEY_NAME_PLACE_MOUNTAIN = 'place-mountain';
+    final public const KEY_NAME_PLACE_SPOT = 'place-spot';
+    final public const KEY_NAME_PLACE_FOREST = 'place-forest';
+    final public const KEY_NAME_PLACE_COUNTRY = 'place-country';
+    final public const KEY_NAME_PLACE_COUNTRY_CODE = 'place-country-code';
+    final public const KEY_NAME_PLACE_TIMEZONE = 'place-timezone';
+    final public const KEY_NAME_PLACE_POPULATION = 'place-population';
+    final public const KEY_NAME_PLACE_ELEVATION = 'place-elevation';
+    final public const KEY_NAME_PLACE_FEATURE_CLASS = 'place-feature-class';
+    final public const KEY_NAME_PLACE_FEATURE_CODE = 'place-feature-code';
+    final public const KEY_NAME_PLACE_FEATURE_NAME = 'place-feature-name';
+    final public const KEY_NAME_PLACE_DISTANCE_DB = 'place-distance-db';
+    final public const KEY_NAME_PLACE_DISTANCE_METER = 'place-distance-meter';
+    final public const KEY_NAME_PLACE_DEM = 'place-dem';
+    final public const KEY_NAME_PLACE_ADMIN1 = 'place-admin1';
+    final public const KEY_NAME_PLACE_ADMIN2 = 'place-admin2';
+    final public const KEY_NAME_PLACE_ADMIN3 = 'place-admin3';
+    final public const KEY_NAME_PLACE_ADMIN4 = 'place-admin4';
+    final public const KEY_NAME_CITY_OR_RURAL = 'city-or-rural';
+    final public const KEY_NAME_PLACES_NEAR = 'places-near';
+    final public const KEY_NAME_PLACE_TIME_TAKEN = 'time-taken';
 
-    public const WIDTH_TITLE = 30;
+    final public const WIDTH_TITLE = 30;
 
     /**
      * LocationDataService constructor.
@@ -97,14 +91,8 @@ class LocationDataService
      * @param TranslatorInterface $translator
      * @param SearchConfig $searchConfig
      */
-    public function __construct(PlaceLoaderService $placeLoaderService, TranslatorInterface $translator, SearchConfig $searchConfig)
+    public function __construct(protected PlaceLoaderService $placeLoaderService, protected TranslatorInterface $translator, protected SearchConfig $searchConfig)
     {
-        $this->placeLoaderService = $placeLoaderService;
-
-        $this->translator = $translator;
-
-        $this->searchConfig = $searchConfig;
-
         /* Set verbose if given */
         $this->setVerbose($this->searchConfig->isVerbose(), false);
     }
@@ -168,7 +156,7 @@ class LocationDataService
             self::KEY_NAME_UNIT => $unit,
             self::KEY_NAME_UNIT_BEFORE => $unitBefore,
             self::KEY_NAME_VALUE => $value,
-            self::KEY_NAME_VALUE_FORMATTED => sprintf('%s%s%s', $unitBefore, $valueFormatted !== null ? $valueFormatted : $formatted, $unit),
+            self::KEY_NAME_VALUE_FORMATTED => sprintf('%s%s%s', $unitBefore, $valueFormatted ?? $formatted, $unit),
         ];
 
         if ($addValues !== null) {
@@ -578,10 +566,7 @@ class LocationDataService
         $placesNear = [];
 
         return [
-            'locationData' => array_merge(
-                $this->getFlattenedData($this->getLocationDataFull($place->getLatitude(), $place->getLongitude(), $placesNear, $place)),
-                [LocationDataService::KEY_NAME_PLACES_NEAR => $placesNear, ]
-            ),
+            'locationData' => [...$this->getFlattenedData($this->getLocationDataFull($place->getLatitude(), $place->getLongitude(), $placesNear, $place)), ...[LocationDataService::KEY_NAME_PLACES_NEAR => $placesNear, ]],
             'error' => null,
         ];
     }
@@ -608,15 +593,12 @@ class LocationDataService
         }
 
         /* Split position. */
-        list($latitude, $longitude) = $position;
+        [$latitude, $longitude] = $position;
 
         $placesNear = [];
 
         return [
-            'locationData' => array_merge(
-                $this->getFlattenedData($this->getLocationDataFull($latitude, $longitude, $placesNear)),
-                [LocationDataService::KEY_NAME_PLACES_NEAR => $placesNear, ]
-            ),
+            'locationData' => [...$this->getFlattenedData($this->getLocationDataFull($latitude, $longitude, $placesNear)), ...[LocationDataService::KEY_NAME_PLACES_NEAR => $placesNear, ]],
             'error' => null,
         ];
     }
@@ -649,7 +631,7 @@ class LocationDataService
                 throw new Exception(sprintf('Unable to split string (%s:%d).', __FILE__, __LINE__));
             }
 
-            list($latitude, $longitude) = $locationSplit;
+            [$latitude, $longitude] = $locationSplit;
 
             foreach ($placeResults as $placeResult) {
                 $distanceMeter = self::getDistanceBetweenTwoPointsInMeter(
@@ -673,24 +655,18 @@ class LocationDataService
         switch ($sort) {
             /* Sort by distance */
             case SearchConfig::ORDER_BY_LOCATION:
-                usort($placeResults, function (Place $a, Place $b) {
-                    return $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1;
-                });
+                usort($placeResults, fn(Place $a, Place $b) => $a->getDistanceMeter() > $b->getDistanceMeter() ? 1 : -1);
                 break;
 
                 /* Sort by name */
             case SearchConfig::ORDER_BY_NAME:
-                usort($placeResults, function (Place $a, Place $b) {
-                    return $a->getName() > $b->getName() ? 1 : -1;
-                });
+                usort($placeResults, fn(Place $a, Place $b) => $a->getName() > $b->getName() ? 1 : -1);
                 break;
 
                 /* Sort by relevance */
             case SearchConfig::ORDER_BY_RELEVANCE:
             case SearchConfig::ORDER_BY_RELEVANCE_LOCATION:
-                usort($placeResults, function (Place $a, Place $b) {
-                    return $a->getRelevance() > $b->getRelevance() ? -1 : 1;
-                });
+                usort($placeResults, fn(Place $a, Place $b) => $a->getRelevance() > $b->getRelevance() ? -1 : 1);
                 break;
         }
 

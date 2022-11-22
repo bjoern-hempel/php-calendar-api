@@ -52,7 +52,7 @@ trait JsonHelper
             return null;
         }
 
-        $data = json_decode($json, true);
+        $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
         if (!is_array($data)) {
             return null;
@@ -71,7 +71,7 @@ trait JsonHelper
     {
         $data = self::jsonDecode($json);
 
-        return $data !== null ? $data : [];
+        return $data ?? [];
     }
 
     /**
@@ -88,7 +88,7 @@ trait JsonHelper
      */
     public static function jsonEncode(array $data, bool $beautify = false, int $indentation = 4, int $lines = -1, int $columns = -1, string $indicant = '...'): string
     {
-        $encoded = json_encode($data);
+        $encoded = json_encode($data, JSON_THROW_ON_ERROR);
 
         if (!is_string($encoded)) {
             throw new Exception(sprintf('Unable to encode given data to JSON (%s:%d).', __FILE__, __LINE__));
@@ -138,9 +138,7 @@ trait JsonHelper
 
         /* Reduce indentation. */
         if ($indentation === Constants::INDENTION_2) {
-            $beautified = preg_replace_callback('/^ +/m', function ($m) {
-                return str_repeat(' ', intval(strlen($m[0]) / 2));
-            }, $beautified);
+            $beautified = preg_replace_callback('/^ +/m', fn($m) => str_repeat(' ', intval(strlen((string) $m[0]) / 2)), $beautified);
         }
 
         if (!is_string($beautified)) {

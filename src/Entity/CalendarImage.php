@@ -136,27 +136,27 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['calendar_image']],
     order: ['id' => 'ASC'],
 )]
-class CalendarImage implements EntityInterface
+class CalendarImage implements EntityInterface, \Stringable
 {
     use TimestampsTrait;
 
     use JsonHelper;
 
-    public const CRUD_FIELDS_ADMIN = ['id', 'user'];
+    final public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'calendar', 'image', 'pathSource', 'pathSourcePreview', 'pathTarget', 'pathTargetPreview', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'calendar', 'image', 'pathSource', 'pathSourcePreview', 'pathTarget', 'pathTargetPreview', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'user', 'calendar', 'pathSourcePreview', 'pathTargetPreview', 'year', 'month', 'title', 'position', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_INDEX = ['id', 'user', 'calendar', 'pathSourcePreview', 'pathTargetPreview', 'year', 'month', 'title', 'position', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson'];
+    final public const CRUD_FIELDS_NEW = ['id', 'user', 'calendar', 'image', 'year', 'month', 'title', 'position', 'url', 'configJson'];
 
-    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+    final public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'calendar', 'pathSource', 'pathTarget', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_DETAIL = ['id', 'user', 'calendar', 'pathSource', 'pathTarget', 'year', 'month', 'title', 'position', 'url', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_FILTER = [/* 'user', 'calendar', 'image', */ 'year', 'month', 'title', 'position', 'url', 'updatedAt', 'createdAt', ];
+    final public const CRUD_FIELDS_FILTER = [/* 'user', 'calendar', 'image', */ 'year', 'month', 'title', 'position', 'url', 'updatedAt', 'createdAt', ];
 
-    public const QUALITY_TARGET = 50;
+    final public const QUALITY_TARGET = 50;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -167,17 +167,17 @@ class CalendarImage implements EntityInterface
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'calendarImages')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['calendar_image', 'calendar_image_extended'])]
-    public ?User $user;
+    public ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: Calendar::class, inversedBy: 'calendarImages')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['calendar_image', 'calendar_image_extended'])]
-    private ?Calendar $calendar;
+    private ?Calendar $calendar = null;
 
     #[ORM\ManyToOne(targetEntity: Image::class, inversedBy: 'calendarImages')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['calendar_image', 'calendar_image_extended'])]
-    private ?Image $image;
+    private ?Image $image = null;
 
     #[ORM\Column(type: 'integer')]
     #[Groups(['calendar_image', 'calendar_image_extended'])]

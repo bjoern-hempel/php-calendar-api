@@ -29,22 +29,19 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class VersionController
 {
-    protected KernelInterface $appKernel;
+    final public const PATH_VERSION = 'VERSION';
 
-    public const PATH_VERSION = 'VERSION';
+    final public const API_ENDPOINT = '/api/v1/version';
 
-    public const API_ENDPOINT = '/api/v1/version';
-
-    public const API_ENDPOINT_METHOD = Request::METHOD_GET;
+    final public const API_ENDPOINT_METHOD = Request::METHOD_GET;
 
     /**
      * VersionController constructor.
      *
      * @param KernelInterface $appKernel
      */
-    public function __construct(KernelInterface $appKernel)
+    public function __construct(protected KernelInterface $appKernel)
     {
-        $this->appKernel = $appKernel;
     }
 
     /**

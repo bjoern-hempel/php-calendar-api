@@ -84,29 +84,29 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['holiday']],
     order: ['id' => 'ASC'],
 )]
-class Holiday implements EntityInterface
+class Holiday implements EntityInterface, \Stringable
 {
     use TimestampsTrait;
 
     use JsonHelper;
 
-    public const CRUD_FIELDS_ADMIN = [];
+    final public const CRUD_FIELDS_ADMIN = [];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_REGISTERED = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_INDEX = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson'];
+    final public const CRUD_FIELDS_NEW = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson'];
 
-    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+    final public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_DETAIL = ['id', 'holidayGroup', 'name', 'date', 'yearly', 'type', 'configJson', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_FILTER = ['holidayGroup', 'name', 'date', 'yearly', 'type'];
+    final public const CRUD_FIELDS_FILTER = ['holidayGroup', 'name', 'date', 'yearly', 'type'];
 
-    public const FIELD_TYPE_PUBLIC_DATE = 0;
+    final public const FIELD_TYPE_PUBLIC_DATE = 0;
 
-    public const FIELD_TYPE_NON_PUBLIC_DATE = 1;
+    final public const FIELD_TYPE_NON_PUBLIC_DATE = 1;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -116,7 +116,7 @@ class Holiday implements EntityInterface
 
     #[ORM\ManyToOne(targetEntity: HolidayGroup::class, inversedBy: 'holidays')]
     #[Groups(['holiday', 'holiday_extended'])]
-    private ?HolidayGroup $holidayGroup;
+    private ?HolidayGroup $holidayGroup = null;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['holiday', 'holiday_extended'])]

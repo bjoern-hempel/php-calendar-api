@@ -746,7 +746,7 @@ abstract class Place
      */
     public function getDistanceDbInMeter(int $decimal = 1, bool $withUnit = true, bool $withDirection = false): float|string
     {
-        $mDegree = 42000000 / 360;
+        $mDegree = 42_000_000 / 360;
 
         $distance = round($mDegree * $this->getDistanceDb(), $decimal);
 
@@ -1613,9 +1613,7 @@ abstract class Place
                 $filterIds = [$filterIds];
             }
 
-            $data = array_filter($data, function (Place $place) use ($filterIds) {
-                return !in_array($place->getId(), $filterIds);
-            });
+            $data = array_filter($data, fn(Place $place) => !in_array($place->getId(), $filterIds));
         }
 
         if ($max !== null) {

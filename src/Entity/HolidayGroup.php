@@ -84,23 +84,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['holiday_group']],
     order: ['id' => 'ASC'],
 )]
-class HolidayGroup implements EntityInterface
+class HolidayGroup implements EntityInterface, \Stringable
 {
     use TimestampsTrait;
 
-    public const CRUD_FIELDS_ADMIN = [];
+    final public const CRUD_FIELDS_ADMIN = [];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'nameShort', 'holidays', 'holidaysGrouped', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'nameShort', 'holidays', 'holidaysGrouped', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'name', 'nameShort', 'holidaysGrouped', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_INDEX = ['id', 'name', 'nameShort', 'holidaysGrouped', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name', 'nameShort'];
+    final public const CRUD_FIELDS_NEW = ['id', 'name', 'nameShort'];
 
-    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+    final public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'nameShort', 'holidaysGrouped', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_DETAIL = ['id', 'name', 'nameShort', 'holidaysGrouped', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_FILTER = ['name'];
+    final public const CRUD_FIELDS_FILTER = ['name'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -229,9 +229,7 @@ class HolidayGroup implements EntityInterface
     #[Groups(['holiday_group', 'holiday_group_extended'])]
     public function getHolidayIds(): Collection
     {
-        return $this->getHolidays()->map(function (Holiday $holiday) {
-            return $holiday->getId();
-        });
+        return $this->getHolidays()->map(fn(Holiday $holiday) => $holiday->getId());
     }
 
     /**

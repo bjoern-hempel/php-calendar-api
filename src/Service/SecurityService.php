@@ -27,16 +27,13 @@ use Symfony\Component\Security\Core\Security;
  */
 class SecurityService
 {
-    protected Security $security;
-
     /**
      * SecurityService constructor
      *
      * @param Security $security
      */
-    public function __construct(Security $security)
+    public function __construct(protected Security $security)
     {
-        $this->security = $security;
     }
 
     /**

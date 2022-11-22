@@ -33,17 +33,11 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class ImageProperty
 {
-    public const PATH_IMAGES = 'images';
+    final public const PATH_IMAGES = 'images';
 
-    public const PATH_TESTS = 'tests';
+    final public const PATH_TESTS = 'tests';
 
-    public const PATH_DATA = 'data';
-
-    protected KernelInterface $kernel;
-
-    protected ?PlaceLoaderService $placeLoaderService;
-
-    protected ?LocationDataService $locationDataService;
+    final public const PATH_DATA = 'data';
 
     protected string $pathRoot;
 
@@ -68,15 +62,8 @@ class ImageProperty
      * @param PlaceLoaderService|null $placeLoaderService
      * @param LocationDataService|null $locationDataService
      */
-    public function __construct(KernelInterface $kernel, PlaceLoaderService $placeLoaderService = null, LocationDataService $locationDataService = null)
+    public function __construct(protected KernelInterface $kernel, protected ?\App\Service\Entity\PlaceLoaderService $placeLoaderService = null, protected ?\App\Service\LocationDataService $locationDataService = null)
     {
-        /* Set kernel. */
-        $this->kernel = $kernel;
-
-        $this->placeLoaderService = $placeLoaderService;
-
-        $this->locationDataService = $locationDataService;
-
         /* Set root path. */
         $this->pathRoot = $this->kernel->getProjectDir();
 
@@ -321,13 +308,7 @@ class ImageProperty
         self::checkPathImage($pathImage);
 
         /* Get image dimensions. */
-        list(
-            'width' => $this->width,
-            'height' => $this->height,
-            'bits' => $this->bits,
-            'channels' => $this->channels,
-            'mime' => $this->mime
-        ) = self::getImageDimensions($pathImage);
+        ['width' => $this->width, 'height' => $this->height, 'bits' => $this->bits, 'channels' => $this->channels, 'mime' => $this->mime] = self::getImageDimensions($pathImage);
 
         /* Get file size. */
         $this->size = self::getFileSize($pathImage);

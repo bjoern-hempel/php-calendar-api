@@ -48,25 +48,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CalendarImageCrudController extends BaseCrudController
 {
-    protected CalendarLoaderService $calendarLoaderService;
+    final public const ACTION_BUILD_CALENDAR_SHEET = 'buildCalendarSheet';
 
-    protected ImageLoaderService $imageLoaderService;
+    final public const ACTION_REBUILD_URL = 'rebuildUrl';
 
-    protected UserLoaderService $userLoaderService;
-
-    protected CalendarSheetCreateService $calendarSheetCreateService;
-
-    protected RequestStack $requestStack;
-
-    protected UrlService $urlService;
-
-    protected EntityManagerInterface $manager;
-
-    public const ACTION_BUILD_CALENDAR_SHEET = 'buildCalendarSheet';
-
-    public const ACTION_REBUILD_URL = 'rebuildUrl';
-
-    public const PARAMETER_CALENDAR = 'calendar';
+    final public const PARAMETER_CALENDAR = 'calendar';
 
     /**
      * CalendarImageCrudController constructor.
@@ -82,23 +68,9 @@ class CalendarImageCrudController extends BaseCrudController
      * @param EntityManagerInterface $manager
      * @throws Exception
      */
-    public function __construct(SecurityService $securityService, TranslatorInterface $translator, CalendarLoaderService $calendarLoaderService, ImageLoaderService $imageLoaderService, UserLoaderService $userLoaderService, CalendarSheetCreateService $calendarSheetCreateService, RequestStack $requestStack, UrlService $urlService, EntityManagerInterface $manager)
+    public function __construct(SecurityService $securityService, TranslatorInterface $translator, protected CalendarLoaderService $calendarLoaderService, protected ImageLoaderService $imageLoaderService, protected UserLoaderService $userLoaderService, protected CalendarSheetCreateService $calendarSheetCreateService, protected RequestStack $requestStack, protected UrlService $urlService, protected EntityManagerInterface $manager)
     {
         parent::__construct($securityService, $translator);
-
-        $this->calendarLoaderService = $calendarLoaderService;
-
-        $this->imageLoaderService = $imageLoaderService;
-
-        $this->userLoaderService = $userLoaderService;
-
-        $this->calendarSheetCreateService = $calendarSheetCreateService;
-
-        $this->requestStack = $requestStack;
-
-        $this->urlService = $urlService;
-
-        $this->manager = $manager;
     }
 
     /**
@@ -151,18 +123,16 @@ class CalendarImageCrudController extends BaseCrudController
                 ->setFormTypeOption('label_html', true)
                 ->setFormTypeOption(
                     'choice_label',
-                    function (Image $image) use ($previewWidth) {
-                        return sprintf(
-                            '<p><img class="preview" src="%s" width="%d" title="%s" alt="%s" data-title="%s" data-position="%s"> &nbsp; %s</p>',
-                            $image->getPath(outputMode: FileNameConverter::MODE_OUTPUT_RELATIVE, width: $previewWidth),
-                            $previewWidth,
-                            $image->getName(),
-                            $image->getName(),
-                            $image->getTitle(),
-                            $image->getFullPosition(),
-                            $image->getName()
-                        );
-                    }
+                    fn(Image $image) => sprintf(
+                        '<p><img class="preview" src="%s" width="%d" title="%s" alt="%s" data-title="%s" data-position="%s"> &nbsp; %s</p>',
+                        $image->getPath(outputMode: FileNameConverter::MODE_OUTPUT_RELATIVE, width: $previewWidth),
+                        $previewWidth,
+                        $image->getName(),
+                        $image->getName(),
+                        $image->getTitle(),
+                        $image->getFullPosition(),
+                        $image->getName()
+                    )
                 )
                 ->setRequired(true)
                 ->setLabel(sprintf('admin.%s.fields.%s.label', $this->getCrudName(), $fieldName))

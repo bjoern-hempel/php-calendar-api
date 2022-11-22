@@ -119,25 +119,25 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     ],
     order: ['id' => 'ASC']
 )]
-class Calendar implements EntityInterface
+class Calendar implements EntityInterface, \Stringable
 {
     use TimestampsTrait;
 
     use JsonHelper;
 
-    public const CRUD_FIELDS_ADMIN = ['id', 'user'];
+    final public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
+    final public const CRUD_FIELDS_REGISTERED = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson', 'published'];
+    final public const CRUD_FIELDS_INDEX = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'updatedAt', 'createdAt', 'configJson', 'published'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'configJson', 'published'];
+    final public const CRUD_FIELDS_NEW = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'configJson', 'published'];
 
-    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+    final public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
+    final public const CRUD_FIELDS_DETAIL = ['id', 'name', 'title', 'subtitle', 'defaultYear', 'user', 'calendarStyle', 'holidayGroup', 'calendarImages', 'updatedAt', 'createdAt', 'configJson', 'published'];
 
-    public const CRUD_FIELDS_FILTER = ['name', 'title', 'subtitle', 'defaultYear', 'user', 'published'];
+    final public const CRUD_FIELDS_FILTER = ['name', 'title', 'subtitle', 'defaultYear', 'user', 'published'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -149,13 +149,13 @@ class Calendar implements EntityInterface
     #[ORM\JoinColumn(nullable: false)]
     #[MaxDepth(1)]
     #[Groups(['calendar_extended', 'calendar'])]
-    public ?User $user;
+    public ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: CalendarStyle::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[MaxDepth(1)]
     #[Groups(['calendar_extended', 'calendar'])]
-    private ?CalendarStyle $calendarStyle;
+    private ?CalendarStyle $calendarStyle = null;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['calendar_extended', 'calendar'])]
@@ -163,15 +163,15 @@ class Calendar implements EntityInterface
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['calendar_extended', 'calendar'])]
-    private ?string $title;
+    private ?string $title = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['calendar_extended', 'calendar'])]
-    private ?string $subtitle;
+    private ?string $subtitle = null;
 
     #[ORM\ManyToOne(targetEntity: HolidayGroup::class)]
     #[Groups(['calendar_extended', 'calendar'])]
-    private ?HolidayGroup $holidayGroup;
+    private ?HolidayGroup $holidayGroup = null;
 
     /** @var Collection<int, CalendarImage> $calendarImages  */
     #[ORM\OneToMany(mappedBy: 'calendar', targetEntity: CalendarImage::class, orphanRemoval: true)]

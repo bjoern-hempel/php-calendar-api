@@ -33,14 +33,6 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CalendarController extends BaseController
 {
-    protected UserLoaderService $userLoaderService;
-
-    protected CalendarLoaderService $calendarLoaderService;
-
-    protected CalendarImageRepository $calendarImageRepository;
-
-    protected SecurityService $securityService;
-
     /**
      * CalendarController constructor.
      *
@@ -49,15 +41,8 @@ class CalendarController extends BaseController
      * @param CalendarImageRepository $calendarImageRepository
      * @param SecurityService $securityService
      */
-    public function __construct(UserLoaderService $userLoaderService, CalendarLoaderService $calendarLoaderService, CalendarImageRepository $calendarImageRepository, SecurityService $securityService)
+    public function __construct(protected UserLoaderService $userLoaderService, protected CalendarLoaderService $calendarLoaderService, protected CalendarImageRepository $calendarImageRepository, protected SecurityService $securityService)
     {
-        $this->userLoaderService = $userLoaderService;
-
-        $this->calendarLoaderService = $calendarLoaderService;
-
-        $this->calendarImageRepository = $calendarImageRepository;
-
-        $this->securityService = $securityService;
     }
 
     /**

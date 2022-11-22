@@ -36,16 +36,13 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 class UserListener
 {
-    protected SecurityService $securityService;
-
     /**
      * UserListener constructor.
      *
      * @param SecurityService $securityService
      */
-    public function __construct(SecurityService $securityService)
+    public function __construct(protected SecurityService $securityService)
     {
-        $this->securityService = $securityService;
     }
 
     /**
@@ -160,7 +157,7 @@ class UserListener
             case $entity instanceof Event:
             case $entity instanceof Image:
                 if ($entity->getUser() !== $this->securityService->getUser()) {
-                    throw new AccessDeniedHttpException(sprintf('You do not have permissions to see that entity "%s" (%s:%d).', get_class($entity), __FILE__, __LINE__));
+                    throw new AccessDeniedHttpException(sprintf('You do not have permissions to see that entity "%s" (%s:%d).', $entity::class, __FILE__, __LINE__));
                 }
                 break;
         }

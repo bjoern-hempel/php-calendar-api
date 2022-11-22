@@ -28,9 +28,6 @@ use Exception;
  */
 class ArrayToObject
 {
-    /** @var array<string|int|float|bool> $data */
-    protected array $data;
-
     protected const KEY_WIDTH = 'width';
 
     protected const KEY_HEIGHT = 'height';
@@ -43,9 +40,8 @@ class ArrayToObject
      * @param array<string|int|float|bool> $data
      * @throws Exception
      */
-    public function __construct(array $data)
+    public function __construct(protected array $data)
     {
-        $this->data = $data;
     }
 
     /**

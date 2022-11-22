@@ -27,7 +27,7 @@ class JsonConverter
 {
     use JsonHelper;
 
-    public const LINE_BREAK = "\n";
+    final public const LINE_BREAK = "\n";
 
     protected string $json;
 

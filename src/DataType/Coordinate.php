@@ -31,21 +31,21 @@ class Coordinate
     /* Y Place */
     protected GPSPosition $latitude;
 
-    public const TYPE_LATITUDE = 'latitude';
+    final public const TYPE_LATITUDE = 'latitude';
 
-    public const TYPE_LONGITUDE = 'longitude';
+    final public const TYPE_LONGITUDE = 'longitude';
 
-    public const DIRECTION_NORTH = 'N';
+    final public const DIRECTION_NORTH = 'N';
 
-    public const DIRECTION_SOUTH = 'S';
+    final public const DIRECTION_SOUTH = 'S';
 
-    public const DIRECTION_WEST = 'W';
+    final public const DIRECTION_WEST = 'W';
 
-    public const DIRECTION_EAST = 'E';
+    final public const DIRECTION_EAST = 'E';
 
-    public const UNIT_LATITUDE = [self::DIRECTION_NORTH, self::DIRECTION_SOUTH, ];
+    final public const UNIT_LATITUDE = [self::DIRECTION_NORTH, self::DIRECTION_SOUTH, ];
 
-    public const UNIT_LONGITUDE = [self::DIRECTION_WEST, self::DIRECTION_EAST, ];
+    final public const UNIT_LONGITUDE = [self::DIRECTION_WEST, self::DIRECTION_EAST, ];
 
     /**
      * Place constructor.

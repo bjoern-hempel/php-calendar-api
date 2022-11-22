@@ -28,11 +28,11 @@ class GPSPosition
     /** @var array<string, int|float|string|null> */
     protected array $data;
 
-    public const SECONDS_PER_HOUR = 3600;
+    final public const SECONDS_PER_HOUR = 3600;
 
-    public const FORMAT_DMS_SHORT_1 = '%d°%d′%s″%s';
+    final public const FORMAT_DMS_SHORT_1 = '%d°%d′%s″%s';
 
-    public const FORMAT_DMS_SHORT_2 = '%s%d°%d′%s″';
+    final public const FORMAT_DMS_SHORT_2 = '%s%d°%d′%s″';
 
     /**
      * GPSPosition constructor.

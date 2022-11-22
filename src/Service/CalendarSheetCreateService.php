@@ -32,14 +32,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class CalendarSheetCreateService
 {
-    protected CalendarLoaderService $calendarLoaderService;
-
-    protected HolidayGroupLoaderService $holidayGroupLoaderService;
-
-    protected SecurityService $securityService;
-
-    protected KernelInterface $appKernel;
-
     /**
      * CalendarSheetCreateService constructor.
      *
@@ -48,15 +40,8 @@ class CalendarSheetCreateService
      * @param SecurityService $securityService
      * @param KernelInterface $appKernel
      */
-    public function __construct(CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService, SecurityService $securityService, KernelInterface $appKernel)
+    public function __construct(protected CalendarLoaderService $calendarLoaderService, protected HolidayGroupLoaderService $holidayGroupLoaderService, protected SecurityService $securityService, protected KernelInterface $appKernel)
     {
-        $this->calendarLoaderService = $calendarLoaderService;
-
-        $this->holidayGroupLoaderService = $holidayGroupLoaderService;
-
-        $this->securityService = $securityService;
-
-        $this->appKernel = $appKernel;
     }
 
     /**

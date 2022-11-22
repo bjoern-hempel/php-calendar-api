@@ -37,12 +37,6 @@ class CreatePageCommand extends Command
 {
     protected static $defaultName = 'calendar:create-page';
 
-    protected KernelInterface $appKernel;
-
-    protected CalendarLoaderService $calendarLoaderService;
-
-    protected HolidayGroupLoaderService $holidayGroupLoaderService;
-
     /**
      * CreatePageCommand constructor
      *
@@ -50,14 +44,8 @@ class CreatePageCommand extends Command
      * @param CalendarLoaderService $calendarLoaderService
      * @param HolidayGroupLoaderService $holidayGroupLoaderService
      */
-    public function __construct(KernelInterface $appKernel, CalendarLoaderService $calendarLoaderService, HolidayGroupLoaderService $holidayGroupLoaderService)
+    public function __construct(protected KernelInterface $appKernel, protected CalendarLoaderService $calendarLoaderService, protected HolidayGroupLoaderService $holidayGroupLoaderService)
     {
-        $this->appKernel = $appKernel;
-
-        $this->calendarLoaderService = $calendarLoaderService;
-
-        $this->holidayGroupLoaderService = $holidayGroupLoaderService;
-
         parent::__construct();
     }
 

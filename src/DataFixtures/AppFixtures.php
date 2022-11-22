@@ -49,39 +49,35 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
 
     final public const INDEX_2 = 2;
 
-    private UserPasswordHasherInterface $userPasswordHasher;
-
     private ?ObjectManager $manager = null;
 
     private ContainerInterface $container;
 
-    private ImageProperty $imageProperty;
+    final public const FIXTURE_TEMPLATE_EMAIL = 'user%d@domain.tld';
 
-    public const FIXTURE_TEMPLATE_EMAIL = 'user%d@domain.tld';
+    final public const FIXTURE_TEMPLATE_EMAIL_ADMIN = 'admin%d@domain.tld';
 
-    public const FIXTURE_TEMPLATE_EMAIL_ADMIN = 'admin%d@domain.tld';
+    final public const FIXTURE_TEMPLATE_USERNAME = 'user%d';
 
-    public const FIXTURE_TEMPLATE_USERNAME = 'user%d';
+    final public const FIXTURE_TEMPLATE_USERNAME_ADMIN = 'admin%d';
 
-    public const FIXTURE_TEMPLATE_USERNAME_ADMIN = 'admin%d';
+    final public const FIXTURE_TEMPLATE_PASSWORD = 'password%d';
 
-    public const FIXTURE_TEMPLATE_PASSWORD = 'password%d';
+    final public const FIXTURE_TEMPLATE_PASSWORD_ADMIN = 'password%d';
 
-    public const FIXTURE_TEMPLATE_PASSWORD_ADMIN = 'password%d';
+    final public const FIXTURE_TEMPLATE_FIRSTNAME = 'Firstname %d';
 
-    public const FIXTURE_TEMPLATE_FIRSTNAME = 'Firstname %d';
+    final public const FIXTURE_TEMPLATE_FIRSTNAME_ADMIN = 'Admin %d';
 
-    public const FIXTURE_TEMPLATE_FIRSTNAME_ADMIN = 'Admin %d';
+    final public const FIXTURE_TEMPLATE_LASTNAME = 'Lastname %d';
 
-    public const FIXTURE_TEMPLATE_LASTNAME = 'Lastname %d';
-
-    public const FIXTURE_TEMPLATE_LASTNAME_ADMIN = 'Admin %d';
+    final public const FIXTURE_TEMPLATE_LASTNAME_ADMIN = 'Admin %d';
 
     private const ENVIRONMENT_NAME_DEV = 'dev';
 
     private const ENVIRONMENT_NAME_TEST = 'test';
 
-    public const NAME_HOLIDAY_GROUP_SAXONY = 'Sachsen';
+    final public const NAME_HOLIDAY_GROUP_SAXONY = 'Sachsen';
 
     /** @var string[][]|int[][] $calendars  */
     protected array $calendars = [
@@ -439,12 +435,8 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
      * @param ImageProperty $imageProperty
      * @param ObjectManager|null $manager
      */
-    public function __construct(UserPasswordHasherInterface $userPasswordHasher, ImageProperty $imageProperty, ObjectManager $manager = null)
+    public function __construct(private readonly UserPasswordHasherInterface $userPasswordHasher, private readonly ImageProperty $imageProperty, ObjectManager $manager = null)
     {
-        $this->userPasswordHasher = $userPasswordHasher;
-
-        $this->imageProperty = $imageProperty;
-
         if ($manager !== null) {
             $this->setManager($manager);
         }
@@ -873,7 +865,7 @@ class AppFixtures extends Fixture implements ContainerAwareInterface
     public function load(ObjectManager $manager): void
     {
         /* Check environment (only dev or test allowed). */
-        if (!in_array($this->getEnvironment(), array(self::ENVIRONMENT_NAME_DEV, self::ENVIRONMENT_NAME_TEST))) {
+        if (!in_array($this->getEnvironment(), [self::ENVIRONMENT_NAME_DEV, self::ENVIRONMENT_NAME_TEST])) {
             throw new Exception(sprintf('Illegal environment "%s" (%s:%d).', $this->getEnvironment(), __FILE__, __LINE__));
         }
 

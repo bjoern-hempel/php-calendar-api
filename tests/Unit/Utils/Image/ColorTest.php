@@ -52,30 +52,13 @@ final class ColorTest extends TestCase
         $this->assertContains($method, get_class_methods(Color::class));
         $this->assertIsCallable($callback);
 
-        switch (true) {
-            case $param5 !== null:
-                $this->assertSame($expected, call_user_func($callback, $param1, $param2, $param3, $param4, $param5));
-                break;
-
-            case $param4 !== null:
-                $this->assertSame($expected, call_user_func($callback, $param1, $param2, $param3, $param4));
-                break;
-
-            case $param3 !== null:
-                $this->assertSame($expected, call_user_func($callback, $param1, $param2, $param3));
-                break;
-
-            case $param2 !== null:
-                $this->assertSame($expected, call_user_func($callback, $param1, $param2));
-                break;
-
-            case $param1 !== null:
-                $this->assertSame($expected, call_user_func($callback, $param1));
-                break;
-
-            default:
-                $this->assertSame($expected, call_user_func($callback));
-        }
+        match (true) {
+            $param5 !== null => $this->assertSame($expected, call_user_func($callback, $param1, $param2, $param3, $param4, $param5)),
+            $param4 !== null => $this->assertSame($expected, call_user_func($callback, $param1, $param2, $param3, $param4)),
+            $param3 !== null => $this->assertSame($expected, call_user_func($callback, $param1, $param2, $param3)),
+            $param2 !== null => $this->assertSame($expected, call_user_func($callback, $param1, $param2)),
+            $param1 !== null => $this->assertSame($expected, call_user_func($callback, $param1)),
+        };
     }
 
     /**

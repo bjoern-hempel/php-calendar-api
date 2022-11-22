@@ -40,14 +40,6 @@ use Twig\TwigFunction;
  */
 class AppExtension extends AbstractExtension
 {
-    protected KernelInterface $kernel;
-
-    protected UrlGeneratorInterface $generator;
-
-    protected ImageService $imageService;
-
-    protected TranslatorInterface $translator;
-
     /**
      * AppExtension constructor.
      *
@@ -56,15 +48,8 @@ class AppExtension extends AbstractExtension
      * @param ImageService $imageService
      * @param TranslatorInterface $translator
      */
-    public function __construct(KernelInterface $kernel, UrlGeneratorInterface $generator, ImageService $imageService, TranslatorInterface $translator)
+    public function __construct(protected KernelInterface $kernel, protected UrlGeneratorInterface $generator, protected ImageService $imageService, protected TranslatorInterface $translator)
     {
-        $this->kernel = $kernel;
-
-        $this->generator = $generator;
-
-        $this->imageService = $imageService;
-
-        $this->translator = $translator;
     }
 
     /**
@@ -75,17 +60,17 @@ class AppExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('preg_replace', [$this, 'pregReplace']),
-            new TwigFilter('camel_case', [$this, 'camelCase']),
-            new TwigFilter('path_orig', [$this, 'getPathOrig']),
-            new TwigFilter('path_preview', [$this, 'getPathPreview']),
-            new TwigFilter('image_dimensions', [$this, 'getImageDimensions']),
-            new TwigFilter('add_hash', [$this, 'addHash']),
-            new TwigFilter('check_path', [$this, 'checkPath']),
-            new TwigFilter('url_absolute', [$this, 'urlAbsolute']),
-            new TwigFilter('month_translation', [$this, 'getMonthTranslationKey']),
-            new TwigFilter('qr_code', [$this, 'getQrCode']),
-            new TwigFilter('date_event', [$this, 'getDateEvent'])
+            new TwigFilter('preg_replace', $this->pregReplace(...)),
+            new TwigFilter('camel_case', $this->camelCase(...)),
+            new TwigFilter('path_orig', $this->getPathOrig(...)),
+            new TwigFilter('path_preview', $this->getPathPreview(...)),
+            new TwigFilter('image_dimensions', $this->getImageDimensions(...)),
+            new TwigFilter('add_hash', $this->addHash(...)),
+            new TwigFilter('check_path', $this->checkPath(...)),
+            new TwigFilter('url_absolute', $this->urlAbsolute(...)),
+            new TwigFilter('month_translation', $this->getMonthTranslationKey(...)),
+            new TwigFilter('qr_code', $this->getQrCode(...)),
+            new TwigFilter('date_event', $this->getDateEvent(...))
         ];
     }
 
@@ -97,7 +82,7 @@ class AppExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('path_encoded', [$this, 'pathEncoded']),
+            new TwigFunction('path_encoded', $this->pathEncoded(...)),
         ];
     }
 
@@ -211,7 +196,7 @@ class AppExtension extends AbstractExtension
             throw new Exception(sprintf('Unable to get image size (%s:%d).', __FILE__, __LINE__));
         }
 
-        return str_replace(array('width=', 'height='), array('data-width=', 'data-height='), $size[3]);
+        return str_replace(['width=', 'height='], ['data-width=', 'data-height='], (string) $size[3]);
     }
 
     /**

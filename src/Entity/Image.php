@@ -113,23 +113,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['enable_max_depth' => true, 'groups' => ['image']],
     order: ['id' => 'ASC'],
 )]
-class Image implements EntityInterface
+class Image implements EntityInterface, \Stringable
 {
     use TimestampsTrait;
 
-    public const CRUD_FIELDS_ADMIN = ['id', 'user'];
+    final public const CRUD_FIELDS_ADMIN = ['id', 'user'];
 
-    public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'name', 'path', 'pathSource', 'pathSourcePreview', 'width', 'height', 'size', 'title', 'latitude', 'longitude', 'url', 'gpsHeight', 'iso', 'mime', 'place', 'placeDistrict', 'placeCity', 'placeState', 'placeCountry', 'placeTimezone', 'information', 'takenAt', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_REGISTERED = ['id', 'user', 'name', 'path', 'pathSource', 'pathSourcePreview', 'width', 'height', 'size', 'title', 'latitude', 'longitude', 'url', 'gpsHeight', 'iso', 'mime', 'place', 'placeDistrict', 'placeCity', 'placeState', 'placeCountry', 'placeTimezone', 'information', 'takenAt', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_INDEX = ['id', 'user', 'name', 'pathSourcePreview', 'width', 'height', 'size', 'title', 'latitude', 'longitude', 'information', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_INDEX = ['id', 'user', 'name', 'pathSourcePreview', 'width', 'height', 'size', 'title', 'latitude', 'longitude', 'information', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_NEW = ['id', 'user', 'path', 'title', 'url'];
+    final public const CRUD_FIELDS_NEW = ['id', 'user', 'path', 'title', 'url'];
 
-    public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
+    final public const CRUD_FIELDS_EDIT = self::CRUD_FIELDS_NEW;
 
-    public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'width', 'height', 'size', 'title', 'latitude', 'longitude', 'url', 'gpsHeight', 'iso', 'mime', 'place', 'placeDistrict', 'placeCity', 'placeState', 'placeCountry', 'placeTimezone', 'information', 'takenAt', 'updatedAt', 'createdAt'];
+    final public const CRUD_FIELDS_DETAIL = ['id', 'user', 'path', 'width', 'height', 'size', 'title', 'latitude', 'longitude', 'url', 'gpsHeight', 'iso', 'mime', 'place', 'placeDistrict', 'placeCity', 'placeState', 'placeCountry', 'placeTimezone', 'information', 'takenAt', 'updatedAt', 'createdAt'];
 
-    public const CRUD_FIELDS_FILTER = ['user', 'width', 'height', 'size'];
+    final public const CRUD_FIELDS_FILTER = ['user', 'width', 'height', 'size'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -152,15 +152,15 @@ class Image implements EntityInterface
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['image', 'image_extended'])]
-    private ?int $width;
+    private ?int $width = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['image', 'image_extended'])]
-    private ?int $height;
+    private ?int $height = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['image', 'image_extended'])]
-    private ?int $size;
+    private ?int $size = null;
 
     /** @var Collection<int, CalendarImage> */
     #[ORM\OneToMany(mappedBy: 'image', targetEntity: CalendarImage::class, orphanRemoval: true)]
@@ -169,11 +169,11 @@ class Image implements EntityInterface
 
     #[ORM\Column(type: 'float', nullable: true)]
     #[Groups(['image_extended'])]
-    private ?float $latitude;
+    private ?float $latitude = null;
 
     #[ORM\Column(type: 'float', nullable: true)]
     #[Groups(['image_extended'])]
-    private ?float $longitude;
+    private ?float $longitude = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['image_extended'])]
@@ -185,38 +185,38 @@ class Image implements EntityInterface
 
     #[ORM\Column(name: 'gps_height', type: 'integer', nullable: true)]
     #[Groups(['image_extended'])]
-    private ?int $gpsHeight;
+    private ?int $gpsHeight = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['image_extended'])]
-    private ?int $iso;
+    private ?int $iso = null;
 
     #[ORM\Column(type: 'string', length: 63, nullable: true)]
     #[Groups(['image_extended'])]
-    private ?string $mime;
+    private ?string $mime = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['image_extended'])]
-    private ?string $place;
+    private ?string $place = null;
 
     #[ORM\Column(name: 'place_district', type: 'string', length: 255, nullable: true)]
-    private ?string $placeDistrict;
+    private ?string $placeDistrict = null;
 
     #[ORM\Column(name: 'place_city', type: 'string', length: 255, nullable: true)]
     #[Groups(['image_extended'])]
-    private ?string $placeCity;
+    private ?string $placeCity = null;
 
     #[ORM\Column(name: 'place_state', type: 'string', length: 255, nullable: true)]
     #[Groups(['image_extended'])]
-    private ?string $placeState;
+    private ?string $placeState = null;
 
     #[ORM\Column(name: 'place_country', type: 'string', length: 255, nullable: true)]
     #[Groups(['image_extended'])]
-    private ?string $placeCountry;
+    private ?string $placeCountry = null;
 
     #[ORM\Column(name: 'place_timezone', type: 'string', length: 255, nullable: true)]
     #[Groups(['image_extended'])]
-    private ?string $placeTimezone;
+    private ?string $placeTimezone = null;
 
     /** @var array<string, mixed> $information */
     #[ORM\Column(type: 'json')]
@@ -224,25 +224,25 @@ class Image implements EntityInterface
     private array $information = [];
 
     #[ORM\Column(name: 'taken_at', type: 'datetime_immutable', nullable: true)]
-    private ?DateTimeImmutable $takenAt;
+    private ?DateTimeImmutable $takenAt = null;
 
-    public const PATH_TYPE_SOURCE = 'source';
+    final public const PATH_TYPE_SOURCE = 'source';
 
-    public const PATH_TYPE_TARGET = 'target';
+    final public const PATH_TYPE_TARGET = 'target';
 
-    public const PATH_TYPE_EXPECTED = 'expected';
+    final public const PATH_TYPE_EXPECTED = 'expected';
 
-    public const PATH_TYPE_COMPARE = 'compare';
+    final public const PATH_TYPE_COMPARE = 'compare';
 
-    public const PATH_TYPE_AUTO = 'auto';
+    final public const PATH_TYPE_AUTO = 'auto';
 
-    public const PATH_DATA = 'data';
+    final public const PATH_DATA = 'data';
 
-    public const PATH_IMAGES = 'images';
+    final public const PATH_IMAGES = 'images';
 
-    public const PATH_DATA_IMAGES = 'data/images';
+    final public const PATH_DATA_IMAGES = 'data/images';
 
-    public const WIDTH_400 = 400;
+    final public const WIDTH_400 = 400;
 
     /**
      * Image constructor.
@@ -734,9 +734,7 @@ class Image implements EntityInterface
     #[Groups(['image', 'image_extended'])]
     public function getCalendarImageIds(): Collection
     {
-        return $this->getCalendarImages()->map(function (CalendarImage $calendarImage) {
-            return $calendarImage->getId();
-        });
+        return $this->getCalendarImages()->map(fn(CalendarImage $calendarImage) => $calendarImage->getId());
     }
 
     /**

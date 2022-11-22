@@ -27,16 +27,13 @@ use Exception;
  */
 class EasyAdminField
 {
-    protected string $crudName;
-
     /**
      * EasyAdminField constructor.
      *
      * @param string $crudName
      */
-    public function __construct(string $crudName)
+    public function __construct(protected string $crudName)
     {
-        $this->crudName = $crudName;
     }
 
     /**

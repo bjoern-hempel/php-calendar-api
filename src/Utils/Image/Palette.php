@@ -41,14 +41,13 @@ class Palette implements Countable, IteratorAggregate
     final public const COLORS_MAX = 16_777_215;
 
     /** @var array<int, int> */
-    protected array $colors;
+    protected array $colors = [];
 
     /**
      * Palette constructor.
      */
     protected function __construct()
     {
-        $this->colors = [];
     }
 
     /**
@@ -157,7 +156,7 @@ class Palette implements Countable, IteratorAggregate
 
                 if ($areColorsIndexed) {
                     $colorComponents = imagecolorsforindex($image, $color);
-                    $color = ($colorComponents['alpha'] * 16777216) +
+                    $color = ($colorComponents['alpha'] * 16_777_216) +
                         ($colorComponents['red'] * 65536) +
                         ($colorComponents['green'] * 256) +
                         ($colorComponents['blue']);
