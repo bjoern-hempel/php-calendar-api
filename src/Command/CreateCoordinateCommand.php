@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Constant\Code;
 use App\DataType\Point;
 use App\Repository\Base\PlaceRepositoryInterface;
 use App\Repository\PlaceARepository;
@@ -26,6 +25,7 @@ use App\Repository\PlaceTRepository;
 use App\Repository\PlaceURepository;
 use App\Repository\PlaceVRepository;
 use App\Service\Entity\PlaceLoaderService;
+use App\Utils\Constants\Code;
 use App\Utils\Timer;
 use DateTime;
 use DateTimeImmutable;

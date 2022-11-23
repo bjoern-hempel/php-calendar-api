@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Constant\Code;
 use App\Entity\Place;
 use App\Entity\PlaceA;
 use App\Entity\PlaceP;
 use App\Repository\Base\PlaceRepositoryInterface;
+use App\Utils\Constants\Code;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;

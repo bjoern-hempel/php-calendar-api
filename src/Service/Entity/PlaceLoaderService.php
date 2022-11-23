@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace App\Service\Entity;
 
 use App\Config\SearchConfig;
-use App\Constant\Code;
-use App\Constant\Country;
 use App\DataType\Point;
 use App\Entity\Place;
 use App\Entity\PlaceA;
@@ -37,6 +35,8 @@ use App\Repository\PlaceTRepository;
 use App\Repository\PlaceURepository;
 use App\Repository\PlaceVRepository;
 use App\Service\LocationDataService;
+use App\Utils\Constants\Code;
+use App\Utils\Constants\Country;
 use App\Utils\GPSConverter;
 use App\Utils\StringConverter;
 use App\Utils\Timer;
