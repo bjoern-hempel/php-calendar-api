@@ -119,6 +119,9 @@
 
         "ixno:header": "bin/header/ixno",
 
+        "db:initialize:test": "bin/header/dbinit 'bin/console db:reinitialize --format=text --env=test' 'Test-DB Initialization'",
+        "db:initialize:main": "for dump in fixtures/db/*.sql; do mysql -h127.0.0.1 -P3306 -uphp-calendar-api -pphp-calendar-api --default-character-set=utf8 opa < \"$dump\"; done",
+
         "phpmnd:src": "bin/header/phpmnd 'vendor/bin/phpmnd run src --progress --hint --include-numeric-string --ignore-funcs=round,sleep' 'src'",
         "phpmnd:tests": "bin/header/phpmnd 'vendor/bin/phpmnd run tests --progress --hint --include-numeric-string --ignore-funcs=round,sleep' 'tests'",
         "phpmnd:all": "bin/header/phpmnd 'vendor/bin/phpmnd run src tests --progress --hint --include-numeric-string --ignore-funcs=round,sleep' 'all'",
@@ -154,9 +157,9 @@
             "@phpunit:all"
         ],
 
-        "phpstan:run:soft": "bin/header/phpstan 'vendor/bin/phpstan analyse --level 5 --memory-limit 512M src tests' 'run'",
-        "phpstan:run": "bin/header/phpstan 'vendor/bin/phpstan analyse --level max --memory-limit 512M src tests' 'run'",
-        "phpstan:run:xdebug": "bin/header/phpstan 'vendor/bin/phpstan analyse --level max --memory-limit 512M --xdebug src tests' 'run'",
+        "phpstan:run:soft": "bin/header/phpstan 'export XDEBUG_MODE=off && vendor/bin/phpstan analyse --level 5 --memory-limit 512M src tests' 'run'",
+        "phpstan:run": "bin/header/phpstan 'export XDEBUG_MODE=off && vendor/bin/phpstan analyse --level max --memory-limit 512M src tests' 'run'",
+        "phpstan:run:xdebug": "bin/header/phpstan 'export XDEBUG_MODE=off && vendor/bin/phpstan analyse --level max --memory-limit 512M --xdebug src tests' 'run'",
         "phpstan": [
             "@phpstan:run"
         ],
@@ -234,6 +237,91 @@
         "migrate-prod": "bin/console doctrine:migrations:migrate -n",
         "migrate-test": "bin/console doctrine:migrations:migrate -n --env=test",
         "jwt-generate-keypair": "bin/console lexik:jwt:generate-keypair --skip-if-exists"
+    },
+    "scripts-descriptions": {
+        ".test:all": " ",
+        ".test:basic": " ",
+        ".test:hardcore": " ",
+        ".test:most": " ",
+
+        "db:initialize:test": "Initializes the test db.",
+        "db:initialize:main": "Initializes the main db.",
+
+        "doc:build:schema": "Builds schema documents.",
+        "doc:build:endpoint": "Builds endpoint documents.",
+        "doc:build": "Builds all documents.",
+
+        "version:main:patch": "Increases the main patch version.",
+        "version:main:show": "Shows the current versions.",
+
+        "rsm:header": "Prints the ressourcenmangel integral GmbH header.",
+
+        "phpcs": "Runs PHP Coding Standards Fixer (Dry-Run, all folders).",
+        "phpcs:check:all": "Runs PHP Coding Standards Fixer (Dry-Run, all folders).",
+        "phpcs:check:src": "Runs PHP Coding Standards Fixer (Dry-Run, src folder).",
+        "phpcs:check:tests": "Runs PHP Coding Standards Fixer (Dry-Run, tests folder).",
+        "phpcs:fix:all": "Runs PHP Coding Standards Fixer (Fix, all folders).",
+        "phpcs:fix:src": "Runs PHP Coding Standards Fixer (Fix, src folder).",
+        "phpcs:fix:tests": "Runs PHP Coding Standards Fixer (Fix, tests folder).",
+
+        "phpmd": "Runs PHP Mess Detector and checks all types (all folders).",
+        "phpmd:all": "Runs PHP Mess Detector and checks all types (all folders).",
+        "phpmd:all-src": "Runs PHP Mess Detector and checks all types (src folder).",
+        "phpmd:all-tests": "Runs PHP Mess Detector and checks all types (tests folder).",
+        "phpmd:cleancode": "Runs PHP Mess Detector and checks for cleancode (all folders).",
+        "phpmd:codesize": "Runs PHP Mess Detector and checks for codesize (all folders).",
+        "phpmd:controversial": "Runs PHP Mess Detector and checks for controversial (all folders).",
+        "phpmd:design": "Runs PHP Mess Detector and checks for design (all folders).",
+        "phpmd:naming": "Runs PHP Mess Detector and checks for naming (all folders).",
+        "phpmd:unusedcode": "Runs PHP Mess Detector and checks for unusedcode (all folders).",
+        "phpmd:cleancode-src": "Runs PHP Mess Detector and checks for cleancode (src folder).",
+        "phpmd:codesize-src": "Runs PHP Mess Detector and checks for codesize (src folder).",
+        "phpmd:controversial-src": "Runs PHP Mess Detector and checks for controversial (src folder).",
+        "phpmd:design-src": "Runs PHP Mess Detector and checks for design (src folder).",
+        "phpmd:naming-src": "Runs PHP Mess Detector and checks for naming (src folder).",
+        "phpmd:unusedcode-src": "Runs PHP Mess Detector and checks for unusedcode (src folder).",
+        "phpmd:cleancode-tests": "Runs PHP Mess Detector and checks for cleancode (tests folder).",
+        "phpmd:codesize-tests": "Runs PHP Mess Detector and checks for codesize (tests folder).",
+        "phpmd:controversial-tests": "Runs PHP Mess Detector and checks for controversial (tests folder).",
+        "phpmd:design-tests": "Runs PHP Mess Detector and checks for design (tests folder).",
+        "phpmd:naming-tests": "Runs PHP Mess Detector and checks for naming (tests folder).",
+        "phpmd:unusedcode-tests": "Runs PHP Mess Detector and checks for unusedcode (tests folder).",
+
+        "phpmnd": "Runs PHP Magic Number Detector and detects magic numbers.",
+        "phpmnd:all": "Runs PHP Magic Number Detector and detects magic numbers (all folders).",
+        "phpmnd:src": "Runs PHP Magic Number Detector and detects magic numbers (src folder).",
+        "phpmnd:tests": "Runs PHP Magic Number Detector and detects magic numbers (tests folder).",
+
+        "phpstan": "Runs PHPStan (PHP Static Analysis Tool).",
+        "phpstan:run": "Runs PHPStan (PHP Static Analysis Tool, Level max).",
+        "phpstan:run:soft": "Runs PHPStan (PHP Static Analysis Tool, Level 5).",
+
+        "phpunit": "Runs PHPUnit unit tests (all tests).",
+        "phpunit:all": "Runs PHPUnit unit tests (all tests).",
+        "phpunit:all:coverage": "Runs PHPUnit unit tests with Code Coverage Analysis (all tests).",
+        "phpunit:all:debug": "Runs PHPUnit unit tests (debug mode, all tests).",
+        "phpunit:api": "Runs PHPUnit unit tests (api tests).",
+        "phpunit:api:coverage": "Runs PHPUnit unit tests with Code Coverage Analysis (api tests).",
+        "phpunit:api:debug": "Runs PHPUnit unit tests (debug mode, api tests).",
+        "phpunit:functional": "Runs PHPUnit unit tests (functional tests).",
+        "phpunit:functional:coverage": "Runs PHPUnit unit tests with Code Coverage Analysis (functional tests).",
+        "phpunit:functional:debug": "Runs PHPUnit unit tests (debug mode, functional tests).",
+        "phpunit:unit": "Runs PHPUnit unit tests (unit tests).",
+        "phpunit:unit:coverage": "Runs PHPUnit unit tests with Code Coverage Analysis (unit tests).",
+        "phpunit:unit:debug": "Runs PHPUnit unit tests (debug mode, unit tests).",
+
+        "rector": "Runs PHP Rector (Dry-Run).",
+        "rector:check": "Runs PHP Rector (Dry-Run).",
+        "rector:check:clear": "Runs PHP Rector (Dry-Run, Clear).",
+        "rector:clear": "Runs PHP Rector (Dry-Run, Clear).",
+        "rector:fix": "Runs PHP Rector (Fix).",
+        "rector:fix:clear": "Runs PHP Rector (Fix, Force).",
+
+        "test": "Runs all available tests (phpmnd, phpunit, phpstan, phpcs, rector).",
+        "test:all": "Runs all available tests (phpmnd, phpunit, phpstan, phpcs, phpmd).",
+        "test:hardcore": "Runs the ultimate available tests (phpmnd, phpunit, phpstan, phpcs, rector, phpmd).",
+        "test:most": "Runs most tests (phpmnd, phpunit, phpstan, phpcs).",
+        "test:basic": "Runs basic tests (phpunit, phpstan)."
     },
     "conflict": {
         "symfony/symfony": "*"
