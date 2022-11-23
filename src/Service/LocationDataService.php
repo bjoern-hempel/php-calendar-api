@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Config\SearchConfig;
-use App\Constant\Code;
 use App\Entity\Place;
 use App\Entity\PlaceA;
 use App\Service\Entity\PlaceLoaderService;
+use App\Utils\Constants\Code;
 use App\Utils\GPSConverter;
 use App\Utils\Timer;
 use Doctrine\DBAL\Exception as DoctrineDBALException;

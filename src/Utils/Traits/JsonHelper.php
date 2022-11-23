@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace App\Utils\Traits;
 
-use App\Constant\Constants;
+use App\Utils\Constants\Constants;
 use Exception;
 
 /**

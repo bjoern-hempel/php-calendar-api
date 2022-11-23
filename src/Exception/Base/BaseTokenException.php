@@ -11,19 +11,15 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace App\Constant;
+namespace App\Exception\Base;
 
 /**
- * Class Country
+ * Class BaseValueException
  *
  * @author Björn Hempel <bjoern@hempel.li>
- * @version 1.0 (2022-05-25)
- * @package App\Constant
+ * @version 0.1.0 (2022-11-23)
+ * @since 0.1.0 (2022-11-23) First version.
  */
-class Country
+abstract class BaseTokenException extends BaseException
 {
-    final public const AUSTRIA_ISO_2 = 'AT';
-    final public const POLAND_ISO_2 = 'PL';
-    final public const SPAIN_ISO_2 = 'ES';
-    final public const SWITZERLAND_ISO_2 = 'CH';
 }

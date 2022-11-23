@@ -1,4 +1,4 @@
-# PHPCalendarApi
+_# PHPCalendarApi
 
 [![CI workflow](https://github.com/bjoern-hempel/php-calendar-api/actions/workflows/ci-workflow.yml/badge.svg?branch=main)](https://github.com/bjoern-hempel/php-calendar-api/actions/workflows/ci-workflow.yml)
 [![Release](https://img.shields.io/github/v/release/bjoern-hempel/php-calendar-api)](https://github.com/bjoern-hempel/php-calendar-api/releases)
@@ -58,14 +58,55 @@
 * **JSON**: https://en.wikipedia.org/wiki/JSON
 * **REST**: https://en.wikipedia.org/wiki/Representational_state_transfer
 
-# 1. Make it work
-
-## 1.1 Clone project, start docker environment and install dependencies
-
-### 1.1.1 Local development
+## 1. Installation
 
 ```bash
-❯ git clone git@github.com:bjoern-hempel/calendarBuilder.git && cd calendarBuilder
+git clone git@github.com:bjoern-hempel/calendarBuilder.git && cd calendarBuilder
+```
+
+### 1.1 Local development
+
+The development of the unit classes, the unit tests and the general framework can be done locally.
+
+#### 1.1.1 Check PHP version
+
+At least version 8.1 is required.
+
+```bash
+php -v
+```
+
+```bash
+PHP 8.1.12 (cli) (built: Oct 28 2022 18:35:51) (NTS)
+Copyright (c) The PHP Group
+Zend Engine v4.1.12, Copyright (c) Zend Technologies
+    with Zend OPcache v8.1.12, Copyright (c), by Zend Technologies
+    with Xdebug v3.1.5, Copyright (c) 2002-2022, by Derick Rethans
+```
+
+#### 1.1.2 Composer install
+
+```bash
+composer install
+```
+
+#### 1.1.3 Show version
+
+```bash
+bin/console version:show
+```
+
+```bash
+  Version:         0.33.0
+  License:         Copyright (c) 2022 Björn Hempel
+  Authors:         Björn Hempel <bjoern@hempel.li>
+  PHP Version:     8.1.12
+  Symfony Version: 6.1.7
+```
+
+## 1.2 Clone project, start docker environment and install dependencies
+
+```bash
 ❯ ln -s docker-compose.dev.yml docker-compose.yml
 ❯ docker compose up -d
 ❯ docker compose exec php /etc/init.d/supervisor start
@@ -76,7 +117,7 @@
 ❯ docker compose exec php composer test
 ```
 
-# 2. Documentation
+# 2. API Documentation
 
 * [API - v1](docs/api/README.md)
 
@@ -93,4 +134,4 @@ PHP 8.1.12 (cli) (built: Oct 28 2022 18:32:13) (NTS)
 Copyright (c) The PHP Group
 Zend Engine v4.1.12, Copyright (c) Zend Technologies
     with Zend OPcache v8.1.12, Copyright (c), by Zend Technologies
-```
+```_

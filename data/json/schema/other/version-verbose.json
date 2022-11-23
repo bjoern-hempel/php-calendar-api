@@ -1,0 +1,10 @@
+{
+    "$schema": "version-verbose.schema.json",
+    "version": "0.33.0",
+    "license": "Copyright (c) 2022 Björn Hempel",
+    "authors": [
+        "Björn Hempel <bjoern@hempel.li>"
+    ],
+    "php-version": "8.1.12",
+    "symfony-version": "6.1.7"
+}

@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Constant\Code;
 use App\DataType\Point;
 use App\Service\Entity\PlaceLoaderService;
+use App\Utils\Constants\Code;
 use App\Utils\GPSConverter;
 use CrEOF\Spatial\PHP\Types\Geometry\Point as CrEOFSpatialPHPTypesGeometryPoint;
 use DateTime;

@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Constant\Code;
 use App\DataType\Point;
-use App\Entity\Place;
 use App\Repository\Base\PlaceRepositoryInterface;
 use App\Repository\PlaceARepository;
 use App\Repository\PlaceHRepository;
@@ -28,6 +26,7 @@ use App\Repository\PlaceURepository;
 use App\Repository\PlaceVRepository;
 use App\Service\Entity\PlaceLoaderService;
 use App\Service\LocationDataService;
+use App\Utils\Constants\Code;
 use App\Utils\GPSConverter;
 use DateTime;
 use DateTimeImmutable;
@@ -195,17 +194,17 @@ EOT
         }
 
         $lowestId = 100_000_000;
-        $geonameId = $placeRepository->getHighestGeonameId();
-        $geonameId++;
+        $geoNameId = $placeRepository->getHighestGeonameId();
+        $geoNameId++;
 
-        if ($geonameId < $lowestId) {
-            $geonameId = $lowestId;
+        if ($geoNameId < $lowestId) {
+            $geoNameId = $lowestId;
         }
 
         $point = new Point($latitude, $longitude);
         $place = PlaceLoaderService::getPlace($featureClass);
 
-        $place->setGeonameId($geonameId);
+        $place->setGeonameId($geoNameId);
         $place->setName($name);
         $place->setAsciiName($name);
         $place->setAlternateNames($name);
