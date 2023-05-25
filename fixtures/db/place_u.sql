@@ -1,4 +1,4 @@
--- MariaDB dump 10.19  Distrib 10.7.1-MariaDB, for debian-linux-gnu (x86_64)
+-- MariaDB dump 10.19  Distrib 10.7.7-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: 127.0.0.1    Database: php-calendar-api
 -- ------------------------------------------------------
@@ -46,7 +46,7 @@ CREATE TABLE `place_u` (
   `admin4_code` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   SPATIAL KEY `coordinate_place_u` (`coordinate`)
-) ENGINE=InnoDB AUTO_INCREMENT=678986 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=678989 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -66,7 +66,10 @@ INSERT INTO `place_u` VALUES
 (656178,10345378,'R√•geleje 100 m ude','Rageleje 100 m ude','','\0\0\0\0\0\0\0\"\Z›AÏL@rßt∞˛O(@','U','BKSU','DK','',0,0,-9999,'Europe/Copenhagen','2015-06-22','2022-05-12 16:31:27','2022-05-12 16:31:27','17','270',NULL,NULL),
 (656179,10345379,'Tisvilleleje 100 m ude','Tisvilleleje 100 m ude','','\0\0\0\0\0\0\0∂J∞8L@i∆¢È(@','U','BNKU','DK','',0,0,-9999,'Europe/Copenhagen','2015-06-22','2022-05-12 16:31:28','2022-05-12 16:31:28','17',NULL,NULL,NULL),
 (656180,10345400,'R√∏dvig 100 m ude','Rodvig 100 m ude','','\0\0\0\0\0\0\0j\'˜;†K@ñ	ø‘œÀ(@','U','BNKU','DK','',0,0,-9999,'Europe/Copenhagen','2015-06-22','2022-05-12 16:31:28','2022-05-12 16:31:28','20','336',NULL,NULL),
-(656181,10345413,'Busende have 100 m ude','Busende have 100 m ude','','\0\0\0\0\0\0\0ï∑#úxK@ÕÈ≤òÿ)@','U','BNKU','DK','',0,0,-9999,'Europe/Copenhagen','2017-06-22','2022-05-12 16:31:29','2022-05-12 16:31:29','20','390',NULL,NULL);
+(656181,10345413,'Busende have 100 m ude','Busende have 100 m ude','','\0\0\0\0\0\0\0ï∑#úxK@ÕÈ≤òÿ)@','U','BNKU','DK','',0,0,-9999,'Europe/Copenhagen','2017-06-22','2022-05-12 16:31:29','2022-05-12 16:31:29','20','390',NULL,NULL),
+(678986,2522617,'Graham Island','Graham Island','Banco Graham,Banco Grahm,Ferdinandea Bank,Ferdinandea Island,Giulia-Ferdinandeo Bank,Graham Bank,Graham Island,Graham Shoal,Graham\'s Reef,Graham‚Äôs Reef,Isola Ferdinandea,Isola Giulia,Isola Gi√∫lia,Isola Gullia,Julia Bank,Julia Island','\0\0\0\0\0\0\0C9—ÆBíB@¡ãæÇ4√)@','U','SHLU','IT','',0,0,-9999,'','2021-04-27','2023-05-24 23:13:37','2023-05-24 23:13:37','15',NULL,NULL,NULL),
+(678987,6621072,'Secca Missipezza','Secca Missipezza','','\0\0\0\0\0\0\0àÖZ”ºD@G ^◊/x2@','U','SHLU','IT','',0,0,-9999,'Europe/Rome','2008-01-05','2023-05-25 01:39:13','2023-05-25 01:39:13','13','LE',NULL,NULL),
+(678988,7534683,'Faraglioni','Faraglioni','','\0\0\0\0\0\0\0ËŸ¨˙\\ED@˝ˆu‡úÅ,@','U','PKSU','IT','',0,0,-9999,'Europe/Rome','2010-09-11','2023-05-25 01:54:48','2023-05-25 01:54:48','04',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `place_u` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
