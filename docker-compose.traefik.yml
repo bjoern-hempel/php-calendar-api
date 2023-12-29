@@ -24,11 +24,16 @@ services:
     labels:
       # enable
       - "traefik.enable=true"
+      # middleware -> domain redirect
+      - "traefik.http.middlewares.php-8-0-12-apache-calendar-ixno-de-redirect.redirectregex.regex=^https?://www\\.twelvepics\\.com/(.*)"
+      - "traefik.http.middlewares.php-8-0-12-apache-calendar-ixno-de-redirect.redirectregex.replacement=https://twelvepics.com/$${1}"
+      - "traefik.http.middlewares.php-8-0-12-apache-calendar-ixno-de-redirect.redirectregex.permanent=true"
       # calendar.ixno.de
-      - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.rule=Host(`${GENERAL_URL}`)"
+      - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.rule=Host(`${GENERAL_URL}`) || Host(`www.${GENERAL_URL}`)"
       - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.entrypoints=websecure"
       - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.tls=true"
       - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.tls.certresolver=letsencryptresolver"
+      - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.middlewares=php-8-0-12-apache-calendar-ixno-de-redirect"
       - "traefik.http.routers.php-8-0-12-apache-calendar-ixno-de.service=lb-php-8-0-12-apache-calendar-ixno-de"
       # load balancer
       - "traefik.http.services.lb-php-8-0-12-apache-calendar-ixno-de.loadbalancer.server.port=443"
